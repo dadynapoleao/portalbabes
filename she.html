@@ -333,7 +333,7 @@
             }
         }
 
-        async function loadRelatedVideos(actressId) {
+       async function loadRelatedVideos(actressId) {
             const videosSection = document.getElementById('actress-videos');
             if (!videosSection) {
                 console.error("Elemento 'actress-videos' não encontrado.");
@@ -344,11 +344,13 @@
             try {
                 const querySnapshot = await getDocs(videosQuery);
                 let videosHTML = '';
-                querySnapshot.forEach((doc) => {
+                for (const doc of querySnapshot.docs) { // Usar loop for...of para async/await dentro do loop
                     const videoData = doc.data();
                     const videoNome = videoData.nome;
                     const videoImagem = videoData.imagem;
                     const videoPagina = videoData.pagina;
+                    const actressIds = videoData.atores || []; // Garantir que 'atores' é um array, mesmo que ausente
+                    const actressCount = actressIds.length;
 
                     videosHTML += `
                         <div class="video-card">
@@ -357,13 +359,40 @@
                                 <h3>${videoNome}</h3>
                                 <a href="${videoPagina}" target="_blank" class="video-link-button">Ver Vídeo</a>
                             </div>
+                            <div class="video-actress-icons-container">
+                                ${actressCount > 1 ? `
+                                    <div class="silhouette-icon" data-video-id="${doc.id}"></div>
+                                    <div class="actress-icons-list" id="actress-icons-list-${doc.id}">
+                                        <!-- Ícones de atrizes serão adicionados aqui -->
+                                    </div>
+                                `: ''}
+                            </div>
                         </div>
                     `;
-                });
+                }
                 videosSection.innerHTML += videosHTML; // Adicionar vídeos à seção
                 if (videosHTML === '') {
                     videosSection.innerHTML += '<p>Nenhum vídeo relacionado encontrado.</p>'; // Mensagem se não houver vídeos
                 }
+
+                // Adicionar event listeners para ícones de silhueta APÓS os vídeos serem adicionados ao DOM
+                querySnapshot.forEach(doc => {
+                    const actressIds = doc.data().atores || [];
+                    if (actressIds.length > 1) {
+                        const silhouetteIcon = document.querySelector(`.silhouette-icon[data-video-id="${doc.id}"]`);
+                        const actressIconsList = document.getElementById(`actress-icons-list-${doc.id}`);
+
+                        if (silhouetteIcon && actressIconsList) {
+                            silhouetteIcon.addEventListener('click', function() {
+                                actressIconsList.classList.toggle('show');
+                            });
+
+                            // Carregar ícones de atrizes dentro da lista
+                            loadActressIcons(actressIconsList, actressIds);
+                        }
+                    }
+                });
+
 
             } catch (error) {
                 console.error("Erro ao buscar vídeos relacionados:", error);
@@ -371,6 +400,31 @@
             }
         }
 
+        async function loadActressIcons(iconsListContainer, actressIds) {
+            let actressIconsHTML = '';
+            for (const actressId of actressIds) {
+                try {
+                    const actressDoc = await getDoc(doc(db, "atores", actressId));
+                    if (actressDoc.exists()) {
+                        const actressData = actressDoc.data();
+                        const actressNome = actressData.nome;
+                        const actressFoto = actressData.foto;
+
+                        actressIconsHTML += `
+                            <a href="she.html?id=${actressId}" class="actress-icon-link">
+                                <div class="actress-icon">
+                                    <img src="${actressFoto}" alt="${actressNome}">
+                                </div>
+                            </a>
+                        `;
+                    }
+                } catch (error) {
+                    console.error("Erro ao carregar ícone de atriz:", error);
+                    // Em caso de erro ao carregar um ícone, pode adicionar um ícone de fallback ou ignorar
+                }
+            }
+            iconsListContainer.innerHTML = actressIconsHTML; // Adicionar ícones ao container
+        }
 
         // Carregar os detalhes da atriz quando a página for carregada
         loadActressDetails();
