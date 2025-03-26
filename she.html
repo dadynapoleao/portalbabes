@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalhes da Atriz</title>
     <style>
-        /* Estilos CSS para she.html (consistente com index.html) */
+        /* Estilos CSS para she.html com layout de 3 colunas */
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
             background-color: #121212;
             color: #e0e0e0;
-            line-height: 1.6; /* Melhor legibilidade para texto */
+            line-height: 1.6;
         }
 
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
@@ -22,7 +22,7 @@
             color: #fff;
             padding: 2em 0;
             text-align: center;
-            margin-bottom: 30px; /* Mais margem inferior */
+            margin-bottom: 30px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
@@ -34,148 +34,238 @@
         }
 
         .actress-details-container {
-            max-width: 900px;
+            max-width: 1200px; /* Aumentar max-width para acomodar 3 colunas */
             margin: 20px auto;
             background-color: #242424;
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
             padding: 30px;
+            display: grid; /* Layout Grid */
+            grid-template-columns: repeat(3, 1fr); /* 3 colunas de igual largura */
+            gap: 30px; /* Espaçamento entre colunas */
         }
+
+        .column { /* Estilo para cada coluna */
+            padding: 20px;
+        }
+
+        .column:first-child { /* Estilo específico para a primeira coluna (informações da atriz) */
+            /* Pode adicionar estilos específicos se necessário */
+        }
+
+        .column:nth-child(2) { /* Estilo específico para a segunda coluna (vídeos) */
+            /* Pode adicionar estilos específicos se necessário */
+        }
+
+        .column:last-child { /* Estilo específico para a terceira coluna (vazia/futuro) */
+            /* Pode adicionar estilos específicos se necessário */
+        }
+
 
         .actress-image-container {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px; /* Reduzir margem inferior na coluna */
         }
 
         .actress-image-container img {
             max-width: 100%;
             height: auto;
-            border-radius: 12px; /* Imagem também arredondada */
+            border-radius: 12px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
 
         .actress-info-section {
             margin-bottom: 20px;
             padding-bottom: 20px;
-            border-bottom: 1px solid #333; /* Separador entre seções */
+            border-bottom: 1px solid #333;
         }
 
         .actress-info-section:last-child {
-            border-bottom: none; /* Remove o separador da última seção */
-            margin-bottom: 0; /* Remove margem inferior da última seção */
-            padding-bottom: 0; /* Remove padding inferior da última seção */
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
         }
 
         .actress-info-section h2 {
             color: #fff;
             font-size: 2em;
             margin-top: 0;
-            margin-bottom: 20px;
-            font-weight: normal; /* Peso da fonte normal para o nome da atriz */
-            text-align: center; /* Nome da atriz centralizado */
+            margin-bottom: 15px; /* Reduzir margem inferior do título */
+            font-weight: normal;
+            text-align: left; /* Alinhar título da seção à esquerda na coluna */
         }
 
 
         .detail-row {
             display: flex;
-            margin-bottom: 10px;
+            margin-bottom: 8px; /* Reduzir margem inferior das linhas de detalhe */
         }
 
         .detail-label {
             font-weight: bold;
             color: #bbb;
-            width: 150px; /* Largura fixa para os labels */
-            margin-right: 15px;
-            text-align: right; /* Alinhar labels à direita */
+            width: 120px; /* Reduzir largura dos labels */
+            margin-right: 10px; /* Reduzir margem direita dos labels */
+            text-align: right;
+            font-size: 0.95em; /* Reduzir tamanho da fonte dos labels */
         }
 
         .detail-value {
             color: #e0e0e0;
+            font-size: 0.95em; /* Reduzir tamanho da fonte dos valores */
+        }
+
+        /* Estilos para a seção de vídeos */
+        .videos-section {
+            margin-top: 20px; /* Adicionar margem superior para separar dos detalhes da atriz */
+        }
+
+        .videos-section h2 {
+            color: #fff;
+            font-size: 2em;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-weight: normal;
+            text-align: left;
+        }
+
+        .video-card {
+            background-color: #333; /* Cor de fundo para os cards de vídeo */
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .video-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .video-info {
+            padding: 15px;
+        }
+
+        .video-info h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.2em;
+            color: #fff;
+        }
+
+        .video-link-button {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #5cb85c; /* Cor verde para botão */
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease;
+        }
+
+        .video-link-button:hover {
+            background-color: #4cae4c; /* Verde mais escuro no hover */
         }
     </style>
 </head>
 <body>
     <header>
-        <h1 id="actress-name-header">Detalhes da Atriz</h1> <!-- Título dinâmico será atualizado com o nome da atriz -->
+        <h1 id="actress-name-header">Detalhes da Atriz</h1>
     </header>
 
     <div class="actress-details-container" id="actress-details">
-        <!-- Detalhes da atriz serão carregados aqui pelo JavaScript -->
-        <div class="actress-image-container">
-            <img src="" alt="Imagem da Atriz" id="actress-foto">
+        <!-- Coluna 1: Informações da Atriz -->
+        <div class="column">
+            <div class="actress-image-container">
+                <img src="" alt="Imagem da Atriz" id="actress-foto">
+            </div>
+
+            <div class="actress-info-section">
+                <h2 id="actress-nome"></h2>
+            </div>
+
+            <div class="actress-info-section">
+                <h3>Informações Pessoais</h3>
+                <div class="detail-row">
+                    <div class="detail-label">Nome:</div>
+                    <div class="detail-value" id="actress-nome-detail"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Data de Nascimento:</div>
+                    <div class="detail-value" id="actress-dataNascimento"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Etnia:</div>
+                    <div class="detail-value" id="actress-etnia"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">País:</div>
+                    <div class="detail-value" id="actress-pais"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Idade:</div>
+                    <div class="detail-value" id="actress-idade"></div>
+                </div>
+            </div>
+
+            <div class="actress-info-section">
+                <h3>Características Físicas</h3>
+                <div class="detail-row">
+                    <div class="detail-label">Altura:</div>
+                    <div class="detail-value" id="actress-altura"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Peso:</div>
+                    <div class="detail-value" id="actress-peso"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Cor do Cabelo:</div>
+                    <div class="detail-value" id="actress-corCabelo"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Cor dos Olhos:</div>
+                    <div class="detail-value" id="actress-corOlhos"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Medidas:</div>
+                    <div class="detail-value" id="actress-medidas"></div>
+                </div>
+                 <div class="detail-row">
+                    <div class="detail-label">Tipo Corpo:</div>
+                    <div class="detail-value" id="actress-tipoCorpo"></div>
+                </div>
+            </div>
+
+             <div class="actress-info-section">
+                <h3>Outros Detalhes</h3>
+                <div class="detail-row">
+                    <div class="detail-label">Nota:</div>
+                    <div class="detail-value" id="actress-nota"></div>
+                </div>
+            </div>
         </div>
 
-        <div class="actress-info-section">
-            <h2 id="actress-nome"></h2> <!-- Nome da atriz -->
+        <!-- Coluna 2: Vídeos Relacionados -->
+        <div class="column" id="actress-videos-column">
+            <section class="videos-section" id="actress-videos">
+                <h2>Vídeos Relacionados</h2>
+                <!-- Vídeos serão adicionados aqui pelo JavaScript -->
+            </section>
         </div>
 
-        <div class="actress-info-section">
-            <h3>Informações Pessoais</h3>
-            <div class="detail-row">
-                <div class="detail-label">Nome:</div>
-                <div class="detail-value" id="actress-nome-detail"></div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">Data de Nascimento:</div>
-                <div class="detail-value" id="actress-dataNascimento"></div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">Etnia:</div>
-                <div class="detail-value" id="actress-etnia"></div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">País:</div>
-                <div class="detail-value" id="actress-pais"></div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">Idade:</div>
-                <div class="detail-value" id="actress-idade"></div>
-            </div>
-        </div>
-
-        <div class="actress-info-section">
-            <h3>Características Físicas</h3>
-            <div class="detail-row">
-                <div class="detail-label">Altura:</div>
-                <div class="detail-value" id="actress-altura"></div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">Peso:</div>
-                <div class="detail-value" id="actress-peso"></div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">Cor do Cabelo:</div>
-                <div class="detail-value" id="actress-corCabelo"></div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">Cor dos Olhos:</div>
-                <div class="detail-value" id="actress-corOlhos"></div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">Medidas:</div>
-                <div class="detail-value" id="actress-medidas"></div>
-            </div>
-        </div>
-
-         <div class="actress-info-section">
-            <h3>Outros Detalhes</h3>
-            <div class="detail-row">
-                <div class="detail-label">Nota:</div>
-                <div class="detail-value" id="actress-nota"></div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">Timestamp:</div>
-                <div class="detail-value" id="actress-timestamp"></div>
-            </div>
+        <!-- Coluna 3: Espaço Reservado (Vazia por enquanto) -->
+        <div class="column">
+            <!-- Pode adicionar conteúdo adicional aqui no futuro -->
         </div>
 
     </div>
 
-    <!-- Firebase Modular SDKs via CDN e script para carregar detalhes da atriz -->
+    <!-- Firebase Modular SDKs via CDN e script para carregar detalhes da atriz e vídeos -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, doc, getDoc, collection, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         // Suas configurações do Firebase (cole aqui as suas configurações)
         const firebaseConfig = {
@@ -208,25 +298,28 @@
 
                 if (docSnap.exists()) {
                     const actressData = docSnap.data();
-                    console.log("Dados da atriz:", actressData); // Para debugging
+                    console.log("Dados da atriz:", actressData);
 
-                    // Atualizar os elementos HTML com os dados da atriz
-                    document.getElementById('actress-name-header').textContent = `Detalhes de ${actressData.nome}`; // Título do header
-                    document.getElementById('actress-nome').textContent = actressData.nome; // Nome no cabeçalho da seção de info
-                    document.getElementById('actress-nome-detail').textContent = actressData.nome; // Nome detalhado
-                    document.getElementById('actress-foto').src = actressData.foto; // Imagem
-                    document.getElementById('actress-foto').alt = actressData.nome; // Alt da imagem
-                    document.getElementById('actress-altura').textContent = actressData.altura || 'N/A'; // Altura
-                    document.getElementById('actress-corCabelo').textContent = actressData.corCabelo || 'N/A'; // Cor do Cabelo
-                    document.getElementById('actress-corOlhos').textContent = actressData.corOlhos || 'N/A'; // Cor dos Olhos
-                    document.getElementById('actress-dataNascimento').textContent = actressData.dataNascimento || 'N/A'; // Data de Nascimento
-                    document.getElementById('actress-etnia').textContent = actressData.etnia || 'N/A'; // Etnia
-                    document.getElementById('actress-idade').textContent = actressData.idade || 'N/A'; // Idade
-                    document.getElementById('actress-medidas').textContent = actressData.medidas || 'N/A'; // Medidas
-                    document.getElementById('actress-nota').textContent = actressData.nota || 'N/A'; // Nota
-                    document.getElementById('actress-pais').textContent = actressData.pais || 'N/A'; // País
-                    document.getElementById('actress-peso').textContent = actressData.peso || 'N/A'; // Peso
-                    document.getElementById('actress-timestamp').textContent = actressData.timestamp || 'N/A'; // Timestamp
+                    // Atualizar os elementos HTML com os dados da atriz (Coluna 1)
+                    document.getElementById('actress-name-header').textContent = `Detalhes de ${actressData.nome}`;
+                    document.getElementById('actress-nome').textContent = actressData.nome;
+                    document.getElementById('actress-nome-detail').textContent = actressData.nome;
+                    document.getElementById('actress-foto').src = actressData.foto;
+                    document.getElementById('actress-foto').alt = actressData.nome;
+                    document.getElementById('actress-altura').textContent = actressData.altura || 'N/A';
+                    document.getElementById('actress-corCabelo').textContent = actressData.corCabelo || 'N/A';
+                    document.getElementById('actress-corOlhos').textContent = actressData.corOlhos || 'N/A';
+                    document.getElementById('actress-dataNascimento').textContent = actressData.dataNascimento || 'N/A';
+                    document.getElementById('actress-etnia').textContent = actressData.etnia || 'N/A';
+                    document.getElementById('actress-idade').textContent = actressData.idade || 'N/A';
+                    document.getElementById('actress-medidas').textContent = actressData.medidas || 'N/A';
+                    document.getElementById('actress-nota').textContent = actressData.nota || 'N/A';
+                    document.getElementById('actress-pais').textContent = actressData.pais || 'N/A';
+                    document.getElementById('actress-peso').textContent = actressData.peso || 'N/A';
+                    document.getElementById('actress-tipoCorpo').textContent = actressData.tipoCorpo || 'N/A';
+
+                    // Carregar vídeos relacionados (Coluna 2)
+                    loadRelatedVideos(actressId);
 
 
                 } else {
@@ -239,6 +332,45 @@
                 document.getElementById('actress-details').innerHTML = '<p>Erro ao carregar detalhes da atriz.</p>';
             }
         }
+
+        async function loadRelatedVideos(actressId) {
+            const videosSection = document.getElementById('actress-videos');
+            if (!videosSection) {
+                console.error("Elemento 'actress-videos' não encontrado.");
+                return;
+            }
+
+            const videosQuery = query(collection(db, "videos"), where("atores", "array-contains", actressId)); // Consulta para vídeos da atriz
+            try {
+                const querySnapshot = await getDocs(videosQuery);
+                let videosHTML = '';
+                querySnapshot.forEach((doc) => {
+                    const videoData = doc.data();
+                    const videoNome = videoData.nome;
+                    const videoImagem = videoData.imagem;
+                    const videoPagina = videoData.pagina;
+
+                    videosHTML += `
+                        <div class="video-card">
+                            <img src="${videoImagem}" alt="${videoNome}">
+                            <div class="video-info">
+                                <h3>${videoNome}</h3>
+                                <a href="${videoPagina}" target="_blank" class="video-link-button">Ver Vídeo</a>
+                            </div>
+                        </div>
+                    `;
+                });
+                videosSection.innerHTML += videosHTML; // Adicionar vídeos à seção
+                if (videosHTML === '') {
+                    videosSection.innerHTML += '<p>Nenhum vídeo relacionado encontrado.</p>'; // Mensagem se não houver vídeos
+                }
+
+            } catch (error) {
+                console.error("Erro ao buscar vídeos relacionados:", error);
+                videosSection.innerHTML = '<p>Erro ao carregar vídeos relacionados.</p>';
+            }
+        }
+
 
         // Carregar os detalhes da atriz quando a página for carregada
         loadActressDetails();
