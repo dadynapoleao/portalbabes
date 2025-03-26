@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalhes da Atriz</title>
     <style>
-        /* Estilos CSS para she.html com layout de 3 colunas */
+        /* Estilos CSS para she.html com layout de 3 colunas e ícones de vídeo */
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
@@ -136,6 +136,7 @@
             overflow: hidden;
             margin-bottom: 15px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative; /* Adicionar para posicionar o ícone de silhueta relativamente ao card */
         }
 
         .video-card img {
@@ -168,6 +169,89 @@
         .video-link-button:hover {
             background-color: #4cae4c; /* Verde mais escuro no hover */
         }
+
+        /* Estilos para o ícone de silhueta e container de atrizes */
+        .video-actress-icons-container {
+            position: absolute; /* Posicionamento absoluto dentro de .video-card */
+            bottom: 10px;
+            right: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .silhouette-icon {
+            width: 30px;
+            height: 30px;
+            background-color: #666; /* Cor de fundo para o ícone de silhueta */
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            font-size: 1.2em; /* Tamanho do ícone */
+            margin-left: 5px; /* Espaçamento entre o texto e os ícones de atrizes */
+            transition: background-color 0.3s ease;
+             overflow: hidden; /* Garante que o conteúdo interno não vaze */
+        }
+
+        .silhouette-icon:hover {
+            background-color: #777;
+        }
+
+        .silhouette-icon::before { /* Simples silhueta com ::before pseudo-elemento (pode usar uma imagem SVG se preferir) */
+            content: "\\2640"; /* Unicode para símbolo feminino ♀ */
+            display: block;
+        }
+
+
+        .actress-icons-list {
+            display: none; /* Inicialmente escondido */
+            background-color: rgba(0, 0, 0, 0.8); /* Fundo semi-transparente para os ícones */
+            border-radius: 5px;
+            padding: 5px;
+            position: absolute; /* Posicionado relativamente ao .video-actress-icons-container */
+            bottom: 100%; /* Posicionar acima do ícone de silhueta */
+            right: 0;
+            z-index: 10; /* Garantir que está acima de outros elementos */
+            flex-direction: column; /* Ícones em coluna */
+            align-items: flex-end; /* Alinhar ícones à direita */
+        }
+
+        .actress-icons-list.show {
+            display: flex; /* Mostrar quando a classe 'show' for adicionada */
+        }
+
+        .actress-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-bottom: 5px;
+            cursor: pointer;
+            border: 2px solid transparent; /* Borda transparente por padrão */
+            transition: border-color 0.3s ease;
+            overflow: hidden; /* Para imagens arredondadas */
+        }
+
+        .actress-icon:last-child {
+            margin-bottom: 0; /* Remover margem inferior do último ícone */
+        }
+
+        .actress-icon:hover {
+            border-color: #fff; /* Borda branca no hover */
+        }
+
+        .actress-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Preencher o container circular */
+            display: block;
+        }
+
+        .actress-icon-link {
+            display: block; /* Fazer o link ocupar todo o espaço do ícone */
+        }
+
     </style>
 </head>
 <body>
@@ -333,7 +417,7 @@
             }
         }
 
-       async function loadRelatedVideos(actressId) {
+        async function loadRelatedVideos(actressId) {
             const videosSection = document.getElementById('actress-videos');
             if (!videosSection) {
                 console.error("Elemento 'actress-videos' não encontrado.");
@@ -425,6 +509,7 @@
             }
             iconsListContainer.innerHTML = actressIconsHTML; // Adicionar ícones ao container
         }
+
 
         // Carregar os detalhes da atriz quando a página for carregada
         loadActressDetails();
