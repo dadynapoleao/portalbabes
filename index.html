@@ -3,59 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Site de Atrizes</title>
+    <title>Site de Atrizes - Homepage</title>
     <style>
-        /* Estilos CSS para a homepage */
+        /* Estilos CSS Modernos */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif; /* Fonte moderna do Google Fonts */
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
+            background-color: #121212; /* Fundo mais escuro para um visual moderno */
+            color: #e0e0e0; /* Cor do texto mais clara para contraste */
         }
 
+        /* Importar a fonte Roboto do Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
         header {
-            background-color: #333;
+            background-color: #1e1e1e; /* Cabeçalho ligeiramente mais claro que o fundo */
             color: #fff;
-            padding: 1em 0;
+            padding: 2em 0; /* Mais padding vertical */
             text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Sombra suave no cabeçalho */
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 700; /* Negrito para o título */
+            letter-spacing: 0.5px; /* Espaçamento entre letras */
         }
 
         .actresses-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Layout responsivo com colunas de no mínimo 200px */
-            gap: 20px;
-            padding: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Cards um pouco maiores */
+            gap: 25px; /* Mais espaçamento entre os cards */
+            padding: 30px;
             max-width: 1200px;
             margin: 20px auto;
         }
 
         .actress-card {
-            background-color: #fff;
-            border-radius: 8px;
+            background-color: #242424; /* Card mais escuro para integrar com o fundo */
+            border-radius: 12px; /* Bordas mais arredondadas */
             overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Sombra mais pronunciada no card */
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transições suaves */
+        }
+
+        .actress-card:hover {
+            transform: translateY(-5px); /* Efeito de elevação ao passar o mouse */
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4); /* Sombra mais intensa no hover */
         }
 
         .actress-card img {
             width: 100%;
-            height: auto;
-            display: block; /* Evita espaço extra abaixo da imagem */
+            height: 250px; /* Altura fixa para as imagens, pode ajustar conforme necessário */
+            object-fit: cover; /* Assegura que a imagem preenche o espaço sem distorcer */
+            display: block;
         }
 
         .actress-info {
-            padding: 15px;
+            padding: 20px;
             text-align: center;
         }
 
         .actress-info h3 {
-            margin: 0 0 10px 0;
+            margin: 0 0 15px 0;
+            font-size: 1.4em;
+            font-weight: normal; /* Peso da fonte normal para o nome */
+            color: #fff; /* Nome da atriz em branco */
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>Bem-vindos ao Site de Atrizes</h1>
+        <h1>Últimas Atrizes Adicionadas</h1>
     </header>
 
     <div class="actresses-container" id="actresses-list">
