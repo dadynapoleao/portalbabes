@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site de Atrizes</title>
+    <style>
+        /* Estilos CSS para a homepage */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 1em 0;
+            text-align: center;
+        }
+
+        .actresses-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Layout responsivo com colunas de no mínimo 200px */
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+
+        .actress-card {
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .actress-card img {
+            width: 100%;
+            height: auto;
+            display: block; /* Evita espaço extra abaixo da imagem */
+        }
+
+        .actress-info {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .actress-info h3 {
+            margin: 0 0 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Bem-vindos ao Site de Atrizes</h1>
+    </header>
+
+    <div class="actresses-container" id="actresses-list">
+        <!-- As cartas das atrizes serão adicionadas aqui pelo JavaScript -->
+    </div>
+
+    <script type="module">
+        // Importe as funções necessárias do Firebase SDK
+        import { initializeApp } from "firebase/app";
+        import { getFirestore, collection, getDocs, query, orderBy, limit } from "firebase/firestore";
+
+        // Suas configurações do Firebase (cole aqui as suas configurações)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0",
+            authDomain: "babes-392fd.firebaseapp.com",
+            projectId: "babes-392fd",
+            storageBucket: "babes-392fd.appspot.com",
+            messagingSenderId: "376795361631",
+            appId: "1:376795361631:web:d662f2b2f2cd23b115c6ea"
+        };
+
+        // Inicialize o Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app); // Inicialize o Firestore
+
+        async function loadLatestActresses() {
+            const actressesListElement = document.getElementById('actresses-list');
+            if (!actressesListElement) {
+                console.error("Element with ID 'actresses-list' not found");
+                return;
+            }
+
+            // Consulta para obter as últimas 15 atrizes, ordenadas por data de criação (por padrão, descendente)
+            const actressesQuery = query(collection(db, "atores"), orderBy("__name__", "desc"), limit(15)); // Ordenando por nome do documento em ordem decrescente para simular "últimas"
+
+            try {
+                const querySnapshot = await getDocs(actressesQuery);
+                let actressesHTML = '';
+                querySnapshot.forEach((doc) => {
+                    // doc.data() é um objeto com os campos do documento
+                    const actressData = doc.data();
+                    const nome = actressData.nome;
+                    const foto = actressData.foto; // Assumindo que 'foto' é a URL da imagem
+
+                    // Crie o HTML para cada card de atriz
+                    actressesHTML += `
+                        <div class="actress-card">
+                            <img src="${foto}" alt="${nome}">
+                            <div class="actress-info">
+                                <h3>${nome}</h3>
+                            </div>
+                        </div>
+                    `;
+                });
+                actressesListElement.innerHTML = actressesHTML; // Insira o HTML gerado no container
+            } catch (error) {
+                console.error("Erro ao buscar atrizes do Firestore:", error);
+                actressesListElement.innerHTML = '<p>Erro ao carregar as atrizes.</p>';
+            }
+        }
+
+        // Carregue as atrizes quando a página for carregada
+        loadLatestActresses();
+    </script>
+</body>
+</html>
