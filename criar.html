@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- === TÍTULO DA NOVA PÁGINA === -->
+    <title>Criar Nova Atriz</title>
+    <style>
+        /* === COLE EXATAMENTE O MESMO BLOCO CSS DA PÁGINA PRINCIPAL AQUI === */
+        /* Copie todo o conteúdo da tag <style>...</style> da sua página principal */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #e0e0e0;
+            position: relative; /* Mantido caso use popups aqui também */
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+        /* Estilos do Menu (copiados da página principal) */
+        .main-nav {
+            background-color: #1f1f1f;
+            padding: 0.8em 30px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            text-align: right;
+        }
+        .main-nav ul { list-style: none; margin: 0; padding: 0; }
+        .main-nav li { display: inline-block; margin-left: 20px; }
+        .main-nav a { color: #e0e0e0; text-decoration: none; font-size: 1.1em; padding: 5px 10px; border-radius: 4px; transition: background-color 0.2s ease, color 0.2s ease; }
+        .main-nav a:hover { background-color: #bb86fc; color: #121212; }
+
+        /* Estilos do Header (copiados da página principal) */
+        header {
+            background-color: #1e1e1e;
+            color: #fff;
+            padding: 2em 0;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+         header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* === ESTILOS PARA O CONTAINER DE CONTEÚDO DA PÁGINA CRIAR === */
+        .content-container {
+            max-width: 800px; /* Largura máxima para o formulário */
+            margin: 40px auto; /* Centraliza e adiciona margem */
+            padding: 30px;
+            background-color: #242424; /* Fundo similar aos cards */
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+         /* Adicione estilos para formulários aqui quando precisar */
+        .content-container label {
+             display: block;
+             margin-bottom: 8px;
+             color: #aaa;
+         }
+         .content-container input[type="text"],
+         .content-container input[type="url"],
+         .content-container input[type="number"],
+         .content-container textarea {
+             width: 100%;
+             padding: 12px;
+             margin-bottom: 15px;
+             background-color: #333;
+             border: 1px solid #555;
+             border-radius: 6px;
+             color: #e0e0e0;
+             box-sizing: border-box;
+         }
+         .content-container input:focus,
+         .content-container textarea:focus {
+            outline: none;
+            border-color: #bb86fc;
+            box-shadow: 0 0 5px rgba(187, 134, 252, 0.5);
+         }
+         .content-container button {
+            background-color: #bb86fc;
+             color: #121212;
+             padding: 12px 25px;
+             border: none;
+             border-radius: 6px;
+             font-size: 1.1em;
+             font-weight: bold;
+             cursor: pointer;
+             transition: background-color 0.2s ease;
+         }
+         .content-container button:hover {
+             background-color: #a772e3;
+         }
+
+        /* === REMOVA ESTILOS NÃO USADOS NESTA PÁGINA (Opcional, mas bom para limpeza) === */
+        /* Por exemplo, .actresses-container, .actress-card, popup styles podem ser removidos
+           SE você tem certeza que não os usará nesta página específica.
+           Por simplicidade agora, vamos manter todos, pois não causam problemas. */
+
+    </style>
+</head>
+<body>
+
+    <!-- === MENU DE NAVEGAÇÃO (O mesmo da página principal) === -->
+    <nav class="main-nav">
+        <ul>
+            <li><a href="index.html">Home</a></li> <!-- Ajuste o nome se for diferente -->
+            <li><a href="criar.html">Criar</a></li>
+        </ul>
+    </nav>
+    <!-- === FIM MENU === -->
+
+    <header>
+        <!-- === TÍTULO ESPECÍFICO DA PÁGINA === -->
+        <h1>Criar Nova Atriz</h1>
+    </header>
+
+    <!-- === ÁREA DE CONTEÚDO PRINCIPAL === -->
+    <main>
+        <div class="content-container">
+            <h2>Formulário de Criação</h2>
+            <p>Aqui você poderá adicionar os campos para criar uma nova atriz.</p>
+
+            <!-- Exemplo de como o formulário poderia começar -->
+            <form id="create-actress-form">
+                <div>
+                    <label for="nome">Nome:</label>
+                    <input type="text" id="nome" name="nome" required>
+                </div>
+                <div>
+                    <label for="foto">URL da Foto:</label>
+                    <input type="url" id="foto" name="foto" required>
+                </div>
+                <div>
+                    <label for="pais">País:</label>
+                    <input type="text" id="pais" name="pais">
+                </div>
+                 <div>
+                    <label for="nota">Nota (0-10):</label>
+                    <input type="number" id="nota" name="nota" min="0" max="10" step="0.1">
+                </div>
+                
+                <button type="submit">Salvar Atriz</button>
+            </form>
+            
+        </div>
+    </main>
+    <!-- === FIM ÁREA DE CONTEÚDO === -->
+
+    <!-- Não precisamos do script de carregar atrizes ou do popup aqui (a menos que queira funcionalidades específicas) -->
+    <!-- Se precisar de JS para o formulário, adicione um novo script aqui -->
+    <!-- <script type="module">
+        // Importar o necessário do Firebase para ADICIONAR dados
+        // import { getFirestore, collection, addDoc } from '...';
+
+        // Lógica para pegar dados do formulário e salvar no Firestore
+    </script> -->
+
+</body>
+</html>
