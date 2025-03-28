@@ -7,16 +7,14 @@
     <style>
         /* === COLE EXATAMENTE O MESMO BLOCO CSS DA PÁGINA index.html AQUI === */
         /* Incluindo body, @import, .main-nav, header, etc. */
-        /* ... (Todo o CSS de index.html vai aqui) ... */
 
-        /* --- Garanta que todo o CSS do index.html esteja aqui --- */
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
             background-color: #121212;
             color: #e0e0e0;
-            position: relative; 
+            position: relative;
         }
 
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
@@ -34,9 +32,9 @@
 
         /* Estilos para o Container de Conteúdo */
         .content-container {
-            max-width: 800px;
+            max-width: 1000px; /* Aumentado um pouco para caber mais cards lado a lado */
             margin: 40px auto;
-            padding: 30px 40px; /* Aumentado padding lateral */
+            padding: 30px 40px;
             background-color: #242424;
             border-radius: 12px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
@@ -49,37 +47,63 @@
             font-weight: normal;
         }
 
-         /* Estilos para Formulários */
-         .form-group {
-             margin-bottom: 20px; /* Espaçamento entre grupos de label/input */
-         }
+        /* --- ESTILOS DO FORMULÁRIO COM CARDS --- */
 
-         .content-container label {
+        /* Container Flex para os cards (o próprio form) */
+        #create-actress-form {
+            display: flex; /* Ativa o Flexbox */
+            flex-wrap: wrap; /* Permite que os itens quebrem para a próxima linha */
+            gap: 16px; /* Espaço entre os cards */
+            margin-bottom: 30px; /* Espaço antes do botão de submit */
+        }
+
+        /* Estilo do Card Individual (era .form-group) */
+        .form-card {
+            background-color: #333; /* Fundo do card */
+            padding: 18px; /* Espaçamento interno do card */
+            border-radius: 8px; /* Bordas arredondadas */
+            border: 1px solid #444; /* Borda sutil */
+            /* Controle de Largura: flex-basis define o tamanho base, grow/shrink permitem ajuste */
+            flex-basis: calc(50% - 8px); /* Base para 2 colunas (50% menos metade do gap) */
+            flex-grow: 1; /* Permite que o card cresça se houver espaço */
+            box-sizing: border-box; /* Padding e borda incluídos na largura/altura */
+            min-width: 250px; /* Largura mínima para evitar cards muito estreitos */
+        }
+
+        /* Card de Largura Total (para Textarea, por exemplo) */
+        .form-card.full-width {
+            flex-basis: 100%; /* Ocupa a largura total */
+        }
+
+
+        .content-container label {
              display: block;
-             margin-bottom: 8px;
-             color: #b0b0b0; /* Cor do label um pouco mais clara */
-             font-size: 0.95em;
+             margin-bottom: 10px; /* Espaço maior abaixo do label */
+             color: #b0b0b0;
+             font-size: 0.9em; /* Label ligeiramente menor */
+             font-weight: bold;
          }
 
+         /* Inputs e Textarea dentro dos cards */
          .content-container input[type="text"],
          .content-container input[type="url"],
          .content-container input[type="number"],
          .content-container textarea {
              width: 100%;
-             padding: 12px 15px; /* Ajustado padding */
-             /* margin-bottom: 15px; */ /* Removido - espaçamento agora no .form-group */
-             background-color: #333;
+             padding: 10px 12px; /* Padding interno dos inputs */
+             background-color: #404040; /* Fundo do input ligeiramente diferente do card */
              border: 1px solid #555;
-             border-radius: 6px;
+             border-radius: 5px;
              color: #e0e0e0;
-             box-sizing: border-box; /* Importante! */
-             font-size: 1em; /* Tamanho de fonte consistente */
-             transition: border-color 0.2s ease, box-shadow 0.2s ease; /* Transição suave */
+             box-sizing: border-box;
+             font-size: 1em;
+             transition: border-color 0.2s ease, box-shadow 0.2s ease;
+             margin-bottom: 0; /* Remover margem inferior do input, espaço é controlado pelo card/gap */
          }
-         /* Aplica estilo especificamente para textarea também */
+
          .content-container textarea {
-             min-height: 100px; /* Altura mínima para a caixa de texto */
-             resize: vertical; /* Permite redimensionamento vertical */
+             min-height: 120px;
+             resize: vertical;
          }
 
 
@@ -87,19 +111,24 @@
          .content-container textarea:focus {
             outline: none;
             border-color: #bb86fc;
-            box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.3); /* Anel de foco mais visível */
+            box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.3);
          }
 
+         /* Botão de Submit (fora do flex container dos cards) */
+         .submit-button-container {
+             text-align: center; /* Centraliza o botão se ele não for 100% */
+         }
          .content-container button[type="submit"] {
-             display: block; /* Faz o botão ocupar a largura */
-             width: 100%; /* Largura total */
-             margin-top: 30px; /* Espaço acima do botão */
+             /* display: block; */ /* Pode ser inline-block ou block */
+             /* width: 100%; */ /* Opcional: largura total ou auto? */
+             min-width: 200px; /* Largura mínima */
+             margin-top: 10px; /* Ajuste conforme necessário */
              background-color: #bb86fc;
              color: #121212;
-             padding: 14px 25px; /* Botão ligeiramente maior */
+             padding: 14px 35px; /* Padding generoso */
              border: none;
              border-radius: 6px;
-             font-size: 1.2em; /* Texto do botão maior */
+             font-size: 1.2em;
              font-weight: bold;
              cursor: pointer;
              transition: background-color 0.2s ease, transform 0.1s ease;
@@ -108,19 +137,18 @@
              background-color: #a772e3;
          }
          .content-container button[type="submit"]:active {
-             transform: scale(0.99); /* Efeito de clique */
+             transform: scale(0.98);
          }
 
-        /* --- Fim dos estilos do formulário --- */
-
+        /* --- FIM DOS ESTILOS DO FORMULÁRIO COM CARDS --- */
     </style>
 </head>
 <body>
 
-    <!-- MENU DE NAVEGAÇÃO (O mesmo da página principal) -->
+    <!-- MENU DE NAVEGAÇÃO -->
     <nav class="main-nav">
         <ul>
-            <li><a href="index.html">Home</a></li> <!-- Ajuste o nome do arquivo se for diferente -->
+            <li><a href="index.html">Home</a></li>
             <li><a href="criar.html">Criar</a></li>
         </ul>
     </nav>
@@ -135,83 +163,109 @@
         <div class="content-container">
             <h2>Adicionar Nova Atriz</h2>
 
-            <!-- FORMULÁRIO DE CRIAÇÃO -->
+            <!-- FORMULÁRIO DE CRIAÇÃO - AGORA UM FLEX CONTAINER -->
             <form id="create-actress-form">
 
-                <div class="form-group">
-                    <label for="texto">Texto (Biografia/Descrição):</label>
-                    <!-- 'texto' será o nome do campo no Firestore -->
-                    <textarea id="texto" name="texto" rows="6" placeholder="Cole ou digite a biografia e informações aqui..." required></textarea>
-                </div>
-
-                <div class="form-group">
+                <!-- Card para Nome -->
+                <div class="form-card">
                     <label for="name">Name:</label>
                     <input type="text" id="name" name="name" required>
                 </div>
 
-                <div class="form-group">
-                    <label for="born">Born (Ex: 1990-05-15 ou May 15, 1990):</label>
-                    <input type="text" id="born" name="born" placeholder="YYYY-MM-DD ou formato textual">
+                <!-- Card para Foto (NOVO) -->
+                <div class="form-card">
+                    <label for="foto">Foto (URL):</label>
+                    <input type="url" id="foto" name="foto" placeholder="https://exemplo.com/imagem.jpg" required>
                 </div>
 
-                <div class="form-group">
+                 <!-- Card para Texto/Biografia (Largura Total) -->
+                <div class="form-card full-width">
+                    <label for="texto">Texto (Biografia/Descrição):</label>
+                    <textarea id="texto" name="texto" rows="5" placeholder="Cole ou digite a biografia e informações aqui..." required></textarea>
+                </div>
+
+                <!-- Card para Born -->
+                <div class="form-card">
+                    <label for="born">Born (Ex: 1990-05-15):</label>
+                    <input type="text" id="born" name="born" placeholder="YYYY-MM-DD">
+                </div>
+
+                <!-- Card para Birthplace -->
+                <div class="form-card">
                     <label for="birthplace">Birthplace:</label>
                     <input type="text" id="birthplace" name="birthplace">
                 </div>
 
-                <div class="form-group">
+                <!-- Card para Ethnicity -->
+                <div class="form-card">
                     <label for="ethnicity">Ethnicity:</label>
                     <input type="text" id="ethnicity" name="ethnicity">
                 </div>
 
-                <div class="form-group">
+                <!-- Card para Hair color -->
+                <div class="form-card">
                     <label for="hair_color">Hair color:</label>
                     <input type="text" id="hair_color" name="hair_color">
                 </div>
 
-                <div class="form-group">
+                <!-- Card para Eye color -->
+                <div class="form-card">
                     <label for="eye_color">Eye color:</label>
                     <input type="text" id="eye_color" name="eye_color">
                 </div>
 
-                <div class="form-group">
-                    <label for="height">Height (Ex: 5' 7" ou 170 cm):</label>
+                <!-- Card para Height -->
+                <div class="form-card">
+                    <label for="height">Height (Ex: 170 cm):</label>
                     <input type="text" id="height" name="height">
                 </div>
 
-                <div class="form-group">
-                    <label for="weight">Weight (Ex: 130 lbs ou 59 kg):</label>
+                <!-- Card para Weight -->
+                <div class="form-card">
+                    <label for="weight">Weight (Ex: 59 kg):</label>
                     <input type="text" id="weight" name="weight">
                 </div>
 
-                <div class="form-group">
+                <!-- Card para Body type -->
+                <div class="form-card">
                     <label for="body_type">Body type:</label>
                     <input type="text" id="body_type" name="body_type">
                 </div>
 
-                <div class="form-group">
-                    <label for="measurements">Measurements (Ex: 34B-24-35):</label>
+                <!-- Card para Measurements -->
+                <div class="form-card">
+                    <label for="measurements">Measurements (Ex: 34-24-35):</label>
                     <input type="text" id="measurements" name="measurements">
                 </div>
 
-                <div class="form-group">
+                <!-- Card para Years active -->
+                <div class="form-card">
                     <label for="years_active">Years active (Ex: 2010-present):</label>
                     <input type="text" id="years_active" name="years_active">
                 </div>
-                
-                <!-- BOTÃO DE SUBMISSÃO -->
-                <button type="submit">Criar</button>
+
+                <!-- Card para Nota (NOVO) -->
+                 <div class="form-card">
+                    <label for="nota">Nota (0 a 10):</label>
+                    <input type="number" id="nota" name="nota" min="0" max="10" step="0.1" placeholder="Ex: 8.5">
+                </div>
+
             </form>
-            <!-- FIM FORMULÁRIO -->
-            
+            <!-- FIM DO FORMULÁRIO (FLEX CONTAINER) -->
+
+            <!-- CONTAINER PARA O BOTÃO (Fora do form flex) -->
+            <div class="submit-button-container">
+                <button type="submit" form="create-actress-form">Criar</button>
+            </div>
+
         </div>
     </main>
     <!-- FIM ÁREA DE CONTEÚDO -->
 
-    <!-- Adicione aqui o script para lidar com o envio do formulário para o Firebase -->
+    <!-- Script para lidar com o envio do formulário -->
     <script type="module">
-        // Importar funções do Firestore para adicionar documentos
-        // import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js'; // Já deve ter no script do index, mas repetir por segurança se isolado
+        // Importar funções do Firestore (DESCOMENTE QUANDO PRONTO)
+        // import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         // import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         // Config Firebase (COPIE SUAS CONFIGURAÇÕES AQUI)
@@ -220,58 +274,58 @@
         // const db = getFirestore(app);
 
         const form = document.getElementById('create-actress-form');
+        // O botão agora está fora do form, mas o atributo 'form' no botão o conecta
+        const submitButton = document.querySelector('button[form="create-actress-form"]'); 
 
         form.addEventListener('submit', async (e) => {
-            e.preventDefault(); // Impede o envio padrão do formulário HTML
+            e.preventDefault();
 
-            // Desabilita o botão para evitar múltiplos envios
-            const submitButton = form.querySelector('button[type="submit"]');
+            if (!submitButton) return; // Segurança
+
             submitButton.disabled = true;
             submitButton.textContent = 'Salvando...';
 
-            // Coleta os dados do formulário
             const formData = new FormData(form);
             const actressData = {};
             formData.forEach((value, key) => {
-                // Simplesmente pega chave/valor. Você pode querer tratar campos vazios aqui.
-                if (value) { // Só adiciona se tiver valor (ou ajuste conforme necessidade)
-                   actressData[key] = value;
+                // Trata o campo 'nota' para garantir que seja número ou null
+                if (key === 'nota') {
+                    const numValue = parseFloat(value);
+                    // Adiciona apenas se for um número válido, senão pode ficar ausente ou null
+                    actressData[key] = isNaN(numValue) ? null : numValue; 
+                } else if (value.trim()) { // Adiciona outros campos apenas se não estiverem vazios (após remover espaços)
+                   actressData[key] = value.trim();
                 }
             });
+            
+            // Adicionar um timestamp (DESCOMENTE para usar)
+            // actressData.createdAt = serverTimestamp();
 
-            // Adicionar um timestamp de criação (opcional, mas útil)
-            // actressData.createdAt = serverTimestamp(); 
+            console.log('Dados a serem enviados:', actressData);
 
-            console.log('Dados a serem enviados:', actressData); // Para depuração
-
-            // --- SEÇÃO PARA SALVAR NO FIRESTORE ---
-            // DESCOMENTE e ajuste quando tiver as configurações do Firebase aqui
+            // --- SEÇÃO PARA SALVAR NO FIRESTORE (DESCOMENTE) ---
             /*
             try {
                 const docRef = await addDoc(collection(db, "atores"), actressData);
                 console.log("Documento escrito com ID: ", docRef.id);
                 alert('Atriz criada com sucesso!');
-                form.reset(); // Limpa o formulário
+                form.reset(); 
             } catch (error) {
                 console.error("Erro ao adicionar documento: ", error);
                 alert('Erro ao criar atriz. Verifique o console.');
             } finally {
-                // Reabilita o botão
                 submitButton.disabled = false;
                 submitButton.textContent = 'Criar';
             }
             */
-            
-             // --- REMOVA ISSO APÓS DESCOMENTAR O CÓDIGO DO FIRESTORE ---
-             // Simulação de salvamento (para teste sem Firebase configurado aqui)
-             await new Promise(resolve => setTimeout(resolve, 1000)); // Simula espera
-             alert('Simulação: Atriz criada! (Descomente o código do Firebase para salvar de verdade)');
-             form.reset(); 
+
+             // --- SIMULAÇÃO (REMOVER DEPOIS) ---
+             await new Promise(resolve => setTimeout(resolve, 1000));
+             alert('Simulação: Atriz criada! (Descomente o código do Firebase)');
+             form.reset();
              submitButton.disabled = false;
              submitButton.textContent = 'Criar';
-             // --- FIM DA SIMULAÇÃO ---
-
-
+             // --- FIM SIMULAÇÃO ---
         });
     </script>
 
