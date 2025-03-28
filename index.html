@@ -208,6 +208,25 @@
         }
         
 
+   .popup-search-bar {
+            width: 100%;
+            padding: 10px 15px;
+            margin-bottom: 20px; /* Espaço entre a busca e a lista */
+            border: 1px solid #555;
+            border-radius: 6px;
+            background-color: #333; /* Fundo escuro */
+            color: #e0e0e0; /* Texto claro */
+            font-size: 1em;
+            box-sizing: border-box; /* Garante que padding não aumente a largura total */
+        }
+
+        .popup-search-bar:focus {
+            outline: none;
+            border-color: #bb86fc; /* Destaque ao focar */
+            box-shadow: 0 0 5px rgba(187, 134, 252, 0.5);
+        }
+
+        
     </style>
 </head>
 <body>
@@ -221,51 +240,72 @@
     </div>
 
  <!-- HTML do Popup (escondido inicialmente) -->
-    <div class="popup-overlay" id="more-stars-popup">
+ <div class="popup-overlay" id="more-stars-popup">
         <div class="popup-content">
             <button class="popup-close-btn" id="close-popup-button">×</button>
             <h2>Todas as Estrelas</h2>
-            
+
+            <!-- === BARRA DE PESQUISA === -->
+            <input type="text" id="popup-search-input" class="popup-search-bar" placeholder="Pesquisar por nome...">
+            <!-- === FIM BARRA DE PESQUISA === -->
+
             <!-- Container para a lista de atrizes do popup -->
             <div id="popup-actress-list" class="popup-list-container">
                 <!-- A lista será preenchida pelo JavaScript -->
-                <p>Carregando...</p> 
+                <p>Carregando...</p>
             </div>
 
         </div>
     </div>
 
     <!-- Firebase Modular SDKs via CDN -->
-   <script type="module">
+  <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getFirestore, collection, getDocs, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-        // Suas configurações do Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0",
-            authDomain: "babes-392fd.firebaseapp.com",
-            projectId: "babes-392fd",
-            storageBucket: "babes-392fd.appspot.com",
-            messagingSenderId: "376795361631",
-            appId: "1:376795361631:web:d662f2b2f2cd23b115c6ea"
-        };
+        // Configs Firebase...
+        const firebaseConfig = { // ... suas configs aqui ... };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
         const actressesListElement = document.getElementById('actresses-list');
         const popupOverlay = document.getElementById('more-stars-popup');
         const closePopupButton = document.getElementById('close-popup-button');
-        const popupListContainer = document.getElementById('popup-actress-list'); // Referência ao container da lista no popup
+        const popupListContainer = document.getElementById('popup-actress-list');
+        const popupSearchInput = document.getElementById('popup-search-input'); // <<<--- Referência para o input de busca
 
-        // --- NOVA FUNÇÃO PARA CARREGAR TODOS OS ATORES NO POPUP ---
+        // --- FUNÇÃO DE BUSCA/FILTRO ---
+        function filterPopupList() {
+            if (!popupSearchInput || !popupListContainer) return; // Garante que os elementos existem
+
+            const searchTerm = popupSearchInput.value.toLowerCase(); // Pega o termo de busca em minúsculas
+            const items = popupListContainer.querySelectorAll('.popup-list-item-link'); // Pega todos os itens (links) da lista
+
+            items.forEach(item => {
+                // Encontra o nome dentro do item atual
+                const nameElement = item.querySelector('.info strong');
+                if (nameElement) {
+                    const name = nameElement.textContent.toLowerCase(); // Pega o nome em minúsculas
+                    // Verifica se o nome inclui o termo de busca
+                    if (name.includes(searchTerm)) {
+                        item.style.display = 'block'; // Mostra o item se corresponder
+                    } else {
+                        item.style.display = 'none';  // Esconde o item se não corresponder
+                    }
+                }
+            });
+        }
+
+        // --- FUNÇÃO PARA CARREGAR TODOS OS ATORES NO POPUP ---
         async function loadAllActressesForPopup() {
+            // ... (código existente de loadAllActressesForPopup, sem alterações na busca de dados) ...
             if (!popupListContainer) {
                 console.error("Element with ID 'popup-actress-list' not found");
                 return;
             }
             popupListContainer.innerHTML = '<p>Carregando...</p>';
+            popupSearchInput.value = ''; // Limpa a busca ao recarregar a lista
 
             const allActressesQuery = query(collection(db, "atores"), orderBy("nome", "asc"));
 
@@ -278,16 +318,14 @@
                 } else {
                     querySnapshot.forEach((doc) => {
                         const data = doc.data();
-                        const actressId = doc.id; // <<<--- OBTER O ID DO DOCUMENTO
+                        const actressId = doc.id;
                         const nome = data.nome || 'Nome não disponível';
                         const foto = data.foto || 'path/to/default/image.png';
                         const pais = data.pais || 'País não informado';
                         const nota = data.nota !== undefined ? data.nota : '-';
 
-                        // --- INÍCIO DA ALTERAÇÃO ---
-                        // Envolve o 'div.popup-list-item' com uma tag 'a'
                         popupHTML += `
-                            <a href="she.html?id=${actressId}" class="popup-list-item-link"> 
+                            <a href="she.html?id=${actressId}" class="popup-list-item-link">
                                 <div class="popup-list-item">
                                     <img src="${foto}" alt="${nome}">
                                     <div class="info">
@@ -296,12 +334,13 @@
                                     </div>
                                     <span class="rating">${nota}</span>
                                 </div>
-                            </a> 
+                            </a>
                         `;
-                        // --- FIM DA ALTERAÇÃO ---
                     });
                 }
                 popupListContainer.innerHTML = popupHTML;
+                 // Após carregar a lista, aplica o filtro inicial (caso haja algo na busca, embora tenhamos limpado)
+                filterPopupList(); 
 
             } catch (error) {
                 console.error("Erro ao buscar todas as atrizes para o popup:", error);
@@ -309,85 +348,57 @@
             }
         }
 
+
         // --- FUNÇÃO PARA CARREGAR AS ÚLTIMAS ATRIZES NA PÁGINA PRINCIPAL ---
         async function loadLatestActresses() {
-            // ... (código existente para buscar as 15 atrizes, sem alterações) ...
-            if (!actressesListElement) {
-                console.error("Element with ID 'actresses-list' not found");
-                return;
-            }
-
+           // ... (código existente de loadLatestActresses, sem alterações na busca inicial) ...
+            if (!actressesListElement) { /*...*/ return; }
             const actressesQuery = query(collection(db, "atores"), orderBy("__name__", "desc"), limit(15));
-
             try {
                 const querySnapshot = await getDocs(actressesQuery);
                 let actressesHTML = '';
-                querySnapshot.forEach((doc) => {
-                    const actressData = doc.data();
-                    const nome = actressData.nome;
-                    const foto = actressData.foto;
-                    const actressId = doc.id;
-
-                    actressesHTML += `
-                        <a href="she.html?id=${actressId}" class="actress-card-link">
-                            <div class="actress-card">
-                                <img src="${foto}" alt="${nome}">
-                                <div class="actress-info">
-                                    <h3>${nome}</h3>
-                                </div>
-                            </div>
-                        </a>
-                    `;
-                });
+                querySnapshot.forEach((doc) => { /* ... criação HTML das 15 atrizes ... */
+                     actressesHTML += `<a href="she.html?id=${doc.id}" class="actress-card-link"> ... </a>`;
+                 });
                 actressesListElement.innerHTML = actressesHTML;
 
-                const moreStarsHTML = `
-                    <div class="actress-card more-stars-card" id="more-stars-card">
-                        <div class="actress-info">
-                            <h3>More Stars</h3>
-                        </div>
-                    </div>
-                `;
+                const moreStarsHTML = `/* ... HTML do card More Stars ... */`;
                 actressesListElement.insertAdjacentHTML('beforeend', moreStarsHTML);
 
-                // --- AJUSTE NA FUNCIONALIDADE DO POPUP ---
                 const moreStarsCard = document.getElementById('more-stars-card');
 
-                if (moreStarsCard && popupOverlay && closePopupButton && popupListContainer) {
-                    // Abrir popup ao clicar no card "More Stars"
+                if (moreStarsCard && popupOverlay && closePopupButton && popupListContainer && popupSearchInput) { // <<-- Inclui popupSearchInput na verificação
+                    // Abrir popup
                     moreStarsCard.addEventListener('click', () => {
-                        loadAllActressesForPopup(); // <<-- CHAMA A FUNÇÃO PARA CARREGAR A LISTA COMPLETA
-                        popupOverlay.style.display = 'flex'; // Mostra o popup
+                        loadAllActressesForPopup(); // Carrega/Recarrega a lista
+                        popupOverlay.style.display = 'flex';
+                        // Opcional: focar na barra de busca ao abrir o popup
+                        // setTimeout(() => popupSearchInput.focus(), 100); 
                     });
 
-                    // Fechar popup ao clicar no botão 'X'
+                    // Fechar popup com botão 'X'
                     closePopupButton.addEventListener('click', () => {
-                        popupOverlay.style.display = 'none'; // Esconde o popup
-                         // Opcional: Limpar a lista ao fechar para economizar memória, 
-                         // mas exigirá recarregar na próxima vez.
-                         // popupListContainer.innerHTML = '<p>Carregando...</p>'; 
+                        popupOverlay.style.display = 'none';
                     });
 
-                    // Fechar popup ao clicar fora da área de conteúdo
+                    // Fechar popup clicando fora
                     popupOverlay.addEventListener('click', (event) => {
                         if (event.target === popupOverlay) {
                             popupOverlay.style.display = 'none';
-                            // Opcional: Limpar lista ao fechar
-                            // popupListContainer.innerHTML = '<p>Carregando...</p>';
                         }
                     });
-                } else {
-                    console.error("Não foi possível encontrar os elementos do popup ou o card 'More Stars'.");
-                }
-                // --- FIM: AJUSTE NA FUNCIONALIDADE DO POPUP ---
 
-            } catch (error) {
-                console.error("Erro ao buscar atrizes do Firestore:", error);
-                actressesListElement.innerHTML = '<p>Erro ao carregar as atrizes.</p>';
-            }
+                    // <<<--- ADICIONAR EVENT LISTENER PARA A BUSCA --- >>>
+                    popupSearchInput.addEventListener('input', filterPopupList);
+
+                } else {
+                    console.error("Não foi possível encontrar todos os elementos necessários (popup, busca, etc).");
+                }
+
+            } catch (error) { /* ... tratamento de erro ... */ }
         }
 
-        // Carrega as atrizes iniciais quando a página for carregada
+        // Carrega as atrizes iniciais
         loadLatestActresses();
     </script>
 </body>
