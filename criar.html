@@ -263,71 +263,216 @@
     <!-- FIM ÁREA DE CONTEÚDO -->
 
     <!-- Script para lidar com o envio do formulário -->
-    <script type="module">
-        // Importar funções do Firestore (DESCOMENTE QUANDO PRONTO)
-        // import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        // import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+  <script type="module">
+    // Importar funções do Firestore (DESCOMENTE QUANDO PRONTO e ajuste o caminho se necessário)
+    // import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    // import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-        // Config Firebase (COPIE SUAS CONFIGURAÇÕES AQUI)
-        // const firebaseConfig = { /* ... suas configs ... */ };
-        // const app = initializeApp(firebaseConfig);
-        // const db = getFirestore(app);
+    // Config Firebase (COPIE SUAS CONFIGURAÇÕES AQUI)
+    /*
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_AUTH_DOMAIN",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_STORAGE_BUCKET",
+        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+        appId: "YOUR_APP_ID"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    */
 
-        const form = document.getElementById('create-actress-form');
-        // O botão agora está fora do form, mas o atributo 'form' no botão o conecta
-        const submitButton = document.querySelector('button[form="create-actress-form"]'); 
+    // --- ELEMENTOS DO DOM ---
+    const form = document.getElementById('create-actress-form');
+    const submitButton = document.querySelector('button[form="create-actress-form"]');
+    const sourceTextArea = document.getElementById('texto'); // Referência à textarea
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
+    // --- MAPEAMENTO: Rótulo no Texto -> ID do Campo do Formulário ---
+    // Ajuste as chaves (rótulos) para corresponderem EXATAMENTE ao texto de origem
+    const fieldMappings = {
+        'Born': 'born',
+        'Birthplace': 'birthplace',
+        'Ethnicity': 'ethnicity',
+        'Hair color': 'hair_color', // Case sensitive! Ajuste se o texto for 'Hair Color'
+        'Eye color': 'eye_color',   // Case sensitive! Ajuste se o texto for 'Eye Color'
+        'Height': 'height',
+        'Weight': 'weight',
+        'Body type': 'body_type', // Case sensitive! Ajuste se o texto for 'Body Type'
+        'Measurements': 'measurements',
+        'Years active': 'years_active' // Case sensitive! Ajuste se o texto for 'Years Active'
+    };
 
-            if (!submitButton) return; // Segurança
+    // --- FUNÇÕES HELPER PARA FORMATAÇÃO ---
 
-            submitButton.disabled = true;
-            submitButton.textContent = 'Salvando...';
+    function formatBornDate(dateString) {
+        // Regex mais robusto para capturar dia (com ou sem sufixo), mês (nome completo) e ano (4 dígitos)
+        // Ex: "Thursday 27th of March 1997", "9th of June 1981", "1 May 1988"
+        const dateRegex = /(\d{1,2})(?:st|nd|rd|th)?\s+(?:of\s+)?([a-zA-Z]+)\s+(\d{4})/;
+        const match = dateString.match(dateRegex);
 
-            const formData = new FormData(form);
-            const actressData = {};
-            formData.forEach((value, key) => {
-                // Trata o campo 'nota' para garantir que seja número ou null
-                if (key === 'nota') {
-                    const numValue = parseFloat(value);
-                    // Adiciona apenas se for um número válido, senão pode ficar ausente ou null
-                    actressData[key] = isNaN(numValue) ? null : numValue; 
-                } else if (value.trim()) { // Adiciona outros campos apenas se não estiverem vazios (após remover espaços)
-                   actressData[key] = value.trim();
-                }
-            });
-            
-            // Adicionar um timestamp (DESCOMENTE para usar)
-            // actressData.createdAt = serverTimestamp();
+        if (match) {
+            const day = match[1].padStart(2, '0');
+            const monthName = match[2];
+            const year = match[3];
 
-            console.log('Dados a serem enviados:', actressData);
+            // Mapeamento de meses (case-insensitive na busca)
+            const monthMap = {
+                'january': '01', 'february': '02', 'march': '03', 'april': '04',
+                'may': '05', 'june': '06', 'july': '07', 'august': '08',
+                'september': '09', 'october': '10', 'november': '11', 'december': '12'
+            };
 
-            // --- SEÇÃO PARA SALVAR NO FIRESTORE (DESCOMENTE) ---
-            /*
-            try {
-                const docRef = await addDoc(collection(db, "atores"), actressData);
-                console.log("Documento escrito com ID: ", docRef.id);
-                alert('Atriz criada com sucesso!');
-                form.reset(); 
-            } catch (error) {
-                console.error("Erro ao adicionar documento: ", error);
-                alert('Erro ao criar atriz. Verifique o console.');
-            } finally {
-                submitButton.disabled = false;
-                submitButton.textContent = 'Criar';
+            const monthNumber = monthMap[monthName.toLowerCase()]; // Compara em minúsculas
+
+            if (monthNumber) {
+                return `${year}/${monthNumber}/${day}`;
+            } else {
+                 console.warn(`Mês não reconhecido na data: "${monthName}"`);
             }
-            */
+        } else {
+            console.warn(`Não foi possível analisar o formato da data: "${dateString}"`);
+        }
+        // Se a formatação falhar, retorna a string original ou vazio
+        return dateString; // Ou return '';
+    }
 
-             // --- SIMULAÇÃO (REMOVER DEPOIS) ---
-             await new Promise(resolve => setTimeout(resolve, 1000));
-             alert('Simulação: Atriz criada! (Descomente o código do Firebase)');
-             form.reset();
-             submitButton.disabled = false;
-             submitButton.textContent = 'Criar';
-             // --- FIM SIMULAÇÃO ---
+    function extractCmValue(heightString) {
+        // Procura por "(XXX cm)" ou "(or XXX cm)" e extrai XXX
+        const cmRegex = /\(\s*(?:or\s+)?(\d+)\s*cm\s*\)/i; // 'i' para case-insensitive
+        const match = heightString.match(cmRegex);
+        // Retorna o número encontrado ou vazio se não encontrar
+        return match ? match[1] : '';
+    }
+
+    function extractKgValue(weightString) {
+        // Procura por "(XX kg)" ou "(or XX kg)" e extrai XX
+        const kgRegex = /\(\s*(?:or\s+)?(\d+)\s*kg\s*\)/i; // 'i' para case-insensitive
+        const match = weightString.match(kgRegex);
+        // Retorna o número encontrado ou vazio se não encontrar
+        return match ? match[1] : '';
+    }
+
+
+    // --- FUNÇÃO PRINCIPAL DE AUTO-PREENCHIMENTO ---
+    function autoFillForm() {
+        if (!sourceTextArea) return;
+        const textContent = sourceTextArea.value;
+
+        // Limpa previamente todos os campos que serão preenchidos automaticamente
+        Object.values(fieldMappings).forEach(fieldId => {
+            const inputElement = document.getElementById(fieldId);
+            if (inputElement) {
+                inputElement.value = ''; // Limpa o campo
+            }
         });
-    </script>
+
+        // Processa cada mapeamento de campo
+        Object.entries(fieldMappings).forEach(([label, fieldId]) => {
+            // Regex para encontrar a linha: Início da linha ou espaço/tab -> Label -> : -> Espaços -> Captura o resto da linha
+            // Usa (?:\s|^) para aceitar início de linha ou espaço antes do label.
+            // Usa .*? para captura não-gulosa caso haja múltiplos ':' na linha (pega só até o primeiro).
+             // Flags: 'i' (ignore case no label), 'm' (multiline)
+            const regex = new RegExp(`(?:^|\\s)${label}\\s*:\\s*(.*?)$`, 'im');
+            const match = textContent.match(regex);
+
+            if (match) {
+                let value = match[1].trim(); // Valor encontrado
+
+                // Aplica formatação específica se necessário
+                if (fieldId === 'born') {
+                    value = formatBornDate(value);
+                } else if (fieldId === 'height') {
+                    value = extractCmValue(value);
+                } else if (fieldId === 'weight') {
+                    value = extractKgValue(value);
+                }
+                // Adicione outras formatações aqui se precisar
+
+                // Preenche o campo correspondente no formulário
+                const inputElement = document.getElementById(fieldId);
+                if (inputElement) {
+                    inputElement.value = value;
+                }
+            }
+            // Se não encontrar 'match', o campo já foi limpo no início da função.
+        });
+    }
+
+    // --- EVENT LISTENERS ---
+
+    // Listener para auto-preenchimento quando a textarea muda
+    if (sourceTextArea) {
+        sourceTextArea.addEventListener('input', autoFillForm);
+        // Opcional: Chamar uma vez no carregamento se a textarea puder ter conteúdo inicial
+        // autoFillForm();
+    }
+
+    // Listener para o envio do formulário
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault(); // Impede recarregamento da página
+        if (!submitButton) return;
+
+        // Desabilita botão durante o processo
+        submitButton.disabled = true;
+        submitButton.textContent = 'Salvando...';
+
+        // Coleta dados do formulário
+        const formData = new FormData(form);
+        const actressData = {};
+        formData.forEach((value, key) => {
+            const trimmedValue = typeof value === 'string' ? value.trim() : value;
+
+            // Tratamento especial para 'nota'
+            if (key === 'nota') {
+                const numValue = parseFloat(trimmedValue);
+                // Adiciona nota apenas se for um número válido, caso contrário omite ou define como null
+                if (!isNaN(numValue)) {
+                    actressData[key] = numValue;
+                } else {
+                    // actressData[key] = null; // Opcional: definir como null se inválido/vazio
+                }
+            } else if (trimmedValue !== '') { // Adiciona outros campos apenas se não estiverem vazios
+                actressData[key] = trimmedValue;
+            } else {
+                 // Opcional: Omitir campos vazios ou definir como null
+                 // actressData[key] = null;
+            }
+        });
+
+        // Adicionar timestamp (DESCOMENTE para usar com Firestore)
+        // actressData.createdAt = serverTimestamp();
+
+        console.log('Dados a serem enviados:', actressData); // Para depuração
+
+        // --- SEÇÃO PARA SALVAR NO FIRESTORE (DESCOMENTE E AJUSTE) ---
+        /*
+        try {
+            const docRef = await addDoc(collection(db, "atores"), actressData);
+            console.log("Documento escrito com ID: ", docRef.id);
+            alert('Atriz criada com sucesso!');
+            form.reset(); // Limpa o formulário após sucesso
+            // Opcional: Redirecionar para outra página
+            // window.location.href = 'index.html';
+        } catch (error) {
+            console.error("Erro ao adicionar documento: ", error);
+            alert('Erro ao criar atriz. Verifique o console.');
+        } finally {
+            // Reabilita o botão independentemente de sucesso ou falha
+            submitButton.disabled = false;
+            submitButton.textContent = 'Criar';
+        }
+        */
+
+        // --- SIMULAÇÃO DE ENVIO (REMOVER QUANDO USAR FIRESTORE) ---
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Simula tempo de espera
+        alert('Simulação: Atriz criada! (Descomente o código do Firebase para salvar de verdade)');
+        form.reset(); // Limpa o formulário
+        submitButton.disabled = false;
+        submitButton.textContent = 'Criar';
+        // --- FIM DA SIMULAÇÃO ---
+    });
+
+</script>
 
 </body>
 </html>
