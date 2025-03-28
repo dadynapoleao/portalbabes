@@ -263,10 +263,11 @@
     <!-- FIM ÁREA DE CONTEÚDO -->
 
     <!-- Script para lidar com o envio do formulário -->
- <script type="module">
-    // Import the functions you need from the SDKs you need
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"; // Use CDN path
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"; // Use CDN path
+<script type="module">
+    // Import Firebase functions
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    // Import Firestore functions needed for query and write
+    import { getFirestore, collection, addDoc, query, where, getDocs, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     // Your web app's Firebase configuration
     const firebaseConfig = {
@@ -280,7 +281,7 @@
 
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app); // Initialize Firestore
+    const db = getFirestore(app);
 
     // --- ELEMENTOS DO DOM ---
     const form = document.getElementById('create-actress-form');
@@ -291,8 +292,8 @@
     // --- MAPEAMENTO: ID do Formulário -> Nome do Campo no Firestore ---
     const firestoreFieldMap = {
         'name': 'nome',
-        'texto': 'texto', // Assuming you still want the full text saved
-        'foto': 'foto',   // Form ID 'foto' maps to Firestore field 'foto'
+        'texto': 'texto',
+        'foto': 'foto',
         'born': 'dataNascimento',
         'birthplace': 'pais',
         'ethnicity': 'etnia',
@@ -301,109 +302,73 @@
         'height': 'altura',
         'weight': 'peso',
         'body_type': 'tipoCorpo',
-        'measurements': 'medidas', // This key maps to the original string "34-27-39"
+        'measurements': 'medidas',
         'years_active': 'AnosAtiva',
-        'nota': 'nota'     // Form ID 'nota' maps to Firestore field 'nota'
+        'nota': 'nota'
     };
 
     // --- FUNÇÕES HELPER PARA FORMATAÇÃO (sem alterações) ---
+    function formatBornDate(dateString) { /* ... */ }
+    function extractCmValue(heightString) { /* ... */ }
+    function extractKgValue(weightString) { /* ... */ }
+    function extractStartYear(yearsString) { /* ... */ }
+    // --- (Cole as funções helper completas aqui como no exemplo anterior) ---
     function formatBornDate(dateString) {
         const dateRegex = /(\d{1,2})(?:st|nd|rd|th)?\s+(?:of\s+)?([a-zA-Z]+)\s+(\d{4})/;
         const match = dateString.match(dateRegex);
-        if (match) {
-            const day = match[1].padStart(2, '0');
-            const monthName = match[2];
-            const year = match[3];
-            const monthMap = {'january': '01', 'february': '02', 'march': '03', 'april': '04', 'may': '05', 'june': '06', 'july': '07', 'august': '08', 'september': '09', 'october': '10', 'november': '11', 'december': '12'};
-            const monthNumber = monthMap[monthName.toLowerCase()];
-            if (monthNumber) return `${year}/${monthNumber}/${day}`;
-            else console.warn(`Mês não reconhecido: "${monthName}"`);
-        } else {
-            console.warn(`Formato de data não reconhecido: "${dateString}"`);
-        }
+        if (match) { /* ... (lógica de conversão) ... */ return `${year}/${monthNumber}/${day}`; }
         return dateString;
     }
     function extractCmValue(heightString) {
-        const cmRegex = /\(\s*(?:or\s+)?(\d+)\s*cm\s*\)/i;
-        const match = heightString.match(cmRegex);
-        return match ? match[1] : '';
+        const cmRegex = /\(\s*(?:or\s+)?(\d+)\s*cm\s*\)/i; const match = heightString.match(cmRegex); return match ? match[1] : '';
     }
     function extractKgValue(weightString) {
-        const kgRegex = /\(\s*(?:or\s+)?(\d+)\s*kg\s*\)/i;
-        const match = weightString.match(kgRegex);
-        return match ? match[1] : '';
+        const kgRegex = /\(\s*(?:or\s+)?(\d+)\s*kg\s*\)/i; const match = weightString.match(kgRegex); return match ? match[1] : '';
     }
     function extractStartYear(yearsString) {
-        const yearRegex = /(\d{4})/;
-        const match = yearsString.match(yearRegex);
-        return match ? match[1] : '';
+        const yearRegex = /(\d{4})/; const match = yearsString.match(yearRegex); return match ? match[1] : '';
     }
 
+
     // --- FUNÇÃO PRINCIPAL DE AUTO-PREENCHIMENTO (sem alterações na lógica de preenchimento) ---
-    function autoFillForm() {
+    function autoFillForm() { /* ... (Cole a função autoFillForm completa aqui) ... */
         if (!sourceTextArea) return;
         const textContent = sourceTextArea.value;
         const lines = textContent.split('\n');
-
         // Limpeza
         if(nameInput) nameInput.value = '';
-        Object.keys(firestoreFieldMap).forEach(formId => { // Iterate over keys (form IDs)
-             // Skip 'texto' if you don't want it cleared by autofill logic unrelated to the textarea itself
+        Object.keys(firestoreFieldMap).forEach(formId => {
              if(formId === 'texto') return;
-
              const inputElement = document.getElementById(formId);
-             if (inputElement) {
-                 inputElement.value = '';
+             if (inputElement) inputElement.value = '';
+         });
+        // Nome
+        if (lines.length > 0 && nameInput) nameInput.value = lines[0].trim();
+        // Outros campos
+        const fieldMappingsForAutofill = { /* Recreate this map if needed for autofill logic */
+            'Born': 'dataNascimento', 'Birthplace': 'pais', 'Ethnicity': 'etnia',
+            'Hair color': 'corCabelo', 'Eye color': 'corOlhos', 'Height': 'altura',
+            'Weight': 'peso', 'Body type': 'tipoCorpo', 'Measurements': 'medidas',
+            'Years active': 'AnosAtiva'
+         };
+         Object.entries(fieldMappingsForAutofill).forEach(([label, firestoreKey]) => {
+             const formId = Object.keys(firestoreFieldMap).find(key => firestoreFieldMap[key] === firestoreKey);
+             if(!formId) return;
+
+             const regex = new RegExp(`^${label}:\\s*(.*)$`, 'im');
+             const match = textContent.match(regex);
+             if (match) {
+                 let value = match[1].trim();
+                 // Formatação
+                 if (firestoreKey === 'dataNascimento') value = formatBornDate(value);
+                 else if (firestoreKey === 'altura') value = extractCmValue(value);
+                 else if (firestoreKey === 'peso') value = extractKgValue(value);
+                 else if (firestoreKey === 'AnosAtiva') value = extractStartYear(value);
+                 // Preenchimento
+                 const inputElement = document.getElementById(formId);
+                 if (inputElement) inputElement.value = value;
              }
          });
-
-
-        // Nome (primeira linha)
-        if (lines.length > 0 && nameInput) {
-            nameInput.value = lines[0].trim();
-        }
-
-        // Outros campos
-        Object.entries(fieldMappings).forEach(([label, fieldId]) => { // fieldMappings from previous code, used for finding value
-            const correspondingFormId = Object.keys(firestoreFieldMap).find(key => firestoreFieldMap[key] === fieldId); // Find form ID if needed, but we use fieldId directly if it's the element ID
-
-            const regex = new RegExp(`^${label}:\\s*(.*)$`, 'im');
-            const match = textContent.match(regex);
-
-            if (match) {
-                let value = match[1].trim();
-                let targetFormId = fieldId; // Assume fieldId is the element ID initially
-
-                // Find the actual form element ID using the reverse mapping if needed
-                 const formElementId = Object.keys(firestoreFieldMap).find(key => firestoreFieldMap[key] === fieldId);
-                 if (formElementId) {
-                    targetFormId = formElementId;
-                 } else {
-                     // Handle cases where the mapping might be indirect or fieldId isn't the element ID
-                     console.warn(`No direct form element ID found for Firestore field: ${fieldId}. Trying ID: ${fieldId}`);
-                 }
-
-
-                // Aplica formatação
-                if (fieldId === 'dataNascimento') { // Check Firestore field name for logic
-                    value = formatBornDate(value);
-                } else if (fieldId === 'altura') {
-                    value = extractCmValue(value);
-                } else if (fieldId === 'peso') {
-                    value = extractKgValue(value);
-                } else if (fieldId === 'AnosAtiva') {
-                    value = extractStartYear(value);
-                }
-
-                // Preenche o campo do formulário usando o ID correto
-                const inputElement = document.getElementById(targetFormId);
-                if (inputElement) {
-                    inputElement.value = value;
-                } else {
-                    console.warn(`Element with ID "${targetFormId}" not found for field "${fieldId}"`);
-                }
-            }
-        });
     }
 
 
@@ -412,84 +377,89 @@
         sourceTextArea.addEventListener('input', autoFillForm);
     }
 
-    // Listener para o envio do formulário (MODIFICADO PARA MAPEAMENTO)
+    // Listener para o envio do formulário (MODIFICADO COM VERIFICAÇÃO DE NOME)
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!submitButton) return;
 
         submitButton.disabled = true;
-        submitButton.textContent = 'Salvando...';
+        submitButton.textContent = 'Verificando...'; // Novo estado
 
         const formData = new FormData(form);
-        const firestoreData = {}; // Objeto final para o Firestore
+        const enteredName = formData.get('name')?.trim(); // Pega o nome e faz trim
 
-        // Itera sobre o mapeamento para construir o objeto firestoreData
-        for (const [formId, firestoreKey] of Object.entries(firestoreFieldMap)) {
-            const rawValue = formData.get(formId); // Pega valor do formulário pelo ID/name
-
-            if (rawValue !== null && rawValue !== undefined) {
-                const trimmedValue = typeof rawValue === 'string' ? rawValue.trim() : rawValue;
-
-                // Pula campos completamente vazios após trim, exceto talvez 'nota' se 0 for válido
-                if (trimmedValue === '' && firestoreKey !== 'nota') {
-                    continue; // Ou defina como null: firestoreData[firestoreKey] = null;
-                }
-
-                // Tratamento especial para 'nota' (converter para número)
-                if (formId === 'nota') {
-                    const numValue = parseFloat(trimmedValue);
-                    if (!isNaN(numValue)) {
-                        firestoreData[firestoreKey] = numValue; // Salva como número se válido
-                    } else {
-                       // Opcional: firestoreData[firestoreKey] = null; // Salva null se não for número
-                    }
-                 // Tratamento especial para 'measurements'
-                } else if (formId === 'measurements') {
-                    firestoreData[firestoreKey] = trimmedValue; // Salva a string original em 'medidas'
-
-                    // Tenta dividir em Boobs, Waist, Ass
-                    const parts = trimmedValue.split('-');
-                    if (parts.length === 3) {
-                        firestoreData['Boobs'] = parts[0].trim();
-                        firestoreData['Waist'] = parts[1].trim(); // Usando Waist como padrão
-                        firestoreData['Ass'] = parts[2].trim();
-                    } else {
-                        console.warn(`Formato de medidas inválido para divisão: "${trimmedValue}"`);
-                        // Opcional: definir Boobs/Waist/Ass como null ou omitir
-                        // firestoreData['Boobs'] = null;
-                        // firestoreData['Waist'] = null;
-                        // firestoreData['Ass'] = null;
-                    }
-                } else {
-                    // Para todos os outros campos mapeados
-                    firestoreData[firestoreKey] = trimmedValue;
-                }
-            } else {
-                 // Opcional: Lidar com campos que não estão no FormData (raro para inputs padrão)
-                 // firestoreData[firestoreKey] = null;
-            }
+        // --- PASSO 1: VERIFICAR SE O NOME JÁ EXISTE ---
+        if (!enteredName) {
+            alert('O campo "Nome" é obrigatório.');
+            submitButton.disabled = false;
+            submitButton.textContent = 'Criar';
+            return; // Para a execução se o nome estiver vazio
         }
 
-        // Adicionar timestamp de criação no servidor
-        firestoreData.createdAt = serverTimestamp();
-
-        console.log('Dados a serem enviados para Firestore:', firestoreData);
-
-        // --- SALVAR NO FIRESTORE ---
         try {
-            // Usa addDoc para criar um novo documento na coleção "atores"
+            // Cria a query para buscar na coleção 'atores' onde o campo 'nome' é igual ao nome digitado
+            // limit(1) torna a query muito mais eficiente, só precisamos saber se *existe* ou não.
+            const checkQuery = query(
+                collection(db, "atores"),
+                where("nome", "==", enteredName), // Filtra pelo campo 'nome'
+                limit(1)                           // Pega no máximo 1 resultado
+            );
+
+            const querySnapshot = await getDocs(checkQuery);
+
+            // Se querySnapshot NÃO estiver vazio, significa que encontrou um documento com esse nome
+            if (!querySnapshot.empty) {
+                alert(`Já existe uma atriz com o nome "${enteredName}".`);
+                submitButton.disabled = false;
+                submitButton.textContent = 'Criar';
+                return; // Para a execução
+            }
+
+            // --- PASSO 2: Se o nome NÃO existe, prossegue para salvar ---
+            submitButton.textContent = 'Salvando...'; // Atualiza status
+
+            const firestoreData = {};
+            // Constrói o objeto firestoreData usando o mapeamento
+            for (const [formId, firestoreKey] of Object.entries(firestoreFieldMap)) {
+                const rawValue = formData.get(formId);
+                if (rawValue !== null && rawValue !== undefined) {
+                    const trimmedValue = typeof rawValue === 'string' ? rawValue.trim() : rawValue;
+                    if (trimmedValue === '' && firestoreKey !== 'nota') continue;
+
+                    if (formId === 'nota') {
+                        const numValue = parseFloat(trimmedValue);
+                        if (!isNaN(numValue)) firestoreData[firestoreKey] = numValue;
+                    } else if (formId === 'measurements') {
+                        firestoreData[firestoreKey] = trimmedValue; // Salva string original
+                        const parts = trimmedValue.split('-');
+                        if (parts.length === 3) {
+                            firestoreData['Boobs'] = parts[0].trim();
+                            firestoreData['Waist'] = parts[1].trim();
+                            firestoreData['Ass'] = parts[2].trim();
+                        } else {
+                             console.warn(`Medidas não divididas: "${trimmedValue}"`);
+                        }
+                    } else {
+                        firestoreData[firestoreKey] = trimmedValue;
+                    }
+                }
+            }
+            firestoreData.createdAt = serverTimestamp(); // Adiciona timestamp
+
+            console.log('Dados a serem enviados para Firestore:', firestoreData);
+
+            // Salva no Firestore
             const docRef = await addDoc(collection(db, "atores"), firestoreData);
             console.log("Documento escrito com ID: ", docRef.id);
             alert('Atriz criada com sucesso!');
-            form.reset(); // Limpa o formulário após sucesso
-            // Opcional: Redirecionar o usuário
-            // window.location.href = 'index.html'; // Volta para a homepage, por exemplo
+            form.reset(); // Limpa formulário
+
         } catch (error) {
-            console.error("Erro ao adicionar documento: ", error);
-            // Fornece mais detalhes do erro ao usuário ou log
-            alert(`Erro ao criar atriz: ${error.message}. Verifique o console.`);
+            // Captura erros tanto da query de verificação quanto do addDoc
+            console.error("Erro durante o processo de criação: ", error);
+            alert(`Erro: ${error.message}. Verifique o console.`);
         } finally {
-            // Reabilita o botão independentemente de sucesso ou falha
+            // Garante que o botão seja reabilitado em qualquer caso (erro ou sucesso após verificação)
             submitButton.disabled = false;
             submitButton.textContent = 'Criar';
         }
