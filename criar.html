@@ -263,8 +263,8 @@
     <!-- FIM ÁREA DE CONTEÚDO -->
 
     <!-- Script para lidar com o envio do formulário -->
-  <script type="module">
-    // Importar funções do Firestore (DESCOMENTE QUANDO PRONTO e ajuste o caminho se necessário)
+ <script type="module">
+    // Importar funções do Firestore (DESCOMENTE QUANDO PRONTO)
     // import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     // import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
@@ -285,108 +285,105 @@
     // --- ELEMENTOS DO DOM ---
     const form = document.getElementById('create-actress-form');
     const submitButton = document.querySelector('button[form="create-actress-form"]');
-    const sourceTextArea = document.getElementById('texto'); // Referência à textarea
+    const sourceTextArea = document.getElementById('texto');
+    const nameInput = document.getElementById('name'); // Referência direta ao campo Nome
 
-    // --- MAPEAMENTO: Rótulo no Texto -> ID do Campo do Formulário ---
-    // Ajuste as chaves (rótulos) para corresponderem EXATAMENTE ao texto de origem
+    // --- MAPEAMENTO (SEM 'Name' agora) ---
+    // Ajuste as chaves para corresponderem EXATAMENTE ao texto de origem
     const fieldMappings = {
+        // 'Name' é tratado separadamente agora
         'Born': 'born',
         'Birthplace': 'birthplace',
         'Ethnicity': 'ethnicity',
-        'Hair color': 'hair_color', // Case sensitive! Ajuste se o texto for 'Hair Color'
-        'Eye color': 'eye_color',   // Case sensitive! Ajuste se o texto for 'Eye Color'
+        'Hair color': 'hair_color',
+        'Eye color': 'eye_color',
         'Height': 'height',
         'Weight': 'weight',
-        'Body type': 'body_type', // Case sensitive! Ajuste se o texto for 'Body Type'
+        'Body type': 'body_type',
         'Measurements': 'measurements',
-        'Years active': 'years_active' // Case sensitive! Ajuste se o texto for 'Years Active'
+        'Years active': 'years_active'
     };
 
     // --- FUNÇÕES HELPER PARA FORMATAÇÃO ---
 
     function formatBornDate(dateString) {
-        // Regex mais robusto para capturar dia (com ou sem sufixo), mês (nome completo) e ano (4 dígitos)
-        // Ex: "Thursday 27th of March 1997", "9th of June 1981", "1 May 1988"
         const dateRegex = /(\d{1,2})(?:st|nd|rd|th)?\s+(?:of\s+)?([a-zA-Z]+)\s+(\d{4})/;
         const match = dateString.match(dateRegex);
-
         if (match) {
             const day = match[1].padStart(2, '0');
             const monthName = match[2];
             const year = match[3];
-
-            // Mapeamento de meses (case-insensitive na busca)
-            const monthMap = {
-                'january': '01', 'february': '02', 'march': '03', 'april': '04',
-                'may': '05', 'june': '06', 'july': '07', 'august': '08',
-                'september': '09', 'october': '10', 'november': '11', 'december': '12'
-            };
-
-            const monthNumber = monthMap[monthName.toLowerCase()]; // Compara em minúsculas
-
-            if (monthNumber) {
-                return `${year}/${monthNumber}/${day}`;
-            } else {
-                 console.warn(`Mês não reconhecido na data: "${monthName}"`);
-            }
+            const monthMap = {'january': '01', 'february': '02', 'march': '03', 'april': '04', 'may': '05', 'june': '06', 'july': '07', 'august': '08', 'september': '09', 'october': '10', 'november': '11', 'december': '12'};
+            const monthNumber = monthMap[monthName.toLowerCase()];
+            if (monthNumber) return `${year}/${monthNumber}/${day}`;
+            else console.warn(`Mês não reconhecido: "${monthName}"`);
         } else {
-            console.warn(`Não foi possível analisar o formato da data: "${dateString}"`);
+            console.warn(`Formato de data não reconhecido: "${dateString}"`);
         }
-        // Se a formatação falhar, retorna a string original ou vazio
-        return dateString; // Ou return '';
+        return dateString; // Retorna original se falhar
     }
 
     function extractCmValue(heightString) {
-        // Procura por "(XXX cm)" ou "(or XXX cm)" e extrai XXX
-        const cmRegex = /\(\s*(?:or\s+)?(\d+)\s*cm\s*\)/i; // 'i' para case-insensitive
+        const cmRegex = /\(\s*(?:or\s+)?(\d+)\s*cm\s*\)/i;
         const match = heightString.match(cmRegex);
-        // Retorna o número encontrado ou vazio se não encontrar
         return match ? match[1] : '';
     }
 
     function extractKgValue(weightString) {
-        // Procura por "(XX kg)" ou "(or XX kg)" e extrai XX
-        const kgRegex = /\(\s*(?:or\s+)?(\d+)\s*kg\s*\)/i; // 'i' para case-insensitive
+        const kgRegex = /\(\s*(?:or\s+)?(\d+)\s*kg\s*\)/i;
         const match = weightString.match(kgRegex);
-        // Retorna o número encontrado ou vazio se não encontrar
         return match ? match[1] : '';
     }
 
+    // --- NOVA FUNÇÃO PARA EXTRAIR ANO INICIAL DE "Years active" ---
+    function extractStartYear(yearsString) {
+        // Procura pelos primeiros 4 dígitos após "Years active: "
+        const yearRegex = /(\d{4})/; // Regex simples para 4 dígitos
+        const match = yearsString.match(yearRegex);
+        return match ? match[1] : ''; // Retorna os 4 dígitos ou vazio
+    }
 
-    // --- FUNÇÃO PRINCIPAL DE AUTO-PREENCHIMENTO ---
+
+    // --- FUNÇÃO PRINCIPAL DE AUTO-PREENCHIMENTO (MODIFICADA) ---
     function autoFillForm() {
         if (!sourceTextArea) return;
         const textContent = sourceTextArea.value;
+        const lines = textContent.split('\n'); // Divide o texto em linhas
 
-        // Limpa previamente todos os campos que serão preenchidos automaticamente
+        // 1. Limpa previamente todos os campos (incluindo Nome)
+        if(nameInput) nameInput.value = '';
         Object.values(fieldMappings).forEach(fieldId => {
             const inputElement = document.getElementById(fieldId);
             if (inputElement) {
-                inputElement.value = ''; // Limpa o campo
+                inputElement.value = '';
             }
         });
 
-        // Processa cada mapeamento de campo
+        // 2. Trata o Nome (primeira linha)
+        if (lines.length > 0 && nameInput) {
+            nameInput.value = lines[0].trim(); // Pega a primeira linha como nome
+        }
+
+        // 3. Processa os outros mapeamentos
         Object.entries(fieldMappings).forEach(([label, fieldId]) => {
-            // Regex para encontrar a linha: Início da linha ou espaço/tab -> Label -> : -> Espaços -> Captura o resto da linha
-            // Usa (?:\s|^) para aceitar início de linha ou espaço antes do label.
-            // Usa .*? para captura não-gulosa caso haja múltiplos ':' na linha (pega só até o primeiro).
-             // Flags: 'i' (ignore case no label), 'm' (multiline)
-            const regex = new RegExp(`(?:^|\\s)${label}\\s*:\\s*(.*?)$`, 'im');
-            const match = textContent.match(regex);
+            // Regex para encontrar a linha com o label específico
+            // Procura: Início da linha -> Label -> : -> Espaços -> Captura o resto (.*) -> Fim da linha
+            const regex = new RegExp(`^${label}:\\s*(.*)$`, 'im');
+            const match = textContent.match(regex); // Procura no texto completo
 
             if (match) {
                 let value = match[1].trim(); // Valor encontrado
 
-                // Aplica formatação específica se necessário
+                // Aplica formatação específica
                 if (fieldId === 'born') {
                     value = formatBornDate(value);
                 } else if (fieldId === 'height') {
                     value = extractCmValue(value);
                 } else if (fieldId === 'weight') {
                     value = extractKgValue(value);
+                } else if (fieldId === 'years_active') { // Formatação para Years Active
+                    value = extractStartYear(value);
                 }
-                // Adicione outras formatações aqui se precisar
 
                 // Preenche o campo correspondente no formulário
                 const inputElement = document.getElementById(fieldId);
@@ -394,7 +391,7 @@
                     inputElement.value = value;
                 }
             }
-            // Se não encontrar 'match', o campo já foi limpo no início da função.
+            // Se não houver match, o campo já foi limpo.
         });
     }
 
@@ -403,76 +400,57 @@
     // Listener para auto-preenchimento quando a textarea muda
     if (sourceTextArea) {
         sourceTextArea.addEventListener('input', autoFillForm);
-        // Opcional: Chamar uma vez no carregamento se a textarea puder ter conteúdo inicial
+        // Opcional: Chamar uma vez no carregamento
         // autoFillForm();
     }
 
     // Listener para o envio do formulário
     form.addEventListener('submit', async (e) => {
-        e.preventDefault(); // Impede recarregamento da página
+        e.preventDefault();
         if (!submitButton) return;
 
-        // Desabilita botão durante o processo
         submitButton.disabled = true;
         submitButton.textContent = 'Salvando...';
 
-        // Coleta dados do formulário
         const formData = new FormData(form);
         const actressData = {};
         formData.forEach((value, key) => {
             const trimmedValue = typeof value === 'string' ? value.trim() : value;
-
-            // Tratamento especial para 'nota'
             if (key === 'nota') {
                 const numValue = parseFloat(trimmedValue);
-                // Adiciona nota apenas se for um número válido, caso contrário omite ou define como null
-                if (!isNaN(numValue)) {
-                    actressData[key] = numValue;
-                } else {
-                    // actressData[key] = null; // Opcional: definir como null se inválido/vazio
-                }
-            } else if (trimmedValue !== '') { // Adiciona outros campos apenas se não estiverem vazios
+                if (!isNaN(numValue)) actressData[key] = numValue;
+            } else if (trimmedValue !== '') {
                 actressData[key] = trimmedValue;
-            } else {
-                 // Opcional: Omitir campos vazios ou definir como null
-                 // actressData[key] = null;
             }
         });
 
-        // Adicionar timestamp (DESCOMENTE para usar com Firestore)
-        // actressData.createdAt = serverTimestamp();
+        // actressData.createdAt = serverTimestamp(); // Descomente se usar
 
-        console.log('Dados a serem enviados:', actressData); // Para depuração
+        console.log('Dados a serem enviados:', actressData);
 
-        // --- SEÇÃO PARA SALVAR NO FIRESTORE (DESCOMENTE E AJUSTE) ---
+        // --- SEÇÃO FIRESTORE (DESCOMENTE) ---
         /*
         try {
-            const docRef = await addDoc(collection(db, "atores"), actressData);
-            console.log("Documento escrito com ID: ", docRef.id);
+            // ... (código addDoc) ...
             alert('Atriz criada com sucesso!');
-            form.reset(); // Limpa o formulário após sucesso
-            // Opcional: Redirecionar para outra página
-            // window.location.href = 'index.html';
+            form.reset();
         } catch (error) {
-            console.error("Erro ao adicionar documento: ", error);
-            alert('Erro ao criar atriz. Verifique o console.');
+            // ... (tratamento de erro) ...
         } finally {
-            // Reabilita o botão independentemente de sucesso ou falha
             submitButton.disabled = false;
             submitButton.textContent = 'Criar';
         }
         */
 
-        // --- SIMULAÇÃO DE ENVIO (REMOVER QUANDO USAR FIRESTORE) ---
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Simula tempo de espera
-        alert('Simulação: Atriz criada! (Descomente o código do Firebase para salvar de verdade)');
-        form.reset(); // Limpa o formulário
+        // --- SIMULAÇÃO (REMOVER DEPOIS) ---
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        alert('Simulação: Atriz criada! (Descomente o código do Firebase)');
+        form.reset();
         submitButton.disabled = false;
         submitButton.textContent = 'Criar';
-        // --- FIM DA SIMULAÇÃO ---
+        // --- FIM SIMULAÇÃO ---
     });
 
 </script>
-
 </body>
 </html>
