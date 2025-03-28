@@ -140,6 +140,64 @@
              color: #fff;
          }
 
+
+/* Estilos Adicionais para a Lista no Popup */
+        .popup-list-container {
+            margin-top: 20px;
+            max-height: 400px; /* Altura máxima, habilita scroll se necessário */
+            overflow-y: auto; /* Adiciona barra de rolagem vertical se conteúdo exceder */
+            text-align: left; /* Alinha o texto dos itens à esquerda */
+            border-top: 1px solid #444; /* Linha separadora */
+            padding-top: 15px;
+        }
+
+        .popup-list-item {
+            display: flex; /* Usa flexbox para alinhar itens na horizontal */
+            align-items: center; /* Centraliza verticalmente */
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #3a3a3a; /* Linha separadora suave */
+        }
+        .popup-list-item:last-child {
+             border-bottom: none; /* Remove borda do último item */
+             margin-bottom: 0;
+        }
+
+
+        .popup-list-item img {
+            width: 50px; /* Tamanho do ícone */
+            height: 50px;
+            object-fit: cover;
+            border-radius: 50%; /* Ícones redondos */
+            margin-right: 15px; /* Espaço entre imagem e texto */
+            flex-shrink: 0; /* Evita que a imagem encolha */
+        }
+
+        .popup-list-item .info {
+            flex-grow: 1; /* Faz a div de info ocupar o espaço restante */
+        }
+
+        .popup-list-item .info strong {
+            display: block; /* Nome em uma linha */
+            color: #e0e0e0;
+        }
+
+        .popup-list-item .info .country {
+            font-size: 0.9em;
+            color: #aaa;
+        }
+
+        .popup-list-item .rating {
+            margin-left: 15px; /* Espaço antes da nota */
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #bb86fc; /* Cor de destaque para a nota */
+            flex-shrink: 0; /* Evita que a nota encolha */
+        }
+
+
+        
+
     </style>
 </head>
 <body>
@@ -152,19 +210,23 @@
         <!-- O card "More Stars" será adicionado aqui pelo JavaScript -->
     </div>
 
-    <!-- HTML do Popup (escondido inicialmente) -->
+ <!-- HTML do Popup (escondido inicialmente) -->
     <div class="popup-overlay" id="more-stars-popup">
         <div class="popup-content">
             <button class="popup-close-btn" id="close-popup-button">×</button>
-            <h2>Mais Estrelas</h2>
-            <p>Aqui você pode colocar o conteúdo que deseja exibir no popup.</p>
-            <p>Pode ser um formulário, mais informações, links, etc.</p>
-            <!-- Adicione o conteúdo do seu popup aqui -->
+            <h2>Todas as Estrelas</h2>
+            
+            <!-- Container para a lista de atrizes do popup -->
+            <div id="popup-actress-list" class="popup-list-container">
+                <!-- A lista será preenchida pelo JavaScript -->
+                <p>Carregando...</p> 
+            </div>
+
         </div>
     </div>
 
     <!-- Firebase Modular SDKs via CDN -->
-    <script type="module">
+   <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getFirestore, collection, getDocs, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
@@ -182,8 +244,63 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        const actressesListElement = document.getElementById('actresses-list');
+        const popupOverlay = document.getElementById('more-stars-popup');
+        const closePopupButton = document.getElementById('close-popup-button');
+        const popupListContainer = document.getElementById('popup-actress-list'); // Referência ao container da lista no popup
+
+        // --- NOVA FUNÇÃO PARA CARREGAR TODOS OS ATORES NO POPUP ---
+        async function loadAllActressesForPopup() {
+            if (!popupListContainer) {
+                console.error("Element with ID 'popup-actress-list' not found");
+                return;
+            }
+            // Limpa a lista anterior e mostra mensagem de carregamento
+            popupListContainer.innerHTML = '<p>Carregando...</p>';
+
+            // Query para buscar TODOS os documentos da coleção "atores", ordenados por nome
+            // Remova o limit() para buscar todos
+            const allActressesQuery = query(collection(db, "atores"), orderBy("nome", "asc")); 
+
+            try {
+                const querySnapshot = await getDocs(allActressesQuery);
+                let popupHTML = '';
+
+                if (querySnapshot.empty) {
+                    popupHTML = '<p>Nenhuma atriz encontrada.</p>';
+                } else {
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        const nome = data.nome || 'Nome não disponível'; // Valor padrão
+                        // Assumindo que o campo da imagem é 'foto' como no código anterior
+                        const foto = data.foto || 'path/to/default/image.png'; // Use um caminho para imagem padrão se 'foto' não existir
+                        const pais = data.pais || 'País não informado'; // Valor padrão
+                        const nota = data.nota !== undefined ? data.nota : '-'; // Valor padrão se nota não existir
+
+                        popupHTML += `
+                            <div class="popup-list-item">
+                                <img src="${foto}" alt="${nome}">
+                                <div class="info">
+                                    <strong>${nome}</strong>
+                                    <span class="country">(${pais})</span>
+                                </div>
+                                <span class="rating">${nota}</span>
+                            </div>
+                        `;
+                    });
+                }
+                popupListContainer.innerHTML = popupHTML; // Insere a lista gerada no container do popup
+
+            } catch (error) {
+                console.error("Erro ao buscar todas as atrizes para o popup:", error);
+                popupListContainer.innerHTML = '<p>Erro ao carregar a lista de atrizes.</p>';
+            }
+        }
+
+
+        // --- FUNÇÃO PARA CARREGAR AS ÚLTIMAS ATRIZES NA PÁGINA PRINCIPAL ---
         async function loadLatestActresses() {
-            const actressesListElement = document.getElementById('actresses-list');
+            // ... (código existente para buscar as 15 atrizes, sem alterações) ...
             if (!actressesListElement) {
                 console.error("Element with ID 'actresses-list' not found");
                 return;
@@ -211,9 +328,8 @@
                         </a>
                     `;
                 });
-                actressesListElement.innerHTML = actressesHTML; // Insira as atrizes
+                actressesListElement.innerHTML = actressesHTML;
 
-                // --- INÍCIO: Adicionar card "More Stars" ---
                 const moreStarsHTML = `
                     <div class="actress-card more-stars-card" id="more-stars-card">
                         <div class="actress-info">
@@ -221,37 +337,38 @@
                         </div>
                     </div>
                 `;
-                // Adiciona o card "More Stars" ao final do container
                 actressesListElement.insertAdjacentHTML('beforeend', moreStarsHTML);
-                // --- FIM: Adicionar card "More Stars" ---
 
-
-                // --- INÍCIO: Funcionalidade do Popup ---
+                // --- AJUSTE NA FUNCIONALIDADE DO POPUP ---
                 const moreStarsCard = document.getElementById('more-stars-card');
-                const popupOverlay = document.getElementById('more-stars-popup');
-                const closePopupButton = document.getElementById('close-popup-button');
 
-                if (moreStarsCard && popupOverlay && closePopupButton) {
+                if (moreStarsCard && popupOverlay && closePopupButton && popupListContainer) {
                     // Abrir popup ao clicar no card "More Stars"
                     moreStarsCard.addEventListener('click', () => {
-                        popupOverlay.style.display = 'flex'; // Mostra o popup (usando flex para centralizar)
+                        loadAllActressesForPopup(); // <<-- CHAMA A FUNÇÃO PARA CARREGAR A LISTA COMPLETA
+                        popupOverlay.style.display = 'flex'; // Mostra o popup
                     });
 
                     // Fechar popup ao clicar no botão 'X'
                     closePopupButton.addEventListener('click', () => {
                         popupOverlay.style.display = 'none'; // Esconde o popup
+                         // Opcional: Limpar a lista ao fechar para economizar memória, 
+                         // mas exigirá recarregar na próxima vez.
+                         // popupListContainer.innerHTML = '<p>Carregando...</p>'; 
                     });
 
-                    // Opcional: Fechar popup ao clicar fora da área de conteúdo
+                    // Fechar popup ao clicar fora da área de conteúdo
                     popupOverlay.addEventListener('click', (event) => {
-                        if (event.target === popupOverlay) { // Verifica se o clique foi no overlay (fundo)
-                            popupOverlay.style.display = 'none'; // Esconde o popup
+                        if (event.target === popupOverlay) {
+                            popupOverlay.style.display = 'none';
+                            // Opcional: Limpar lista ao fechar
+                            // popupListContainer.innerHTML = '<p>Carregando...</p>';
                         }
                     });
                 } else {
                     console.error("Não foi possível encontrar os elementos do popup ou o card 'More Stars'.");
                 }
-                // --- FIM: Funcionalidade do Popup ---
+                // --- FIM: AJUSTE NA FUNCIONALIDADE DO POPUP ---
 
             } catch (error) {
                 console.error("Erro ao buscar atrizes do Firestore:", error);
@@ -259,6 +376,7 @@
             }
         }
 
+        // Carrega as atrizes iniciais quando a página for carregada
         loadLatestActresses();
     </script>
 </body>
