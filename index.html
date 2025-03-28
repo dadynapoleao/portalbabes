@@ -195,7 +195,17 @@
             flex-shrink: 0; /* Evita que a nota encolha */
         }
 
+   .popup-list-item-link {
+            text-decoration: none; /* Remove o sublinhado do link */
+            color: inherit; /* Faz o link herdar a cor do texto pai */
+            display: block; /* Faz o link ocupar a largura total disponível */
+            transition: background-color 0.2s ease; /* Efeito suave ao passar o mouse */
+        }
 
+        .popup-list-item-link:hover .popup-list-item {
+             /* Leve mudança de fundo no item ao passar o mouse sobre o link */
+            background-color: #3a3a3a; 
+        }
         
 
     </style>
@@ -255,12 +265,9 @@
                 console.error("Element with ID 'popup-actress-list' not found");
                 return;
             }
-            // Limpa a lista anterior e mostra mensagem de carregamento
             popupListContainer.innerHTML = '<p>Carregando...</p>';
 
-            // Query para buscar TODOS os documentos da coleção "atores", ordenados por nome
-            // Remova o limit() para buscar todos
-            const allActressesQuery = query(collection(db, "atores"), orderBy("nome", "asc")); 
+            const allActressesQuery = query(collection(db, "atores"), orderBy("nome", "asc"));
 
             try {
                 const querySnapshot = await getDocs(allActressesQuery);
@@ -271,32 +278,36 @@
                 } else {
                     querySnapshot.forEach((doc) => {
                         const data = doc.data();
-                        const nome = data.nome || 'Nome não disponível'; // Valor padrão
-                        // Assumindo que o campo da imagem é 'foto' como no código anterior
-                        const foto = data.foto || 'path/to/default/image.png'; // Use um caminho para imagem padrão se 'foto' não existir
-                        const pais = data.pais || 'País não informado'; // Valor padrão
-                        const nota = data.nota !== undefined ? data.nota : '-'; // Valor padrão se nota não existir
+                        const actressId = doc.id; // <<<--- OBTER O ID DO DOCUMENTO
+                        const nome = data.nome || 'Nome não disponível';
+                        const foto = data.foto || 'path/to/default/image.png';
+                        const pais = data.pais || 'País não informado';
+                        const nota = data.nota !== undefined ? data.nota : '-';
 
+                        // --- INÍCIO DA ALTERAÇÃO ---
+                        // Envolve o 'div.popup-list-item' com uma tag 'a'
                         popupHTML += `
-                            <div class="popup-list-item">
-                                <img src="${foto}" alt="${nome}">
-                                <div class="info">
-                                    <strong>${nome}</strong>
-                                    <span class="country">(${pais})</span>
+                            <a href="she.html?id=${actressId}" class="popup-list-item-link"> 
+                                <div class="popup-list-item">
+                                    <img src="${foto}" alt="${nome}">
+                                    <div class="info">
+                                        <strong>${nome}</strong>
+                                        <span class="country">(${pais})</span>
+                                    </div>
+                                    <span class="rating">${nota}</span>
                                 </div>
-                                <span class="rating">${nota}</span>
-                            </div>
+                            </a> 
                         `;
+                        // --- FIM DA ALTERAÇÃO ---
                     });
                 }
-                popupListContainer.innerHTML = popupHTML; // Insere a lista gerada no container do popup
+                popupListContainer.innerHTML = popupHTML;
 
             } catch (error) {
                 console.error("Erro ao buscar todas as atrizes para o popup:", error);
                 popupListContainer.innerHTML = '<p>Erro ao carregar a lista de atrizes.</p>';
             }
         }
-
 
         // --- FUNÇÃO PARA CARREGAR AS ÚLTIMAS ATRIZES NA PÁGINA PRINCIPAL ---
         async function loadLatestActresses() {
