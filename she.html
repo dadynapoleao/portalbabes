@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt">
 <head>
@@ -6,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalhes da Atriz</title>
     <style>
-        /* Estilos CSS para she.html com layout de 3 colunas e ícones de vídeo */
+        /* === COPIE TODOS os estilos de index.html/criar.html aqui primeiro === */
+        /* (body, @import, .main-nav, header, .content-container, form styles, popup styles etc.) */
+
+        /* Estilos Globais e Reset Básico */
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
@@ -14,322 +16,218 @@
             background-color: #121212;
             color: #e0e0e0;
             line-height: 1.6;
+            position: relative; /* Para popups e ícones posicionados */
         }
 
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
+        /* Estilos para o Menu de Navegação */
+        .main-nav { /* ... (Copiar de index.html) ... */
+            background-color: #1f1f1f; padding: 0.8em 30px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); text-align: right;
+        }
+        .main-nav ul { list-style: none; margin: 0; padding: 0; }
+        .main-nav li { display: inline-block; margin-left: 20px; }
+        .main-nav a { color: #e0e0e0; text-decoration: none; font-size: 1.1em; padding: 5px 10px; border-radius: 4px; transition: background-color 0.2s ease, color 0.2s ease; }
+        .main-nav a:hover { background-color: #bb86fc; color: #121212; }
+
+
+        /* Estilos do Cabeçalho */
         header {
             background-color: #1e1e1e;
             color: #fff;
-            padding: 2em 0;
+            padding: 1.5em 30px; /* Ajuste padding */
             text-align: center;
-            margin-bottom: 30px;
+            /* margin-bottom: 30px; */ /* Removido margin-bottom */
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            position: relative; /* Para posicionar o ícone de edição */
         }
 
         header h1 {
             margin: 0;
-            font-size: 2.5em;
+            font-size: 2.2em; /* Levemente menor */
             font-weight: 700;
             letter-spacing: 0.5px;
+            display: inline-block; /* Para permitir ícone ao lado */
+            margin-right: 40px; /* Espaço para o ícone */
         }
 
-        .actress-details-container {
-            max-width: 1200px; /* Aumentar max-width para acomodar 3 colunas */
-            margin: 20px auto;
-            background-color: #242424;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            padding: 30px;
-            display: grid; /* Layout Grid */
-            grid-template-columns: repeat(3, 1fr); /* 3 colunas de igual largura */
-            gap: 30px; /* Espaçamento entre colunas */
-        }
-
-        .column { /* Estilo para cada coluna */
-            padding: 20px;
-        }
-
-        .column:first-child { /* Estilo específico para a primeira coluna (informações da atriz) */
-            /* Pode adicionar estilos específicos se necessário */
-        }
-
-        .column:nth-child(2) { /* Estilo específico para a segunda coluna (vídeos) */
-            /* Pode adicionar estilos específicos se necessário */
-        }
-
-        .column:last-child { /* Estilo específico para a terceira coluna (vazia/futuro) */
-            /* Pode adicionar estilos específicos se necessário */
-        }
-
-
-        .actress-image-container {
-            text-align: center;
-            margin-bottom: 20px; /* Reduzir margem inferior na coluna */
-        }
-
-        .actress-image-container img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        .actress-info-section {
-            margin-bottom: 20px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #333;
-        }
-
-        .actress-info-section:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-
-        .actress-info-section h2 {
-            color: #fff;
-            font-size: 2em;
-            margin-top: 0;
-            margin-bottom: 15px; /* Reduzir margem inferior do título */
-            font-weight: normal;
-            text-align: left; /* Alinhar título da seção à esquerda na coluna */
-        }
-
-
-        .detail-row {
-            display: flex;
-            margin-bottom: 8px; /* Reduzir margem inferior das linhas de detalhe */
-        }
-
-        .detail-label {
-            font-weight: bold;
-            color: #bbb;
-            width: 120px; /* Reduzir largura dos labels */
-            margin-right: 10px; /* Reduzir margem direita dos labels */
-            text-align: right;
-            font-size: 0.95em; /* Reduzir tamanho da fonte dos labels */
-        }
-
-        .detail-value {
-            color: #e0e0e0;
-            font-size: 0.95em; /* Reduzir tamanho da fonte dos valores */
-        }
-
-        /* Estilos para a seção de vídeos */
-        .videos-section {
-            margin-top: 20px; /* Adicionar margem superior para separar dos detalhes da atriz */
-        }
-
-        .videos-section h2 {
-            color: #fff;
-            font-size: 2em;
-            margin-top: 0;
-            margin-bottom: 20px;
-            font-weight: normal;
-            text-align: left;
-        }
-
-        .video-card {
-            background-color: #333; /* Cor de fundo para os cards de vídeo */
-            border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            position: relative; /* Adicionar para posicionar o ícone de silhueta relativamente ao card */
-        }
-
-        .video-card img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        .video-info {
-            padding: 15px;
-        }
-
-        .video-info h3 {
-            margin: 0 0 10px 0;
-            font-size: 1.2em;
-            color: #fff;
-        }
-
-        .video-link-button {
-            display: inline-block;
-            padding: 10px 15px;
-            background-color: #5cb85c; /* Cor verde para botão */
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 0.9em;
-            transition: background-color 0.3s ease;
-        }
-
-        .video-link-button:hover {
-            background-color: #4cae4c; /* Verde mais escuro no hover */
-        }
-
-        /* Estilos para o ícone de silhueta e container de atrizes */
-        .video-actress-icons-container {
-            position: absolute; /* Posicionamento absoluto dentro de .video-card */
-            bottom: 10px;
-            right: 10px;
-            display: flex;
-            align-items: center;
-        }
-
-        .silhouette-icon {
-            width: 30px;
-            height: 30px;
-            background-color: #666; /* Cor de fundo para o ícone de silhueta */
-            border-radius: 50%;
+        /* === ESTILO PARA O ÍCONE DE EDIÇÃO === */
+        #edit-actress-button {
+            position: absolute;
+            top: 50%;
+            right: 30px;
+            transform: translateY(-50%);
+            font-size: 1.8em; /* Tamanho do ícone */
+            color: #aaa;
             cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #fff;
-            font-size: 1.2em; /* Tamanho do ícone */
-            margin-left: 5px; /* Espaçamento entre o texto e os ícones de atrizes */
-            transition: background-color 0.3s ease;
-             overflow: hidden; /* Garante que o conteúdo interno não vaze */
-        }
-
-        .silhouette-icon:hover {
-            background-color: #777;
-        }
-
-        .silhouette-icon::before { /* Simples silhueta com ::before pseudo-elemento (pode usar uma imagem SVG se preferir) */
-            content: "\\2640"; /* Unicode para símbolo feminino ♀ */
-            display: block;
-        }
-
-
-        .actress-icons-list {
-            display: none; /* Inicialmente escondido */
-            background-color: rgba(0, 0, 0, 0.8); /* Fundo semi-transparente para os ícones */
-            border-radius: 5px;
+            transition: color 0.2s ease;
+            background: none;
+            border: none;
             padding: 5px;
-            position: absolute; /* Posicionado relativamente ao .video-actress-icons-container */
-            bottom: 100%; /* Posicionar acima do ícone de silhueta */
-            right: 0;
-            z-index: 10; /* Garantir que está acima de outros elementos */
-            flex-direction: column; /* Ícones em coluna */
-            align-items: flex-end; /* Alinhar ícones à direita */
+        }
+        #edit-actress-button:hover {
+            color: #fff;
         }
 
-        .actress-icons-list.show {
-            display: flex; /* Mostrar quando a classe 'show' for adicionada */
+
+        /* Estilos do Container Principal (3 colunas) */
+        .actress-details-container { /* ... (Seus estilos existentes) ... */
+            max-width: 1200px; margin: 20px auto; background-color: #242424; border-radius: 12px;
+            overflow: hidden; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); padding: 30px;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;
+        }
+        .column { padding: 20px; }
+
+        /* Estilos Detalhes da Atriz (Coluna 1) */
+         .actress-image-container { text-align: center; margin-bottom: 20px; }
+         .actress-image-container img { max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); }
+         .actress-info-section { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #333; }
+         .actress-info-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+         .actress-info-section h2 { color: #fff; font-size: 2em; margin-top: 0; margin-bottom: 15px; font-weight: normal; text-align: left; }
+         .actress-info-section h3 { color: #ddd; font-size: 1.3em; margin-top: 0; margin-bottom: 15px; font-weight: bold; text-align: left; border-bottom: 1px solid #444; padding-bottom: 5px;}
+         .detail-row { display: flex; margin-bottom: 8px; }
+         .detail-label { font-weight: bold; color: #bbb; width: 120px; margin-right: 10px; text-align: right; font-size: 0.95em; flex-shrink: 0;}
+         .detail-value { color: #e0e0e0; font-size: 0.95em; }
+
+        /* Estilos Vídeos (Coluna 2) */
+        .videos-section { margin-top: 0; /* Removido margin-top extra */ }
+        .videos-section h2 { /* ... */ }
+        .video-card { /* ... */ }
+        /* ... (Todos os seus estilos de .video-card, .silhouette-icon, .actress-icons-list etc.) ... */
+         .videos-section h2 { color: #fff; font-size: 2em; margin-top: 0; margin-bottom: 20px; font-weight: normal; text-align: left; }
+         .video-card { background-color: #333; border-radius: 8px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); position: relative; }
+         .video-card img { width: 100%; height: auto; display: block; }
+         .video-info { padding: 15px; }
+         .video-info h3 { margin: 0 0 10px 0; font-size: 1.2em; color: #fff; }
+         .video-link-button { display: inline-block; padding: 10px 15px; background-color: #5cb85c; color: #fff; text-decoration: none; border-radius: 5px; font-size: 0.9em; transition: background-color 0.3s ease; }
+         .video-link-button:hover { background-color: #4cae4c; }
+         .video-actress-icons-container { position: absolute; bottom: 10px; right: 10px; display: flex; align-items: center; }
+         .silhouette-icon { width: 30px; height: 30px; background-color: #666; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; color: #fff; font-size: 1.2em; margin-left: 5px; transition: background-color 0.3s ease; overflow: hidden; }
+         .silhouette-icon:hover { background-color: #777; }
+         .silhouette-icon::before { content: "\\2640"; display: block; }
+         .actress-icons-list { display: none; background-color: rgba(0, 0, 0, 0.8); border-radius: 5px; padding: 5px; position: absolute; bottom: 100%; right: 0; z-index: 10; flex-direction: column; align-items: flex-end; }
+         .actress-icons-list.show { display: flex; }
+         .actress-icon { width: 40px; height: 40px; border-radius: 50%; margin-bottom: 5px; cursor: pointer; border: 2px solid transparent; transition: border-color 0.3s ease; overflow: hidden; }
+         .actress-icon:last-child { margin-bottom: 0; }
+         .actress-icon:hover { border-color: #fff; }
+         .actress-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+         .actress-icon-link { display: block; }
+
+
+        /* === ESTILOS PARA O POPUP DE EDIÇÃO === */
+        /* Reutilizar estilos de popup se possível, mas com ID específico */
+        .popup-overlay { /* Estilo genérico para overlays */
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.85); z-index: 1000; justify-content: center;
+            align-items: center; padding: 20px; box-sizing: border-box; overflow-y: auto; /* Permite scroll do overlay se o popup for maior que a tela */
         }
 
-        .actress-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            margin-bottom: 5px;
-            cursor: pointer;
-            border: 2px solid transparent; /* Borda transparente por padrão */
-            transition: border-color 0.3s ease;
-            overflow: hidden; /* Para imagens arredondadas */
+        #edit-popup .popup-content { /* Estilo específico para conteúdo do popup de edição */
+            background-color: #2e2e2e; padding: 25px 30px; border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5); max-width: 1000px; /* Igual ao .content-container */
+            width: 95%; position: relative; text-align: left; /* Alterado para left */
+            max-height: 90vh; /* Altura máxima */
+            display: flex; flex-direction: column;
         }
 
-        .actress-icon:last-child {
-            margin-bottom: 0; /* Remover margem inferior do último ícone */
+        #edit-popup .popup-content h2 { /* Título dentro do popup */
+            text-align: center; color: #fff; margin-top: 0; margin-bottom: 25px; font-weight: normal;
         }
 
-        .actress-icon:hover {
-            border-color: #fff; /* Borda branca no hover */
-        }
+        #edit-popup .popup-close-btn { /* Botão de fechar */
+             position: absolute; top: 10px; right: 15px; font-size: 1.8em; font-weight: bold;
+             color: #aaa; cursor: pointer; border: none; background: none; padding: 5px; line-height: 1;
+         }
+         #edit-popup .popup-close-btn:hover { color: #fff; }
 
-        .actress-icon img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; /* Preencher o container circular */
-            display: block;
+        /* === ESTILOS PARA O FORMULÁRIO DENTRO DO POPUP DE EDIÇÃO === */
+        /* (Copiar estilos de .form-card, .full-width, label, input, textarea, button de criar.html) */
+        #edit-actress-form {
+            display: flex; flex-wrap: wrap; gap: 16px;
+             /* Remove margin-bottom, espaço gerenciado pelo popup content */
+             overflow-y: auto; /* Permite scroll interno do formulário se necessário */
+             padding: 5px; /* Pequeno padding interno */
+             flex-grow: 1; /* Ocupa espaço vertical */
         }
+        .form-card { /* Estilos copiados de criar.html */
+            background-color: #333; padding: 18px; border-radius: 8px; border: 1px solid #444;
+            flex-basis: calc(50% - 8px); flex-grow: 1; box-sizing: border-box; min-width: 250px;
+        }
+        .form-card.full-width { flex-basis: 100%; }
+        #edit-popup label { display: block; margin-bottom: 10px; color: #b0b0b0; font-size: 0.9em; font-weight: bold; }
+        #edit-popup input[type="text"],
+        #edit-popup input[type="url"],
+        #edit-popup input[type="number"],
+        #edit-popup textarea {
+            width: 100%; padding: 10px 12px; background-color: #404040; border: 1px solid #555;
+            border-radius: 5px; color: #e0e0e0; box-sizing: border-box; font-size: 1em;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease; margin-bottom: 0;
+        }
+        #edit-popup textarea { min-height: 120px; resize: vertical; }
+        #edit-popup input:focus,
+        #edit-popup textarea:focus { outline: none; border-color: #bb86fc; box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.3); }
 
-        .actress-icon-link {
-            display: block; /* Fazer o link ocupar todo o espaço do ícone */
+        /* Botão de Salvar Alterações */
+        #edit-popup .submit-button-container {
+            text-align: center;
+            margin-top: 20px; /* Espaço acima do botão */
+            padding-top: 20px;
+            border-top: 1px solid #444; /* Linha separadora */
         }
+         #edit-popup button[type="submit"] {
+            min-width: 200px; background-color: #bb86fc; color: #121212; padding: 14px 35px;
+            border: none; border-radius: 6px; font-size: 1.2em; font-weight: bold; cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+        #edit-popup button[type="submit"]:hover { background-color: #a772e3; }
+        #edit-popup button[type="submit"]:active { transform: scale(0.98); }
+        #edit-popup button[type="submit"]:disabled { background-color: #555; color: #888; cursor: not-allowed;}
 
     </style>
 </head>
 <body>
+    <!-- === MENU DE NAVEGAÇÃO === -->
+    <nav class="main-nav">
+        <ul>
+            <li><a href="index.html">Home</a></li> <!-- Ajuste o nome se for diferente -->
+            <li><a href="criar.html">Criar</a></li>
+        </ul>
+    </nav>
+    <!-- === FIM MENU === -->
+
     <header>
         <h1 id="actress-name-header">Detalhes da Atriz</h1>
+        <!-- === ÍCONE DE EDIÇÃO === -->
+        <button id="edit-actress-button" title="Editar Atriz">⚙️</button>
     </header>
 
     <div class="actress-details-container" id="actress-details">
         <!-- Coluna 1: Informações da Atriz -->
-        <div class="column">
-            <div class="actress-image-container">
-                <img src="" alt="Imagem da Atriz" id="actress-foto">
-            </div>
-
-            <div class="actress-info-section">
-                <h2 id="actress-nome"></h2>
-            </div>
-
-            <div class="actress-info-section">
-                <h3>Informações Pessoais</h3>
-                <div class="detail-row">
-                    <div class="detail-label">Nome:</div>
-                    <div class="detail-value" id="actress-nome-detail"></div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Data de Nascimento:</div>
-                    <div class="detail-value" id="actress-dataNascimento"></div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Etnia:</div>
-                    <div class="detail-value" id="actress-etnia"></div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">País:</div>
-                    <div class="detail-value" id="actress-pais"></div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Idade:</div>
-                    <div class="detail-value" id="actress-idade"></div>
-                </div>
-            </div>
-
-            <div class="actress-info-section">
-                <h3>Características Físicas</h3>
-                <div class="detail-row">
-                    <div class="detail-label">Altura:</div>
-                    <div class="detail-value" id="actress-altura"></div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Peso:</div>
-                    <div class="detail-value" id="actress-peso"></div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Cor do Cabelo:</div>
-                    <div class="detail-value" id="actress-corCabelo"></div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Cor dos Olhos:</div>
-                    <div class="detail-value" id="actress-corOlhos"></div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Medidas:</div>
-                    <div class="detail-value" id="actress-medidas"></div>
-                </div>
-                 <div class="detail-row">
-                    <div class="detail-label">Tipo Corpo:</div>
-                    <div class="detail-value" id="actress-tipoCorpo"></div>
-                </div>
-            </div>
-
-             <div class="actress-info-section">
-                <h3>Outros Detalhes</h3>
-                <div class="detail-row">
-                    <div class="detail-label">Nota:</div>
-                    <div class="detail-value" id="actress-nota"></div>
-                </div>
-            </div>
+        <div class="column" id="column-info">
+             <!-- Conteúdo dinâmico preenchido por JS -->
+             <div class="actress-image-container"><img src="" alt="Imagem da Atriz" id="actress-foto"></div>
+             <div class="actress-info-section"><h2 id="actress-nome"></h2></div>
+             <div class="actress-info-section"><h3>Informações Pessoais</h3> <!-- ... (detail-rows) ... -->
+                 <div class="detail-row"><div class="detail-label">Nome:</div><div class="detail-value" id="actress-nome-detail"></div></div>
+                 <div class="detail-row"><div class="detail-label">Nascimento:</div><div class="detail-value" id="actress-dataNascimento"></div></div>
+                 <div class="detail-row"><div class="detail-label">Etnia:</div><div class="detail-value" id="actress-etnia"></div></div>
+                 <div class="detail-row"><div class="detail-label">País:</div><div class="detail-value" id="actress-pais"></div></div>
+                 <!-- <div class="detail-row"><div class="detail-label">Idade:</div><div class="detail-value" id="actress-idade"></div></div> -->
+             </div>
+             <div class="actress-info-section"><h3>Características Físicas</h3> <!-- ... (detail-rows) ... -->
+                 <div class="detail-row"><div class="detail-label">Altura (cm):</div><div class="detail-value" id="actress-altura"></div></div>
+                 <div class="detail-row"><div class="detail-label">Peso (kg):</div><div class="detail-value" id="actress-peso"></div></div>
+                 <div class="detail-row"><div class="detail-label">Cabelo:</div><div class="detail-value" id="actress-corCabelo"></div></div>
+                 <div class="detail-row"><div class="detail-label">Olhos:</div><div class="detail-value" id="actress-corOlhos"></div></div>
+                 <div class="detail-row"><div class="detail-label">Medidas:</div><div class="detail-value" id="actress-medidas"></div></div>
+                 <div class="detail-row"><div class="detail-label">Corpo:</div><div class="detail-value" id="actress-tipoCorpo"></div></div>
+             </div>
+              <div class="actress-info-section"><h3>Outros Detalhes</h3> <!-- ... (detail-rows) ... -->
+                  <div class="detail-row"><div class="detail-label">Ativa desde:</div><div class="detail-value" id="actress-AnosAtiva"></div></div>
+                  <div class="detail-row"><div class="detail-label">Nota:</div><div class="detail-value" id="actress-nota"></div></div>
+                  <!-- Você pode adicionar o campo 'texto' aqui se quiser exibi-lo -->
+                  <!-- <div class="detail-row"><div class="detail-label">Descrição:</div><div class="detail-value" id="actress-texto"></div></div> -->
+             </div>
         </div>
 
         <!-- Coluna 2: Vídeos Relacionados -->
@@ -340,180 +238,379 @@
             </section>
         </div>
 
-        <!-- Coluna 3: Espaço Reservado (Vazia por enquanto) -->
-        <div class="column">
-            <!-- Pode adicionar conteúdo adicional aqui no futuro -->
-        </div>
+        <!-- Coluna 3: Espaço Reservado -->
+        <div class="column"></div>
 
     </div>
 
-    <!-- Firebase Modular SDKs via CDN e script para carregar detalhes da atriz e vídeos -->
+    <!-- === POPUP DE EDIÇÃO (Escondido) === -->
+    <div class="popup-overlay" id="edit-popup">
+        <div class="popup-content">
+            <button class="popup-close-btn" id="edit-popup-close-button">×</button>
+            <h2>Editar Atriz</h2>
+
+            <!-- Formulário de Edição (mesma estrutura de criar.html, mas IDs diferentes se necessário nos inputs) -->
+            <form id="edit-actress-form">
+                <!-- Card para Nome -->
+                <div class="form-card">
+                    <label for="edit-name">Name:</label>
+                    <input type="text" id="edit-name" name="name" required>
+                </div>
+                <!-- Card para Foto -->
+                <div class="form-card">
+                    <label for="edit-foto">Foto (URL):</label>
+                    <input type="url" id="edit-foto" name="foto" required>
+                </div>
+                 <!-- Card para Texto/Biografia -->
+                <div class="form-card full-width">
+                    <label for="edit-texto">Texto (Biografia/Descrição):</label>
+                    <textarea id="edit-texto" name="texto" rows="5" required></textarea>
+                </div>
+                <!-- Card para Born -->
+                <div class="form-card">
+                    <label for="edit-born">Born (YYYY/MM/DD):</label>
+                    <input type="text" id="edit-born" name="born">
+                </div>
+                <!-- Card para Birthplace -->
+                <div class="form-card">
+                    <label for="edit-birthplace">Birthplace:</label>
+                    <input type="text" id="edit-birthplace" name="birthplace">
+                </div>
+                <!-- Card para Ethnicity -->
+                <div class="form-card">
+                    <label for="edit-ethnicity">Ethnicity:</label>
+                    <input type="text" id="edit-ethnicity" name="ethnicity">
+                </div>
+                <!-- Card para Hair color -->
+                <div class="form-card">
+                    <label for="edit-hair_color">Hair color:</label>
+                    <input type="text" id="edit-hair_color" name="hair_color">
+                </div>
+                <!-- Card para Eye color -->
+                <div class="form-card">
+                    <label for="edit-eye_color">Eye color:</label>
+                    <input type="text" id="edit-eye_color" name="eye_color">
+                </div>
+                <!-- Card para Height -->
+                <div class="form-card">
+                    <label for="edit-height">Height (cm):</label>
+                    <input type="text" id="edit-height" name="height">
+                </div>
+                <!-- Card para Weight -->
+                <div class="form-card">
+                    <label for="edit-weight">Weight (kg):</label>
+                    <input type="text" id="edit-weight" name="weight">
+                </div>
+                <!-- Card para Body type -->
+                <div class="form-card">
+                    <label for="edit-body_type">Body type:</label>
+                    <input type="text" id="edit-body_type" name="body_type">
+                </div>
+                <!-- Card para Measurements -->
+                <div class="form-card">
+                    <label for="edit-measurements">Measurements:</label>
+                    <input type="text" id="edit-measurements" name="measurements">
+                </div>
+                <!-- Card para Years active -->
+                <div class="form-card">
+                    <label for="edit-years_active">Years active (Ano início):</label>
+                    <input type="text" id="edit-years_active" name="years_active">
+                </div>
+                <!-- Card para Nota -->
+                 <div class="form-card">
+                    <label for="edit-nota">Nota (0 a 10):</label>
+                    <input type="number" id="edit-nota" name="nota" min="0" max="10" step="0.1">
+                </div>
+            </form>
+            <!-- FIM FORMULÁRIO -->
+
+            <div class="submit-button-container">
+                <button type="submit" form="edit-actress-form" id="edit-submit-button">Salvar Alterações</button>
+            </div>
+        </div>
+    </div>
+    <!-- === FIM POPUP === -->
+
+
+    <!-- Firebase SDKs e Script -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getFirestore, doc, getDoc, collection, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        // Importar funções necessárias do Firestore
+        import { getFirestore, doc, getDoc, collection, getDocs, query, where, updateDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-        // Suas configurações do Firebase (cole aqui as suas configurações)
-        const firebaseConfig = {
-            apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0",
-            authDomain: "babes-392fd.firebaseapp.com",
-            projectId: "babes-392fd",
-            storageBucket: "babes-392fd.appspot.com",
-            messagingSenderId: "376795361631",
-            appId: "1:376795361631:web:d662f2b2f2cd23b115c6ea"
-        };
-
-        // Initialize Firebase
+        // Config Firebase
+        const firebaseConfig = { /* ... Suas configs ... */
+             apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0", authDomain: "babes-392fd.firebaseapp.com", projectId: "babes-392fd",
+             storageBucket: "babes-392fd.appspot.com", messagingSenderId: "376795361631", appId: "1:376795361631:web:d662f2b2f2cd23b115c6ea"
+         };
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app); // Inicialize o Firestore
+        const db = getFirestore(app);
 
+        // Variáveis globais para dados e ID da atriz atual
+        let currentActressId = null;
+        let currentActressData = null;
+
+        // Elementos do DOM para Edição
+        const editButton = document.getElementById('edit-actress-button');
+        const editPopup = document.getElementById('edit-popup');
+        const editPopupCloseButton = document.getElementById('edit-popup-close-button');
+        const editForm = document.getElementById('edit-actress-form');
+        const editSubmitButton = document.getElementById('edit-submit-button');
+
+        // Mapeamento ID do formulário -> Chave Firestore (igual ao de criar.html)
+         const firestoreFieldMap = {
+            'name': 'nome', 'texto': 'texto', 'foto': 'foto', 'born': 'dataNascimento',
+            'birthplace': 'pais', 'ethnicity': 'etnia', 'hair_color': 'corCabelo',
+            'eye_color': 'corOlhos', 'height': 'altura', 'weight': 'peso',
+            'body_type': 'tipoCorpo', 'measurements': 'medidas', 'years_active': 'AnosAtiva', 'nota': 'nota'
+         };
+         // Mapeamento ID do formulário de EDIÇÃO -> Chave Firestore
+         // (usaremos um prefixo 'edit-' para os IDs dos inputs no formulário de edição)
+         const editFormFieldMap = {
+             'edit-name': 'nome', 'edit-texto': 'texto', 'edit-foto': 'foto', 'edit-born': 'dataNascimento',
+             'edit-birthplace': 'pais', 'edit-ethnicity': 'etnia', 'edit-hair_color': 'corCabelo',
+             'edit-eye_color': 'corOlhos', 'edit-height': 'altura', 'edit-weight': 'peso',
+             'edit-body_type': 'tipoCorpo', 'edit-measurements': 'medidas', 'edit-years_active': 'AnosAtiva', 'edit-nota': 'nota'
+         };
+
+
+        // Função para carregar detalhes da atriz (modificada para guardar dados)
         async function loadActressDetails() {
-            // Obter o ID da atriz da URL (query parameter)
             const urlParams = new URLSearchParams(window.location.search);
-            const actressId = urlParams.get('id');
+            currentActressId = urlParams.get('id'); // Guarda o ID globalmente
 
-            if (!actressId) {
-                console.error("ID da atriz não encontrado na URL.");
-                document.getElementById('actress-details').innerHTML = '<p>Erro: ID da atriz não especificado.</p>';
-                return;
-            }
+            if (!currentActressId) { /* ... (tratamento de erro ID não encontrado) ... */ return; }
 
-            const actressDocumentRef = doc(db, "atores", actressId); // Referência ao documento da atriz
+            const actressDocumentRef = doc(db, "atores", currentActressId);
             try {
-                const docSnap = await getDoc(actressDocumentRef); // Obter o documento
-
+                const docSnap = await getDoc(actressDocumentRef);
                 if (docSnap.exists()) {
-                    const actressData = docSnap.data();
-                    console.log("Dados da atriz:", actressData);
+                    currentActressData = docSnap.data(); // Guarda os dados globalmente
+                    console.log("Dados da atriz carregados:", currentActressData);
 
-                    // Atualizar os elementos HTML com os dados da atriz (Coluna 1)
-                    document.getElementById('actress-name-header').textContent = `Detalhes de ${actressData.nome}`;
-                    document.getElementById('actress-nome').textContent = actressData.nome;
-                    document.getElementById('actress-nome-detail').textContent = actressData.nome;
-                    document.getElementById('actress-foto').src = actressData.foto;
-                    document.getElementById('actress-foto').alt = actressData.nome;
-                    document.getElementById('actress-altura').textContent = actressData.altura || 'N/A';
-                    document.getElementById('actress-corCabelo').textContent = actressData.corCabelo || 'N/A';
-                    document.getElementById('actress-corOlhos').textContent = actressData.corOlhos || 'N/A';
-                    document.getElementById('actress-dataNascimento').textContent = actressData.dataNascimento || 'N/A';
-                    document.getElementById('actress-etnia').textContent = actressData.etnia || 'N/A';
-                    document.getElementById('actress-idade').textContent = actressData.idade || 'N/A';
-                    document.getElementById('actress-medidas').textContent = actressData.medidas || 'N/A';
-                    document.getElementById('actress-nota').textContent = actressData.nota || 'N/A';
-                    document.getElementById('actress-pais').textContent = actressData.pais || 'N/A';
-                    document.getElementById('actress-peso').textContent = actressData.peso || 'N/A';
-                    document.getElementById('actress-tipoCorpo').textContent = actressData.tipoCorpo || 'N/A';
+                    // Preencher a página principal (Coluna 1)
+                    document.getElementById('actress-name-header').textContent = `Detalhes de ${currentActressData.nome}`;
+                    document.getElementById('actress-nome').textContent = currentActressData.nome;
+                    document.getElementById('actress-nome-detail').textContent = currentActressData.nome;
+                    document.getElementById('actress-foto').src = currentActressData.foto;
+                    document.getElementById('actress-foto').alt = currentActressData.nome;
+                    // Preencher outros campos da página
+                    document.getElementById('actress-dataNascimento').textContent = currentActressData.dataNascimento || 'N/A';
+                    document.getElementById('actress-etnia').textContent = currentActressData.etnia || 'N/A';
+                    document.getElementById('actress-pais').textContent = currentActressData.pais || 'N/A';
+                    document.getElementById('actress-altura').textContent = currentActressData.altura ? `${currentActressData.altura} cm` : 'N/A';
+                    document.getElementById('actress-peso').textContent = currentActressData.peso ? `${currentActressData.peso} kg` : 'N/A';
+                    document.getElementById('actress-corCabelo').textContent = currentActressData.corCabelo || 'N/A';
+                    document.getElementById('actress-corOlhos').textContent = currentActressData.corOlhos || 'N/A';
+                    document.getElementById('actress-medidas').textContent = currentActressData.medidas || 'N/A';
+                    document.getElementById('actress-tipoCorpo').textContent = currentActressData.tipoCorpo || 'N/A';
+                    document.getElementById('actress-AnosAtiva').textContent = currentActressData.AnosAtiva || 'N/A';
+                    document.getElementById('actress-nota').textContent = currentActressData.nota !== undefined ? currentActressData.nota : 'N/A';
+                    // document.getElementById('actress-texto').textContent = currentActressData.texto || ''; // Se quiser exibir o texto
 
-                    // Carregar vídeos relacionados (Coluna 2)
-                    loadRelatedVideos(actressId);
+                    // Habilitar botão de edição agora que os dados estão carregados
+                    if(editButton) editButton.disabled = false;
 
+                    // Carregar vídeos relacionados
+                    loadRelatedVideos(currentActressId);
 
-                } else {
-                    console.error("Documento da atriz não encontrado:", actressId);
-                    document.getElementById('actress-details').innerHTML = '<p>Atriz não encontrada.</p>';
-                }
-
-            } catch (error) {
-                console.error("Erro ao buscar detalhes da atriz:", error);
-                document.getElementById('actress-details').innerHTML = '<p>Erro ao carregar detalhes da atriz.</p>';
-            }
+                } else { /* ... (tratamento de erro documento não encontrado) ... */ }
+            } catch (error) { /* ... (tratamento de erro geral) ... */ }
         }
 
-        async function loadRelatedVideos(actressId) {
-            const videosSection = document.getElementById('actress-videos');
-            if (!videosSection) {
-                console.error("Elemento 'actress-videos' não encontrado.");
+        // Função para carregar vídeos (sem alterações significativas)
+        async function loadRelatedVideos(actressId) { /* ... (Sua função existente) ... */
+             const videosSection = document.getElementById('actress-videos');
+             if (!videosSection) return;
+             const videosQuery = query(collection(db, "videos"), where("atores", "array-contains", actressId));
+             try {
+                 const querySnapshot = await getDocs(videosQuery);
+                 let videosHTML = '<h2>Vídeos Relacionados</h2>'; // Reinicia com o título
+                 if (querySnapshot.empty) {
+                     videosHTML += '<p>Nenhum vídeo relacionado encontrado.</p>';
+                 } else {
+                     for (const docSnap of querySnapshot.docs) {
+                         const videoData = docSnap.data();
+                         const actressIdsInVideo = videoData.atores || [];
+                         videosHTML += `
+                             <div class="video-card">
+                                 <img src="${videoData.imagem}" alt="${videoData.nome}">
+                                 <div class="video-info">
+                                     <h3>${videoData.nome}</h3>
+                                     <a href="${videoData.pagina}" target="_blank" class="video-link-button">Ver Vídeo</a>
+                                 </div>
+                                 ${actressIdsInVideo.length > 1 ? `
+                                     <div class="video-actress-icons-container">
+                                         <div class="silhouette-icon" data-video-id="${docSnap.id}"></div>
+                                         <div class="actress-icons-list" id="actress-icons-list-${docSnap.id}"></div>
+                                     </div>
+                                 ` : ''}
+                             </div>`;
+                     }
+                 }
+                 videosSection.innerHTML = videosHTML; // Substitui conteúdo
+
+                 // Adicionar listeners para ícones de silhueta DEPOIS de adicionar o HTML
+                 querySnapshot.forEach(docSnap => {
+                     const actressIdsInVideo = docSnap.data().atores || [];
+                     if (actressIdsInVideo.length > 1) {
+                         const silhouetteIcon = videosSection.querySelector(`.silhouette-icon[data-video-id="${docSnap.id}"]`);
+                         const actressIconsList = videosSection.querySelector(`#actress-icons-list-${docSnap.id}`);
+                         if (silhouetteIcon && actressIconsList) {
+                             silhouetteIcon.addEventListener('click', function(e) {
+                                 e.stopPropagation(); // Impede que clique feche imediatamente se lista estiver dentro do icon
+                                 actressIconsList.classList.toggle('show');
+                                 // Opcional: Fechar outras listas abertas
+                             });
+                             loadActressIcons(actressIconsList, actressIdsInVideo);
+                         }
+                     }
+                 });
+                 // Opcional: Fechar lista de ícones se clicar fora dela
+                 document.body.addEventListener('click', (event) => {
+                      const openLists = videosSection.querySelectorAll('.actress-icons-list.show');
+                      openLists.forEach(list => {
+                          if (!list.contains(event.target) && !list.previousElementSibling.contains(event.target)) {
+                              list.classList.remove('show');
+                          }
+                      });
+                  }, true); // Use capture phase
+
+             } catch (error) { /* ... (tratamento erro vídeos) ... */ }
+         }
+
+
+         // Função para carregar ícones de atriz (sem alterações)
+        async function loadActressIcons(iconsListContainer, actressIds) { /* ... (Sua função existente) ... */
+             let actressIconsHTML = '';
+             for (const id of actressIds) {
+                 try {
+                     const actressDoc = await getDoc(doc(db, "atores", id));
+                     if (actressDoc.exists()) {
+                         const d = actressDoc.data();
+                         actressIconsHTML += `<a href="she.html?id=${id}" class="actress-icon-link"><div class="actress-icon"><img src="${d.foto}" alt="${d.nome}"></div></a>`;
+                     }
+                 } catch (err) { console.error("Erro carregando icone atriz:", err); }
+             }
+             iconsListContainer.innerHTML = actressIconsHTML;
+         }
+
+        // --- FUNÇÕES PARA O POPUP DE EDIÇÃO ---
+
+        function openEditPopup() {
+            if (!currentActressData || !editForm) {
+                console.error("Dados da atriz ou formulário de edição não estão prontos.");
                 return;
             }
 
-            const videosQuery = query(collection(db, "videos"), where("atores", "array-contains", actressId)); // Consulta para vídeos da atriz
-            try {
-                const querySnapshot = await getDocs(videosQuery);
-                let videosHTML = '';
-                for (const doc of querySnapshot.docs) { // Usar loop for...of para async/await dentro do loop
-                    const videoData = doc.data();
-                    const videoNome = videoData.nome;
-                    const videoImagem = videoData.imagem;
-                    const videoPagina = videoData.pagina;
-                    const actressIds = videoData.atores || []; // Garantir que 'atores' é um array, mesmo que ausente
-                    const actressCount = actressIds.length;
+            console.log("Preenchendo formulário com:", currentActressData);
 
-                    videosHTML += `
-                        <div class="video-card">
-                            <img src="${videoImagem}" alt="${videoNome}">
-                            <div class="video-info">
-                                <h3>${videoNome}</h3>
-                                <a href="${videoPagina}" target="_blank" class="video-link-button">Ver Vídeo</a>
-                            </div>
-                            <div class="video-actress-icons-container">
-                                ${actressCount > 1 ? `
-                                    <div class="silhouette-icon" data-video-id="${doc.id}"></div>
-                                    <div class="actress-icons-list" id="actress-icons-list-${doc.id}">
-                                        <!-- Ícones de atrizes serão adicionados aqui -->
-                                    </div>
-                                `: ''}
-                            </div>
-                        </div>
-                    `;
+            // Preenche cada campo do formulário de edição
+            for (const [formInputId, firestoreKey] of Object.entries(editFormFieldMap)) {
+                const inputElement = editForm.querySelector(`#${formInputId}`); // Busca dentro do formulário
+                if (inputElement) {
+                    // Pega o valor do Firestore, usa '' se for null/undefined
+                    const value = currentActressData[firestoreKey] ?? '';
+                    inputElement.value = value;
+                     console.log(`Setting ${formInputId} to: ${value}`);
+                } else {
+                    console.warn(`Elemento ${formInputId} não encontrado no formulário de edição.`);
                 }
-                videosSection.innerHTML += videosHTML; // Adicionar vídeos à seção
-                if (videosHTML === '') {
-                    videosSection.innerHTML += '<p>Nenhum vídeo relacionado encontrado.</p>'; // Mensagem se não houver vídeos
+            }
+
+            editPopup.style.display = 'flex'; // Mostra o popup
+        }
+
+        function closeEditPopup() {
+            if (editPopup) editPopup.style.display = 'none'; // Esconde o popup
+        }
+
+        // --- EVENT LISTENERS PARA EDIÇÃO ---
+
+        if (editButton) {
+             editButton.disabled = true; // Desabilitado até os dados carregarem
+             editButton.addEventListener('click', openEditPopup);
+        }
+        if (editPopupCloseButton) {
+            editPopupCloseButton.addEventListener('click', closeEditPopup);
+        }
+        // Fechar ao clicar no overlay
+        if (editPopup) {
+            editPopup.addEventListener('click', (event) => {
+                if (event.target === editPopup) {
+                    closeEditPopup();
                 }
+            });
+        }
 
-                // Adicionar event listeners para ícones de silhueta APÓS os vídeos serem adicionados ao DOM
-                querySnapshot.forEach(doc => {
-                    const actressIds = doc.data().atores || [];
-                    if (actressIds.length > 1) {
-                        const silhouetteIcon = document.querySelector(`.silhouette-icon[data-video-id="${doc.id}"]`);
-                        const actressIconsList = document.getElementById(`actress-icons-list-${doc.id}`);
+        // Listener para submissão do formulário de EDIÇÃO
+        if (editForm) {
+            editForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!currentActressId || !editSubmitButton) return;
 
-                        if (silhouetteIcon && actressIconsList) {
-                            silhouetteIcon.addEventListener('click', function() {
-                                actressIconsList.classList.toggle('show');
-                            });
+                editSubmitButton.disabled = true;
+                editSubmitButton.textContent = 'Salvando...';
 
-                            // Carregar ícones de atrizes dentro da lista
-                            loadActressIcons(actressIconsList, actressIds);
+                const formData = new FormData(editForm);
+                const updatedData = {};
+
+                // Constrói objeto com dados atualizados
+                for (const [formInputId, firestoreKey] of Object.entries(editFormFieldMap)) {
+                     const rawValue = formData.get(formInputId.replace('edit-', '')); // Usa o 'name' original do input
+                    if (rawValue !== null && rawValue !== undefined) {
+                        const trimmedValue = typeof rawValue === 'string' ? rawValue.trim() : rawValue;
+
+                        if (trimmedValue === '' && firestoreKey !== 'nota') continue; // Pula vazios
+
+                        if (firestoreKey === 'nota') {
+                            const numValue = parseFloat(trimmedValue);
+                            updatedData[firestoreKey] = isNaN(numValue) ? null : numValue; // Salva null se inválido
+                        } else if (firestoreKey === 'medidas') {
+                            updatedData[firestoreKey] = trimmedValue; // Salva string original
+                            const parts = trimmedValue.split('-');
+                            if (parts.length === 3) {
+                                updatedData['Boobs'] = parts[0].trim();
+                                updatedData['Waist'] = parts[1].trim();
+                                updatedData['Ass'] = parts[2].trim();
+                            } else {
+                                // Opcional: Remover campos antigos se o novo formato for inválido
+                                // updatedData['Boobs'] = null; updatedData['Waist'] = null; updatedData['Ass'] = null;
+                            }
+                        } else {
+                            updatedData[firestoreKey] = trimmedValue;
                         }
                     }
-                });
-
-
-            } catch (error) {
-                console.error("Erro ao buscar vídeos relacionados:", error);
-                videosSection.innerHTML = '<p>Erro ao carregar vídeos relacionados.</p>';
-            }
-        }
-
-        async function loadActressIcons(iconsListContainer, actressIds) {
-            let actressIconsHTML = '';
-            for (const actressId of actressIds) {
-                try {
-                    const actressDoc = await getDoc(doc(db, "atores", actressId));
-                    if (actressDoc.exists()) {
-                        const actressData = actressDoc.data();
-                        const actressNome = actressData.nome;
-                        const actressFoto = actressData.foto;
-
-                        actressIconsHTML += `
-                            <a href="she.html?id=${actressId}" class="actress-icon-link">
-                                <div class="actress-icon">
-                                    <img src="${actressFoto}" alt="${actressNome}">
-                                </div>
-                            </a>
-                        `;
-                    }
-                } catch (error) {
-                    console.error("Erro ao carregar ícone de atriz:", error);
-                    // Em caso de erro ao carregar um ícone, pode adicionar um ícone de fallback ou ignorar
                 }
-            }
-            iconsListContainer.innerHTML = actressIconsHTML; // Adicionar ícones ao container
+
+                // Adicionar timestamp de atualização
+                updatedData.updatedAt = serverTimestamp();
+
+                console.log("Atualizando documento:", currentActressId, " com dados:", updatedData);
+
+                try {
+                    const docRef = doc(db, "atores", currentActressId); // Referência ao documento existente
+                    await updateDoc(docRef, updatedData); // Atualiza o documento
+
+                    alert("Dados da atriz atualizados com sucesso!");
+                    closeEditPopup(); // Fecha o popup
+                    await loadActressDetails(); // Recarrega os detalhes na página para mostrar as mudanças
+
+                } catch (error) {
+                    console.error("Erro ao atualizar documento:", error);
+                    alert(`Erro ao salvar alterações: ${error.message}. Verifique o console.`);
+                } finally {
+                    editSubmitButton.disabled = false;
+                    editSubmitButton.textContent = 'Salvar Alterações';
+                }
+            });
         }
 
 
-        // Carregar os detalhes da atriz quando a página for carregada
-        loadActressDetails();
+        // --- INICIALIZAÇÃO ---
+        loadActressDetails(); // Carrega os detalhes da atriz ao iniciar a página
+
     </script>
+
 </body>
 </html>
