@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site de Atrizes - Videos</title> <!-- Changed Title -->
+    <style>
+        /* Estilos Globais e Reset Básico */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #e0e0e0;
+            position: relative; /* Necessário para posicionamento absoluto/fixo de filhos */
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+        /* Estilos para o Menu de Navegação */
+        .main-nav {
+            background-color: #1f1f1f; /* Cor de fundo para o menu */
+            padding: 0.8em 30px; /* Espaçamento interno */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); /* Sombra sutil */
+            text-align: right; /* Alinha o item do menu à direita */
+        }
+
+        .main-nav ul {
+            list-style: none; /* Remove marcadores de lista */
+            margin: 0;
+            padding: 0;
+        }
+
+        .main-nav li {
+            display: inline-block; /* Coloca os itens na mesma linha */
+            margin-left: 20px; /* Espaço entre itens */
+        }
+
+        .main-nav a {
+            color: #e0e0e0; /* Cor do texto do link */
+            text-decoration: none; /* Remove sublinhado */
+            font-size: 1.1em;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .main-nav a:hover {
+            background-color: #bb86fc; /* Cor de destaque no hover */
+            color: #121212; /* Cor do texto no hover */
+        }
+
+        /* Estilos do Cabeçalho */
+        header {
+            background-color: #1e1e1e;
+            color: #fff;
+            padding: 2em 0;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* Placeholder styles for main content area */
+        main {
+            padding: 30px;
+            max-width: 1200px;
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        main h2 {
+             color: #bb86fc;
+             margin-bottom: 1em;
+        }
+
+        /* Keep other styles if needed for potential future elements like cards */
+        /* ... (You can keep or remove unused styles like .actress-card, .popup-overlay etc. if you prefer) */
+
+    </style>
+</head>
+<body>
+
+    <!-- MENU DE NAVEGAÇÃO -->
+    <nav class="main-nav">
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="criar.html">Criar</a></li>
+            <li><a href="videos.html">Videos</a></li> <!-- Link included here too -->
+        </ul>
+    </nav>
+    <!-- FIM MENU -->
+
+    <header>
+        <h1>Vídeos</h1> <!-- Changed Header Title -->
+    </header>
+
+    <!-- CONTAINER PRINCIPAL PARA VÍDEOS -->
+    <main>
+        <h2>Conteúdo de Vídeos</h2>
+        <p>Esta seção exibirá os vídeos disponíveis.</p>
+        <!-- Aqui você adicionaria a estrutura para listar ou exibir vídeos -->
+        <!-- Exemplo: <div class="video-grid"> ... video items ... </div> -->
+    </main>
+    <!-- FIM CONTAINER -->
+
+    <!-- No Firebase script needed here unless fetching videos dynamically -->
+
+</body>
+</html>
