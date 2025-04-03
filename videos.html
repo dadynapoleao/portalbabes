@@ -298,6 +298,7 @@
         }
 
         // --- FUNCTIONS FOR ACTRESS SEARCH & SELECTION ---
+              // --- FUNCTIONS FOR ACTRESS SEARCH & SELECTION ---
         function displaySuggestions(searchTerm) {
             suggestionsList.innerHTML = '';
             if (!searchTerm) {
@@ -309,17 +310,39 @@
             let matchedActresses = [];
             let relatedActressIds = new Set(); // For related logic
 
+            console.log(`\n--- displaySuggestions ---`); // Log start
+            console.log(`Search Term: "${lowerSearchTerm}"`);
+            console.log(`Selected Actresses (${selectedActresses.length}):`, JSON.stringify(selectedActresses.map(a => a.nome))); // Log selected names
+
             // Prioritize related actresses when exactly ONE is selected
             if (selectedActresses.length === 1) {
+                console.log("Mode: Prioritizing related actresses.");
                 const firstSelectedActressId = selectedActresses[0].id;
+                console.log(`Selected Actress ID: ${firstSelectedActressId}`);
+
+                // Find related IDs
                 allContent.forEach(item => {
                     if (item.atores && Array.isArray(item.atores) && item.atores.includes(firstSelectedActressId)) {
+                        // Log the item where the selected actress was found
+                        // console.log(`   Found selected in item ID ${item.id} (Type: ${item.type}, Name: ${item.nome || 'N/A'}), Actors:`, item.atores);
                         item.atores.forEach(actressId => {
-                            if (actressId !== firstSelectedActressId) relatedActressIds.add(actressId);
+                            if (actressId !== firstSelectedActressId) {
+                                relatedActressIds.add(actressId);
+                            }
                         });
                     }
                 });
+                // Convert Set to Array for easier logging/viewing
+                const relatedIdsArray = Array.from(relatedActressIds);
+                console.log(`Potential Related Actress IDs Found (${relatedIdsArray.length}):`, relatedIdsArray);
+                 // Optional: Log names corresponding to related IDs for better readability
+                 const relatedNames = allActresses
+                    .filter(a => relatedIdsArray.includes(a.id))
+                    .map(a => a.nome);
+                 console.log(`Names of Potential Related Actresses:`, relatedNames);
 
+
+                // Filter all actresses based on search term AND related status
                 const relatedMatching = allActresses.filter(actress =>
                     relatedActressIds.has(actress.id) &&
                     actress.nome.toLowerCase().includes(lowerSearchTerm) &&
@@ -330,25 +353,33 @@
                     actress.nome.toLowerCase().includes(lowerSearchTerm) &&
                     !selectedActresses.some(sa => sa.id === actress.id)
                 );
+
+                console.log(`   Matching Related (${relatedMatching.length}):`, relatedMatching.map(a=>a.nome));
+                console.log(`   Matching Other (${otherMatching.length}):`, otherMatching.map(a=>a.nome));
+
                 matchedActresses = [...relatedMatching, ...otherMatching];
 
             } else {
+                 console.log(`Mode: Standard filtering (${selectedActresses.length} selected).`);
                 // Original logic (0 or 2+ selected)
                 matchedActresses = allActresses.filter(actress =>
                     actress.nome.toLowerCase().includes(lowerSearchTerm) &&
                     !selectedActresses.some(sa => sa.id === actress.id)
                 );
+                 console.log(`   Matching Standard (${matchedActresses.length}):`, matchedActresses.map(a=>a.nome));
             }
 
-            // Displaying Suggestions
+
+            // Displaying Suggestions (No changes needed here)
             if (matchedActresses.length > 0) {
+                 console.log(`Displaying ${matchedActresses.length} suggestions.`);
                 matchedActresses.slice(0, 10).forEach(actress => {
                     const item = document.createElement('div');
                     item.classList.add('suggestion-item');
                     item.dataset.id = actress.id;
                     item.dataset.nome = actress.nome;
                     if (selectedActresses.length === 1 && relatedActressIds.has(actress.id)) {
-                         item.classList.add('related-suggestion'); // Add class for styling
+                         item.classList.add('related-suggestion');
                     }
                     item.innerHTML = `
                         <img src="${actress.foto || 'path/to/default/avatar.png'}" alt="">
@@ -359,9 +390,11 @@
                 });
                 suggestionsList.style.display = 'block';
             } else {
+                 console.log("Displaying: No matching suggestions found.");
                  suggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma atriz encontrada</div>';
                  suggestionsList.style.display = 'block';
             }
+             console.log(`--- End displaySuggestions ---`); // Log end
         }
 
         function handleSuggestionClick(event) {
