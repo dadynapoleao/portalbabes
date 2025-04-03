@@ -148,6 +148,14 @@
             object-fit: cover;
         }
 
+.suggestion-item.related-suggestion {
+    /* Slightly different background or border to highlight */
+    background-color: #3a3a3a; /* A bit darker/different than regular suggestion hover */
+}
+.suggestion-item.related-suggestion:hover {
+     background-color: #505050; /* Adjust hover for related items */
+}
+        
         /* --- End: Filters and Search Styles --- */
 
         /* Container Grid (Same as before) */
@@ -325,8 +333,7 @@
         }
 
         // --- FUNCTIONS FOR ACTRESS SEARCH & SELECTION ---
-        function displaySuggestions(searchTerm) {
-             // ... (rest of the displaySuggestions function remains the same) ...
+      function displaySuggestions(searchTerm) {
             suggestionsList.innerHTML = ''; // Clear previous suggestions
             if (!searchTerm) {
                 suggestionsList.style.display = 'none';
@@ -334,20 +341,74 @@
             }
 
             const lowerSearchTerm = searchTerm.toLowerCase();
-            const matchedActresses = allActresses.filter(actress =>
-                actress.nome.toLowerCase().includes(lowerSearchTerm) &&
-                !selectedActresses.some(sa => sa.id === actress.id) // Exclude already selected
-            );
+            let matchedActresses = [];
+            let relatedActressIds = new Set(); // Keep track of related IDs for potential highlighting
 
+            // --- NEW LOGIC: Prioritize related actresses when exactly ONE is selected ---
+            if (selectedActresses.length === 1) {
+                const firstSelectedActressId = selectedActresses[0].id;
+
+                // Find IDs of actresses appearing in the same content as the selected one
+                allContent.forEach(item => {
+                    // Check if the item has actors and includes the selected one
+                    if (item.atores && Array.isArray(item.atores) && item.atores.includes(firstSelectedActressId)) {
+                        // Add all *other* actors from this item to the related set
+                        item.atores.forEach(actressId => {
+                            if (actressId !== firstSelectedActressId) {
+                                relatedActressIds.add(actressId);
+                            }
+                        });
+                    }
+                });
+
+                // Now, filter all available actresses based on the search term AND related status
+
+                // 1. Find RELATED actresses matching the search term (and not already selected)
+                const relatedMatching = allActresses.filter(actress =>
+                    relatedActressIds.has(actress.id) && // Must be in the related set
+                    actress.nome.toLowerCase().includes(lowerSearchTerm) && // Must match search term
+                    !selectedActresses.some(sa => sa.id === actress.id) // Must not be already selected
+                );
+
+                // 2. Find OTHER actresses matching the search term (and not related, not already selected)
+                const otherMatching = allActresses.filter(actress =>
+                    !relatedActressIds.has(actress.id) && // Must NOT be in the related set
+                    actress.nome.toLowerCase().includes(lowerSearchTerm) && // Must match search term
+                    !selectedActresses.some(sa => sa.id === actress.id) // Must not be already selected
+                );
+
+                // Combine the lists, prioritizing related ones
+                matchedActresses = [...relatedMatching, ...otherMatching];
+
+            } else {
+                // --- Original Logic: Use when 0 or 2+ actresses are selected ---
+                matchedActresses = allActresses.filter(actress =>
+                    actress.nome.toLowerCase().includes(lowerSearchTerm) &&
+                    !selectedActresses.some(sa => sa.id === actress.id) // Exclude already selected
+                );
+            }
+            // --- END OF NEW/MODIFIED LOGIC ---
+
+
+            // --- Displaying Suggestions (Limit results and generate HTML) ---
             if (matchedActresses.length > 0) {
                 matchedActresses.slice(0, 10).forEach(actress => { // Limit suggestions shown
                     const item = document.createElement('div');
                     item.classList.add('suggestion-item');
-                    item.dataset.id = actress.id; // Store ID for adding later
+                    item.dataset.id = actress.id;
                     item.dataset.nome = actress.nome;
+
+                    // Add a visual cue if the suggestion is 'related' (optional but helpful)
+                    let relatedMarker = '';
+                    if (selectedActresses.length === 1 && relatedActressIds.has(actress.id)) {
+                         item.classList.add('related-suggestion'); // Add class for styling
+                         // relatedMarker = `<span style="font-size:0.8em; color: #aaa; margin-left: 5px;">(Relacionada)</span>`; // Example marker
+                    }
+
                     item.innerHTML = `
                         <img src="${actress.foto || 'path/to/default/avatar.png'}" alt="">
                         <span>${actress.nome}</span>
+                        ${relatedMarker} {/* Add the marker if defined */}
                     `;
                     item.addEventListener('click', handleSuggestionClick);
                     suggestionsList.appendChild(item);
@@ -356,104 +417,6 @@
             } else {
                  suggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma atriz encontrada</div>';
                  suggestionsList.style.display = 'block';
-            }
-        }
-
-        function handleSuggestionClick(event) {
-             // ... (rest of the handleSuggestionClick function remains the same) ...
-             const target = event.currentTarget; // The div.suggestion-item
-            const actressId = target.dataset.id;
-            const actressName = target.dataset.nome;
-
-            // Add to selected list if not already there
-            if (!selectedActresses.some(a => a.id === actressId)) {
-                selectedActresses.push({ id: actressId, nome: actressName });
-                renderSelectedActressesPills();
-                renderContent(); // Re-filter content
-            }
-
-            // Clear input and hide suggestions
-            searchInput.value = '';
-            suggestionsList.style.display = 'none';
-            searchInput.focus(); // Keep focus in the input area
-        }
-
-        function renderSelectedActressesPills() {
-             // ... (rest of the renderSelectedActressesPills function remains the same) ...
-            selectedActressesContainer.innerHTML = ''; // Clear existing pills
-            selectedActresses.forEach(actress => {
-                const pill = document.createElement('div');
-                pill.classList.add('actress-pill');
-                pill.dataset.id = actress.id;
-                pill.innerHTML = `
-                    <span>${actress.nome}</span>
-                    <button class="remove-actress-btn" title="Remover">×</button>
-                `;
-                // Add listener directly to the remove button
-                pill.querySelector('.remove-actress-btn').addEventListener('click', handleRemoveActress);
-                selectedActressesContainer.appendChild(pill);
-            });
-        }
-
-        function handleRemoveActress(event) {
-             // ... (rest of the handleRemoveActress function remains the same) ...
-            event.stopPropagation(); // Prevent wrapper click listener if needed
-            const pill = event.target.closest('.actress-pill');
-            const actressIdToRemove = pill.dataset.id;
-
-            // Remove from selected list
-            selectedActresses = selectedActresses.filter(a => a.id !== actressIdToRemove);
-
-            // Remove pill from DOM
-            pill.remove();
-
-            // Re-filter content
-            renderContent();
-            searchInput.focus(); // Keep focus
-        }
-
-
-        // --- FUNCTION TO LOAD ALL INITIAL DATA ---
-        async function loadInitialData() {
-            // ... (rest of the loadInitialData function remains the same) ...
-            contentContainer.innerHTML = '<p class="message">Carregando...</p>';
-            try {
-                const videosCol = collection(db, "videos");
-                const filmesCol = collection(db, "filmes");
-                const atoresCol = collection(db, "atores"); // Actress collection
-
-                // Fetch all data concurrently
-                const [videosSnapshot, filmesSnapshot, atoresSnapshot] = await Promise.all([
-                    getDocs(videosCol),
-                    getDocs(filmesCol),
-                    getDocs(atoresCol) // Fetch actresses
-                ]);
-
-                // Process Content (Videos/Films)
-                allContent = [];
-                videosSnapshot.forEach(doc => allContent.push({ id: doc.id, type: 'video', ...doc.data() }));
-                filmesSnapshot.forEach(doc => allContent.push({ id: doc.id, type: 'film', ...doc.data() }));
-
-                // Process Actresses for suggestions
-                allActresses = [];
-                atoresSnapshot.forEach(doc => {
-                    const data = doc.data();
-                    allActresses.push({
-                        id: doc.id,
-                        nome: data.nome || 'Nome Desconhecido', // Ensure nome exists
-                        foto: data.foto // Optional photo
-                    });
-                });
-                // Sort actresses alphabetically for suggestions (optional but nice)
-                allActresses.sort((a, b) => a.nome.localeCompare(b.nome));
-
-                // Initial Render
-                renderSelectedActressesPills(); // Render empty pills initially
-                renderContent();
-
-            } catch (error) {
-                console.error("Erro ao buscar dados do Firestore:", error);
-                contentContainer.innerHTML = '<p class="message">Erro ao carregar. Tente novamente.</p>';
             }
         }
 
