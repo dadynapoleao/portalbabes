@@ -3,118 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Site de Atrizes - Videos & Filmes</title> <!-- Updated Title -->
+    <title>Site de Atrizes - Videos & Filmes</title>
     <style>
-        /* Estilos Globais e Reset Básico (Same as index.html) */
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #121212;
-            color: #e0e0e0;
-        }
-
+        /* Estilos Globais e Reset Básico (Same as before) */
+        body { font-family: 'Roboto', sans-serif; margin: 0; padding: 0; background-color: #121212; color: #e0e0e0; }
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
-        /* Estilos para o Menu de Navegação (Same as index.html) */
-        .main-nav {
-            background-color: #1f1f1f;
-            padding: 0.8em 30px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-            text-align: right;
-        }
+        /* Estilos para o Menu de Navegação (Same as before) */
+        .main-nav { background-color: #1f1f1f; padding: 0.8em 30px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); text-align: right; }
         .main-nav ul { list-style: none; margin: 0; padding: 0; }
         .main-nav li { display: inline-block; margin-left: 20px; }
         .main-nav a { color: #e0e0e0; text-decoration: none; font-size: 1.1em; padding: 5px 10px; border-radius: 4px; transition: background-color 0.2s ease, color 0.2s ease; }
         .main-nav a:hover { background-color: #bb86fc; color: #121212; }
 
-        /* Estilos do Cabeçalho (Same as index.html) */
-        header {
-            background-color: #1e1e1e;
-            color: #fff;
-            padding: 2em 0;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
+        /* Estilos do Cabeçalho (Same as before) */
+        header { background-color: #1e1e1e; color: #fff; padding: 2em 0; text-align: center; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); }
         header h1 { margin: 0; font-size: 2.5em; font-weight: 700; letter-spacing: 0.5px; }
 
-        /* Container Grid para os Cards de Vídeos e Filmes */
+        /* --- NEW: Styles for Filters and Search --- */
+        .filters-container {
+            display: flex;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            justify-content: space-between; /* Space out buttons and search */
+            align-items: center;
+            padding: 15px 30px;
+            max-width: 1200px;
+            margin: 20px auto 0; /* Margin top, auto left/right, 0 bottom */
+            background-color: #1f1f1f; /* Slightly different background */
+            border-radius: 8px;
+            gap: 15px; /* Spacing between items */
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px; /* Spacing between buttons */
+        }
+
+        .filter-btn {
+            padding: 8px 15px;
+            border: 1px solid #555;
+            background-color: #333;
+            color: #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .filter-btn:hover {
+            background-color: #444;
+        }
+
+        .filter-btn.active {
+            background-color: #bb86fc;
+            color: #121212;
+            border-color: #bb86fc;
+            font-weight: bold;
+        }
+
+        .search-container {
+           flex-grow: 1; /* Allow search to take available space */
+           min-width: 200px; /* Minimum width for the search bar */
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #555;
+            border-radius: 6px;
+            background-color: #2e2e2e; /* Slightly different from button */
+            color: #e0e0e0;
+            font-size: 1em;
+            box-sizing: border-box; /* Include padding/border in width */
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #bb86fc;
+            box-shadow: 0 0 5px rgba(187, 134, 252, 0.5);
+        }
+        /* --- End: Filters and Search Styles --- */
+
+
+        /* Container Grid (Same as before) */
         .content-grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Responsive grid */
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 25px;
             padding: 30px;
             max-width: 1200px;
-            margin: 20px auto;
+            margin: 10px auto 20px; /* Reduced top margin */
         }
 
-        /* Estilo Base dos Cards */
-        .content-card {
-            background-color: #242424;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            position: relative; /* Needed for positioning the video number badge */
-        }
+        /* Card Styles (Same as before) */
+        .content-card { background-color: #242424; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); transition: transform 0.3s ease, box-shadow 0.3s ease; height: 100%; display: flex; flex-direction: column; position: relative; }
+        .content-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4); }
+        .content-card img { width: 100%; height: 250px; object-fit: cover; display: block; }
+        .content-info { padding: 15px 20px 20px; text-align: center; margin-top: auto; }
+        .content-info h3 { margin: 0 0 8px 0; font-size: 1.3em; font-weight: normal; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .content-info .year { font-size: 0.9em; color: #aaa; margin-top: -5px; }
+        .video-number-badge { position: absolute; top: 10px; left: 10px; background-color: rgba(187, 134, 252, 0.85); color: #121212; font-size: 0.9em; font-weight: bold; padding: 4px 8px; border-radius: 4px; z-index: 1; }
 
-        .content-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
-        }
-
-        .content-card img {
-            width: 100%;
-            height: 250px; /* Adjust height as needed */
-            object-fit: cover;
-            display: block;
-        }
-
-        .content-info {
-            padding: 15px 20px 20px; /* Adjusted padding */
-            text-align: center;
-            margin-top: auto; /* Pushes info down if card height varies */
-        }
-
-        .content-info h3 { /* Nome (Video/Filme) */
-            margin: 0 0 8px 0; /* Reduced bottom margin */
-            font-size: 1.3em;
-            font-weight: normal;
-            color: #fff;
-            white-space: nowrap;      /* Prevent wrapping */
-            overflow: hidden;         /* Hide overflow */
-            text-overflow: ellipsis;  /* Add ellipsis (...) */
-        }
-
-        .content-info .year { /* Ano (Filme) */
-            font-size: 0.9em;
-            color: #aaa;
-            margin-top: -5px; /* Adjust spacing */
-        }
-
-        /* Estilo para o "Pequeno Card" (Badge) do Número do Vídeo */
-        .video-number-badge {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background-color: rgba(187, 134, 252, 0.85); /* Purple with some transparency */
-            color: #121212;
-            font-size: 0.9em;
-            font-weight: bold;
-            padding: 4px 8px;
-            border-radius: 4px;
-            z-index: 1; /* Ensure it's above the image */
-        }
-
-        /* Loading/Error Message Style */
+        /* Loading/Error/No Results Message Style */
         .message {
             color: #aaa;
             font-size: 1.1em;
             text-align: center;
             padding: 40px;
+            grid-column: 1 / -1; /* Make message span all columns if grid is empty */
         }
 
     </style>
@@ -132,8 +128,21 @@
     <!-- FIM MENU -->
 
     <header>
-        <h1>Vídeos & Filmes</h1> <!-- Updated Header Title -->
+        <h1>Vídeos & Filmes</h1>
     </header>
+
+    <!-- FILTERS AND SEARCH AREA -->
+    <div class="filters-container">
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">Todos</button>
+            <button class="filter-btn" data-filter="video">Só Vídeos</button>
+            <button class="filter-btn" data-filter="film">Só Filmes</button>
+        </div>
+        <div class="search-container">
+            <input type="text" id="search-input" class="search-input" placeholder="Pesquisar por nome ou atriz...">
+        </div>
+    </div>
+    <!-- END FILTERS AND SEARCH AREA -->
 
     <!-- CONTAINER PRINCIPAL PARA VÍDEOS E FILMES -->
     <div class="content-grid-container" id="videos-filmes-container">
@@ -147,25 +156,104 @@
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-        // Suas configurações do Firebase (Mesmas do index.html)
+        // Firebase Config (Same as before)
         const firebaseConfig = {
-            apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0",
-            authDomain: "babes-392fd.firebaseapp.com",
-            projectId: "babes-392fd",
-            storageBucket: "babes-392fd.appspot.com",
-            messagingSenderId: "376795361631",
-            appId: "1:376795361631:web:d662f2b2f2cd23b115c6ea"
-        };
+             apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0",
+             authDomain: "babes-392fd.firebaseapp.com",
+             projectId: "babes-392fd",
+             storageBucket: "babes-392fd.appspot.com",
+             messagingSenderId: "376795361631",
+             appId: "1:376795361631:web:d662f2b2f2cd23b115c6ea"
+         };
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Referência ao container no DOM
+        // DOM References
         const contentContainer = document.getElementById('videos-filmes-container');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const searchInput = document.getElementById('search-input');
 
-        // --- FUNÇÃO PARA CARREGAR VÍDEOS E FILMES ---
-        async function loadVideosAndFilmes() {
+        // --- Global Data Storage ---
+        let allContent = []; // Will store all fetched videos and filmes
+        let activeTypeFilter = 'all'; // 'all', 'video', 'film'
+        let currentSearchTerm = '';
+
+        // --- FUNCTION TO RENDER CONTENT BASED ON FILTERS ---
+        function renderContent() {
+            if (!contentContainer) return;
+
+            const searchTermLower = currentSearchTerm.toLowerCase().trim();
+            let contentHTML = '';
+
+            const filteredContent = allContent.filter(item => {
+                // 1. Filter by Type
+                const typeMatch = activeTypeFilter === 'all' || item.type === activeTypeFilter;
+                if (!typeMatch) return false;
+
+                // 2. Filter by Search Term (Name or Actress)
+                if (searchTermLower === '') return true; // No search term, include if type matches
+
+                const nameLower = item.nome ? item.nome.toLowerCase() : '';
+                let actressMatch = false;
+                // Check actors map (assuming values are actress names)
+                if (item.atores && typeof item.atores === 'object') {
+                    // Important: Check if atores exists and is an object
+                    actressMatch = Object.values(item.atores).some(actressName =>
+                        typeof actressName === 'string' && actressName.toLowerCase().includes(searchTermLower)
+                    );
+                }
+
+
+                return nameLower.includes(searchTermLower) || actressMatch;
+            });
+
+            // Generate HTML for filtered items
+            if (filteredContent.length === 0) {
+                contentHTML = '<p class="message">Nenhum resultado encontrado.</p>';
+            } else {
+                filteredContent.forEach(item => {
+                    contentHTML += generateCardHTML(item);
+                });
+            }
+
+            contentContainer.innerHTML = contentHTML;
+        }
+
+        // --- FUNCTION TO GENERATE HTML FOR A SINGLE CARD ---
+        function generateCardHTML(item) {
+            const nome = item.nome || (item.type === 'video' ? 'Vídeo sem nome' : 'Filme sem nome');
+            const imagem = item.imagem || 'path/to/default/placeholder.png'; // Single default placeholder
+            const ano = item.ano || 'N/A';
+            const videoNo = item.no !== undefined ? item.no : '?';
+
+            if (item.type === 'video') {
+                return `
+                    <div class="content-card video-card">
+                        ${videoNo !== '?' ? `<span class="video-number-badge">#${videoNo}</span>` : ''}
+                        <img src="${imagem}" alt="${nome}">
+                        <div class="content-info">
+                            <h3>${nome}</h3>
+                        </div>
+                    </div>
+                `;
+            } else { // item.type === 'film'
+                return `
+                    <div class="content-card film-card">
+                        <img src="${imagem}" alt="${nome}">
+                        <div class="content-info">
+                            <h3>${nome}</h3>
+                            <p class="year">(${ano})</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+
+        // --- FUNCTION TO LOAD INITIAL DATA FROM FIREBASE ---
+        async function loadInitialData() {
             if (!contentContainer) {
                 console.error("Container element not found!");
                 return;
@@ -173,72 +261,69 @@
             contentContainer.innerHTML = '<p class="message">Carregando conteúdo...</p>'; // Show loading message
 
             try {
-                // Referências às coleções
                 const videosCol = collection(db, "videos");
                 const filmesCol = collection(db, "filmes");
 
-                // Buscar documentos de ambas as coleções em paralelo
                 const [videosSnapshot, filmesSnapshot] = await Promise.all([
                     getDocs(videosCol),
                     getDocs(filmesCol)
                 ]);
 
-                let contentHTML = '';
+                allContent = []; // Clear previous data
 
-                // Processar Vídeos
+                // Process Videos
                 videosSnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const nome = data.nome || 'Vídeo sem nome';
-                    const imagem = data.imagem || 'path/to/default/video_thumb.png'; // Caminho para imagem padrão
-                    const videoNo = data.no !== undefined ? data.no : '?'; // Pega o campo 'no'
-
-                    contentHTML += `
-                        <div class="content-card video-card">
-                            ${videoNo !== '?' ? `<span class="video-number-badge">#${videoNo}</span>` : ''}
-                            <img src="${imagem}" alt="${nome}">
-                            <div class="content-info">
-                                <h3>${nome}</h3>
-                                <!-- Não há ano para vídeos -->
-                            </div>
-                        </div>
-                    `;
+                    allContent.push({
+                        id: doc.id,
+                        type: 'video',
+                        ...doc.data() // Spread operator to copy all fields
+                    });
                 });
 
-                // Processar Filmes
+                // Process Filmes
                 filmesSnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const nome = data.nome || 'Filme sem nome';
-                    const imagem = data.imagem || 'path/to/default/movie_poster.png'; // Caminho para imagem padrão
-                    const ano = data.ano || 'N/A'; // Pega o campo 'ano'
-
-                    contentHTML += `
-                        <div class="content-card film-card">
-                            <!-- Sem badge de número para filmes -->
-                            <img src="${imagem}" alt="${nome}">
-                            <div class="content-info">
-                                <h3>${nome}</h3>
-                                <p class="year">(${ano})</p>
-                            </div>
-                        </div>
-                    `;
+                    allContent.push({
+                        id: doc.id,
+                        type: 'film',
+                        ...doc.data() // Spread operator
+                    });
                 });
 
-                // Exibir conteúdo ou mensagem se vazio
-                if (contentHTML === '') {
-                    contentContainer.innerHTML = '<p class="message">Nenhum vídeo ou filme encontrado.</p>';
-                } else {
-                    contentContainer.innerHTML = contentHTML;
-                }
+                // Initial Render
+                renderContent();
 
             } catch (error) {
-                console.error("Erro ao buscar vídeos e filmes do Firestore:", error);
+                console.error("Erro ao buscar dados do Firestore:", error);
                 contentContainer.innerHTML = '<p class="message">Erro ao carregar o conteúdo. Tente novamente mais tarde.</p>';
             }
         }
 
-        // --- INICIALIZAÇÃO ---
-        // Carrega os vídeos e filmes quando a página é carregada
-        loadVideosAndFilmes();
+        // --- EVENT LISTENERS ---
+
+        // 1. Filter Buttons
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Update active button style
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+
+                // Update active filter state
+                activeTypeFilter = button.getAttribute('data-filter');
+
+                // Re-render content
+                renderContent();
+            });
+        });
+
+        // 2. Search Input
+        searchInput.addEventListener('input', () => {
+            currentSearchTerm = searchInput.value;
+            // Re-render content as user types
+            renderContent();
+        });
+
+        // --- INITIALIZATION ---
+        loadInitialData(); // Load data when the script runs
 
     </script>
 
