@@ -3,54 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Site de Atrizes - Videos</title> <!-- Changed Title -->
+    <title>Site de Atrizes - Videos & Filmes</title> <!-- Updated Title -->
     <style>
-        /* Estilos Globais e Reset Básico */
+        /* Estilos Globais e Reset Básico (Same as index.html) */
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
             background-color: #121212;
             color: #e0e0e0;
-            position: relative; /* Necessário para posicionamento absoluto/fixo de filhos */
         }
 
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
-        /* Estilos para o Menu de Navegação */
+        /* Estilos para o Menu de Navegação (Same as index.html) */
         .main-nav {
-            background-color: #1f1f1f; /* Cor de fundo para o menu */
-            padding: 0.8em 30px; /* Espaçamento interno */
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); /* Sombra sutil */
-            text-align: right; /* Alinha o item do menu à direita */
+            background-color: #1f1f1f;
+            padding: 0.8em 30px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            text-align: right;
         }
+        .main-nav ul { list-style: none; margin: 0; padding: 0; }
+        .main-nav li { display: inline-block; margin-left: 20px; }
+        .main-nav a { color: #e0e0e0; text-decoration: none; font-size: 1.1em; padding: 5px 10px; border-radius: 4px; transition: background-color 0.2s ease, color 0.2s ease; }
+        .main-nav a:hover { background-color: #bb86fc; color: #121212; }
 
-        .main-nav ul {
-            list-style: none; /* Remove marcadores de lista */
-            margin: 0;
-            padding: 0;
-        }
-
-        .main-nav li {
-            display: inline-block; /* Coloca os itens na mesma linha */
-            margin-left: 20px; /* Espaço entre itens */
-        }
-
-        .main-nav a {
-            color: #e0e0e0; /* Cor do texto do link */
-            text-decoration: none; /* Remove sublinhado */
-            font-size: 1.1em;
-            padding: 5px 10px;
-            border-radius: 4px;
-            transition: background-color 0.2s ease, color 0.2s ease;
-        }
-
-        .main-nav a:hover {
-            background-color: #bb86fc; /* Cor de destaque no hover */
-            color: #121212; /* Cor do texto no hover */
-        }
-
-        /* Estilos do Cabeçalho */
+        /* Estilos do Cabeçalho (Same as index.html) */
         header {
             background-color: #1e1e1e;
             color: #fff;
@@ -58,29 +36,86 @@
             text-align: center;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
+        header h1 { margin: 0; font-size: 2.5em; font-weight: 700; letter-spacing: 0.5px; }
 
-        header h1 {
-            margin: 0;
-            font-size: 2.5em;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-
-        /* Placeholder styles for main content area */
-        main {
+        /* Container Grid para os Cards de Vídeos e Filmes */
+        .content-grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Responsive grid */
+            gap: 25px;
             padding: 30px;
             max-width: 1200px;
             margin: 20px auto;
+        }
+
+        /* Estilo Base dos Cards */
+        .content-card {
+            background-color: #242424;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative; /* Needed for positioning the video number badge */
+        }
+
+        .content-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .content-card img {
+            width: 100%;
+            height: 250px; /* Adjust height as needed */
+            object-fit: cover;
+            display: block;
+        }
+
+        .content-info {
+            padding: 15px 20px 20px; /* Adjusted padding */
             text-align: center;
+            margin-top: auto; /* Pushes info down if card height varies */
         }
 
-        main h2 {
-             color: #bb86fc;
-             margin-bottom: 1em;
+        .content-info h3 { /* Nome (Video/Filme) */
+            margin: 0 0 8px 0; /* Reduced bottom margin */
+            font-size: 1.3em;
+            font-weight: normal;
+            color: #fff;
+            white-space: nowrap;      /* Prevent wrapping */
+            overflow: hidden;         /* Hide overflow */
+            text-overflow: ellipsis;  /* Add ellipsis (...) */
         }
 
-        /* Keep other styles if needed for potential future elements like cards */
-        /* ... (You can keep or remove unused styles like .actress-card, .popup-overlay etc. if you prefer) */
+        .content-info .year { /* Ano (Filme) */
+            font-size: 0.9em;
+            color: #aaa;
+            margin-top: -5px; /* Adjust spacing */
+        }
+
+        /* Estilo para o "Pequeno Card" (Badge) do Número do Vídeo */
+        .video-number-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(187, 134, 252, 0.85); /* Purple with some transparency */
+            color: #121212;
+            font-size: 0.9em;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+            z-index: 1; /* Ensure it's above the image */
+        }
+
+        /* Loading/Error Message Style */
+        .message {
+            color: #aaa;
+            font-size: 1.1em;
+            text-align: center;
+            padding: 40px;
+        }
 
     </style>
 </head>
@@ -91,25 +126,121 @@
         <ul>
             <li><a href="index.html">Home</a></li>
             <li><a href="criar.html">Criar</a></li>
-            <li><a href="videos.html">Videos</a></li> <!-- Link included here too -->
+            <li><a href="videos.html">Videos</a></li>
         </ul>
     </nav>
     <!-- FIM MENU -->
 
     <header>
-        <h1>Vídeos</h1> <!-- Changed Header Title -->
+        <h1>Vídeos & Filmes</h1> <!-- Updated Header Title -->
     </header>
 
-    <!-- CONTAINER PRINCIPAL PARA VÍDEOS -->
-    <main>
-        <h2>Conteúdo de Vídeos</h2>
-        <p>Esta seção exibirá os vídeos disponíveis.</p>
-        <!-- Aqui você adicionaria a estrutura para listar ou exibir vídeos -->
-        <!-- Exemplo: <div class="video-grid"> ... video items ... </div> -->
-    </main>
+    <!-- CONTAINER PRINCIPAL PARA VÍDEOS E FILMES -->
+    <div class="content-grid-container" id="videos-filmes-container">
+        <p class="message">Carregando conteúdo...</p>
+        <!-- Cards de vídeos e filmes serão inseridos aqui pelo JavaScript -->
+    </div>
     <!-- FIM CONTAINER -->
 
-    <!-- No Firebase script needed here unless fetching videos dynamically -->
+    <!-- Firebase Modular SDKs via CDN -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Suas configurações do Firebase (Mesmas do index.html)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0",
+            authDomain: "babes-392fd.firebaseapp.com",
+            projectId: "babes-392fd",
+            storageBucket: "babes-392fd.appspot.com",
+            messagingSenderId: "376795361631",
+            appId: "1:376795361631:web:d662f2b2f2cd23b115c6ea"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Referência ao container no DOM
+        const contentContainer = document.getElementById('videos-filmes-container');
+
+        // --- FUNÇÃO PARA CARREGAR VÍDEOS E FILMES ---
+        async function loadVideosAndFilmes() {
+            if (!contentContainer) {
+                console.error("Container element not found!");
+                return;
+            }
+            contentContainer.innerHTML = '<p class="message">Carregando conteúdo...</p>'; // Show loading message
+
+            try {
+                // Referências às coleções
+                const videosCol = collection(db, "videos");
+                const filmesCol = collection(db, "filmes");
+
+                // Buscar documentos de ambas as coleções em paralelo
+                const [videosSnapshot, filmesSnapshot] = await Promise.all([
+                    getDocs(videosCol),
+                    getDocs(filmesCol)
+                ]);
+
+                let contentHTML = '';
+
+                // Processar Vídeos
+                videosSnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const nome = data.nome || 'Vídeo sem nome';
+                    const imagem = data.imagem || 'path/to/default/video_thumb.png'; // Caminho para imagem padrão
+                    const videoNo = data.no !== undefined ? data.no : '?'; // Pega o campo 'no'
+
+                    contentHTML += `
+                        <div class="content-card video-card">
+                            ${videoNo !== '?' ? `<span class="video-number-badge">#${videoNo}</span>` : ''}
+                            <img src="${imagem}" alt="${nome}">
+                            <div class="content-info">
+                                <h3>${nome}</h3>
+                                <!-- Não há ano para vídeos -->
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // Processar Filmes
+                filmesSnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const nome = data.nome || 'Filme sem nome';
+                    const imagem = data.imagem || 'path/to/default/movie_poster.png'; // Caminho para imagem padrão
+                    const ano = data.ano || 'N/A'; // Pega o campo 'ano'
+
+                    contentHTML += `
+                        <div class="content-card film-card">
+                            <!-- Sem badge de número para filmes -->
+                            <img src="${imagem}" alt="${nome}">
+                            <div class="content-info">
+                                <h3>${nome}</h3>
+                                <p class="year">(${ano})</p>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // Exibir conteúdo ou mensagem se vazio
+                if (contentHTML === '') {
+                    contentContainer.innerHTML = '<p class="message">Nenhum vídeo ou filme encontrado.</p>';
+                } else {
+                    contentContainer.innerHTML = contentHTML;
+                }
+
+            } catch (error) {
+                console.error("Erro ao buscar vídeos e filmes do Firestore:", error);
+                contentContainer.innerHTML = '<p class="message">Erro ao carregar o conteúdo. Tente novamente mais tarde.</p>';
+            }
+        }
+
+        // --- INICIALIZAÇÃO ---
+        // Carrega os vídeos e filmes quando a página é carregada
+        loadVideosAndFilmes();
+
+    </script>
 
 </body>
 </html>
