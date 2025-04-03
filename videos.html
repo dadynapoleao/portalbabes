@@ -4,141 +4,307 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Site de Atrizes - Videos & Filmes</title>
-    <style>
+   <style>
         /* Estilos Globais e Reset Básico */
-        body { font-family: 'Roboto', sans-serif; margin: 0; padding: 0; background-color: #121212; color: #e0e0e0; }
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #e0e0e0;
+        }
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
         /* Estilos para o Menu de Navegação */
-        .main-nav { background-color: #1f1f1f; padding: 0.8em 30px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); text-align: right; }
-        .main-nav ul { list-style: none; margin: 0; padding: 0; }
-        .main-nav li { display: inline-block; margin-left: 20px; }
-        .main-nav a { color: #e0e0e0; text-decoration: none; font-size: 1.1em; padding: 5px 10px; border-radius: 4px; transition: background-color 0.2s ease, color 0.2s ease; }
-        .main-nav a:hover { background-color: #bb86fc; color: #121212; }
+        .main-nav {
+            background-color: #1f1f1f;
+            padding: 0.8em 30px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            text-align: right;
+        }
+        .main-nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .main-nav li {
+            display: inline-block;
+            margin-left: 20px;
+        }
+        .main-nav a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 1.1em;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .main-nav a:hover {
+            background-color: #bb86fc;
+            color: #121212;
+        }
 
         /* Estilos do Cabeçalho */
-        header { background-color: #1e1e1e; color: #fff; padding: 2em 0; text-align: center; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); }
-        header h1 { margin: 0; font-size: 2.5em; font-weight: 700; letter-spacing: 0.5px; }
+        header {
+            background-color: #1e1e1e;
+            color: #fff;
+            padding: 2em 0;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
 
-        /* Estilos para Filters and Multi-Actress Search */
+        /* --- Estilos para Filters and Multi-Actress Search --- */
         .filters-container {
             display: flex;
-            flex-direction: column;
+            flex-direction: column; /* Empilha controlos verticalmente */
             padding: 15px 30px;
             max-width: 1200px;
-            margin: 20px auto 0;
-            background-color: #1f1f1f;
+            margin: 20px auto 0; /* Margem acima, auto dos lados, 0 abaixo */
+            background-color: #1f1f1f; /* Fundo ligeiramente diferente */
             border-radius: 8px;
-            gap: 15px;
+            gap: 15px; /* Espaçamento entre linhas de filtros/pesquisa */
         }
 
         .top-filter-row {
              display: flex;
-             justify-content: space-between;
+             justify-content: space-between; /* Espaça botões */
              align-items: center;
-             flex-wrap: wrap;
-             gap: 15px;
+             flex-wrap: wrap; /* Permite quebrar linha se necessário */
+             gap: 15px; /* Espaçamento se quebrar linha */
         }
 
-        .filter-buttons { display: flex; gap: 10px; }
-        .filter-btn { padding: 8px 15px; border: 1px solid #555; background-color: #333; color: #e0e0e0; border-radius: 6px; cursor: pointer; font-size: 0.95em; transition: background-color 0.2s ease, border-color 0.2s ease; }
-        .filter-btn:hover { background-color: #444; }
-        .filter-btn.active { background-color: #bb86fc; color: #121212; border-color: #bb86fc; font-weight: bold; }
+        .filter-buttons {
+            display: flex;
+            gap: 10px; /* Espaçamento entre botões */
+        }
 
-        /* Actress Search Area */
+        .filter-btn {
+            padding: 8px 15px;
+            border: 1px solid #555;
+            background-color: #333;
+            color: #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+        .filter-btn:hover { background-color: #444; }
+        .filter-btn.active {
+            background-color: #bb86fc;
+            color: #121212;
+            border-color: #bb86fc;
+            font-weight: bold;
+        }
+
+        /* Actress Search Area (Container pai das pílulas, input e sugestões) */
         .actress-search-area {
-            position: relative;
+            position: relative; /* ESSENCIAL para o posicionamento absoluto da lista de sugestões */
             width: 100%;
         }
 
+        /* Wrapper para pílulas e input */
         .search-input-wrapper {
             display: flex;
-            flex-wrap: wrap;
+            flex-wrap: wrap; /* Permite que pílulas quebrem linha */
             align-items: center;
-            gap: 5px;
-            padding: 5px 10px;
+            gap: 5px; /* Espaçamento entre pílulas e input */
+            padding: 5px 10px; /* Padding à volta */
             border: 1px solid #555;
             border-radius: 6px;
-            background-color: #2e2e2e;
-            cursor: text;
+            background-color: #2e2e2e; /* Fundo da área de input */
+            cursor: text; /* Indica que é clicável */
         }
-        .search-input-wrapper:focus-within {
+        .search-input-wrapper:focus-within { /* Estilo quando wrapper ou input têm foco */
              border-color: #bb86fc;
              box-shadow: 0 0 5px rgba(187, 134, 252, 0.5);
         }
 
+        /* Container das pílulas (usa display: contents para fluir no flex) */
         #selected-actresses-container {
             display: contents;
         }
 
+        /* Estilo individual das pílulas */
         .actress-pill {
-            display: inline-flex;
+            display: inline-flex; /* Alinha texto e botão dentro da pílula */
             align-items: center;
-            background-color: #bb86fc;
-            color: #121212;
+            background-color: #bb86fc; /* Cor de destaque */
+            color: #121212; /* Cor do texto na pílula */
             padding: 4px 8px;
             border-radius: 4px;
             font-size: 0.9em;
-            margin: 2px;
-            white-space: nowrap;
+            margin: 2px; /* Pequena margem entre pílulas */
+            white-space: nowrap; /* Evita quebra de linha dentro da pílula */
         }
-        .actress-pill span { margin-right: 5px; }
-        .remove-actress-btn { background: none; border: none; color: #121212; cursor: pointer; font-weight: bold; font-size: 1.1em; padding: 0 2px; line-height: 1; }
-        .remove-actress-btn:hover { opacity: 0.7; }
-
-        .search-input {
-            flex-grow: 1;
-            padding: 6px 5px;
+        .actress-pill span { margin-right: 5px; /* Espaço entre nome e botão X */ }
+        .remove-actress-btn { /* Botão 'X' para remover pílula */
+            background: none;
             border: none;
-            background-color: transparent;
+            color: #121212; /* Mesma cor do texto da pílula */
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1em;
+            padding: 0 2px;
+            line-height: 1; /* Garante alinhamento vertical */
+        }
+        .remove-actress-btn:hover { opacity: 0.7; /* Feedback visual ao passar o rato */ }
+
+        /* Input de texto real onde se digita */
+        .search-input {
+            flex-grow: 1; /* Ocupa o espaço restante na linha */
+            padding: 6px 5px; /* Padding mínimo */
+            border: none; /* Sem borda própria */
+            background-color: transparent; /* Usa o fundo do wrapper */
             color: #e0e0e0;
             font-size: 1em;
-            min-width: 150px;
-            outline: none;
+            min-width: 150px; /* Largura mínima para não desaparecer */
+            outline: none; /* Sem outline de foco (tratado pelo wrapper) */
         }
 
-        /* Suggestions Dropdown */
+        /* Suggestions Dropdown List */
         #suggestions-list {
-            display: none;
+            /* --- Visibilidade e Posição --- */
+            display: none; /* Começa escondido, JS muda para 'block' */
             position: absolute;
-            top: 100%;
+            top: 100%; /* Posiciona logo abaixo do search-input-wrapper */
             left: 0;
             right: 0;
-            background-color: #2e2e2e;
-            border: 1px solid #555;
-            border-top: none;
-            border-radius: 0 0 6px 6px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 10;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 10; /* Deve ficar acima da grelha de conteúdo */
+
+            /* --- Aparência --- */
+            background-color: #2e2e2e; /* Fundo da lista */
+            border: 1px solid #555; /* Borda à volta */
+            border-top: none; /* Evita borda dupla com o wrapper */
+            border-radius: 0 0 6px 6px; /* Cantos inferiores arredondados */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Sombra */
+
+            /* --- Tamanho e Scroll --- */
+            max-height: 200px; /* Altura máxima antes de scroll */
+            overflow-y: auto; /* Adiciona scroll vertical se necessário */
+
+             /* --- Garantir visibilidade --- */
+             visibility: visible;
+             opacity: 1;
+             height: auto; /* Altura baseada no conteúdo até max-height */
         }
 
-        .suggestion-item { padding: 8px 15px; color: #e0e0e0; cursor: pointer; display: flex; align-items: center; gap: 10px; }
-        .suggestion-item:hover { background-color: #444; }
-        .suggestion-item.no-results { cursor: default; color: #aaa; }
-        .suggestion-item img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
-        /* Style for related suggestions */
+        /* Itens Individuais na Lista de Sugestões */
+        .suggestion-item {
+             display: flex; /* Para alinhar imagem e texto */
+             padding: 8px 15px; /* Espaçamento interno */
+             color: #e0e0e0;
+             cursor: pointer;
+             align-items: center; /* Alinha verticalmente imagem e texto */
+             gap: 10px; /* Espaço entre imagem e texto */
+        }
+        .suggestion-item:hover { background-color: #444; /* Cor ao passar o rato */ }
+        .suggestion-item.no-results { /* Item de "Nenhum resultado" */
+            cursor: default;
+            color: #aaa; /* Cor diferente para indicar inatividade */
+            justify-content: center; /* Centraliza texto */
+        }
+        .suggestion-item img { /* Imagem da atriz na sugestão */
+            width: 30px;
+            height: 30px;
+            border-radius: 50%; /* Imagem redonda */
+            object-fit: cover; /* Cobre a área sem distorcer */
+            flex-shrink: 0; /* Evita que a imagem encolha */
+        }
+         /* Estilo para sugestões relacionadas (co-estrelas) */
         .suggestion-item.related-suggestion { background-color: #3a3a3a; }
         .suggestion-item.related-suggestion:hover { background-color: #505050; }
 
-        /* Container Grid */
-        .content-grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 25px; padding: 30px; max-width: 1200px; margin: 10px auto 20px; }
+        /* --- Fim dos Estilos de Filtros e Pesquisa --- */
 
-        /* Card Link */
-        .content-card-link { text-decoration: none; color: inherit; display: block; height: 100%; }
 
-        /* Card Styles */
-        .content-card { background-color: #242424; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); transition: transform 0.3s ease, box-shadow 0.3s ease; height: 100%; display: flex; flex-direction: column; position: relative; }
-        .content-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4); }
-        .content-card img { width: 100%; height: 250px; object-fit: cover; display: block; }
-        .content-info { padding: 15px 20px 20px; text-align: center; margin-top: auto; }
-        .content-info h3 { margin: 0 0 8px 0; font-size: 1.3em; font-weight: normal; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .content-info .year { font-size: 0.9em; color: #aaa; margin-top: -5px; }
-        .video-number-badge { position: absolute; top: 10px; left: 10px; background-color: rgba(187, 134, 252, 0.85); color: #121212; font-size: 0.9em; font-weight: bold; padding: 4px 8px; border-radius: 4px; z-index: 1; }
+        /* Container Grid para os Cards de Vídeos e Filmes */
+        .content-grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Grelha responsiva */
+            gap: 25px; /* Espaçamento entre cards */
+            padding: 30px; /* Espaçamento à volta da grelha */
+            max-width: 1200px; /* Largura máxima */
+            margin: 10px auto 20px; /* Margem abaixo dos filtros, auto dos lados, abaixo */
+        }
 
-        /* Message Style */
-        .message { color: #aaa; font-size: 1.1em; text-align: center; padding: 40px; grid-column: 1 / -1; }
+        /* Link que envolve o Card */
+        .content-card-link {
+            text-decoration: none; /* Remove sublinhado */
+            color: inherit; /* Herda cor do texto */
+            display: block; /* Ocupa espaço */
+            height: 100%; /* Tenta preencher altura da célula da grelha */
+        }
+
+        /* Estilo Base dos Cards (Vídeo/Filme) */
+        .content-card {
+            background-color: #242424; /* Fundo do card */
+            border-radius: 12px; /* Cantos arredondados */
+            overflow: hidden; /* Esconde conteúdo que transborda */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Sombra */
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Animação suave */
+            height: 100%; /* Tenta preencher altura do link pai */
+            display: flex;
+            flex-direction: column; /* Empilha imagem e info */
+            position: relative; /* Necessário para badge de número de vídeo */
+        }
+        .content-card:hover {
+            transform: translateY(-5px); /* Efeito de levantar ao passar o rato */
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4); /* Sombra mais pronunciada */
+        }
+        .content-card img { /* Imagem do card */
+            width: 100%;
+            height: 250px; /* Altura fixa para imagem (ajuste conforme necessário) */
+            object-fit: cover; /* Cobre a área sem distorcer */
+            display: block; /* Remove espaço extra abaixo da imagem */
+        }
+        .content-info { /* Área de texto abaixo da imagem */
+            padding: 15px 20px 20px;
+            text-align: center;
+            margin-top: auto; /* Empurra para baixo se card tiver altura extra */
+        }
+        .content-info h3 { /* Nome (Vídeo/Filme) */
+            margin: 0 0 8px 0;
+            font-size: 1.3em;
+            font-weight: normal;
+            color: #fff;
+            white-space: nowrap;      /* Evita quebra de linha */
+            overflow: hidden;         /* Esconde o excesso */
+            text-overflow: ellipsis;  /* Adiciona "..." */
+        }
+        .content-info .year { /* Ano (Filme) */
+            font-size: 0.9em;
+            color: #aaa;
+            margin-top: -5px; /* Ajusta espaçamento */
+        }
+
+        /* Badge para Número do Vídeo */
+        .video-number-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(187, 134, 252, 0.85); /* Fundo roxo semi-transparente */
+            color: #121212; /* Texto escuro */
+            font-size: 0.9em;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+            z-index: 1; /* Garante que fica acima da imagem */
+        }
+
+        /* Mensagem de Loading/Erro/Sem Resultados */
+        .message {
+            color: #aaa;
+            font-size: 1.1em;
+            text-align: center;
+            padding: 40px;
+            grid-column: 1 / -1; /* Ocupa toda a largura da grelha */
+        }
 
     </style>
 </head>
