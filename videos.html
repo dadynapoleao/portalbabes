@@ -232,43 +232,50 @@
         let activeTypeFilter = 'all';
 
         // --- FUNCTION TO RENDER CONTENT BASED ON FILTERS ---
-        function renderContent() {
-            // ... (rest of the renderContent function remains the same) ...
-             if (!contentContainer) return;
+             function renderContent() {
+            if (!contentContainer) return;
             let contentHTML = '';
 
             const filteredContent = allContent.filter(item => {
-                // 1. Filter by Type
+                // 1. Filter by Type (No change here)
                 const typeMatch = activeTypeFilter === 'all' || item.type === activeTypeFilter;
                 if (!typeMatch) return false;
 
-                // 2. Filter by Selected Actresses (if any)
+                // 2. Filter by Selected Actresses (UPDATED LOGIC)
                 if (selectedActresses.length > 0) {
-                    if (!item.atores || typeof item.atores !== 'object') {
-                        return false; // Item has no actors listed, cannot match
+                    // --- START OF CHANGES ---
+                    // Check if the item has an 'atores' field, AND if it's an ARRAY with items
+                    if (!item.atores || !Array.isArray(item.atores) || item.atores.length === 0) {
+                        // If no 'atores' array, it cannot match the selected actresses filter
+                        return false;
                     }
-                    // Check if *any* selected actress is present in the item's actors map
-                    // Assuming item.atores maps something like role/id -> actress *name*
-                    const itemActressNames = Object.values(item.atores).map(name => typeof name === 'string' ? name.toLowerCase() : '');
-                    const selectedActressNamesLower = selectedActresses.map(a => a.nome.toLowerCase());
 
-                    const actressMatch = selectedActressNamesLower.some(selectedName =>
-                        itemActressNames.includes(selectedName)
+                    // Get the array of actress IDs directly from the item
+                    const itemActressIds = item.atores;
+
+                    // Get the IDs of the actresses the user has selected (from the pills)
+                    const selectedActressIds = selectedActresses.map(a => a.id);
+
+                    // Check if *at least one* of the selected actress IDs exists in the item's actress ID array
+                    const actressMatch = selectedActressIds.some(selectedId =>
+                        itemActressIds.includes(selectedId) // Compare ID from pill with IDs in item.atores array
                     );
+                    // --- END OF CHANGES ---
 
+                    // If none of the selected actresses are found in this item's list, exclude the item
                     if (!actressMatch) return false;
                 }
 
-                // If we reach here, the item matches all filters
+                // If we reach here, the item matches all active filters
                 return true;
             });
 
-            // Generate HTML
+            // Generate HTML for the filtered items (No change here)
             if (filteredContent.length === 0) {
                 contentHTML = '<p class="message">Nenhum resultado encontrado para os filtros selecionados.</p>';
             } else {
                 filteredContent.forEach(item => {
-                    contentHTML += generateCardHTML(item); // Reuse your existing card generator
+                    contentHTML += generateCardHTML(item);
                 });
             }
             contentContainer.innerHTML = contentHTML;
