@@ -397,19 +397,41 @@
              console.log(`--- End displaySuggestions ---`); // Log end
         }
 
-        function handleSuggestionClick(event) {
+   function handleSuggestionClick(event) {
+            console.log("\n--- handleSuggestionClick ---"); // Log start
             const target = event.currentTarget;
             const actressId = target.dataset.id;
             const actressName = target.dataset.nome;
+            console.log(`Clicked Suggestion: ID=${actressId}, Name=${actressName}`);
 
-            if (!selectedActresses.some(a => a.id === actressId)) {
-                selectedActresses.push({ id: actressId, nome: actressName });
-                renderSelectedActressesPills();
-                renderContent(); // Re-filter content
+            if (!actressId || !actressName) {
+                console.error("Error: Clicked suggestion item missing data-id or data-nome!");
+                return; // Stop if data is missing
             }
+
+            // Check if already selected BEFORE trying to add
+            const isAlreadySelected = selectedActresses.some(a => a.id === actressId);
+            console.log(`Is already selected? ${isAlreadySelected}`);
+
+            if (!isAlreadySelected) {
+                console.log(`Adding actress to selectedActresses array...`);
+                selectedActresses.push({ id: actressId, nome: actressName });
+                // Log the array AFTER adding
+                console.log(`selectedActresses NOW (${selectedActresses.length}):`, JSON.stringify(selectedActresses.map(a => a.nome)));
+
+                console.log("Rendering pills...");
+                renderSelectedActressesPills();
+                console.log("Rendering content grid...");
+                renderContent(); // Re-filter content based on new selection
+            } else {
+                 console.log("Actress already selected, not adding again.");
+            }
+
+            console.log("Clearing search input and hiding suggestions...");
             searchInput.value = '';
             suggestionsList.style.display = 'none';
-            searchInput.focus();
+            searchInput.focus(); // Keep focus in the input area
+            console.log("--- End handleSuggestionClick ---"); // Log end
         }
 
         function renderSelectedActressesPills() {
