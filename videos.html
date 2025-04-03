@@ -199,13 +199,22 @@
     <div class="content-grid-container" id="videos-filmes-container">...</div>
 
     <!-- Firebase -->
-    <script type="module">
+     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-        // Firebase Config (Same as before)
-        const firebaseConfig = { /* ... your config ... */ };
-        const app = initializeApp(firebaseConfig);
+        // Firebase Config (CORRECTED)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0",
+            authDomain: "babes-392fd.firebaseapp.com",
+            projectId: "babes-392fd", // <--- Now included
+            storageBucket: "babes-392fd.appspot.com",
+            messagingSenderId: "376795361631",
+            appId: "1:376795361631:web:d662f2b2f2cd23b115c6ea"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig); // Now receives the correct config
         const db = getFirestore(app);
 
         // DOM References
@@ -217,14 +226,15 @@
         const searchInputWrapper = document.querySelector('.search-input-wrapper');
 
         // --- Global Data Storage ---
-        let allContent = []; // Stores all fetched videos and filmes
-        let allActresses = []; // Stores {id, nome, foto} from 'atores' collection
-        let selectedActresses = []; // Stores {id, nome} of selected actresses
-        let activeTypeFilter = 'all'; // 'all', 'video', 'film'
+        let allContent = [];
+        let allActresses = [];
+        let selectedActresses = [];
+        let activeTypeFilter = 'all';
 
         // --- FUNCTION TO RENDER CONTENT BASED ON FILTERS ---
         function renderContent() {
-            if (!contentContainer) return;
+            // ... (rest of the renderContent function remains the same) ...
+             if (!contentContainer) return;
             let contentHTML = '';
 
             const filteredContent = allContent.filter(item => {
@@ -265,34 +275,51 @@
         }
 
         // --- FUNCTION TO GENERATE HTML FOR A SINGLE CARD (Keep your existing) ---
-        function generateCardHTML(item) {
-            // ... (Your existing function to create video/film card HTML) ...
-            // Make sure it uses item.nome, item.imagem, item.no, item.ano etc.
+         function generateCardHTML(item) {
             const nome = item.nome || (item.type === 'video' ? 'Vídeo sem nome' : 'Filme sem nome');
             const imagem = item.imagem || 'path/to/default/placeholder.png';
             const ano = item.ano || 'N/A';
             const videoNo = item.no !== undefined ? item.no : '?';
 
+            // --- MAKE CARDS CLICKABLE ---
+            // Added href to link to she.html?id=ACTRESS_ID (assuming actress ID exists in item.atores)
+            // Or maybe link to video/film details page? Let's link to video/film detail page using item.id
+            // e.g., href="video_details.html?id=${item.id}&type=${item.type}"
+
+             let cardLink = '#'; // Default link if no specific page exists
+             if (item.type === 'video') {
+                 // Example link structure: video.html?id=videoId
+                 cardLink = `video_detail.html?id=${item.id}`; // Adjust the target page name if needed
+             } else if (item.type === 'film') {
+                 // Example link structure: film.html?id=filmId
+                  cardLink = `film_detail.html?id=${item.id}`; // Adjust the target page name if needed
+             }
+
+
+            // Wrap the card content in an anchor tag
+            let cardHTML = `<a href="${cardLink}" class="content-card-link" style="text-decoration: none; color: inherit;">`;
+
             if (item.type === 'video') {
-                return `
+                cardHTML += `
                     <div class="content-card video-card" data-id="${item.id}">
                         ${videoNo !== '?' ? `<span class="video-number-badge">#${videoNo}</span>` : ''}
                         <img src="${imagem}" alt="${nome}">
                         <div class="content-info"><h3>${nome}</h3></div>
                     </div>`;
-            } else {
-                return `
+            } else { // film
+                cardHTML += `
                     <div class="content-card film-card" data-id="${item.id}">
                         <img src="${imagem}" alt="${nome}">
                         <div class="content-info"><h3>${nome}</h3><p class="year">(${ano})</p></div>
                     </div>`;
             }
+            cardHTML += `</a>`; // Close the anchor tag
+            return cardHTML;
         }
 
-
         // --- FUNCTIONS FOR ACTRESS SEARCH & SELECTION ---
-
         function displaySuggestions(searchTerm) {
+             // ... (rest of the displaySuggestions function remains the same) ...
             suggestionsList.innerHTML = ''; // Clear previous suggestions
             if (!searchTerm) {
                 suggestionsList.style.display = 'none';
@@ -322,12 +349,12 @@
             } else {
                  suggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma atriz encontrada</div>';
                  suggestionsList.style.display = 'block';
-                 // Maybe hide after a delay if no results? Or keep showing the message.
             }
         }
 
         function handleSuggestionClick(event) {
-            const target = event.currentTarget; // The div.suggestion-item
+             // ... (rest of the handleSuggestionClick function remains the same) ...
+             const target = event.currentTarget; // The div.suggestion-item
             const actressId = target.dataset.id;
             const actressName = target.dataset.nome;
 
@@ -345,6 +372,7 @@
         }
 
         function renderSelectedActressesPills() {
+             // ... (rest of the renderSelectedActressesPills function remains the same) ...
             selectedActressesContainer.innerHTML = ''; // Clear existing pills
             selectedActresses.forEach(actress => {
                 const pill = document.createElement('div');
@@ -361,6 +389,7 @@
         }
 
         function handleRemoveActress(event) {
+             // ... (rest of the handleRemoveActress function remains the same) ...
             event.stopPropagation(); // Prevent wrapper click listener if needed
             const pill = event.target.closest('.actress-pill');
             const actressIdToRemove = pill.dataset.id;
@@ -379,6 +408,7 @@
 
         // --- FUNCTION TO LOAD ALL INITIAL DATA ---
         async function loadInitialData() {
+            // ... (rest of the loadInitialData function remains the same) ...
             contentContainer.innerHTML = '<p class="message">Carregando...</p>';
             try {
                 const videosCol = collection(db, "videos");
@@ -421,7 +451,7 @@
         }
 
         // --- EVENT LISTENERS ---
-
+         // ... (Event listeners remain the same) ...
         // 1. Filter Buttons (Type: All/Video/Film)
         filterButtons.forEach(button => {
             button.addEventListener('click', () => {
