@@ -5,21 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Site de Atrizes - Videos & Filmes</title>
     <style>
-        /* Estilos Globais, Nav, Header (Same as before) */
+        /* Estilos Globais e Reset Básico */
         body { font-family: 'Roboto', sans-serif; margin: 0; padding: 0; background-color: #121212; color: #e0e0e0; }
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+        /* Estilos para o Menu de Navegação */
         .main-nav { background-color: #1f1f1f; padding: 0.8em 30px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); text-align: right; }
         .main-nav ul { list-style: none; margin: 0; padding: 0; }
         .main-nav li { display: inline-block; margin-left: 20px; }
         .main-nav a { color: #e0e0e0; text-decoration: none; font-size: 1.1em; padding: 5px 10px; border-radius: 4px; transition: background-color 0.2s ease, color 0.2s ease; }
         .main-nav a:hover { background-color: #bb86fc; color: #121212; }
+
+        /* Estilos do Cabeçalho */
         header { background-color: #1e1e1e; color: #fff; padding: 2em 0; text-align: center; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); }
         header h1 { margin: 0; font-size: 2.5em; font-weight: 700; letter-spacing: 0.5px; }
 
-        /* --- Updated Styles for Filters and Multi-Actress Search --- */
+        /* Estilos para Filters and Multi-Actress Search */
         .filters-container {
             display: flex;
-            flex-direction: column; /* Stack controls vertically */
+            flex-direction: column;
             padding: 15px 30px;
             max-width: 1200px;
             margin: 20px auto 0;
@@ -32,7 +36,7 @@
              display: flex;
              justify-content: space-between;
              align-items: center;
-             flex-wrap: wrap; /* Wrap if needed */
+             flex-wrap: wrap;
              gap: 15px;
         }
 
@@ -43,124 +47,88 @@
 
         /* Actress Search Area */
         .actress-search-area {
-            position: relative; /* Needed for absolute positioning of suggestions */
+            position: relative;
             width: 100%;
         }
 
         .search-input-wrapper {
             display: flex;
-            flex-wrap: wrap; /* Allow pills to wrap */
+            flex-wrap: wrap;
             align-items: center;
             gap: 5px;
-            padding: 5px 10px; /* Padding around pills and input */
+            padding: 5px 10px;
             border: 1px solid #555;
             border-radius: 6px;
             background-color: #2e2e2e;
-            cursor: text; /* Indicate it's clickable like a text input */
+            cursor: text;
         }
-        .search-input-wrapper:focus-within { /* Style when wrapper or input has focus */
+        .search-input-wrapper:focus-within {
              border-color: #bb86fc;
              box-shadow: 0 0 5px rgba(187, 134, 252, 0.5);
         }
 
         #selected-actresses-container {
-            display: contents; /* Allow pills to flow directly inside the flex wrapper */
+            display: contents;
         }
 
         .actress-pill {
-            display: inline-flex; /* Use flex for alignment within pill */
+            display: inline-flex;
             align-items: center;
             background-color: #bb86fc;
             color: #121212;
             padding: 4px 8px;
             border-radius: 4px;
             font-size: 0.9em;
-            margin: 2px; /* Small margin between pills */
-            white-space: nowrap; /* Prevent wrapping inside pill */
+            margin: 2px;
+            white-space: nowrap;
         }
-
-        .actress-pill span {
-             margin-right: 5px;
-        }
-
-        .remove-actress-btn {
-            background: none;
-            border: none;
-            color: #121212;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 1.1em;
-            padding: 0 2px;
-            line-height: 1;
-        }
-        .remove-actress-btn:hover {
-            opacity: 0.7;
-        }
+        .actress-pill span { margin-right: 5px; }
+        .remove-actress-btn { background: none; border: none; color: #121212; cursor: pointer; font-weight: bold; font-size: 1.1em; padding: 0 2px; line-height: 1; }
+        .remove-actress-btn:hover { opacity: 0.7; }
 
         .search-input {
-            flex-grow: 1; /* Take remaining space */
-            padding: 6px 5px; /* Minimal padding */
-            border: none; /* Remove default border */
-            background-color: transparent; /* Inherit wrapper background */
+            flex-grow: 1;
+            padding: 6px 5px;
+            border: none;
+            background-color: transparent;
             color: #e0e0e0;
             font-size: 1em;
-            min-width: 150px; /* Ensure it doesn't get too small */
-            outline: none; /* Remove focus outline (handled by wrapper) */
+            min-width: 150px;
+            outline: none;
         }
 
         /* Suggestions Dropdown */
         #suggestions-list {
-            display: none; /* Hidden by default */
+            display: none;
             position: absolute;
-            top: 100%; /* Position below the input wrapper */
+            top: 100%;
             left: 0;
             right: 0;
             background-color: #2e2e2e;
             border: 1px solid #555;
-            border-top: none; /* Avoid double border */
+            border-top: none;
             border-radius: 0 0 6px 6px;
-            max-height: 200px; /* Limit height and add scroll */
+            max-height: 200px;
             overflow-y: auto;
-            z-index: 10; /* Ensure it's above content grid */
+            z-index: 10;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
-        .suggestion-item {
-            padding: 8px 15px;
-            color: #e0e0e0;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .suggestion-item { padding: 8px 15px; color: #e0e0e0; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        .suggestion-item:hover { background-color: #444; }
+        .suggestion-item.no-results { cursor: default; color: #aaa; }
+        .suggestion-item img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
+        /* Style for related suggestions */
+        .suggestion-item.related-suggestion { background-color: #3a3a3a; }
+        .suggestion-item.related-suggestion:hover { background-color: #505050; }
 
-        .suggestion-item:hover {
-            background-color: #444;
-        }
-        .suggestion-item.no-results {
-            cursor: default;
-            color: #aaa;
-        }
-        .suggestion-item img {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-.suggestion-item.related-suggestion {
-    /* Slightly different background or border to highlight */
-    background-color: #3a3a3a; /* A bit darker/different than regular suggestion hover */
-}
-.suggestion-item.related-suggestion:hover {
-     background-color: #505050; /* Adjust hover for related items */
-}
-        
-        /* --- End: Filters and Search Styles --- */
-
-        /* Container Grid (Same as before) */
+        /* Container Grid */
         .content-grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 25px; padding: 30px; max-width: 1200px; margin: 10px auto 20px; }
-        /* Card Styles (Same as before) */
+
+        /* Card Link */
+        .content-card-link { text-decoration: none; color: inherit; display: block; height: 100%; }
+
+        /* Card Styles */
         .content-card { background-color: #242424; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); transition: transform 0.3s ease, box-shadow 0.3s ease; height: 100%; display: flex; flex-direction: column; position: relative; }
         .content-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4); }
         .content-card img { width: 100%; height: 250px; object-fit: cover; display: block; }
@@ -168,15 +136,27 @@
         .content-info h3 { margin: 0 0 8px 0; font-size: 1.3em; font-weight: normal; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .content-info .year { font-size: 0.9em; color: #aaa; margin-top: -5px; }
         .video-number-badge { position: absolute; top: 10px; left: 10px; background-color: rgba(187, 134, 252, 0.85); color: #121212; font-size: 0.9em; font-weight: bold; padding: 4px 8px; border-radius: 4px; z-index: 1; }
+
+        /* Message Style */
         .message { color: #aaa; font-size: 1.1em; text-align: center; padding: 40px; grid-column: 1 / -1; }
 
     </style>
 </head>
 <body>
 
-    <!-- MENU, HEADER (Same as before) -->
-     <nav class="main-nav">...</nav>
-     <header><h1>Vídeos & Filmes</h1></header>
+    <!-- MENU DE NAVEGAÇÃO -->
+    <nav class="main-nav">
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="criar.html">Criar</a></li>
+            <li><a href="videos.html">Videos</a></li>
+        </ul>
+    </nav>
+    <!-- FIM MENU -->
+
+    <header>
+        <h1>Vídeos & Filmes</h1>
+    </header>
 
     <!-- FILTERS AND SEARCH AREA -->
     <div class="filters-container">
@@ -190,7 +170,7 @@
 
         <!-- Actress Search Area -->
         <div class="actress-search-area">
-            <div class="search-input-wrapper" onclick="document.getElementById('search-input').focus()"> <!-- Focus input on wrapper click -->
+            <div class="search-input-wrapper" onclick="document.getElementById('search-input').focus()">
                 <div id="selected-actresses-container">
                     <!-- Selected actress pills will be inserted here -->
                 </div>
@@ -203,26 +183,30 @@
     </div>
     <!-- END FILTERS AND SEARCH AREA -->
 
-    <!-- CONTENT GRID (Same as before) -->
-    <div class="content-grid-container" id="videos-filmes-container">...</div>
+    <!-- CONTAINER PRINCIPAL PARA VÍDEOS E FILMES -->
+    <div class="content-grid-container" id="videos-filmes-container">
+        <p class="message">Carregando conteúdo...</p>
+        <!-- Cards de vídeos e filmes serão inseridos aqui -->
+    </div>
+    <!-- FIM CONTAINER -->
 
-    <!-- Firebase -->
-     <script type="module">
+    <!-- Firebase Modular SDKs via CDN -->
+    <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-        // Firebase Config (CORRECTED)
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0",
             authDomain: "babes-392fd.firebaseapp.com",
-            projectId: "babes-392fd", // <--- Now included
+            projectId: "babes-392fd",
             storageBucket: "babes-392fd.appspot.com",
             messagingSenderId: "376795361631",
             appId: "1:376795361631:web:d662f2b2f2cd23b115c6ea"
         };
 
         // Initialize Firebase
-        const app = initializeApp(firebaseConfig); // Now receives the correct config
+        const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
         // DOM References
@@ -234,51 +218,41 @@
         const searchInputWrapper = document.querySelector('.search-input-wrapper');
 
         // --- Global Data Storage ---
-        let allContent = [];
-        let allActresses = [];
-        let selectedActresses = [];
-        let activeTypeFilter = 'all';
+        let allContent = []; // Stores all fetched videos and filmes {id, type, ...data}
+        let allActresses = []; // Stores {id, nome, foto} from 'atores' collection
+        let selectedActresses = []; // Stores {id, nome} of selected actresses
+        let activeTypeFilter = 'all'; // 'all', 'video', 'film'
 
         // --- FUNCTION TO RENDER CONTENT BASED ON FILTERS ---
-             function renderContent() {
+        function renderContent() {
             if (!contentContainer) return;
             let contentHTML = '';
 
             const filteredContent = allContent.filter(item => {
-                // 1. Filter by Type (No change here)
+                // 1. Filter by Type
                 const typeMatch = activeTypeFilter === 'all' || item.type === activeTypeFilter;
                 if (!typeMatch) return false;
 
-                // 2. Filter by Selected Actresses (UPDATED LOGIC)
+                // 2. Filter by Selected Actresses (Uses IDs)
                 if (selectedActresses.length > 0) {
-                    // --- START OF CHANGES ---
-                    // Check if the item has an 'atores' field, AND if it's an ARRAY with items
                     if (!item.atores || !Array.isArray(item.atores) || item.atores.length === 0) {
-                        // If no 'atores' array, it cannot match the selected actresses filter
-                        return false;
+                        return false; // Item has no 'atores' array or it's empty
                     }
-
-                    // Get the array of actress IDs directly from the item
-                    const itemActressIds = item.atores;
-
-                    // Get the IDs of the actresses the user has selected (from the pills)
+                    const itemActressIds = item.atores; // Expecting array of IDs
                     const selectedActressIds = selectedActresses.map(a => a.id);
 
-                    // Check if *at least one* of the selected actress IDs exists in the item's actress ID array
+                    // Check if AT LEAST ONE selected actress ID is in the item's actors array
                     const actressMatch = selectedActressIds.some(selectedId =>
-                        itemActressIds.includes(selectedId) // Compare ID from pill with IDs in item.atores array
+                        itemActressIds.includes(selectedId)
                     );
-                    // --- END OF CHANGES ---
-
-                    // If none of the selected actresses are found in this item's list, exclude the item
-                    if (!actressMatch) return false;
+                    if (!actressMatch) return false; // None of the selected actresses are in this item
                 }
 
-                // If we reach here, the item matches all active filters
+                // Item matches all filters
                 return true;
             });
 
-            // Generate HTML for the filtered items (No change here)
+            // Generate HTML for filtered items
             if (filteredContent.length === 0) {
                 contentHTML = '<p class="message">Nenhum resultado encontrado para os filtros selecionados.</p>';
             } else {
@@ -289,30 +263,21 @@
             contentContainer.innerHTML = contentHTML;
         }
 
-        // --- FUNCTION TO GENERATE HTML FOR A SINGLE CARD (Keep your existing) ---
-         function generateCardHTML(item) {
+        // --- FUNCTION TO GENERATE HTML FOR A SINGLE CARD ---
+        function generateCardHTML(item) {
             const nome = item.nome || (item.type === 'video' ? 'Vídeo sem nome' : 'Filme sem nome');
-            const imagem = item.imagem || 'path/to/default/placeholder.png';
+            const imagem = item.imagem || 'path/to/default/placeholder.png'; // Use a real path
             const ano = item.ano || 'N/A';
             const videoNo = item.no !== undefined ? item.no : '?';
 
-            // --- MAKE CARDS CLICKABLE ---
-            // Added href to link to she.html?id=ACTRESS_ID (assuming actress ID exists in item.atores)
-            // Or maybe link to video/film details page? Let's link to video/film detail page using item.id
-            // e.g., href="video_details.html?id=${item.id}&type=${item.type}"
-
-             let cardLink = '#'; // Default link if no specific page exists
-             if (item.type === 'video') {
-                 // Example link structure: video.html?id=videoId
-                 cardLink = `video_detail.html?id=${item.id}`; // Adjust the target page name if needed
-             } else if (item.type === 'film') {
-                 // Example link structure: film.html?id=filmId
-                  cardLink = `film_detail.html?id=${item.id}`; // Adjust the target page name if needed
-             }
+            // Decide link (adjust target page names if needed)
+            let cardLink = '#';
+             // TODO: Define where video/film cards should link. Example:
+             // if (item.type === 'video') { cardLink = `video_detail.html?id=${item.id}`; }
+             // else if (item.type === 'film') { cardLink = `film_detail.html?id=${item.id}`; }
 
 
-            // Wrap the card content in an anchor tag
-            let cardHTML = `<a href="${cardLink}" class="content-card-link" style="text-decoration: none; color: inherit;">`;
+            let cardHTML = `<a href="${cardLink}" class="content-card-link">`; // Wrap in link
 
             if (item.type === 'video') {
                 cardHTML += `
@@ -328,13 +293,13 @@
                         <div class="content-info"><h3>${nome}</h3><p class="year">(${ano})</p></div>
                     </div>`;
             }
-            cardHTML += `</a>`; // Close the anchor tag
+            cardHTML += `</a>`; // Close link
             return cardHTML;
         }
 
         // --- FUNCTIONS FOR ACTRESS SEARCH & SELECTION ---
-      function displaySuggestions(searchTerm) {
-            suggestionsList.innerHTML = ''; // Clear previous suggestions
+        function displaySuggestions(searchTerm) {
+            suggestionsList.innerHTML = '';
             if (!searchTerm) {
                 suggestionsList.style.display = 'none';
                 return;
@@ -342,73 +307,52 @@
 
             const lowerSearchTerm = searchTerm.toLowerCase();
             let matchedActresses = [];
-            let relatedActressIds = new Set(); // Keep track of related IDs for potential highlighting
+            let relatedActressIds = new Set(); // For related logic
 
-            // --- NEW LOGIC: Prioritize related actresses when exactly ONE is selected ---
+            // Prioritize related actresses when exactly ONE is selected
             if (selectedActresses.length === 1) {
                 const firstSelectedActressId = selectedActresses[0].id;
-
-                // Find IDs of actresses appearing in the same content as the selected one
                 allContent.forEach(item => {
-                    // Check if the item has actors and includes the selected one
                     if (item.atores && Array.isArray(item.atores) && item.atores.includes(firstSelectedActressId)) {
-                        // Add all *other* actors from this item to the related set
                         item.atores.forEach(actressId => {
-                            if (actressId !== firstSelectedActressId) {
-                                relatedActressIds.add(actressId);
-                            }
+                            if (actressId !== firstSelectedActressId) relatedActressIds.add(actressId);
                         });
                     }
                 });
 
-                // Now, filter all available actresses based on the search term AND related status
-
-                // 1. Find RELATED actresses matching the search term (and not already selected)
                 const relatedMatching = allActresses.filter(actress =>
-                    relatedActressIds.has(actress.id) && // Must be in the related set
-                    actress.nome.toLowerCase().includes(lowerSearchTerm) && // Must match search term
-                    !selectedActresses.some(sa => sa.id === actress.id) // Must not be already selected
+                    relatedActressIds.has(actress.id) &&
+                    actress.nome.toLowerCase().includes(lowerSearchTerm) &&
+                    !selectedActresses.some(sa => sa.id === actress.id)
                 );
-
-                // 2. Find OTHER actresses matching the search term (and not related, not already selected)
                 const otherMatching = allActresses.filter(actress =>
-                    !relatedActressIds.has(actress.id) && // Must NOT be in the related set
-                    actress.nome.toLowerCase().includes(lowerSearchTerm) && // Must match search term
-                    !selectedActresses.some(sa => sa.id === actress.id) // Must not be already selected
+                    !relatedActressIds.has(actress.id) &&
+                    actress.nome.toLowerCase().includes(lowerSearchTerm) &&
+                    !selectedActresses.some(sa => sa.id === actress.id)
                 );
-
-                // Combine the lists, prioritizing related ones
                 matchedActresses = [...relatedMatching, ...otherMatching];
 
             } else {
-                // --- Original Logic: Use when 0 or 2+ actresses are selected ---
+                // Original logic (0 or 2+ selected)
                 matchedActresses = allActresses.filter(actress =>
                     actress.nome.toLowerCase().includes(lowerSearchTerm) &&
-                    !selectedActresses.some(sa => sa.id === actress.id) // Exclude already selected
+                    !selectedActresses.some(sa => sa.id === actress.id)
                 );
             }
-            // --- END OF NEW/MODIFIED LOGIC ---
 
-
-            // --- Displaying Suggestions (Limit results and generate HTML) ---
+            // Displaying Suggestions
             if (matchedActresses.length > 0) {
-                matchedActresses.slice(0, 10).forEach(actress => { // Limit suggestions shown
+                matchedActresses.slice(0, 10).forEach(actress => {
                     const item = document.createElement('div');
                     item.classList.add('suggestion-item');
                     item.dataset.id = actress.id;
                     item.dataset.nome = actress.nome;
-
-                    // Add a visual cue if the suggestion is 'related' (optional but helpful)
-                    let relatedMarker = '';
                     if (selectedActresses.length === 1 && relatedActressIds.has(actress.id)) {
                          item.classList.add('related-suggestion'); // Add class for styling
-                         // relatedMarker = `<span style="font-size:0.8em; color: #aaa; margin-left: 5px;">(Relacionada)</span>`; // Example marker
                     }
-
                     item.innerHTML = `
                         <img src="${actress.foto || 'path/to/default/avatar.png'}" alt="">
                         <span>${actress.nome}</span>
-                        ${relatedMarker} {/* Add the marker if defined */}
                     `;
                     item.addEventListener('click', handleSuggestionClick);
                     suggestionsList.appendChild(item);
@@ -420,15 +364,97 @@
             }
         }
 
+        function handleSuggestionClick(event) {
+            const target = event.currentTarget;
+            const actressId = target.dataset.id;
+            const actressName = target.dataset.nome;
+
+            if (!selectedActresses.some(a => a.id === actressId)) {
+                selectedActresses.push({ id: actressId, nome: actressName });
+                renderSelectedActressesPills();
+                renderContent(); // Re-filter content
+            }
+            searchInput.value = '';
+            suggestionsList.style.display = 'none';
+            searchInput.focus();
+        }
+
+        function renderSelectedActressesPills() {
+            selectedActressesContainer.innerHTML = '';
+            selectedActresses.forEach(actress => {
+                const pill = document.createElement('div');
+                pill.classList.add('actress-pill');
+                pill.dataset.id = actress.id;
+                pill.innerHTML = `
+                    <span>${actress.nome}</span>
+                    <button class="remove-actress-btn" title="Remover">×</button>
+                `;
+                pill.querySelector('.remove-actress-btn').addEventListener('click', handleRemoveActress);
+                selectedActressesContainer.appendChild(pill);
+            });
+        }
+
+        function handleRemoveActress(event) {
+            event.stopPropagation();
+            const pill = event.target.closest('.actress-pill');
+            const actressIdToRemove = pill.dataset.id;
+            selectedActresses = selectedActresses.filter(a => a.id !== actressIdToRemove);
+            pill.remove();
+            renderContent(); // Re-filter content
+            searchInput.focus();
+        }
+
+        // --- FUNCTION TO LOAD ALL INITIAL DATA ---
+        async function loadInitialData() {
+            contentContainer.innerHTML = '<p class="message">Carregando...</p>';
+            try {
+                const videosCol = collection(db, "videos");
+                const filmesCol = collection(db, "filmes");
+                const atoresCol = collection(db, "atores");
+
+                // Fetch all data concurrently
+                const [videosSnapshot, filmesSnapshot, atoresSnapshot] = await Promise.all([
+                    getDocs(videosCol),
+                    getDocs(filmesCol),
+                    getDocs(atoresCol)
+                ]);
+
+                // Process Content (Videos/Films)
+                allContent = [];
+                videosSnapshot.forEach(doc => allContent.push({ id: doc.id, type: 'video', ...doc.data() }));
+                filmesSnapshot.forEach(doc => allContent.push({ id: doc.id, type: 'film', ...doc.data() }));
+
+                // Process Actresses for suggestions
+                allActresses = [];
+                atoresSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    allActresses.push({
+                        id: doc.id,
+                        nome: data.nome || 'Nome Desconhecido',
+                        foto: data.foto // Optional photo
+                    });
+                });
+                allActresses.sort((a, b) => a.nome.localeCompare(b.nome)); // Sort for suggestions
+
+                // Initial Render
+                renderSelectedActressesPills(); // Render empty pills initially
+                renderContent();
+
+            } catch (error) {
+                console.error("Erro ao buscar dados do Firestore:", error);
+                contentContainer.innerHTML = '<p class="message">Erro ao carregar. Tente novamente.</p>';
+            }
+        }
+
         // --- EVENT LISTENERS ---
-         // ... (Event listeners remain the same) ...
+
         // 1. Filter Buttons (Type: All/Video/Film)
         filterButtons.forEach(button => {
             button.addEventListener('click', () => {
                 filterButtons.forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
                 activeTypeFilter = button.getAttribute('data-filter');
-                renderContent(); // Re-render content
+                renderContent();
             });
         });
 
@@ -436,21 +462,20 @@
         searchInput.addEventListener('input', () => {
             displaySuggestions(searchInput.value);
         });
-        // Hide suggestions when clicking outside the search area
+        searchInput.addEventListener('focus', () => {
+             if(searchInput.value) displaySuggestions(searchInput.value);
+        });
+
+        // 3. Hide suggestions on click outside
          document.addEventListener('click', (event) => {
              if (!searchInputWrapper.contains(event.target) && !suggestionsList.contains(event.target)) {
                  suggestionsList.style.display = 'none';
              }
          });
-         searchInput.addEventListener('focus', () => {
-              // Maybe show suggestions again on focus if input has value?
-              if(searchInput.value) {
-                   displaySuggestions(searchInput.value);
-              }
-         });
 
 
         // --- INITIALIZATION ---
+        // Ensure this is the LAST line inside the <script type="module">
         loadInitialData();
 
     </script>
