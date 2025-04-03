@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Site de Atrizes - Videos & Filmes</title>
-   <style>
+    <style>
         /* Estilos Globais e Reset Básico */
         body {
             font-family: 'Roboto', sans-serif;
@@ -335,14 +335,14 @@
         </div>
 
         <!-- Actress Search Area -->
-        <div class="actress-search-area">
+        <div class="actress-search-area">  <!-- Pai com position: relative -->
             <div class="search-input-wrapper" onclick="document.getElementById('search-input').focus()">
                 <div id="selected-actresses-container">
                     <!-- Selected actress pills will be inserted here -->
                 </div>
                 <input type="text" id="search-input" class="search-input" placeholder="Pesquisar por atriz...">
             </div>
-            <div id="suggestions-list">
+            <div id="suggestions-list"> <!-- Filho com position: absolute -->
                 <!-- Suggestions will be loaded here -->
             </div>
         </div>
@@ -357,7 +357,7 @@
     <!-- FIM CONTAINER -->
 
     <!-- Firebase Modular SDKs via CDN -->
-   <script type="module">
+    <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
@@ -471,7 +471,7 @@
             suggestionsList.style.display = 'none'; // Esconde por defeito
 
             if (selectedActresses.length !== 1) {
-                console.log("showRelatedSuggestions: Not exactly one actress selected, hiding list.");
+                // console.log("showRelatedSuggestions: Not exactly one actress selected, hiding list.");
                 return; // Só funciona com UMA atriz selecionada
             }
 
@@ -521,6 +521,8 @@
                     item.addEventListener('click', handleSuggestionClick); // Reutiliza o handler
                     suggestionsList.appendChild(item);
                 });
+                // Força reflow (opcional, para tentar resolver problemas de renderização)
+                // console.log("Forcing reflow by reading offsetHeight:", suggestionsList.offsetHeight);
                 suggestionsList.style.display = 'block'; // Torna a lista visível
             } else {
                  console.log("   No related actress objects found after filtering allActresses.");
@@ -540,9 +542,9 @@
             let matchedActresses = [];
             let relatedActressIds = new Set(); // Still useful for highlighting/priority
 
-            console.log(`\n--- displaySuggestions (Typing) ---`);
-            console.log(`Search Term: "${lowerSearchTerm}"`);
-            console.log(`Selected Actresses (${selectedActresses.length}):`, JSON.stringify(selectedActresses.map(a => a.nome)));
+            // console.log(`\n--- displaySuggestions (Typing) ---`);
+            // console.log(`Search Term: "${lowerSearchTerm}"`);
+            // console.log(`Selected Actresses (${selectedActresses.length}):`, JSON.stringify(selectedActresses.map(a => a.nome)));
 
             // Calculate related IDs IF exactly one is selected, for prioritization/styling
             if (selectedActresses.length === 1) {
@@ -554,7 +556,7 @@
                         });
                     }
                 });
-                console.log(`   (Typing) Potential Related IDs:`, Array.from(relatedActressIds));
+                // console.log(`   (Typing) Potential Related IDs:`, Array.from(relatedActressIds));
             }
 
             // Filter based on search term
@@ -568,15 +570,15 @@
                  const relatedMatching = allMatchingSearch.filter(actress => relatedActressIds.has(actress.id));
                  const otherMatching = allMatchingSearch.filter(actress => !relatedActressIds.has(actress.id));
                  matchedActresses = [...relatedMatching, ...otherMatching];
-                 console.log(`   (Typing) Matching Related: ${relatedMatching.length}, Matching Other: ${otherMatching.length}`);
+                 // console.log(`   (Typing) Matching Related: ${relatedMatching.length}, Matching Other: ${otherMatching.length}`);
             } else {
                 matchedActresses = allMatchingSearch;
-                 console.log(`   (Typing) Matching Standard: ${matchedActresses.length}`);
+                 // console.log(`   (Typing) Matching Standard: ${matchedActresses.length}`);
             }
 
             // Displaying Suggestions
             if (matchedActresses.length > 0) {
-                console.log(`   (Typing) Displaying ${matchedActresses.length} suggestions based on search term.`);
+                // console.log(`   (Typing) Displaying ${matchedActresses.length} suggestions based on search term.`);
                 matchedActresses.slice(0, 10).forEach(actress => {
                     const item = document.createElement('div');
                     item.classList.add('suggestion-item');
@@ -593,62 +595,63 @@
                     item.addEventListener('click', handleSuggestionClick);
                     suggestionsList.appendChild(item);
                 });
+                 // Força reflow (opcional)
+                // console.log("Forcing reflow by reading offsetHeight:", suggestionsList.offsetHeight);
                 suggestionsList.style.display = 'block';
             } else {
-                 console.log("   (Typing) Displaying: No matching suggestions found for the term.");
+                 // console.log("   (Typing) Displaying: No matching suggestions found for the term.");
                  suggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma atriz encontrada</div>';
                  suggestionsList.style.display = 'block';
             }
-            console.log(`--- End displaySuggestions (Typing) ---`);
+            // console.log(`--- End displaySuggestions (Typing) ---`);
         }
 
         // (MODIFICADA) Acionada ao CLICAR numa sugestão
         function handleSuggestionClick(event) {
-            console.log("\n--- handleSuggestionClick ---");
+            // console.log("\n--- handleSuggestionClick ---");
             const target = event.currentTarget;
             const actressId = target.dataset.id;
             const actressName = target.dataset.nome;
-            console.log(`Clicked Suggestion: ID=${actressId}, Name=${actressName}`);
+            // console.log(`Clicked Suggestion: ID=${actressId}, Name=${actressName}`);
 
             if (!actressId || !actressName) {
                 console.error("Error: Clicked suggestion item missing data!"); return;
             }
 
             const isAlreadySelected = selectedActresses.some(a => a.id === actressId);
-            console.log(`Is already selected? ${isAlreadySelected}`);
+            // console.log(`Is already selected? ${isAlreadySelected}`);
 
             if (!isAlreadySelected) {
-                console.log(`Adding actress...`);
+                // console.log(`Adding actress...`);
                 selectedActresses.push({ id: actressId, nome: actressName });
-                console.log(`selectedActresses NOW (${selectedActresses.length}):`, JSON.stringify(selectedActresses.map(a => a.nome)));
+                // console.log(`selectedActresses NOW (${selectedActresses.length}):`, JSON.stringify(selectedActresses.map(a => a.nome)));
                 renderSelectedActressesPills();
                 renderContent(); // Update grid content
 
                 // --- LOGIC AFTER ADDING ---
                 if (selectedActresses.length === 1) {
                     // Just added the FIRST actress, show related co-stars automatically
-                    console.log("Calling showRelatedSuggestions() because ONE actress is now selected.");
+                    // console.log("Calling showRelatedSuggestions() because ONE actress is now selected.");
                     showRelatedSuggestions(); // <= CHAMADA À NOVA FUNÇÃO
                 } else {
                     // Just added the second, third, etc. actress. Hide the suggestion list.
-                     console.log("More than one actress selected, hiding suggestion list.");
+                    //  console.log("More than one actress selected, hiding suggestion list.");
                      suggestionsList.innerHTML = '';
                      suggestionsList.style.display = 'none';
                 }
                  // --- END OF LOGIC AFTER ADDING ---
 
             } else {
-                 console.log("Actress already selected.");
+                //  console.log("Actress already selected.");
                  // Even if already selected, hide the list after click
                  suggestionsList.innerHTML = '';
                  suggestionsList.style.display = 'none';
             }
 
-            console.log("Clearing search input...");
+            // console.log("Clearing search input...");
             searchInput.value = '';
-            // Don't hide suggestionsList here anymore, let the logic above handle it.
             searchInput.focus();
-            console.log("--- End handleSuggestionClick ---");
+            // console.log("--- End handleSuggestionClick ---");
         }
 
         // Renderiza as pílulas das atrizes selecionadas
@@ -670,33 +673,33 @@
 
         // (MODIFICADA) Acionada ao REMOVER uma pílula
         function handleRemoveActress(event) {
-            event.stopPropagation();
-            console.log("\n--- handleRemoveActress ---");
+            event.stopPropagation(); // Impede que o clique na pílula foque o input imediatamente
+            // console.log("\n--- handleRemoveActress ---");
             const pill = event.target.closest('.actress-pill');
             const actressIdToRemove = pill.dataset.id;
-            console.log(`Attempting to remove: ID=${actressIdToRemove}`);
+            // console.log(`Attempting to remove: ID=${actressIdToRemove}`);
 
             selectedActresses = selectedActresses.filter(a => a.id !== actressIdToRemove);
             pill.remove();
-            console.log(`selectedActresses NOW (${selectedActresses.length}):`, JSON.stringify(selectedActresses.map(a => a.nome)));
+            // console.log(`selectedActresses NOW (${selectedActresses.length}):`, JSON.stringify(selectedActresses.map(a => a.nome)));
 
             renderContent(); // Update grid content
 
             // --- LOGIC AFTER REMOVING ---
             if (selectedActresses.length === 1) {
                 // We are back to having exactly one actress, show her co-stars
-                 console.log("Calling showRelatedSuggestions() because ONE actress remains.");
+                //  console.log("Calling showRelatedSuggestions() because ONE actress remains.");
                  showRelatedSuggestions(); // <= CHAMADA À NOVA FUNÇÃO
             } else {
                  // 0 or 2+ actresses remain, hide suggestions
-                 console.log("0 or 2+ actresses remain, hiding suggestion list.");
+                //  console.log("0 or 2+ actresses remain, hiding suggestion list.");
                  suggestionsList.innerHTML = '';
                  suggestionsList.style.display = 'none';
             }
             // --- END OF LOGIC AFTER REMOVING ---
 
-            searchInput.focus();
-            console.log("--- End handleRemoveActress ---");
+            searchInput.focus(); // Devolve o foco ao input após remover
+            // console.log("--- End handleRemoveActress ---");
         }
 
         // --- FUNCTION TO LOAD ALL INITIAL DATA ---
@@ -719,23 +722,22 @@
                 videosSnapshot.forEach(doc => allContent.push({ id: doc.id, type: 'video', ...doc.data() }));
                 filmesSnapshot.forEach(doc => allContent.push({ id: doc.id, type: 'film', ...doc.data() }));
 
-                 // Log content for debugging structure (especially 'atores' field)
-                 // console.log("Loaded Content Sample:", allContent.slice(0, 5));
-
-
                 // Process Actresses for suggestions
                 allActresses = [];
                 atoresSnapshot.forEach(doc => {
                     const data = doc.data();
-                    allActresses.push({
-                        id: doc.id,
-                        nome: data.nome || 'Nome Desconhecido',
-                        foto: data.foto // Optional photo
-                    });
+                    // Garante que apenas atrizes com nome são adicionadas
+                    if (data.nome) {
+                         allActresses.push({
+                            id: doc.id,
+                            nome: data.nome,
+                            foto: data.foto // Optional photo
+                        });
+                    } else {
+                        console.warn(`Atriz com ID ${doc.id} não tem campo 'nome'. Ignorando.`);
+                    }
                 });
                 allActresses.sort((a, b) => a.nome.localeCompare(b.nome)); // Sort for suggestions
-                // console.log("Loaded Actresses:", allActresses);
-
 
                 // Initial Render
                 renderSelectedActressesPills(); // Render empty pills initially
@@ -766,7 +768,12 @@
         });
         // Show suggestions on focus if input has value (optional)
         searchInput.addEventListener('focus', () => {
-             if(searchInput.value) displaySuggestions(searchInput.value);
+             if(searchInput.value) {
+                 displaySuggestions(searchInput.value);
+             } else if (selectedActresses.length === 1) {
+                 // Se o input está vazio AO GANHAR FOCO, e UMA atriz está selecionada, mostra relacionadas
+                 showRelatedSuggestions();
+             }
         });
 
         // 3. Hide suggestions on click outside
