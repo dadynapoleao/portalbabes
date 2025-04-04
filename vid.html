@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Vídeo</title> <!-- Título da Página -->
+    <style>
+        /* --- Copiar TODO o CSS de videos.html aqui --- */
+        /* Estilos Globais e Reset Básico */
+        body { font-family: 'Roboto', sans-serif; margin: 0; padding: 0; background-color: #121212; color: #e0e0e0; }
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+        /* Estilos para o Menu de Navegação (igual a videos.html) */
+        .main-nav { background-color: #1f1f1f; padding: 0.8em 30px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); text-align: right; }
+        .main-nav ul { list-style: none; margin: 0; padding: 0; }
+        .main-nav li { display: inline-block; margin-left: 20px; }
+        .main-nav a { color: #e0e0e0; text-decoration: none; font-size: 1.1em; padding: 5px 10px; border-radius: 4px; transition: background-color 0.2s ease, color 0.2s ease; }
+        .main-nav a:hover { background-color: #bb86fc; color: #121212; }
+
+        /* Estilos do Cabeçalho (igual a videos.html) */
+        header { background-color: #1e1e1e; color: #fff; padding: 2em 0; text-align: center; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); }
+        header h1 { margin: 0; font-size: 2.5em; font-weight: 700; letter-spacing: 0.5px; }
+
+        /* --- Estilos Específicos para vid.html --- */
+        .video-detail-container {
+            max-width: 900px; /* Largura máxima para conteúdo do vídeo */
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #1f1f1f; /* Fundo ligeiramente diferente */
+            border-radius: 8px;
+        }
+
+        .back-button-container {
+            margin-bottom: 20px;
+        }
+
+        #back-button {
+            padding: 8px 18px;
+            border: 1px solid #555;
+            background-color: #333;
+            color: #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+        #back-button:hover { background-color: #444; }
+
+        #video-title {
+            color: #bb86fc; /* Cor de destaque para o título */
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        #video-player-container {
+            position: relative;
+            padding-bottom: 56.25%; /* Proporção 16:9 */
+            height: 0;
+            overflow: hidden;
+            background-color: #000; /* Fundo preto enquanto carrega */
+            margin-bottom: 20px;
+            border-radius: 6px; /* Opcional: cantos arredondados */
+        }
+        #video-player-container iframe,
+        #video-player-container video { /* Estilos se usar iframe ou tag video */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0; /* Remove borda do iframe */
+        }
+        #video-player-container .loading-message {
+             position: absolute;
+             top: 50%;
+             left: 50%;
+             transform: translate(-50%, -50%);
+             color: #aaa;
+        }
+
+
+        #video-details {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #333; /* Linha separadora */
+        }
+        #video-details h3 {
+             margin-bottom: 10px;
+             color: #e0e0e0;
+             font-weight: normal;
+        }
+        #video-details p {
+            margin-bottom: 8px;
+            color: #ccc;
+        }
+         #video-details .actress-link { /* Estilo para links de atrizes */
+             color: #bb86fc;
+             text-decoration: none;
+         }
+         #video-details .actress-link:hover {
+             text-decoration: underline;
+         }
+
+        .error-message {
+            color: #ff5252; /* Cor de erro */
+            text-align: center;
+            padding: 30px;
+            font-size: 1.2em;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- MENU DE NAVEGAÇÃO (igual a videos.html) -->
+    <nav class="main-nav">
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="criar.html">Criar</a></li>
+            <li><a href="videos.html">Videos</a></li>
+        </ul>
+    </nav>
+    <!-- FIM MENU -->
+
+    <header>
+        <h1 id="page-title">Detalhes do Vídeo</h1> <!-- Título será atualizado -->
+    </header>
+
+    <!-- Container Principal -->
+    <div class="video-detail-container">
+
+        <!-- Botão Voltar -->
+        <div class="back-button-container">
+            <button id="back-button">← Voltar</button>
+        </div>
+
+        <!-- Conteúdo do Vídeo (será preenchido pelo JS) -->
+        <h2 id="video-title">Carregando...</h2>
+
+        <div id="video-player-container">
+            <div class="loading-message">A carregar vídeo...</div>
+            <!-- O player (iframe ou video tag) será inserido aqui -->
+        </div>
+
+        <div id="video-details">
+            <h3>Detalhes</h3>
+            <p id="video-number">Número: Carregando...</p>
+            <p id="video-actresses">Atrizes: Carregando...</p>
+            <!-- Adicionar mais campos se necessário (e.g., data, tags) -->
+        </div>
+
+        <!-- Mensagem de Erro (escondida inicialmente) -->
+         <div id="error-container" style="display: none;">
+             <p class="error-message" id="error-text"></p>
+         </div>
+
+    </div>
+    <!-- FIM Container Principal -->
+
+
+    <!-- Firebase Modular SDKs via CDN -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, doc, getDoc, collection } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Firebase Config (mesma de videos.html)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0",
+            authDomain: "babes-392fd.firebaseapp.com",
+            projectId: "babes-392fd",
+            storageBucket: "babes-392fd.appspot.com",
+            messagingSenderId: "376795361631",
+            appId: "1:376795361631:web:d662f2b2f2cd23b115c6ea"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // DOM Elements References
+        const pageTitleElement = document.getElementById('page-title');
+        const videoTitleElement = document.getElementById('video-title');
+        const videoPlayerContainer = document.getElementById('video-player-container');
+        const videoNumberElement = document.getElementById('video-number');
+        const videoActressesElement = document.getElementById('video-actresses');
+        const backButton = document.getElementById('back-button');
+        const errorContainer = document.getElementById('error-container');
+        const errorText = document.getElementById('error-text');
+
+        // --- Função para mostrar erros ---
+        function displayError(message) {
+            console.error(message);
+            videoTitleElement.style.display = 'none'; // Esconde placeholders
+            videoPlayerContainer.style.display = 'none';
+            document.getElementById('video-details').style.display = 'none';
+            errorText.textContent = message;
+            errorContainer.style.display = 'block';
+        }
+
+        // --- Função para buscar nomes das atrizes ---
+        async function getActressNames(actressIds) {
+            if (!actressIds || actressIds.length === 0) {
+                return 'N/A';
+            }
+            try {
+                 // Busca cada atriz pelo ID
+                 const actressPromises = actressIds.map(id => getDoc(doc(db, "atores", id)));
+                 const actressSnaps = await Promise.all(actressPromises);
+
+                 const actressLinks = actressSnaps.map((snap, index) => {
+                     if (snap.exists()) {
+                         const actressData = snap.data();
+                         const actressName = actressData.nome || 'Nome Desconhecido';
+                         // Cria um link para a página da atriz (ajuste she.html se necessário)
+                         return `<a href="she.html?id=${snap.id}" class="actress-link">${actressName}</a>`;
+                     } else {
+                         return `ID Inválido (${actressIds[index]})`; // Indica se um ID não foi encontrado
+                     }
+                 });
+                 return actressLinks.join(', '); // Separa nomes com vírgula
+
+            } catch (error) {
+                console.error("Erro ao buscar nomes das atrizes:", error);
+                return 'Erro ao carregar atrizes';
+            }
+        }
+
+
+        // --- Função Principal para Carregar Dados do Vídeo ---
+        async function loadVideoDetails() {
+            // 1. Get Video ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const videoId = urlParams.get('id');
+
+            if (!videoId) {
+                displayError("Erro: ID do vídeo não encontrado na URL.");
+                return;
+            }
+            // console.log("Carregando vídeo com ID:", videoId);
+
+            try {
+                // 2. Fetch Video Document
+                const videoRef = doc(db, "videos", videoId);
+                const videoSnap = await getDoc(videoRef);
+
+                if (!videoSnap.exists()) {
+                    displayError(`Erro: Vídeo com ID "${videoId}" não encontrado.`);
+                    return;
+                }
+
+                // 3. Get Video Data
+                const videoData = videoSnap.data();
+                // console.log("Dados do vídeo:", videoData);
+
+                // 4. Populate DOM Elements
+                const videoName = videoData.nome || 'Vídeo sem Título';
+                pageTitleElement.textContent = videoName; // Atualiza título da página
+                videoTitleElement.textContent = videoName; // Atualiza título principal
+                videoNumberElement.textContent = `Número: ${videoData.no !== undefined ? videoData.no : 'N/A'}`;
+
+                // Popula Atrizes (buscando nomes)
+                videoActressesElement.innerHTML = 'Atrizes: Carregando...'; // Placeholder
+                const actressNamesHTML = await getActressNames(videoData.atores); // videoData.atores deve ser o array de IDs
+                videoActressesElement.innerHTML = `Atrizes: ${actressNamesHTML}`; // Usa innerHTML por causa dos links
+
+                // 5. Embed Video Player (Exemplo com iframe, ajuste URL/lógica)
+                // Substitua 'videoData.embedUrl' pelo campo correto que contém o link de embed ou ID do vídeo
+                if (videoData.url_video) { // Assumindo que você tem um campo 'url_video'
+                    // Exemplo: se for um link direto para um MP4
+                    // videoPlayerContainer.innerHTML = `<video id="video-player" controls src="${videoData.url_video}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></video>`;
+
+                    // Exemplo: se for um link de embed (iframe)
+                     videoPlayerContainer.innerHTML = `<iframe src="${videoData.url_video}" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>`;
+
+                    // Adapte esta lógica conforme a estrutura do seu 'url_video'
+                } else {
+                    videoPlayerContainer.innerHTML = '<p class="loading-message">Link do vídeo não disponível.</p>';
+                }
+
+
+            } catch (error) {
+                displayError("Ocorreu um erro ao carregar os detalhes do vídeo.");
+                console.error("Erro detalhado:", error);
+            }
+        }
+
+        // --- Event Listener para o Botão Voltar ---
+        backButton.addEventListener('click', () => {
+            history.back(); // Navega para a página anterior no histórico do browser
+        });
+
+        // --- Inicialização ---
+        loadVideoDetails(); // Carrega os detalhes quando a página é carregada
+
+    </script>
+
+</body>
+</html>
