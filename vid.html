@@ -5,21 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalhes do Vídeo</title> <!-- Título da Página -->
     <style>
-        /* --- Copiar TODO o CSS de videos.html aqui --- */
         /* Estilos Globais e Reset Básico */
-        body { font-family: 'Roboto', sans-serif; margin: 0; padding: 0; background-color: #121212; color: #e0e0e0; }
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #e0e0e0;
+        }
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
-        /* Estilos para o Menu de Navegação (igual a videos.html) */
-        .main-nav { background-color: #1f1f1f; padding: 0.8em 30px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); text-align: right; }
-        .main-nav ul { list-style: none; margin: 0; padding: 0; }
-        .main-nav li { display: inline-block; margin-left: 20px; }
-        .main-nav a { color: #e0e0e0; text-decoration: none; font-size: 1.1em; padding: 5px 10px; border-radius: 4px; transition: background-color 0.2s ease, color 0.2s ease; }
-        .main-nav a:hover { background-color: #bb86fc; color: #121212; }
+        /* Estilos para o Menu de Navegação */
+        .main-nav {
+            background-color: #1f1f1f;
+            padding: 0.8em 30px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            text-align: right;
+        }
+        .main-nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .main-nav li {
+            display: inline-block;
+            margin-left: 20px;
+        }
+        .main-nav a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 1.1em;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .main-nav a:hover {
+            background-color: #bb86fc;
+            color: #121212;
+        }
 
-        /* Estilos do Cabeçalho (igual a videos.html) */
-        header { background-color: #1e1e1e; color: #fff; padding: 2em 0; text-align: center; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); }
-        header h1 { margin: 0; font-size: 2.5em; font-weight: 700; letter-spacing: 0.5px; }
+        /* Estilos do Cabeçalho */
+        header {
+            background-color: #1e1e1e;
+            color: #fff;
+            padding: 2em 0;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
 
         /* --- Estilos Específicos para vid.html --- */
         .video-detail-container {
@@ -53,33 +91,38 @@
             text-align: center;
         }
 
+        /* Container para o Iframe (mantém proporção) */
         #video-player-container {
             position: relative;
-            padding-bottom: 56.25%; /* Proporção 16:9 */
+            padding-bottom: 56.25%; /* Proporção 16:9 (ajuste se necessário) */
             height: 0;
             overflow: hidden;
             background-color: #000; /* Fundo preto enquanto carrega */
             margin-bottom: 20px;
             border-radius: 6px; /* Opcional: cantos arredondados */
         }
-        #video-player-container iframe,
-        #video-player-container video { /* Estilos se usar iframe ou tag video */
+        /* Estilos para o Iframe */
+        #video-player-container iframe {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            border: 0; /* Remove borda do iframe */
+            border: none; /* Remove borda do iframe */
         }
-        #video-player-container .loading-message {
+        /* Mensagem dentro do container do iframe */
+        #video-player-container .iframe-status-message {
              position: absolute;
              top: 50%;
              left: 50%;
              transform: translate(-50%, -50%);
              color: #aaa;
+             text-align: center;
+             padding: 10px;
+             display: none; /* Começa escondida */
         }
 
-
+        /* Secção de Detalhes (Número, Atrizes, etc.) */
         #video-details {
             margin-top: 20px;
             padding-top: 15px;
@@ -89,31 +132,39 @@
              margin-bottom: 10px;
              color: #e0e0e0;
              font-weight: normal;
+             font-size: 1.2em;
         }
         #video-details p {
             margin-bottom: 8px;
             color: #ccc;
+            line-height: 1.5;
         }
-         #video-details .actress-link { /* Estilo para links de atrizes */
+        /* Estilo para links de atrizes nos detalhes */
+         #video-details .actress-link {
              color: #bb86fc;
              text-decoration: none;
+             margin: 0 2px; /* Pequeno espaçamento entre links */
          }
          #video-details .actress-link:hover {
              text-decoration: underline;
          }
 
+        /* Container e texto de erro geral */
         .error-message {
             color: #ff5252; /* Cor de erro */
             text-align: center;
             padding: 30px;
             font-size: 1.2em;
         }
+        #error-container {
+             display: none; /* Começa escondido */
+        }
 
     </style>
 </head>
 <body>
 
-    <!-- MENU DE NAVEGAÇÃO (igual a videos.html) -->
+    <!-- MENU DE NAVEGAÇÃO -->
     <nav class="main-nav">
         <ul>
             <li><a href="index.html">Home</a></li>
@@ -138,11 +189,15 @@
         <!-- Conteúdo do Vídeo (será preenchido pelo JS) -->
         <h2 id="video-title">Carregando...</h2>
 
+        <!-- Container do Iframe -->
         <div id="video-player-container">
-            <div class="loading-message">A carregar vídeo...</div>
-            <!-- O player (iframe ou video tag) será inserido aqui -->
+            <!-- Iframe que carregará a página do Firestore -->
+            <iframe id="webpage-frame" src="about:blank" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" frameborder="0"></iframe>
+            <!-- Mensagem de carregamento/erro para o iframe -->
+            <div class="iframe-status-message"></div>
         </div>
 
+        <!-- Detalhes Adicionais -->
         <div id="video-details">
             <h3>Detalhes</h3>
             <p id="video-number">Número: Carregando...</p>
@@ -150,8 +205,8 @@
             <!-- Adicionar mais campos se necessário (e.g., data, tags) -->
         </div>
 
-        <!-- Mensagem de Erro (escondida inicialmente) -->
-         <div id="error-container" style="display: none;">
+        <!-- Mensagem de Erro Geral -->
+         <div id="error-container">
              <p class="error-message" id="error-text"></p>
          </div>
 
@@ -160,136 +215,181 @@
 
 
     <!-- Firebase Modular SDKs via CDN -->
-          // Dentro de vid.html -> <script type="module">
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, doc, getDoc, collection } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-        // --- Função Principal para Carregar Dados do Vídeo ---
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0",
+            authDomain: "babes-392fd.firebaseapp.com",
+            projectId: "babes-392fd",
+            storageBucket: "babes-392fd.appspot.com",
+            messagingSenderId: "376795361631",
+            appId: "1:376795361631:web:d662f2b2f2cd23b115c6ea"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // --- Definições de Funções ---
+
+        // Função para mostrar erros
+        function displayError(message) {
+            // Tenta obter referências DENTRO da função
+            const videoTitleElement = document.getElementById('video-title');
+            const videoPlayerContainer = document.getElementById('video-player-container');
+            const videoDetailsSection = document.getElementById('video-details');
+            const errorContainer = document.getElementById('error-container');
+            const errorText = document.getElementById('error-text');
+
+            console.error(message);
+            if(videoTitleElement) videoTitleElement.style.display = 'none';
+            if(videoPlayerContainer) videoPlayerContainer.style.display = 'none';
+            if(videoDetailsSection) videoDetailsSection.style.display = 'none';
+            if(errorText) errorText.textContent = message;
+            if(errorContainer) errorContainer.style.display = 'block';
+        }
+
+        // Função para buscar nomes das atrizes
+        async function getActressNames(actressIds) {
+            if (!actressIds || actressIds.length === 0) return 'N/A';
+            try {
+                const actressPromises = actressIds.map(id => getDoc(doc(db, "atores", id)));
+                const actressSnaps = await Promise.all(actressPromises);
+                const actressLinks = actressSnaps.map((snap, index) => {
+                    if (snap.exists()) {
+                        const actressData = snap.data();
+                        const actressName = actressData.nome || 'Nome Desconhecido';
+                        // Cria link para página da atriz (ajuste she.html se for diferente)
+                        return `<a href="she.html?id=${snap.id}" class="actress-link">${actressName}</a>`;
+                    } else {
+                        return `<span style="color: #aaa;">ID Inválido (${actressIds[index]})</span>`; // Indica ID inválido
+                     }
+                });
+                return actressLinks.join(', '); // Separa com vírgula e espaço
+            } catch (error) { console.error("Erro ao buscar nomes das atrizes:", error); return 'Erro ao carregar'; }
+        }
+
+        // Função Principal para Carregar Dados do Vídeo
         async function loadVideoDetails() {
-            // 1. Get Video ID from URL (igual)
+            // Obter referências aos elementos DO DOM aqui dentro
+            const pageTitleElement = document.getElementById('page-title');
+            const videoTitleElement = document.getElementById('video-title');
+            const videoPlayerContainer = document.getElementById('video-player-container');
+            const videoDetailsSection = document.getElementById('video-details');
+            const videoNumberElement = document.getElementById('video-number');
+            const videoActressesElement = document.getElementById('video-actresses');
+            const errorContainer = document.getElementById('error-container');
+            const errorText = document.getElementById('error-text');
+            const webpageFrame = document.getElementById('webpage-frame');
+            const iframeStatusMessage = videoPlayerContainer ? videoPlayerContainer.querySelector('.iframe-status-message') : null;
+
+            // Validações iniciais de elementos
+             if (!pageTitleElement || !videoTitleElement || !videoPlayerContainer || !videoDetailsSection || !videoNumberElement || !videoActressesElement || !errorContainer || !errorText || !webpageFrame || !iframeStatusMessage) {
+                 console.error("Um ou mais elementos essenciais do DOM não foram encontrados em loadVideoDetails!");
+                 displayError("Erro interno: Falha ao carregar elementos da página.");
+                 return;
+             }
+
+            // Get Video ID from URL
             const urlParams = new URLSearchParams(window.location.search);
             const videoId = urlParams.get('id');
 
-            const webpageFrame = document.getElementById('webpage-frame'); // Referência ao iframe
-            const iframeStatusMessage = videoPlayerContainer.querySelector('.iframe-status-message'); // Referência à mensagem
-
-            if (!webpageFrame || !iframeStatusMessage) {
-                 console.error("Elemento iframe ou mensagem não encontrado!");
-                 displayError("Erro interno na página.");
-                 return;
-            }
-
-             // Mostra mensagem de carregamento inicial no espaço do iframe
+            // Estado inicial
             iframeStatusMessage.textContent = 'A carregar conteúdo...';
             iframeStatusMessage.style.display = 'block';
+            webpageFrame.style.display = 'block'; // Garante que o iframe está visível
+            errorContainer.style.display = 'none'; // Garante que erro está escondido
+            videoDetailsSection.style.display = 'block'; // Garante que detalhes estão visíveis
+            videoTitleElement.style.display = 'block'; // Garante que título está visível
 
 
             if (!videoId) {
                 displayError("Erro: ID do vídeo não encontrado na URL.");
-                iframeStatusMessage.style.display = 'none'; // Esconde msg de carregamento
+                iframeStatusMessage.style.display = 'none';
                 return;
             }
 
             try {
-                // 2. Fetch Video Document (igual)
+                // Fetch Video Document
                 const videoRef = doc(db, "videos", videoId);
                 const videoSnap = await getDoc(videoRef);
 
                 if (!videoSnap.exists()) {
                     displayError(`Erro: Vídeo com ID "${videoId}" não encontrado.`);
-                     iframeStatusMessage.style.display = 'none';
+                    iframeStatusMessage.style.display = 'none';
                     return;
                 }
 
-                // 3. Get Video Data (igual)
+                // Get Video Data
                 const videoData = videoSnap.data();
 
-                // 4. Populate DOM Elements (igual, exceto player)
+                // Populate DOM Elements
                 const videoName = videoData.nome || 'Vídeo sem Título';
                 pageTitleElement.textContent = videoName;
                 videoTitleElement.textContent = videoName;
                 videoNumberElement.textContent = `Número: ${videoData.no !== undefined ? videoData.no : 'N/A'}`;
 
+                // Popula Atrizes
                 videoActressesElement.innerHTML = 'Atrizes: Carregando...';
                 const actressNamesHTML = await getActressNames(videoData.atores);
                 videoActressesElement.innerHTML = `Atrizes: ${actressNamesHTML}`;
 
-                // ---> 5. Carregar Iframe com URL do campo 'pagina' <---
-                const paginaUrl = videoData.pagina; // Obtém a URL do campo 'pagina'
+                // Carregar Iframe com URL do campo 'pagina'
+                const paginaUrl = videoData.pagina;
 
                 if (paginaUrl && typeof paginaUrl === 'string' && paginaUrl.trim() !== '') {
-                    console.log("A carregar iframe com URL:", paginaUrl);
                     try {
-                        // Validação básica de URL (opcional mas recomendado)
-                        new URL(paginaUrl); // Tenta criar um objeto URL, lança erro se inválido
+                        // Validação básica de URL
+                        new URL(paginaUrl);
                         webpageFrame.src = paginaUrl; // Define o src do iframe
-                        iframeStatusMessage.style.display = 'none'; // Esconde mensagem após definir src
-                         // Opcional: Adicionar listener para erro de carregamento do iframe (pode ser complexo devido a restrições de segurança)
-                         /*
-                         webpageFrame.onerror = () => {
-                             console.error("Erro ao carregar URL no iframe:", paginaUrl);
-                             iframeStatusMessage.textContent = 'Erro ao carregar conteúdo externo.';
-                             iframeStatusMessage.style.display = 'block';
-                             webpageFrame.style.display = 'none'; // Esconde iframe que falhou
-                         };
-                         webpageFrame.onload = () => {
-                              console.log("Iframe carregado com sucesso.");
-                              // Poderia verificar se o conteúdo está vazio, mas cross-origin dificulta
-                         }
-                         */
+                        iframeStatusMessage.style.display = 'none'; // Esconde mensagem de carregamento
                     } catch (e) {
                         console.error("URL inválida no campo 'pagina':", paginaUrl, e);
                         iframeStatusMessage.textContent = 'URL configurada para o conteúdo é inválida.';
                         iframeStatusMessage.style.display = 'block';
-                         webpageFrame.style.display = 'none'; // Esconde iframe
+                        webpageFrame.style.display = 'none'; // Esconde iframe se URL inválida
                     }
                 } else {
-                    console.warn("Campo 'pagina' não encontrado ou vazio no documento do vídeo.");
+                    // Campo 'pagina' não encontrado ou vazio
                     iframeStatusMessage.textContent = 'Nenhuma página associada a este vídeo.';
                     iframeStatusMessage.style.display = 'block';
-                     webpageFrame.style.display = 'none'; // Esconde iframe
+                    webpageFrame.style.display = 'none'; // Esconde iframe se não houver URL
                 }
-                // ---> Fim da Lógica do Iframe <---
 
             } catch (error) {
+                // Erro geral ao buscar/processar dados
                 displayError("Ocorreu um erro ao carregar os detalhes do vídeo.");
                 console.error("Erro detalhado:", error);
-                iframeStatusMessage.style.display = 'none';
+                 if(iframeStatusMessage) iframeStatusMessage.style.display = 'none';
                  if(webpageFrame) webpageFrame.style.display = 'none';
             }
         }
 
-        // --- Função getActressNames (igual à anterior) ---
-        async function getActressNames(actressIds) {
-             if (!actressIds || actressIds.length === 0) return 'N/A';
-             try {
-                 const actressPromises = actressIds.map(id => getDoc(doc(db, "atores", id)));
-                 const actressSnaps = await Promise.all(actressPromises);
-                 const actressLinks = actressSnaps.map((snap, index) => {
-                     if (snap.exists()) {
-                         const actressData = snap.data();
-                         const actressName = actressData.nome || 'Nome Desconhecido';
-                         return `<a href="she.html?id=${snap.id}" class="actress-link">${actressName}</a>`;
-                     } else { return `ID Inválido (${actressIds[index]})`; }
-                 });
-                 return actressLinks.join(', ');
-             } catch (error) { console.error("Erro nomes atrizes:", error); return 'Erro'; }
-        }
 
-        // --- Função displayError (igual à anterior) ---
-         function displayError(message) {
-            console.error(message);
-            videoTitleElement.style.display = 'none';
-            videoPlayerContainer.style.display = 'none';
-            document.getElementById('video-details').style.display = 'none';
-            errorText.textContent = message;
-            errorContainer.style.display = 'block';
-        }
+        // --- Espera o DOM estar pronto ---
+        document.addEventListener('DOMContentLoaded', () => {
 
+            // Tenta encontrar o botão AGORA que o DOM está pronto
+            const backButton = document.getElementById('back-button');
 
-        // --- Event Listener para o Botão Voltar --- (igual)
-        backButton.addEventListener('click', () => { history.back(); });
+            if (backButton) {
+                 // Adiciona o listener
+                 backButton.addEventListener('click', () => {
+                    history.back();
+                });
+            } else {
+                console.error("Botão 'Voltar' não encontrado no DOM!");
+            }
 
-        // --- Inicialização --- (igual)
-        loadVideoDetails();
+            // Chama a função principal para carregar os detalhes
+            loadVideoDetails();
+
+        });
+
+        // As definições das funções ficam no escopo do módulo
 
     </script>
 
