@@ -389,7 +389,7 @@
     <!-- FIM CONTAINER -->
 
     <!-- Firebase Modular SDKs via CDN -->
-      <script type="module">
+     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
@@ -411,7 +411,7 @@
         const contentContainer = document.getElementById('videos-filmes-container');
         const filterButtons = document.querySelectorAll('.filter-btn');
         const searchInput = document.getElementById('search-input');
-        const suggestionsList = document.getElementById('suggestions-list'); // Usaremos esta div para a lista de co-estrelas
+        const suggestionsList = document.getElementById('suggestions-list'); // Usada para ambas as listas
         const selectedActressesContainer = document.getElementById('selected-actresses-container');
         const searchInputWrapper = document.querySelector('.search-input-wrapper');
 
@@ -448,15 +448,14 @@
         // --- FUNCTION TO GENERATE HTML FOR A SINGLE CARD --- (igual)
         function generateCardHTML(item) {
             const nome = item.nome || (item.type === 'video' ? 'Vídeo sem nome' : 'Filme sem nome');
-            const imagem = item.imagem || 'path/to/default/placeholder.png'; // Use a real path
+            const imagem = item.imagem || 'path/to/default/placeholder.png';
             const ano = item.ano || 'N/A';
             const videoNo = item.no !== undefined ? item.no : '?';
-            let cardLink = '#'; // Placeholder link
-
+            let cardLink = '#';
             let cardHTML = `<a href="${cardLink}" class="content-card-link">`;
              if (item.type === 'video') {
                 cardHTML += `<div class="content-card video-card" data-id="${item.id}">${videoNo !== '?' ? `<span class="video-number-badge">#${videoNo}</span>` : ''}<img src="${imagem}" alt="${nome}"><div class="content-info"><h3>${nome}</h3></div></div>`;
-            } else { // film
+            } else {
                 cardHTML += `<div class="content-card film-card" data-id="${item.id}"><img src="${imagem}" alt="${nome}"><div class="content-info"><h3>${nome}</h3><p class="year">(${ano})</p></div></div>`;
             }
             cardHTML += `</a>`;
@@ -465,32 +464,74 @@
 
          // --- FUNCTIONS FOR ACTRESS SEARCH & SELECTION ---
 
-        // Mostra lista de CO-ESTRELAS com botão "Adicionar" (igual)
-        function showCoStarsList() {
+        // (REFEITA) Atualiza e mostra lista de CO-ESTRELAS COMUNS às selecionadas
+        function updateCoStarsList() {
             suggestionsList.innerHTML = '';
             suggestionsList.style.display = 'none';
-            if (selectedActresses.length !== 1) return;
 
-            const selectedActressId = selectedActresses[0].id;
-            const selectedActressName = selectedActresses[0].nome;
-            let coStarIds = new Set();
-            allContent.forEach(item => {
-                if (item.atores && Array.isArray(item.atores) && item.atores.includes(selectedActressId)) {
-                    item.atores.forEach(actressId => {
-                        if (actressId !== selectedActressId && !selectedActresses.some(sa => sa.id === actressId)) {
-                            coStarIds.add(actressId);
-                        }
-                    });
-                }
+            if (selectedActresses.length === 0) {
+                // console.log("updateCoStarsList: No actresses selected. Hiding.");
+                return; // Sem selecionadas, sem co-estrelas
+            }
+
+            // console.log(`updateCoStarsList: Finding common co-stars for ${selectedActresses.length} selected actresses.`);
+            const selectedActressIds = selectedActresses.map(a => a.id);
+            let commonContentItems = [];
+
+            // 1. Encontra itens que contêm TODAS as atrizes selecionadas
+            commonContentItems = allContent.filter(item => {
+                 if (!item.atores || !Array.isArray(item.atores) || item.atores.length < selectedActresses.length) {
+                     return false; // Otimização: não pode ter todas se tiver menos atores que o nº selecionado
+                 }
+                 // Verifica se TODOS os IDs selecionados estão no array de atores do item
+                 return selectedActressIds.every(selectedId => item.atores.includes(selectedId));
             });
-            const coStarActresses = allActresses.filter(actress => coStarIds.has(actress.id));
+            // console.log(`   Found ${commonContentItems.length} items containing all selected actresses.`);
 
-            if (coStarActresses.length > 0) {
+            if (commonContentItems.length === 0 && selectedActresses.length > 1) {
+                // Se mais de 1 selecionada, mas sem conteúdo em comum, informa
+                const noCommonItem = document.createElement('div');
+                noCommonItem.classList.add('suggestion-item', 'no-results');
+                noCommonItem.textContent = 'Nenhum conteúdo encontrado com todas as atrizes selecionadas.';
+                suggestionsList.appendChild(noCommonItem);
+                suggestionsList.style.display = 'block';
+                return;
+            }
+             if (commonContentItems.length === 0 && selectedActresses.length === 1) {
+                 // Se só 1 selecionada e não encontrada em NENHUM item (improvável, mas possível)
+                  // console.log("   Selected actress not found in any content items?");
+                  // Pode mostrar mensagem ou não fazer nada
+             }
+
+
+            // 2. Coleta TODOS os IDs de atores desses itens comuns
+            let potentialCoStarIds = new Set();
+            commonContentItems.forEach(item => {
+                item.atores.forEach(actressId => {
+                    potentialCoStarIds.add(actressId);
+                });
+            });
+
+            // 3. Remove os IDs das atrizes JÁ SELECIONADAS
+            selectedActressIds.forEach(idToRemove => {
+                potentialCoStarIds.delete(idToRemove);
+            });
+
+            // 4. Obtém os objetos completos das atrizes co-estrelas válidas
+            const validCoStars = allActresses.filter(actress => potentialCoStarIds.has(actress.id));
+            // console.log(`   Found ${validCoStars.length} valid co-stars to suggest.`);
+
+
+            // 5. Mostra a lista
+            if (validCoStars.length > 0) {
                 const titleItem = document.createElement('div');
                 titleItem.classList.add('suggestion-title');
-                titleItem.textContent = `Co-estrelas de ${selectedActressName}:`;
+                // Adapta o título se for só uma ou várias selecionadas
+                const titlePrefix = selectedActresses.length === 1 ? `Co-estrelas de ${selectedActresses[0].nome}` : 'Co-estrelas Comuns';
+                titleItem.textContent = `${titlePrefix}:`;
                 suggestionsList.appendChild(titleItem);
-                coStarActresses.forEach(coStar => {
+
+                validCoStars.forEach(coStar => {
                     const item = document.createElement('div');
                     item.classList.add('suggestion-item', 'costar-suggestion-item');
                     item.innerHTML = `<img src="${coStar.foto || 'path/to/default/avatar.png'}" alt="${coStar.nome}"><span>${coStar.nome}</span><button class="add-costar-btn" data-id="${coStar.id}" data-name="${coStar.nome}">Adicionar</button>`;
@@ -498,25 +539,30 @@
                 });
                 suggestionsList.style.display = 'block';
             } else {
-                 const noResultsItem = document.createElement('div');
-                 noResultsItem.classList.add('suggestion-item', 'no-results');
-                 noResultsItem.textContent = `Nenhuma co-estrela adicional encontrada para ${selectedActressName}`;
-                 suggestionsList.appendChild(noResultsItem);
-                 suggestionsList.style.display = 'block';
+                // Nenhuma co-estrela válida encontrada (ou todas já foram selecionadas)
+                const noResultsItem = document.createElement('div');
+                noResultsItem.classList.add('suggestion-item', 'no-results');
+                const reasonText = selectedActresses.length === 1 ? `Nenhuma co-estrela adicional encontrada para ${selectedActresses[0].nome}` : 'Nenhuma co-estrela comum adicional encontrada';
+                noResultsItem.textContent = reasonText;
+                suggestionsList.appendChild(noResultsItem);
+                suggestionsList.style.display = 'block'; // Mostra a mensagem
             }
         }
 
-        // Handler para clique no botão "Adicionar" da lista de co-estrelas (igual)
+        // Handler para clique no botão "Adicionar" da lista de co-estrelas (MODIFICADO - chama updateCoStarsList)
         function handleAddCoStarClick(event) {
              const button = event.target;
              const actressId = button.dataset.id;
              const actressName = button.dataset.name;
              if (!actressId || !actressName) return;
+
              selectedActresses.push({ id: actressId, nome: actressName });
              renderSelectedActressesPills();
-             renderContent();
-             suggestionsList.innerHTML = '';
-             suggestionsList.style.display = 'none';
+             renderContent(); // Atualiza grelha com base na nova seleção
+
+             // Atualiza a lista de co-estrelas COMUNS à nova seleção
+             updateCoStarsList();
+
              // searchInput.focus(); // Mantido comentado
         }
 
@@ -546,7 +592,7 @@
             }
         }
 
-        // Handler para clique numa sugestão da lista STANDARD (MODIFICADO - com setTimeout)
+        // Handler para clique numa sugestão da lista STANDARD (MODIFICADO - chama updateCoStarsList)
         function handleSelectActressClick(event) {
             const target = event.currentTarget;
             const actressId = target.dataset.id;
@@ -558,23 +604,15 @@
                 renderSelectedActressesPills();
                 renderContent();
 
-                // Verifica se foi a PRIMEIRA atriz a ser adicionada
-                if (selectedActresses.length === 1) {
-                    // ----> USA setTimeout PARA MOSTRAR A LISTA <----
-                    setTimeout(() => {
-                        showCoStarsList();
-                    }, 0); // Atraso de 0ms
-                } else {
-                     // Segunda, terceira, etc. Esconde a lista imediatamente
-                     suggestionsList.innerHTML = '';
-                     suggestionsList.style.display = 'none';
-                }
+                // Após adicionar (seja a 1ª ou não), atualiza a lista de co-estrelas
+                updateCoStarsList();
+
             } else {
-                 // Mesmo se já selecionada, esconde a lista
+                 // Se já selecionada, esconde a lista de pesquisa standard
                  suggestionsList.innerHTML = '';
                  suggestionsList.style.display = 'none';
             }
-            searchInput.value = '';
+            searchInput.value = ''; // Limpa sempre o input após seleção
             // searchInput.focus(); // Mantido comentado
         }
 
@@ -591,20 +629,19 @@
             });
         }
 
-        // Handler para REMOVER uma pílula (igual à versão anterior, já funcionava)
+
+        // Handler para REMOVER uma pílula (MODIFICADO - chama updateCoStarsList)
         function handleRemoveActress(event) {
             event.stopPropagation();
             const pill = event.target.closest('.actress-pill');
             const actressIdToRemove = pill.dataset.id;
             selectedActresses = selectedActresses.filter(a => a.id !== actressIdToRemove);
             pill.remove();
-            renderContent();
-            if (selectedActresses.length === 1) {
-                showCoStarsList(); // Mostra co-estrelas da restante
-            } else {
-                 suggestionsList.innerHTML = '';
-                 suggestionsList.style.display = 'none';
-            }
+            renderContent(); // Atualiza grelha
+
+            // Atualiza a lista de co-estrelas com base nas restantes
+            updateCoStarsList();
+
             // searchInput.focus(); // Mantido comentado
         }
 
@@ -643,22 +680,24 @@
                 filterButtons.forEach(btn => btn.classList.remove('active'));
                 button.classList.add('active');
                 activeTypeFilter = button.getAttribute('data-filter');
-                suggestionsList.style.display = 'none';
+                suggestionsList.style.display = 'none'; // Esconde lista ao mudar filtro
                 renderContent();
             });
         });
 
         // 2. Actress Search Input (Typing) -> Mostra sugestões standard (igual)
+        //    NÃO mostra mais co-estrelas ao digitar
         searchInput.addEventListener('input', () => {
             displayStandardSuggestions(searchInput.value);
         });
 
-        // 3. Actress Search Input (Focus) -> SIMPLIFICADO (igual à versão anterior)
+        // 3. Actress Search Input (Focus) -> NÃO faz nada especial ao focar
         searchInput.addEventListener('focus', () => {
+             // Se houver texto ao focar, mostra sugestões standard (comportamento normal)
              if (searchInput.value) {
                  displayStandardSuggestions(searchInput.value);
              }
-             // Não tenta mostrar co-estrelas ao focar
+             // NÃO mostra co-estrelas ao focar, isso é feito após add/remove
         });
 
         // 4. Hide suggestions/co-stars on click outside (igual)
@@ -668,12 +707,15 @@
              }
          });
 
-         // 5. EVENT DELEGATION for "Add" buttons in the co-star list (igual)
+         // 5. EVENT DELEGATION for buttons inside suggestionsList (igual)
          suggestionsList.addEventListener('click', function(event) {
+             // Handler para o botão "Adicionar" da lista de co-estrelas
              if (event.target.classList.contains('add-costar-btn')) {
                  handleAddCoStarClick(event);
              }
              // O clique nos '.suggestion-item' da lista standard é tratado DENTRO de displayStandardSuggestions
+             // porque o listener é adicionado dinamicamente a cada item.
+             // Não precisamos de um handler aqui para isso.
          });
 
         // --- INITIALIZATION ---
