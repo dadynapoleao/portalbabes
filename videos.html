@@ -389,7 +389,7 @@
     <!-- FIM CONTAINER -->
 
     <!-- Firebase Modular SDKs via CDN -->
-         <script type="module">
+      <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
@@ -411,7 +411,7 @@
         const contentContainer = document.getElementById('videos-filmes-container');
         const filterButtons = document.querySelectorAll('.filter-btn');
         const searchInput = document.getElementById('search-input');
-        const suggestionsList = document.getElementById('suggestions-list');
+        const suggestionsList = document.getElementById('suggestions-list'); // Usaremos esta div para a lista de co-estrelas
         const selectedActressesContainer = document.getElementById('selected-actresses-container');
         const searchInputWrapper = document.querySelector('.search-input-wrapper');
 
@@ -438,7 +438,7 @@
                 return true;
             });
             if (filteredContent.length === 0) {
-                contentHTML = '<p class="message">Nenhum resultado encontrado...</p>';
+                contentHTML = '<p class="message">Nenhum resultado encontrado para os filtros selecionados.</p>';
             } else {
                 filteredContent.forEach(item => { contentHTML += generateCardHTML(item); });
             }
@@ -448,14 +448,15 @@
         // --- FUNCTION TO GENERATE HTML FOR A SINGLE CARD --- (igual)
         function generateCardHTML(item) {
             const nome = item.nome || (item.type === 'video' ? 'Vídeo sem nome' : 'Filme sem nome');
-            const imagem = item.imagem || 'path/to/default/placeholder.png';
+            const imagem = item.imagem || 'path/to/default/placeholder.png'; // Use a real path
             const ano = item.ano || 'N/A';
             const videoNo = item.no !== undefined ? item.no : '?';
-            let cardLink = '#';
+            let cardLink = '#'; // Placeholder link
+
             let cardHTML = `<a href="${cardLink}" class="content-card-link">`;
              if (item.type === 'video') {
                 cardHTML += `<div class="content-card video-card" data-id="${item.id}">${videoNo !== '?' ? `<span class="video-number-badge">#${videoNo}</span>` : ''}<img src="${imagem}" alt="${nome}"><div class="content-info"><h3>${nome}</h3></div></div>`;
-            } else {
+            } else { // film
                 cardHTML += `<div class="content-card film-card" data-id="${item.id}"><img src="${imagem}" alt="${nome}"><div class="content-info"><h3>${nome}</h3><p class="year">(${ano})</p></div></div>`;
             }
             cardHTML += `</a>`;
@@ -516,7 +517,7 @@
              renderContent();
              suggestionsList.innerHTML = '';
              suggestionsList.style.display = 'none';
-             // searchInput.focus(); // Removido temporariamente
+             // searchInput.focus(); // Mantido comentado
         }
 
         // Mostra sugestões STANDARD ao DIGITAR (igual)
@@ -535,7 +536,7 @@
                     item.dataset.id = actress.id;
                     item.dataset.nome = actress.nome;
                     item.innerHTML = `<img src="${actress.foto || 'path/to/default/avatar.png'}" alt=""><span>${actress.nome}</span>`;
-                    item.addEventListener('click', handleSelectActressClick); // Usa o handler correto
+                    item.addEventListener('click', handleSelectActressClick);
                     suggestionsList.appendChild(item);
                 });
                 suggestionsList.style.display = 'block';
@@ -545,7 +546,7 @@
             }
         }
 
-        // Handler para clique numa sugestão da lista STANDARD (MODIFICADO - sem focus)
+        // Handler para clique numa sugestão da lista STANDARD (MODIFICADO - com setTimeout)
         function handleSelectActressClick(event) {
             const target = event.currentTarget;
             const actressId = target.dataset.id;
@@ -556,18 +557,25 @@
                 selectedActresses.push({ id: actressId, nome: actressName });
                 renderSelectedActressesPills();
                 renderContent();
+
+                // Verifica se foi a PRIMEIRA atriz a ser adicionada
                 if (selectedActresses.length === 1) {
-                    showCoStarsList(); // <<< MOSTRA AUTOMATICAMENTE
+                    // ----> USA setTimeout PARA MOSTRAR A LISTA <----
+                    setTimeout(() => {
+                        showCoStarsList();
+                    }, 0); // Atraso de 0ms
                 } else {
+                     // Segunda, terceira, etc. Esconde a lista imediatamente
                      suggestionsList.innerHTML = '';
                      suggestionsList.style.display = 'none';
                 }
             } else {
+                 // Mesmo se já selecionada, esconde a lista
                  suggestionsList.innerHTML = '';
                  suggestionsList.style.display = 'none';
             }
             searchInput.value = '';
-            // searchInput.focus(); // REMOVIDO TEMPORARIAMENTE
+            // searchInput.focus(); // Mantido comentado
         }
 
         // Renderiza as pílulas (igual)
@@ -583,7 +591,7 @@
             });
         }
 
-        // Handler para REMOVER uma pílula (MODIFICADO - sem focus)
+        // Handler para REMOVER uma pílula (igual à versão anterior, já funcionava)
         function handleRemoveActress(event) {
             event.stopPropagation();
             const pill = event.target.closest('.actress-pill');
@@ -592,12 +600,12 @@
             pill.remove();
             renderContent();
             if (selectedActresses.length === 1) {
-                showCoStarsList(); // <<< MOSTRA AUTOMATICAMENTE
+                showCoStarsList(); // Mostra co-estrelas da restante
             } else {
                  suggestionsList.innerHTML = '';
                  suggestionsList.style.display = 'none';
             }
-            // searchInput.focus(); // REMOVIDO TEMPORARIAMENTE
+            // searchInput.focus(); // Mantido comentado
         }
 
         // --- FUNCTION TO LOAD ALL INITIAL DATA --- (igual)
@@ -645,13 +653,12 @@
             displayStandardSuggestions(searchInput.value);
         });
 
-        // 3. Actress Search Input (Focus) -> SIMPLIFICADO
+        // 3. Actress Search Input (Focus) -> SIMPLIFICADO (igual à versão anterior)
         searchInput.addEventListener('focus', () => {
-             // Ao focar, SÓ mostra sugestões STANDARD se houver texto no input.
              if (searchInput.value) {
                  displayStandardSuggestions(searchInput.value);
              }
-             // NÃO tenta mais mostrar relacionadas automaticamente ao focar.
+             // Não tenta mostrar co-estrelas ao focar
         });
 
         // 4. Hide suggestions/co-stars on click outside (igual)
@@ -666,7 +673,7 @@
              if (event.target.classList.contains('add-costar-btn')) {
                  handleAddCoStarClick(event);
              }
-             // O clique nos '.suggestion-item' da lista standard é tratado dentro de displayStandardSuggestions
+             // O clique nos '.suggestion-item' da lista standard é tratado DENTRO de displayStandardSuggestions
          });
 
         // --- INITIALIZATION ---
