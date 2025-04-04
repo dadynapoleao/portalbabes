@@ -61,10 +61,10 @@
 
         /* --- Estilos Específicos para vid.html --- */
         .video-detail-container {
-            max-width: 900px; /* Largura máxima para conteúdo do vídeo */
+            max-width: 900px; /* Largura máxima */
             margin: 20px auto;
             padding: 20px;
-            background-color: #1f1f1f; /* Fundo ligeiramente diferente */
+            background-color: #1f1f1f;
             border-radius: 8px;
         }
 
@@ -85,65 +85,73 @@
         #back-button:hover { background-color: #444; }
 
         #video-title {
-            color: #bb86fc; /* Cor de destaque para o título */
+            color: #bb86fc;
             margin-top: 0;
-            margin-bottom: 15px;
+            margin-bottom: 25px; /* Aumenta espaço abaixo do título */
             text-align: center;
+            font-size: 1.8em; /* Ligeiramente menor que o header h1 */
         }
 
-        /* Container para o Iframe (mantém proporção) */
-        #video-player-container {
-            position: relative;
-            padding-bottom: 56.25%; /* Proporção 16:9 (ajuste se necessário) */
-            height: 0;
-            overflow: hidden;
-            background-color: #000; /* Fundo preto enquanto carrega */
-            margin-bottom: 20px;
-            border-radius: 6px; /* Opcional: cantos arredondados */
+        /* Container para Link Externo */
+        #external-link-container {
+            text-align: center;
+            margin: 30px 0; /* Espaçamento vertical */
+            padding: 20px;
+            border: 1px dashed #444; /* Borda para destacar a área */
+            border-radius: 6px;
         }
-        /* Estilos para o Iframe */
-        #video-player-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none; /* Remove borda do iframe */
+        #external-link-message {
+            color: #ccc;
+            margin-bottom: 15px;
+            font-size: 1.1em;
         }
-        /* Mensagem dentro do container do iframe */
-        #video-player-container .iframe-status-message {
-             position: absolute;
-             top: 50%;
-             left: 50%;
-             transform: translate(-50%, -50%);
-             color: #aaa;
-             text-align: center;
-             padding: 10px;
-             display: none; /* Começa escondida */
+        #external-link-button {
+            display: inline-block;
+            padding: 12px 30px; /* Botão maior */
+            background-color: #bb86fc;
+            color: #121212;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: background-color 0.2s ease, transform 0.1s ease;
         }
+         #external-link-button:hover {
+             background-color: #a774e6; /* Cor ligeiramente mais escura */
+             transform: scale(1.03); /* Efeito de zoom leve */
+         }
+        #external-link-url {
+             margin-top: 15px;
+             font-size: 0.9em;
+             color: #888;
+             word-break: break-all; /* Quebra URL longa */
+         }
+
 
         /* Secção de Detalhes (Número, Atrizes, etc.) */
         #video-details {
-            margin-top: 20px;
-            padding-top: 15px;
+            margin-top: 30px; /* Mais espaço acima dos detalhes */
+            padding-top: 20px;
             border-top: 1px solid #333; /* Linha separadora */
         }
         #video-details h3 {
-             margin-bottom: 10px;
+             margin-bottom: 15px; /* Mais espaço abaixo do título "Detalhes" */
              color: #e0e0e0;
              font-weight: normal;
-             font-size: 1.2em;
+             font-size: 1.4em; /* Título de secção um pouco maior */
+             border-bottom: 1px solid #444; /* Sublinhado leve */
+             padding-bottom: 5px;
         }
         #video-details p {
-            margin-bottom: 8px;
+            margin-bottom: 10px; /* Espaço entre parágrafos */
             color: #ccc;
-            line-height: 1.5;
+            line-height: 1.6; /* Melhor legibilidade */
+            font-size: 1.05em;
         }
-        /* Estilo para links de atrizes nos detalhes */
-         #video-details .actress-link {
+        #video-details .actress-link {
              color: #bb86fc;
              text-decoration: none;
-             margin: 0 2px; /* Pequeno espaçamento entre links */
+             margin: 0 3px;
          }
          #video-details .actress-link:hover {
              text-decoration: underline;
@@ -151,13 +159,13 @@
 
         /* Container e texto de erro geral */
         .error-message {
-            color: #ff5252; /* Cor de erro */
+            color: #ff5252;
             text-align: center;
             padding: 30px;
             font-size: 1.2em;
         }
         #error-container {
-             display: none; /* Começa escondido */
+             display: none;
         }
 
     </style>
@@ -186,23 +194,22 @@
             <button id="back-button">← Voltar</button>
         </div>
 
-        <!-- Conteúdo do Vídeo (será preenchido pelo JS) -->
+        <!-- Título do Vídeo -->
         <h2 id="video-title">Carregando...</h2>
 
-        <!-- Container do Iframe -->
-        <div id="video-player-container">
-            <!-- Iframe que carregará a página do Firestore -->
-            <iframe id="webpage-frame" src="about:blank" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" frameborder="0"></iframe>
-            <!-- Mensagem de carregamento/erro para o iframe -->
-            <div class="iframe-status-message"></div>
+        <!-- Container para Link Externo (Substitui o Iframe) -->
+        <div id="external-link-container" style="display: none;"> <!-- Começa escondido -->
+            <p id="external-link-message"></p>
+            <a id="external-link-button" href="#" target="_blank" rel="noopener noreferrer">Abrir Conteúdo</a>
+            <p id="external-link-url"></p>
         </div>
 
         <!-- Detalhes Adicionais -->
-        <div id="video-details">
+        <div id="video-details" style="display: none;"> <!-- Começa escondido -->
             <h3>Detalhes</h3>
             <p id="video-number">Número: Carregando...</p>
             <p id="video-actresses">Atrizes: Carregando...</p>
-            <!-- Adicionar mais campos se necessário (e.g., data, tags) -->
+            <!-- Adicionar mais campos se necessário -->
         </div>
 
         <!-- Mensagem de Erro Geral -->
@@ -237,19 +244,18 @@
 
         // Função para mostrar erros
         function displayError(message) {
-            // Tenta obter referências DENTRO da função
             const videoTitleElement = document.getElementById('video-title');
-            const videoPlayerContainer = document.getElementById('video-player-container');
+            const externalLinkContainer = document.getElementById('external-link-container'); // Referência atualizada
             const videoDetailsSection = document.getElementById('video-details');
             const errorContainer = document.getElementById('error-container');
             const errorText = document.getElementById('error-text');
 
             console.error(message);
             if(videoTitleElement) videoTitleElement.style.display = 'none';
-            if(videoPlayerContainer) videoPlayerContainer.style.display = 'none';
+            if(externalLinkContainer) externalLinkContainer.style.display = 'none'; // Esconde link
             if(videoDetailsSection) videoDetailsSection.style.display = 'none';
             if(errorText) errorText.textContent = message;
-            if(errorContainer) errorContainer.style.display = 'block';
+            if(errorContainer) errorContainer.style.display = 'block'; // Mostra erro
         }
 
         // Função para buscar nomes das atrizes
@@ -262,34 +268,36 @@
                     if (snap.exists()) {
                         const actressData = snap.data();
                         const actressName = actressData.nome || 'Nome Desconhecido';
-                        // Cria link para página da atriz (ajuste she.html se for diferente)
                         return `<a href="she.html?id=${snap.id}" class="actress-link">${actressName}</a>`;
                     } else {
-                        return `<span style="color: #aaa;">ID Inválido (${actressIds[index]})</span>`; // Indica ID inválido
+                        return `<span style="color: #aaa;">ID Inválido (${actressIds[index]})</span>`;
                      }
                 });
-                return actressLinks.join(', '); // Separa com vírgula e espaço
-            } catch (error) { console.error("Erro ao buscar nomes das atrizes:", error); return 'Erro ao carregar'; }
+                return actressLinks.join(', ');
+            } catch (error) { console.error("Erro nomes atrizes:", error); return 'Erro ao carregar'; }
         }
 
         // Função Principal para Carregar Dados do Vídeo
         async function loadVideoDetails() {
-            // Obter referências aos elementos DO DOM aqui dentro
+            // Obter referências aos elementos DO DOM
             const pageTitleElement = document.getElementById('page-title');
             const videoTitleElement = document.getElementById('video-title');
-            const videoPlayerContainer = document.getElementById('video-player-container');
+            const externalLinkContainer = document.getElementById('external-link-container'); // Referência atualizada
+            const externalLinkButton = document.getElementById('external-link-button');
+            const externalLinkMessage = document.getElementById('external-link-message');
+            const externalLinkUrlText = document.getElementById('external-link-url');
             const videoDetailsSection = document.getElementById('video-details');
             const videoNumberElement = document.getElementById('video-number');
             const videoActressesElement = document.getElementById('video-actresses');
             const errorContainer = document.getElementById('error-container');
-            const errorText = document.getElementById('error-text');
-            const webpageFrame = document.getElementById('webpage-frame');
-            const iframeStatusMessage = videoPlayerContainer ? videoPlayerContainer.querySelector('.iframe-status-message') : null;
+            const errorText = document.getElementById('error-text'); // Necessário para displayError
 
-            // Validações iniciais de elementos
-             if (!pageTitleElement || !videoTitleElement || !videoPlayerContainer || !videoDetailsSection || !videoNumberElement || !videoActressesElement || !errorContainer || !errorText || !webpageFrame || !iframeStatusMessage) {
+             // Validações iniciais de elementos
+             if (!pageTitleElement || !videoTitleElement || !externalLinkContainer || !externalLinkButton || !externalLinkMessage || !externalLinkUrlText || !videoDetailsSection || !videoNumberElement || !videoActressesElement || !errorContainer || !errorText) {
                  console.error("Um ou mais elementos essenciais do DOM não foram encontrados em loadVideoDetails!");
-                 displayError("Erro interno: Falha ao carregar elementos da página.");
+                 // Não chama displayError aqui pois ele próprio precisa dos elementos
+                 const body = document.querySelector('body');
+                 if(body) body.innerHTML = '<p style="color: red; text-align: center; padding: 50px;">Erro Crítico: Falha ao carregar estrutura da página.</p>';
                  return;
              }
 
@@ -297,18 +305,14 @@
             const urlParams = new URLSearchParams(window.location.search);
             const videoId = urlParams.get('id');
 
-            // Estado inicial
-            iframeStatusMessage.textContent = 'A carregar conteúdo...';
-            iframeStatusMessage.style.display = 'block';
-            webpageFrame.style.display = 'block'; // Garante que o iframe está visível
-            errorContainer.style.display = 'none'; // Garante que erro está escondido
-            videoDetailsSection.style.display = 'block'; // Garante que detalhes estão visíveis
-            videoTitleElement.style.display = 'block'; // Garante que título está visível
-
+             // Estado inicial (esconde tudo exceto título principal e talvez botão voltar)
+            videoTitleElement.textContent = 'Carregando...';
+            externalLinkContainer.style.display = 'none';
+            videoDetailsSection.style.display = 'none';
+            errorContainer.style.display = 'none';
 
             if (!videoId) {
                 displayError("Erro: ID do vídeo não encontrado na URL.");
-                iframeStatusMessage.style.display = 'none';
                 return;
             }
 
@@ -319,7 +323,6 @@
 
                 if (!videoSnap.exists()) {
                     displayError(`Erro: Vídeo com ID "${videoId}" não encontrado.`);
-                    iframeStatusMessage.style.display = 'none';
                     return;
                 }
 
@@ -328,8 +331,12 @@
 
                 // Populate DOM Elements
                 const videoName = videoData.nome || 'Vídeo sem Título';
-                pageTitleElement.textContent = videoName;
-                videoTitleElement.textContent = videoName;
+                pageTitleElement.textContent = videoName; // Título da aba do browser
+                videoTitleElement.textContent = videoName; // Título H2 na página
+                videoTitleElement.style.display = 'block'; // Mostra título
+
+                // Mostra secção de detalhes
+                videoDetailsSection.style.display = 'block';
                 videoNumberElement.textContent = `Número: ${videoData.no !== undefined ? videoData.no : 'N/A'}`;
 
                 // Popula Atrizes
@@ -337,34 +344,37 @@
                 const actressNamesHTML = await getActressNames(videoData.atores);
                 videoActressesElement.innerHTML = `Atrizes: ${actressNamesHTML}`;
 
-                // Carregar Iframe com URL do campo 'pagina'
+                // Configurar Link Externo
                 const paginaUrl = videoData.pagina;
 
                 if (paginaUrl && typeof paginaUrl === 'string' && paginaUrl.trim() !== '') {
                     try {
-                        // Validação básica de URL
-                        new URL(paginaUrl);
-                        webpageFrame.src = paginaUrl; // Define o src do iframe
-                        iframeStatusMessage.style.display = 'none'; // Esconde mensagem de carregamento
+                        new URL(paginaUrl); // Valida URL
+                        externalLinkButton.href = paginaUrl;
+                        externalLinkUrlText.textContent = `URL: ${paginaUrl}`;
+                        externalLinkMessage.textContent = 'O conteúdo principal está disponível na seguinte página externa:';
+                        externalLinkButton.style.display = 'inline-block'; // Mostra o botão
+                        externalLinkContainer.style.display = 'block'; // Mostra o container do link
+
                     } catch (e) {
                         console.error("URL inválida no campo 'pagina':", paginaUrl, e);
-                        iframeStatusMessage.textContent = 'URL configurada para o conteúdo é inválida.';
-                        iframeStatusMessage.style.display = 'block';
-                        webpageFrame.style.display = 'none'; // Esconde iframe se URL inválida
+                        externalLinkMessage.textContent = 'A URL configurada para o conteúdo externo é inválida.';
+                        externalLinkButton.style.display = 'none';
+                        externalLinkUrlText.textContent = '';
+                        externalLinkContainer.style.display = 'block'; // Mostra container com a mensagem de erro
                     }
                 } else {
                     // Campo 'pagina' não encontrado ou vazio
-                    iframeStatusMessage.textContent = 'Nenhuma página associada a este vídeo.';
-                    iframeStatusMessage.style.display = 'block';
-                    webpageFrame.style.display = 'none'; // Esconde iframe se não houver URL
+                    externalLinkMessage.textContent = 'Nenhuma página externa associada a este vídeo.';
+                    externalLinkButton.style.display = 'none';
+                    externalLinkUrlText.textContent = '';
+                    externalLinkContainer.style.display = 'block'; // Mostra container com a mensagem
                 }
 
             } catch (error) {
                 // Erro geral ao buscar/processar dados
                 displayError("Ocorreu um erro ao carregar os detalhes do vídeo.");
                 console.error("Erro detalhado:", error);
-                 if(iframeStatusMessage) iframeStatusMessage.style.display = 'none';
-                 if(webpageFrame) webpageFrame.style.display = 'none';
             }
         }
 
