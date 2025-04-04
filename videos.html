@@ -446,19 +446,31 @@
         }
 
         // --- FUNCTION TO GENERATE HTML FOR A SINGLE CARD --- (igual)
-        function generateCardHTML(item) {
+          function generateCardHTML(item) {
             const nome = item.nome || (item.type === 'video' ? 'Vídeo sem nome' : 'Filme sem nome');
-            const imagem = item.imagem || 'path/to/default/placeholder.png';
+            const imagem = item.imagem || 'path/to/default/placeholder.png'; // Use a real path
             const ano = item.ano || 'N/A';
             const videoNo = item.no !== undefined ? item.no : '?';
-            let cardLink = '#';
-            let cardHTML = `<a href="${cardLink}" class="content-card-link">`;
-             if (item.type === 'video') {
+
+            // --- Define o link corretamente ---
+            let cardLink = '#'; // Link padrão caso não seja vídeo ou filme
+            if (item.type === 'video') {
+                 // Aponta para vid.html com o ID do vídeo
+                 cardLink = `vid.html?id=${item.id}`;
+            } else if (item.type === 'film') {
+                 // TODO: Definir link para detalhes do filme se necessário (e.g., film.html?id=${item.id})
+                 cardLink = `film_detail.html?id=${item.id}`; // Exemplo, ajuste se tiver página de filme
+            }
+            // --- Fim da definição do link ---
+
+            let cardHTML = `<a href="${cardLink}" class="content-card-link">`; // Wrap in link
+
+            if (item.type === 'video') {
                 cardHTML += `<div class="content-card video-card" data-id="${item.id}">${videoNo !== '?' ? `<span class="video-number-badge">#${videoNo}</span>` : ''}<img src="${imagem}" alt="${nome}"><div class="content-info"><h3>${nome}</h3></div></div>`;
-            } else {
+            } else { // film
                 cardHTML += `<div class="content-card film-card" data-id="${item.id}"><img src="${imagem}" alt="${nome}"><div class="content-info"><h3>${nome}</h3><p class="year">(${ano})</p></div></div>`;
             }
-            cardHTML += `</a>`;
+            cardHTML += `</a>`; // Close link
             return cardHTML;
         }
 
