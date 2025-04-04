@@ -160,138 +160,136 @@
 
 
     <!-- Firebase Modular SDKs via CDN -->
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getFirestore, doc, getDoc, collection } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+          // Dentro de vid.html -> <script type="module">
 
-        // Firebase Config (mesma de videos.html)
-        const firebaseConfig = {
-            apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0",
-            authDomain: "babes-392fd.firebaseapp.com",
-            projectId: "babes-392fd",
-            storageBucket: "babes-392fd.appspot.com",
-            messagingSenderId: "376795361631",
-            appId: "1:376795361631:web:d662f2b2f2cd23b115c6ea"
-        };
+        // --- Função Principal para Carregar Dados do Vídeo ---
+        async function loadVideoDetails() {
+            // 1. Get Video ID from URL (igual)
+            const urlParams = new URLSearchParams(window.location.search);
+            const videoId = urlParams.get('id');
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+            const webpageFrame = document.getElementById('webpage-frame'); // Referência ao iframe
+            const iframeStatusMessage = videoPlayerContainer.querySelector('.iframe-status-message'); // Referência à mensagem
 
-        // DOM Elements References
-        const pageTitleElement = document.getElementById('page-title');
-        const videoTitleElement = document.getElementById('video-title');
-        const videoPlayerContainer = document.getElementById('video-player-container');
-        const videoNumberElement = document.getElementById('video-number');
-        const videoActressesElement = document.getElementById('video-actresses');
-        const backButton = document.getElementById('back-button');
-        const errorContainer = document.getElementById('error-container');
-        const errorText = document.getElementById('error-text');
+            if (!webpageFrame || !iframeStatusMessage) {
+                 console.error("Elemento iframe ou mensagem não encontrado!");
+                 displayError("Erro interno na página.");
+                 return;
+            }
 
-        // --- Função para mostrar erros ---
-        function displayError(message) {
+             // Mostra mensagem de carregamento inicial no espaço do iframe
+            iframeStatusMessage.textContent = 'A carregar conteúdo...';
+            iframeStatusMessage.style.display = 'block';
+
+
+            if (!videoId) {
+                displayError("Erro: ID do vídeo não encontrado na URL.");
+                iframeStatusMessage.style.display = 'none'; // Esconde msg de carregamento
+                return;
+            }
+
+            try {
+                // 2. Fetch Video Document (igual)
+                const videoRef = doc(db, "videos", videoId);
+                const videoSnap = await getDoc(videoRef);
+
+                if (!videoSnap.exists()) {
+                    displayError(`Erro: Vídeo com ID "${videoId}" não encontrado.`);
+                     iframeStatusMessage.style.display = 'none';
+                    return;
+                }
+
+                // 3. Get Video Data (igual)
+                const videoData = videoSnap.data();
+
+                // 4. Populate DOM Elements (igual, exceto player)
+                const videoName = videoData.nome || 'Vídeo sem Título';
+                pageTitleElement.textContent = videoName;
+                videoTitleElement.textContent = videoName;
+                videoNumberElement.textContent = `Número: ${videoData.no !== undefined ? videoData.no : 'N/A'}`;
+
+                videoActressesElement.innerHTML = 'Atrizes: Carregando...';
+                const actressNamesHTML = await getActressNames(videoData.atores);
+                videoActressesElement.innerHTML = `Atrizes: ${actressNamesHTML}`;
+
+                // ---> 5. Carregar Iframe com URL do campo 'pagina' <---
+                const paginaUrl = videoData.pagina; // Obtém a URL do campo 'pagina'
+
+                if (paginaUrl && typeof paginaUrl === 'string' && paginaUrl.trim() !== '') {
+                    console.log("A carregar iframe com URL:", paginaUrl);
+                    try {
+                        // Validação básica de URL (opcional mas recomendado)
+                        new URL(paginaUrl); // Tenta criar um objeto URL, lança erro se inválido
+                        webpageFrame.src = paginaUrl; // Define o src do iframe
+                        iframeStatusMessage.style.display = 'none'; // Esconde mensagem após definir src
+                         // Opcional: Adicionar listener para erro de carregamento do iframe (pode ser complexo devido a restrições de segurança)
+                         /*
+                         webpageFrame.onerror = () => {
+                             console.error("Erro ao carregar URL no iframe:", paginaUrl);
+                             iframeStatusMessage.textContent = 'Erro ao carregar conteúdo externo.';
+                             iframeStatusMessage.style.display = 'block';
+                             webpageFrame.style.display = 'none'; // Esconde iframe que falhou
+                         };
+                         webpageFrame.onload = () => {
+                              console.log("Iframe carregado com sucesso.");
+                              // Poderia verificar se o conteúdo está vazio, mas cross-origin dificulta
+                         }
+                         */
+                    } catch (e) {
+                        console.error("URL inválida no campo 'pagina':", paginaUrl, e);
+                        iframeStatusMessage.textContent = 'URL configurada para o conteúdo é inválida.';
+                        iframeStatusMessage.style.display = 'block';
+                         webpageFrame.style.display = 'none'; // Esconde iframe
+                    }
+                } else {
+                    console.warn("Campo 'pagina' não encontrado ou vazio no documento do vídeo.");
+                    iframeStatusMessage.textContent = 'Nenhuma página associada a este vídeo.';
+                    iframeStatusMessage.style.display = 'block';
+                     webpageFrame.style.display = 'none'; // Esconde iframe
+                }
+                // ---> Fim da Lógica do Iframe <---
+
+            } catch (error) {
+                displayError("Ocorreu um erro ao carregar os detalhes do vídeo.");
+                console.error("Erro detalhado:", error);
+                iframeStatusMessage.style.display = 'none';
+                 if(webpageFrame) webpageFrame.style.display = 'none';
+            }
+        }
+
+        // --- Função getActressNames (igual à anterior) ---
+        async function getActressNames(actressIds) {
+             if (!actressIds || actressIds.length === 0) return 'N/A';
+             try {
+                 const actressPromises = actressIds.map(id => getDoc(doc(db, "atores", id)));
+                 const actressSnaps = await Promise.all(actressPromises);
+                 const actressLinks = actressSnaps.map((snap, index) => {
+                     if (snap.exists()) {
+                         const actressData = snap.data();
+                         const actressName = actressData.nome || 'Nome Desconhecido';
+                         return `<a href="she.html?id=${snap.id}" class="actress-link">${actressName}</a>`;
+                     } else { return `ID Inválido (${actressIds[index]})`; }
+                 });
+                 return actressLinks.join(', ');
+             } catch (error) { console.error("Erro nomes atrizes:", error); return 'Erro'; }
+        }
+
+        // --- Função displayError (igual à anterior) ---
+         function displayError(message) {
             console.error(message);
-            videoTitleElement.style.display = 'none'; // Esconde placeholders
+            videoTitleElement.style.display = 'none';
             videoPlayerContainer.style.display = 'none';
             document.getElementById('video-details').style.display = 'none';
             errorText.textContent = message;
             errorContainer.style.display = 'block';
         }
 
-        // --- Função para buscar nomes das atrizes ---
-        async function getActressNames(actressIds) {
-            if (!actressIds || actressIds.length === 0) {
-                return 'N/A';
-            }
-            try {
-                 // Busca cada atriz pelo ID
-                 const actressPromises = actressIds.map(id => getDoc(doc(db, "atores", id)));
-                 const actressSnaps = await Promise.all(actressPromises);
 
-                 const actressLinks = actressSnaps.map((snap, index) => {
-                     if (snap.exists()) {
-                         const actressData = snap.data();
-                         const actressName = actressData.nome || 'Nome Desconhecido';
-                         // Cria um link para a página da atriz (ajuste she.html se necessário)
-                         return `<a href="she.html?id=${snap.id}" class="actress-link">${actressName}</a>`;
-                     } else {
-                         return `ID Inválido (${actressIds[index]})`; // Indica se um ID não foi encontrado
-                     }
-                 });
-                 return actressLinks.join(', '); // Separa nomes com vírgula
+        // --- Event Listener para o Botão Voltar --- (igual)
+        backButton.addEventListener('click', () => { history.back(); });
 
-            } catch (error) {
-                console.error("Erro ao buscar nomes das atrizes:", error);
-                return 'Erro ao carregar atrizes';
-            }
-        }
-
-
-        // --- Função Principal para Carregar Dados do Vídeo ---
-        async function loadVideoDetails() {
-            // 1. Get Video ID from URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const videoId = urlParams.get('id');
-
-            if (!videoId) {
-                displayError("Erro: ID do vídeo não encontrado na URL.");
-                return;
-            }
-            // console.log("Carregando vídeo com ID:", videoId);
-
-            try {
-                // 2. Fetch Video Document
-                const videoRef = doc(db, "videos", videoId);
-                const videoSnap = await getDoc(videoRef);
-
-                if (!videoSnap.exists()) {
-                    displayError(`Erro: Vídeo com ID "${videoId}" não encontrado.`);
-                    return;
-                }
-
-                // 3. Get Video Data
-                const videoData = videoSnap.data();
-                // console.log("Dados do vídeo:", videoData);
-
-                // 4. Populate DOM Elements
-                const videoName = videoData.nome || 'Vídeo sem Título';
-                pageTitleElement.textContent = videoName; // Atualiza título da página
-                videoTitleElement.textContent = videoName; // Atualiza título principal
-                videoNumberElement.textContent = `Número: ${videoData.no !== undefined ? videoData.no : 'N/A'}`;
-
-                // Popula Atrizes (buscando nomes)
-                videoActressesElement.innerHTML = 'Atrizes: Carregando...'; // Placeholder
-                const actressNamesHTML = await getActressNames(videoData.atores); // videoData.atores deve ser o array de IDs
-                videoActressesElement.innerHTML = `Atrizes: ${actressNamesHTML}`; // Usa innerHTML por causa dos links
-
-                // 5. Embed Video Player (Exemplo com iframe, ajuste URL/lógica)
-                // Substitua 'videoData.embedUrl' pelo campo correto que contém o link de embed ou ID do vídeo
-                if (videoData.url_video) { // Assumindo que você tem um campo 'url_video'
-                    // Exemplo: se for um link direto para um MP4
-                    // videoPlayerContainer.innerHTML = `<video id="video-player" controls src="${videoData.url_video}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></video>`;
-
-                    // Exemplo: se for um link de embed (iframe)
-                     videoPlayerContainer.innerHTML = `<iframe src="${videoData.url_video}" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>`;
-
-                    // Adapte esta lógica conforme a estrutura do seu 'url_video'
-                } else {
-                    videoPlayerContainer.innerHTML = '<p class="loading-message">Link do vídeo não disponível.</p>';
-                }
-
-
-            } catch (error) {
-                displayError("Ocorreu um erro ao carregar os detalhes do vídeo.");
-                console.error("Erro detalhado:", error);
-            }
-        }
-
-        // --- Event Listener para o Botão Voltar ---
-        backButton.addEventListener('click', () => {
-            history.back(); // Navega para a página anterior no histórico do browser
-        });
-
-        // --- Inicialização ---
-        loadVideoDetails(); // Carrega os detalhes quando a página é carregada
+        // --- Inicialização --- (igual)
+        loadVideoDetails();
 
     </script>
 
