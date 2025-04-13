@@ -271,7 +271,7 @@
 
     // Your web app's Firebase configuration
     const firebaseConfig = {
-      apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0",
+      apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0", // IMPORTANT: Consider securing this key
       authDomain: "babes-392fd.firebaseapp.com",
       projectId: "babes-392fd",
       storageBucket: "babes-392fd.appspot.com",
@@ -288,6 +288,8 @@
     const submitButton = document.querySelector('button[form="create-actress-form"]');
     const sourceTextArea = document.getElementById('texto');
     const nameInput = document.getElementById('name');
+    // ADDED: Get the error message element
+    const nameErrorMessage = document.getElementById('name-error-message');
 
     // --- MAPEAMENTO: ID do Formulário -> Nome do Campo no Firestore ---
     const firestoreFieldMap = {
@@ -308,8 +310,9 @@
     };
 
     // --- FUNÇÕES HELPER PARA FORMATAÇÃO ---
-    // *** KEEP ONLY ONE SET OF THESE DEFINITIONS ***
-    function formatBornDate(dateString) {
+    // (Keep your existing formatBornDate, extractCmValue, etc. functions here)
+    // ... (your existing helper functions) ...
+    function formatBornDate(dateString) { // Example - keep all helpers
         const dateRegex = /(\d{1,2})(?:st|nd|rd|th)?\s+(?:of\s+)?([a-zA-Z]+)\s+(\d{4})/;
         const match = dateString.match(dateRegex);
         if (match) {
@@ -344,34 +347,34 @@
 
     // --- FUNÇÃO PRINCIPAL DE AUTO-PREENCHIMENTO ---
     function autoFillForm() {
+       // ... (your existing autoFillForm function - no changes needed here) ...
         if (!sourceTextArea) return;
         const textContent = sourceTextArea.value;
         const lines = textContent.split('\n');
         // Limpeza
-        if(nameInput) nameInput.value = '';
-        // Mapeamento para auto-preenchimento (Label do texto -> Firestore Key)
-        // Necessário para encontrar o valor no texto original
+        // Don't clear name if user is typing in it for the check
+        // if(nameInput) nameInput.value = '';
+
         const fieldMappingsForAutofill = {
             'Born': 'dataNascimento', 'Birthplace': 'pais', 'Ethnicity': 'etnia',
             'Hair color': 'corCabelo', 'Eye color': 'corOlhos', 'Height': 'altura',
             'Weight': 'peso', 'Body type': 'tipoCorpo', 'Measurements': 'medidas',
             'Years active': 'AnosAtiva'
          };
-         // Limpa campos mapeados (exceto texto/nome)
+         // Limpa campos mapeados (exceto texto/nome/foto/nota)
          Object.keys(firestoreFieldMap).forEach(formId => {
-             if(formId === 'texto' || formId === 'name' || formId === 'foto' || formId === 'nota') return; // Não limpa esses
+             if(formId === 'texto' || formId === 'name' || formId === 'foto' || formId === 'nota') return;
              const inputElement = document.getElementById(formId);
              if (inputElement) inputElement.value = '';
          });
 
-        // Nome
-        if (lines.length > 0 && nameInput) nameInput.value = lines[0].trim();
+        // Preenche Nome se ainda não foi preenchido pelo usuário
+        if (lines.length > 0 && nameInput && !nameInput.value) nameInput.value = lines[0].trim();
 
         // Outros campos
          Object.entries(fieldMappingsForAutofill).forEach(([label, firestoreKey]) => {
-             // Encontra o ID do formulário correspondente à chave do Firestore
              const formId = Object.keys(firestoreFieldMap).find(key => firestoreFieldMap[key] === firestoreKey);
-             if(!formId) return; // Pula se não houver mapeamento de formulário para esta chave
+             if(!formId) return;
 
              const regex = new RegExp(`^${label}:\\s*(.*)$`, 'im');
              const match = textContent.match(regex);
@@ -384,24 +387,96 @@
                  else if (firestoreKey === 'AnosAtiva') value = extractStartYear(value);
                  // Preenchimento
                  const inputElement = document.getElementById(formId);
-                 if (inputElement) inputElement.value = value;
-                 else console.warn(`Elemento de formulário com ID "${formId}" não encontrado para ${firestoreKey}`);
+                 // Only fill if the field is empty, don't overwrite user input
+                 if (inputElement && !inputElement.value) inputElement.value = value;
+                 else if (!inputElement) console.warn(`Elemento de formulário com ID "${formId}" não encontrado para ${firestoreKey}`);
              }
          });
     }
 
+    // --- ADDED: Debounce function ---
+    function debounce(func, delay) {
+      let timeoutId;
+      return function(...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          func.apply(this, args);
+        }, delay);
+      };
+    }
+
+    // --- ADDED: Function to check if name exists in Firestore ---
+    async function checkNameExists() {
+        if (!nameInput || !nameErrorMessage || !db) return; // Safety checks
+
+        const enteredName = nameInput.value.trim();
+
+        // Hide message initially or if name is empty
+        nameErrorMessage.style.display = 'none';
+        nameErrorMessage.textContent = '';
+        // Re-enable submit button by default when checking (will be disabled below if needed)
+        if (submitButton) submitButton.disabled = false;
+
+
+        if (enteredName === '') {
+            return; // Don't query if the name field is empty
+        }
+
+        // Disable submit button while checking
+        if (submitButton) submitButton.disabled = true;
+
+
+        try {
+            // console.log(`Checking Firestore for name: "${enteredName}"`); // Optional: for debugging
+            const checkQuery = query(collection(db, "atores"), where("nome", "==", enteredName), limit(1));
+            const querySnapshot = await getDocs(checkQuery);
+
+            if (!querySnapshot.empty) {
+                // Name exists! Show the error message.
+                nameErrorMessage.textContent = `O nome "${enteredName}" já existe.`;
+                nameErrorMessage.style.display = 'block';
+                // Keep submit button disabled because name exists
+                if (submitButton) submitButton.disabled = true;
+            } else {
+                // Name does not exist, message remains hidden.
+                // Enable submit button if the check passed
+                if (submitButton) submitButton.disabled = false;
+            }
+        } catch (error) {
+            console.error("Erro ao verificar nome no Firestore:", error);
+            nameErrorMessage.textContent = 'Erro ao verificar o nome. Tente novamente.';
+            nameErrorMessage.style.display = 'block';
+            // Keep submit button disabled on error
+             if (submitButton) submitButton.disabled = true;
+        }
+    }
 
     // --- EVENT LISTENERS ---
     if (sourceTextArea) {
         sourceTextArea.addEventListener('input', autoFillForm);
     }
 
+    // ADDED: Listener for the Name input field (with debounce)
+    if (nameInput) {
+        // Debounce the check function: wait 500ms after user stops typing
+        const debouncedCheck = debounce(checkNameExists, 500);
+        nameInput.addEventListener('input', debouncedCheck);
+         // Optional: also check when the user leaves the field
+        nameInput.addEventListener('blur', checkNameExists);
+    }
+
+
     // Listener para o envio do formulário
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!submitButton) return;
 
-        submitButton.disabled = true;
+        // --- Submission logic might need adjustment ---
+        // The real-time check might already disable the button.
+        // However, we still perform a final check here as a safeguard.
+
+        const initialButtonText = 'Criar'; // Store initial text
+        submitButton.disabled = true; // Disable immediately
         submitButton.textContent = 'Verificando...';
 
         const formData = new FormData(form);
@@ -410,28 +485,35 @@
         if (!enteredName) {
             alert('O campo "Nome" é obrigatório.');
             submitButton.disabled = false;
-            submitButton.textContent = 'Criar';
+            submitButton.textContent = initialButtonText;
             return;
         }
 
+        // --- FINAL CHECK before saving (redundant if real-time check worked, but safe) ---
         try {
-            // Verifica se nome existe
             const checkQuery = query(collection(db, "atores"), where("nome", "==", enteredName), limit(1));
             const querySnapshot = await getDocs(checkQuery);
 
             if (!querySnapshot.empty) {
-                alert(`Já existe uma atriz com o nome "${enteredName}".`);
-                submitButton.disabled = false;
-                submitButton.textContent = 'Criar';
-                return;
+                // Update the persistent error message as well
+                if(nameErrorMessage) {
+                    nameErrorMessage.textContent = `O nome "${enteredName}" já existe.`;
+                    nameErrorMessage.style.display = 'block';
+                }
+                alert(`Já existe uma atriz com o nome "${enteredName}". Não é possível criar duplicados.`);
+                // Keep button disabled as the name exists
+                submitButton.disabled = true; // Explicitly keep disabled
+                submitButton.textContent = initialButtonText; // Reset text but keep disabled
+                return; // Stop the submission process
             }
+            // --- End of Final Check ---
 
-            // Nome não existe, continua para salvar
+            // Name does not exist (or check passed), proceed to save
             submitButton.textContent = 'Salvando...';
 
             const firestoreData = {};
-            // Constrói o objeto firestoreData
-            for (const [formId, firestoreKey] of Object.entries(firestoreFieldMap)) {
+            // Build firestoreData object (your existing logic is fine)
+             for (const [formId, firestoreKey] of Object.entries(firestoreFieldMap)) {
                 const rawValue = formData.get(formId);
                 if (rawValue !== null && rawValue !== undefined) {
                     const trimmedValue = typeof rawValue === 'string' ? rawValue.trim() : rawValue;
@@ -459,18 +541,41 @@
 
             console.log('Dados a serem enviados para Firestore:', firestoreData);
 
-            // Salva no Firestore
+            // Save to Firestore
             const docRef = await addDoc(collection(db, "atores"), firestoreData);
             console.log("Documento escrito com ID: ", docRef.id);
             alert('Atriz criada com sucesso!');
             form.reset();
+            // Clear any lingering error message after successful submission
+            if (nameErrorMessage) {
+                nameErrorMessage.style.display = 'none';
+                nameErrorMessage.textContent = '';
+            }
+
 
         } catch (error) {
             console.error("Erro durante o processo de criação: ", error);
             alert(`Erro: ${error.message}. Verifique o console.`);
+            // Keep button disabled on error? Or enable? User choice. Let's enable.
+             submitButton.disabled = false;
+
         } finally {
-            submitButton.disabled = false;
-            submitButton.textContent = 'Criar';
+            // Careful here: only re-enable if no error *or* if error wasn't 'duplicate'
+            // The logic above handles enabling/disabling more specifically.
+            // If the button is still disabled at this point (e.g., due to duplicate found),
+            // DON'T re-enable it unconditionally.
+            // So, we adjust the enable/disable within the try/catch blocks.
+            // We'll just ensure the text is reset if it wasn't successful.
+             if (submitButton.textContent.includes('Salvando...') || submitButton.textContent.includes('Verificando...')) {
+                submitButton.textContent = initialButtonText;
+             }
+             // Final check: If the name field still shows an error, keep the button disabled
+             if (nameErrorMessage && nameErrorMessage.style.display === 'block') {
+                 if(submitButton) submitButton.disabled = true;
+             } else {
+                 // If no error is displayed, ensure button is enabled (unless saving failed for other reasons)
+                 // This might conflict slightly, let's rely on the specific enable/disable in try/catch
+             }
         }
     });
 
