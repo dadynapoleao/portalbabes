@@ -266,10 +266,9 @@
 <script type="module">
     // Import Firebase functions
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    // Import Firestore functions needed for query and write
     import { getFirestore, collection, addDoc, query, where, getDocs, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // Your web app's Firebase configuration
+    // Firebase configuration (keep as is)
     const firebaseConfig = {
       apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0", // IMPORTANT: Consider securing this key
       authDomain: "babes-392fd.firebaseapp.com",
@@ -288,90 +287,114 @@
     const submitButton = document.querySelector('button[form="create-actress-form"]');
     const sourceTextArea = document.getElementById('texto');
     const nameInput = document.getElementById('name');
-    // ADDED: Get the error message element
     const nameErrorMessage = document.getElementById('name-error-message');
 
-    // --- MAPEAMENTO: ID do Formulário -> Nome do Campo no Firestore ---
+    // --- MAPEAMENTO --- (keep as is)
     const firestoreFieldMap = {
-        'name': 'nome',
-        'texto': 'texto',
-        'foto': 'foto',
-        'born': 'dataNascimento',
-        'birthplace': 'pais',
-        'ethnicity': 'etnia',
-        'hair_color': 'corCabelo',
-        'eye_color': 'corOlhos',
-        'height': 'altura',
-        'weight': 'peso',
-        'body_type': 'tipoCorpo',
-        'measurements': 'medidas',
-        'years_active': 'AnosAtiva',
+        'name': 'nome', 'texto': 'texto', 'foto': 'foto', 'born': 'dataNascimento',
+        'birthplace': 'pais', 'ethnicity': 'etnia', 'hair_color': 'corCabelo',
+        'eye_color': 'corOlhos', 'height': 'altura', 'weight': 'peso',
+        'body_type': 'tipoCorpo', 'measurements': 'medidas', 'years_active': 'AnosAtiva',
         'nota': 'nota'
     };
 
-    // --- FUNÇÕES HELPER PARA FORMATAÇÃO ---
-    // (Keep your existing formatBornDate, extractCmValue, etc. functions here)
-    // ... (your existing helper functions) ...
-    function formatBornDate(dateString) { // Example - keep all helpers
-        const dateRegex = /(\d{1,2})(?:st|nd|rd|th)?\s+(?:of\s+)?([a-zA-Z]+)\s+(\d{4})/;
-        const match = dateString.match(dateRegex);
-        if (match) {
-            const day = match[1].padStart(2, '0');
-            const monthName = match[2];
-            const year = match[3];
-            const monthMap = {'january': '01', 'february': '02', 'march': '03', 'april': '04', 'may': '05', 'june': '06', 'july': '07', 'august': '08', 'september': '09', 'october': '10', 'november': '11', 'december': '12'};
-            const monthNumber = monthMap[monthName.toLowerCase()];
-            if (monthNumber) return `${year}/${monthNumber}/${day}`;
-            else console.warn(`Mês não reconhecido: "${monthName}"`);
-        } else {
-            console.warn(`Formato de data não reconhecido: "${dateString}"`);
-        }
-        return dateString;
-    }
-    function extractCmValue(heightString) {
-        const cmRegex = /\(\s*(?:or\s+)?(\d+)\s*cm\s*\)/i;
-        const match = heightString.match(cmRegex);
-        return match ? match[1] : '';
-    }
-    function extractKgValue(weightString) {
-        const kgRegex = /\(\s*(?:or\s+)?(\d+)\s*kg\s*\)/i;
-        const match = weightString.match(kgRegex);
-        return match ? match[1] : '';
-    }
-    function extractStartYear(yearsString) {
-        const yearRegex = /(\d{4})/;
-        const match = yearsString.match(yearRegex);
-        return match ? match[1] : '';
+    // --- FUNÇÕES HELPER PARA FORMATAÇÃO --- (keep as is)
+    function formatBornDate(dateString) { /* ... */ return dateString; } // Keep implementations
+    function extractCmValue(heightString) { /* ... */ return ''; } // Keep implementations
+    function extractKgValue(weightString) { /* ... */ return ''; } // Keep implementations
+    function extractStartYear(yearsString) { /* ... */ return ''; } // Keep implementations
+    // Copy your actual helper function implementations here
+
+    // --- Debounce function --- (keep as is)
+    function debounce(func, delay) {
+      let timeoutId;
+      return function(...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          func.apply(this, args);
+        }, delay);
+      };
     }
 
+    // --- Function to check if name exists in Firestore --- (keep as is)
+    async function checkNameExists() {
+        if (!nameInput || !nameErrorMessage || !db) return;
+
+        const enteredName = nameInput.value.trim();
+        nameErrorMessage.style.display = 'none';
+        nameErrorMessage.textContent = '';
+        // Submit button state will be managed based on the check result
+        // Let's default to enabled unless a check is running or finds a duplicate
+        let shouldBeDisabled = false;
+
+
+        if (enteredName === '') {
+            if (submitButton) submitButton.disabled = false; // Enable if name is cleared
+            return;
+        }
+
+        // Indicate checking is in progress (optional, could make button text change)
+        // if (submitButton) submitButton.disabled = true;
+
+        try {
+            const checkQuery = query(collection(db, "atores"), where("nome", "==", enteredName), limit(1));
+            const querySnapshot = await getDocs(checkQuery);
+
+            if (!querySnapshot.empty) {
+                nameErrorMessage.textContent = `O nome "${enteredName}" já existe.`;
+                nameErrorMessage.style.display = 'block';
+                shouldBeDisabled = true; // Mark button to be disabled
+            } else {
+                // Name does not exist, message remains hidden.
+                shouldBeDisabled = false; // Mark button to be enabled
+            }
+        } catch (error) {
+            console.error("Erro ao verificar nome no Firestore:", error);
+            nameErrorMessage.textContent = 'Erro ao verificar o nome.';
+            nameErrorMessage.style.display = 'block';
+            shouldBeDisabled = true; // Disable on error
+        } finally {
+             // Set button state based on the outcome
+             if (submitButton) submitButton.disabled = shouldBeDisabled;
+        }
+    }
+
+
+    // --- Declare debouncedCheck OUTSIDE autoFillForm so it's accessible ---
+    let debouncedCheck;
 
     // --- FUNÇÃO PRINCIPAL DE AUTO-PREENCHIMENTO ---
     function autoFillForm() {
-       // ... (your existing autoFillForm function - no changes needed here) ...
         if (!sourceTextArea) return;
         const textContent = sourceTextArea.value;
         const lines = textContent.split('\n');
-        // Limpeza
-        // Don't clear name if user is typing in it for the check
-        // if(nameInput) nameInput.value = '';
+        let nameWasSetByAutofill = false;
 
+        // Limpa campos mapeados (exceto texto/nome/foto/nota)
+        Object.keys(firestoreFieldMap).forEach(formId => {
+             if(formId === 'texto' || formId === 'name' || formId === 'foto' || formId === 'nota') return;
+             const inputElement = document.getElementById(formId);
+             if (inputElement && !inputElement.value) inputElement.value = ''; // Clear only if empty
+         });
+
+        // Preenche Nome se ainda não foi preenchido pelo usuário
+        if (lines.length > 0 && nameInput && !nameInput.value) {
+            const potentialName = lines[0].trim();
+            if (potentialName) {
+                 nameInput.value = potentialName;
+                 nameWasSetByAutofill = true; // Mark that autofill set the name
+            }
+        }
+
+        // Mapeamento para auto-preenchimento (Label -> Firestore Key)
         const fieldMappingsForAutofill = {
             'Born': 'dataNascimento', 'Birthplace': 'pais', 'Ethnicity': 'etnia',
             'Hair color': 'corCabelo', 'Eye color': 'corOlhos', 'Height': 'altura',
             'Weight': 'peso', 'Body type': 'tipoCorpo', 'Measurements': 'medidas',
             'Years active': 'AnosAtiva'
          };
-         // Limpa campos mapeados (exceto texto/nome/foto/nota)
-         Object.keys(firestoreFieldMap).forEach(formId => {
-             if(formId === 'texto' || formId === 'name' || formId === 'foto' || formId === 'nota') return;
-             const inputElement = document.getElementById(formId);
-             if (inputElement) inputElement.value = '';
-         });
 
-        // Preenche Nome se ainda não foi preenchido pelo usuário
-        if (lines.length > 0 && nameInput && !nameInput.value) nameInput.value = lines[0].trim();
-
-        // Outros campos
+        // Preenche outros campos
          Object.entries(fieldMappingsForAutofill).forEach(([label, firestoreKey]) => {
              const formId = Object.keys(firestoreFieldMap).find(key => firestoreFieldMap[key] === firestoreKey);
              if(!formId) return;
@@ -385,99 +408,60 @@
                  else if (firestoreKey === 'altura') value = extractCmValue(value);
                  else if (firestoreKey === 'peso') value = extractKgValue(value);
                  else if (firestoreKey === 'AnosAtiva') value = extractStartYear(value);
-                 // Preenchimento
+                 // Preenchimento (only if field is currently empty)
                  const inputElement = document.getElementById(formId);
-                 // Only fill if the field is empty, don't overwrite user input
                  if (inputElement && !inputElement.value) inputElement.value = value;
                  else if (!inputElement) console.warn(`Elemento de formulário com ID "${formId}" não encontrado para ${firestoreKey}`);
              }
          });
+
+         // --- MODIFICATION: Trigger the name check IF autofill populated the name field ---
+         if (nameWasSetByAutofill && typeof debouncedCheck === 'function') {
+             console.log("Autofill set name, triggering check..."); // For debugging
+             // Call the existing debounced check function
+             debouncedCheck();
+         }
     }
 
-    // --- ADDED: Debounce function ---
-    function debounce(func, delay) {
-      let timeoutId;
-      return function(...args) {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-          func.apply(this, args);
-        }, delay);
-      };
-    }
-
-    // --- ADDED: Function to check if name exists in Firestore ---
-    async function checkNameExists() {
-        if (!nameInput || !nameErrorMessage || !db) return; // Safety checks
-
-        const enteredName = nameInput.value.trim();
-
-        // Hide message initially or if name is empty
-        nameErrorMessage.style.display = 'none';
-        nameErrorMessage.textContent = '';
-        // Re-enable submit button by default when checking (will be disabled below if needed)
-        if (submitButton) submitButton.disabled = false;
-
-
-        if (enteredName === '') {
-            return; // Don't query if the name field is empty
-        }
-
-        // Disable submit button while checking
-        if (submitButton) submitButton.disabled = true;
-
-
-        try {
-            // console.log(`Checking Firestore for name: "${enteredName}"`); // Optional: for debugging
-            const checkQuery = query(collection(db, "atores"), where("nome", "==", enteredName), limit(1));
-            const querySnapshot = await getDocs(checkQuery);
-
-            if (!querySnapshot.empty) {
-                // Name exists! Show the error message.
-                nameErrorMessage.textContent = `O nome "${enteredName}" já existe.`;
-                nameErrorMessage.style.display = 'block';
-                // Keep submit button disabled because name exists
-                if (submitButton) submitButton.disabled = true;
-            } else {
-                // Name does not exist, message remains hidden.
-                // Enable submit button if the check passed
-                if (submitButton) submitButton.disabled = false;
-            }
-        } catch (error) {
-            console.error("Erro ao verificar nome no Firestore:", error);
-            nameErrorMessage.textContent = 'Erro ao verificar o nome. Tente novamente.';
-            nameErrorMessage.style.display = 'block';
-            // Keep submit button disabled on error
-             if (submitButton) submitButton.disabled = true;
-        }
-    }
 
     // --- EVENT LISTENERS ---
+
+    // Listener for the Name input field (with debounce)
+    if (nameInput) {
+        // Define the debounced function here
+        debouncedCheck = debounce(checkNameExists, 500);
+        // Attach listener for user typing
+        nameInput.addEventListener('input', debouncedCheck);
+        // Attach listener for when user leaves the field (optional but good)
+        nameInput.addEventListener('blur', checkNameExists); // Use non-debounced here for immediate check on blur
+    }
+
+    // Listener for the Text Area input
     if (sourceTextArea) {
+        // AutoFillForm will now potentially call debouncedCheck if it sets the name
         sourceTextArea.addEventListener('input', autoFillForm);
     }
 
-    // ADDED: Listener for the Name input field (with debounce)
-    if (nameInput) {
-        // Debounce the check function: wait 500ms after user stops typing
-        const debouncedCheck = debounce(checkNameExists, 500);
-        nameInput.addEventListener('input', debouncedCheck);
-         // Optional: also check when the user leaves the field
-        nameInput.addEventListener('blur', checkNameExists);
-    }
 
-
-    // Listener para o envio do formulário
+    // Listener para o envio do formulário (keep your existing submit logic)
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
+        // Ensure the button isn't disabled due to a name conflict before proceeding
+        if (submitButton && submitButton.disabled) {
+            // Optionally alert the user again or just prevent submission
+             if (nameErrorMessage && nameErrorMessage.style.display === 'block') {
+                alert('Não é possível criar: ' + nameErrorMessage.textContent);
+             } else {
+                alert('Aguarde a verificação do nome ou corrija o erro.');
+             }
+            return;
+        }
         if (!submitButton) return;
 
-        // --- Submission logic might need adjustment ---
-        // The real-time check might already disable the button.
-        // However, we still perform a final check here as a safeguard.
 
-        const initialButtonText = 'Criar'; // Store initial text
-        submitButton.disabled = true; // Disable immediately
-        submitButton.textContent = 'Verificando...';
+        const initialButtonText = 'Criar';
+        submitButton.disabled = true;
+        submitButton.textContent = 'Verificando...'; // Changed from Salvando...
 
         const formData = new FormData(form);
         const enteredName = formData.get('name')?.trim();
@@ -489,39 +473,41 @@
             return;
         }
 
-        // --- FINAL CHECK before saving (redundant if real-time check worked, but safe) ---
+        // --- FINAL CHECK before saving (still recommended) ---
         try {
             const checkQuery = query(collection(db, "atores"), where("nome", "==", enteredName), limit(1));
             const querySnapshot = await getDocs(checkQuery);
 
             if (!querySnapshot.empty) {
-                // Update the persistent error message as well
                 if(nameErrorMessage) {
                     nameErrorMessage.textContent = `O nome "${enteredName}" já existe.`;
                     nameErrorMessage.style.display = 'block';
                 }
                 alert(`Já existe uma atriz com o nome "${enteredName}". Não é possível criar duplicados.`);
-                // Keep button disabled as the name exists
-                submitButton.disabled = true; // Explicitly keep disabled
-                submitButton.textContent = initialButtonText; // Reset text but keep disabled
-                return; // Stop the submission process
+                submitButton.disabled = true; // Keep disabled
+                submitButton.textContent = initialButtonText;
+                return;
             }
             // --- End of Final Check ---
 
-            // Name does not exist (or check passed), proceed to save
-            submitButton.textContent = 'Salvando...';
+            submitButton.textContent = 'Salvando...'; // Now change to saving
 
             const firestoreData = {};
-            // Build firestoreData object (your existing logic is fine)
+            // Build firestoreData object (keep your existing logic)
              for (const [formId, firestoreKey] of Object.entries(firestoreFieldMap)) {
                 const rawValue = formData.get(formId);
-                if (rawValue !== null && rawValue !== undefined) {
+                // ... (rest of your data building logic) ...
+                 if (rawValue !== null && rawValue !== undefined) {
                     const trimmedValue = typeof rawValue === 'string' ? rawValue.trim() : rawValue;
-                    if (trimmedValue === '' && firestoreKey !== 'nota') continue;
+                    if (trimmedValue === '' && firestoreKey !== 'nota') continue; // Skip empty except nota
 
                     if (formId === 'nota') {
                         const numValue = parseFloat(trimmedValue);
                         if (!isNaN(numValue)) firestoreData[firestoreKey] = numValue;
+                         else if (trimmedValue === '') {
+                           // Handle empty nota if needed, e.g., set to null or omit
+                           // firestoreData[firestoreKey] = null; // Or delete firestoreData[firestoreKey];
+                         }
                     } else if (formId === 'measurements') {
                         firestoreData[firestoreKey] = trimmedValue;
                         const parts = trimmedValue.split('-');
@@ -539,43 +525,36 @@
             }
             firestoreData.createdAt = serverTimestamp();
 
+
             console.log('Dados a serem enviados para Firestore:', firestoreData);
 
-            // Save to Firestore
             const docRef = await addDoc(collection(db, "atores"), firestoreData);
             console.log("Documento escrito com ID: ", docRef.id);
             alert('Atriz criada com sucesso!');
             form.reset();
-            // Clear any lingering error message after successful submission
             if (nameErrorMessage) {
                 nameErrorMessage.style.display = 'none';
                 nameErrorMessage.textContent = '';
             }
+             submitButton.disabled = false; // Re-enable after successful save
 
 
         } catch (error) {
             console.error("Erro durante o processo de criação: ", error);
             alert(`Erro: ${error.message}. Verifique o console.`);
-            // Keep button disabled on error? Or enable? User choice. Let's enable.
-             submitButton.disabled = false;
+             submitButton.disabled = false; // Re-enable on error too
+             submitButton.textContent = initialButtonText;
 
         } finally {
-            // Careful here: only re-enable if no error *or* if error wasn't 'duplicate'
-            // The logic above handles enabling/disabling more specifically.
-            // If the button is still disabled at this point (e.g., due to duplicate found),
-            // DON'T re-enable it unconditionally.
-            // So, we adjust the enable/disable within the try/catch blocks.
-            // We'll just ensure the text is reset if it wasn't successful.
-             if (submitButton.textContent.includes('Salvando...') || submitButton.textContent.includes('Verificando...')) {
-                submitButton.textContent = initialButtonText;
-             }
-             // Final check: If the name field still shows an error, keep the button disabled
-             if (nameErrorMessage && nameErrorMessage.style.display === 'block') {
-                 if(submitButton) submitButton.disabled = true;
-             } else {
-                 // If no error is displayed, ensure button is enabled (unless saving failed for other reasons)
-                 // This might conflict slightly, let's rely on the specific enable/disable in try/catch
-             }
+           // Reset button text if it's stuck on 'Verificando' or 'Salvando'
+           // unless it was intentionally disabled due to duplicate name check
+           if (submitButton && !submitButton.disabled && (submitButton.textContent.includes('Salvando') || submitButton.textContent.includes('Verificando'))) {
+                 submitButton.textContent = initialButtonText;
+           }
+           // If error message is showing, ensure button is disabled
+           if (nameErrorMessage && nameErrorMessage.style.display === 'block') {
+               if(submitButton) submitButton.disabled = true;
+           }
         }
     });
 
