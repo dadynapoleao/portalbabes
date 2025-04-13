@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Criar Nova Atriz</title>
     <style>
-        /* === COLE EXATAMENTE O MESMO BLOCO CSS DA PÁGINA index.html AQUI === */
-        /* Incluindo body, @import, .main-nav, header, etc. */
-
+        /* === CSS STYLES === */
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
@@ -19,20 +17,20 @@
 
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
-        /* Estilos do Menu (copiados) */
+        /* Estilos do Menu */
         .main-nav { background-color: #1f1f1f; padding: 0.8em 30px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); text-align: right; }
         .main-nav ul { list-style: none; margin: 0; padding: 0; }
         .main-nav li { display: inline-block; margin-left: 20px; }
         .main-nav a { color: #e0e0e0; text-decoration: none; font-size: 1.1em; padding: 5px 10px; border-radius: 4px; transition: background-color 0.2s ease, color 0.2s ease; }
         .main-nav a:hover { background-color: #bb86fc; color: #121212; }
 
-        /* Estilos do Header (copiados) */
+        /* Estilos do Header */
         header { background-color: #1e1e1e; color: #fff; padding: 2em 0; text-align: center; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); }
         header h1 { margin: 0; font-size: 2.5em; font-weight: 700; letter-spacing: 0.5px; }
 
         /* Estilos para o Container de Conteúdo */
         .content-container {
-            max-width: 1000px; /* Aumentado um pouco para caber mais cards lado a lado */
+            max-width: 1000px;
             margin: 40px auto;
             padding: 30px 40px;
             background-color: #242424;
@@ -48,64 +46,56 @@
         }
 
         /* --- ESTILOS DO FORMULÁRIO COM CARDS --- */
-
-        /* Container Flex para os cards (o próprio form) */
         #create-actress-form {
-            display: flex; /* Ativa o Flexbox */
-            flex-wrap: wrap; /* Permite que os itens quebrem para a próxima linha */
-            gap: 16px; /* Espaço entre os cards */
-            margin-bottom: 30px; /* Espaço antes do botão de submit */
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 30px;
         }
 
-        /* Estilo do Card Individual (era .form-group) */
         .form-card {
-            background-color: #333; /* Fundo do card */
-            padding: 18px; /* Espaçamento interno do card */
-            border-radius: 8px; /* Bordas arredondadas */
-            border: 1px solid #444; /* Borda sutil */
-            /* Controle de Largura: flex-basis define o tamanho base, grow/shrink permitem ajuste */
-            flex-basis: calc(50% - 8px); /* Base para 2 colunas (50% menos metade do gap) */
-            flex-grow: 1; /* Permite que o card cresça se houver espaço */
-            box-sizing: border-box; /* Padding e borda incluídos na largura/altura */
-            min-width: 250px; /* Largura mínima para evitar cards muito estreitos */
+            background-color: #333;
+            padding: 18px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            flex-basis: calc(50% - 8px);
+            flex-grow: 1;
+            box-sizing: border-box;
+            min-width: 250px;
         }
 
-        /* Card de Largura Total (para Textarea, por exemplo) */
         .form-card.full-width {
-            flex-basis: 100%; /* Ocupa a largura total */
+            flex-basis: 100%;
         }
-
 
         .content-container label {
              display: block;
-             margin-bottom: 10px; /* Espaço maior abaixo do label */
+             margin-bottom: 10px;
              color: #b0b0b0;
-             font-size: 0.9em; /* Label ligeiramente menor */
+             font-size: 0.9em;
              font-weight: bold;
          }
 
-         /* Inputs e Textarea dentro dos cards */
          .content-container input[type="text"],
          .content-container input[type="url"],
          .content-container input[type="number"],
          .content-container textarea {
              width: 100%;
-             padding: 10px 12px; /* Padding interno dos inputs */
-             background-color: #404040; /* Fundo do input ligeiramente diferente do card */
+             padding: 10px 12px;
+             background-color: #404040;
              border: 1px solid #555;
              border-radius: 5px;
              color: #e0e0e0;
              box-sizing: border-box;
              font-size: 1em;
              transition: border-color 0.2s ease, box-shadow 0.2s ease;
-             margin-bottom: 0; /* Remover margem inferior do input, espaço é controlado pelo card/gap */
+             margin-bottom: 0;
          }
 
          .content-container textarea {
              min-height: 120px;
              resize: vertical;
          }
-
 
          .content-container input:focus,
          .content-container textarea:focus {
@@ -114,18 +104,25 @@
             box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.3);
          }
 
-         /* Botão de Submit (fora do flex container dos cards) */
+        /* Style for error messages */
+        .error-message {
+            color: #f44336; /* Material Design Red */
+            font-size: 0.85em;
+            display: block; /* Ensure it appears on its own line */
+            margin-top: 5px; /* Add a little space above */
+            font-weight: bold;
+        }
+
+         /* Botão de Submit */
          .submit-button-container {
-             text-align: center; /* Centraliza o botão se ele não for 100% */
+             text-align: center;
          }
          .content-container button[type="submit"] {
-             /* display: block; */ /* Pode ser inline-block ou block */
-             /* width: 100%; */ /* Opcional: largura total ou auto? */
-             min-width: 200px; /* Largura mínima */
-             margin-top: 10px; /* Ajuste conforme necessário */
+             min-width: 200px;
+             margin-top: 10px;
              background-color: #bb86fc;
              color: #121212;
-             padding: 14px 35px; /* Padding generoso */
+             padding: 14px 35px;
              border: none;
              border-radius: 6px;
              font-size: 1.2em;
@@ -139,6 +136,13 @@
          .content-container button[type="submit"]:active {
              transform: scale(0.98);
          }
+          /* Style for disabled button */
+         .content-container button[type="submit"]:disabled {
+            background-color: #555; /* Darker, less prominent background */
+            color: #999; /* Greyed-out text */
+            cursor: not-allowed; /* Indicate it's not clickable */
+            transform: none; /* Prevent active state transform */
+        }
 
         /* --- FIM DOS ESTILOS DO FORMULÁRIO COM CARDS --- */
     </style>
@@ -163,16 +167,18 @@
         <div class="content-container">
             <h2>Adicionar Nova Atriz</h2>
 
-            <!-- FORMULÁRIO DE CRIAÇÃO - AGORA UM FLEX CONTAINER -->
+            <!-- FORMULÁRIO DE CRIAÇÃO -->
             <form id="create-actress-form">
 
                 <!-- Card para Nome -->
                 <div class="form-card">
                     <label for="name">Name:</label>
                     <input type="text" id="name" name="name" required>
+                    <!-- !!! IMPORTANT: Make sure this span exists and has the correct ID !!! -->
+                    <span id="name-error-message" class="error-message" style="display: none;"></span>
                 </div>
 
-                <!-- Card para Foto (NOVO) -->
+                <!-- Card para Foto -->
                 <div class="form-card">
                     <label for="foto">Foto (URL):</label>
                     <input type="url" id="foto" name="foto" placeholder="https://exemplo.com/imagem.jpg" required>
@@ -186,8 +192,8 @@
 
                 <!-- Card para Born -->
                 <div class="form-card">
-                    <label for="born">Born (Ex: 1990-05-15):</label>
-                    <input type="text" id="born" name="born" placeholder="YYYY-MM-DD">
+                    <label for="born">Born (Ex: 1990/05/15):</label> <!-- Adjusted placeholder -->
+                    <input type="text" id="born" name="born" placeholder="YYYY/MM/DD">
                 </div>
 
                 <!-- Card para Birthplace -->
@@ -216,14 +222,14 @@
 
                 <!-- Card para Height -->
                 <div class="form-card">
-                    <label for="height">Height (Ex: 170 cm):</label>
-                    <input type="text" id="height" name="height">
+                    <label for="height">Height (cm):</label> <!-- Adjusted label -->
+                    <input type="text" id="height" name="height" placeholder="Ex: 170">
                 </div>
 
                 <!-- Card para Weight -->
                 <div class="form-card">
-                    <label for="weight">Weight (Ex: 59 kg):</label>
-                    <input type="text" id="weight" name="weight">
+                    <label for="weight">Weight (kg):</label> <!-- Adjusted label -->
+                    <input type="text" id="weight" name="weight" placeholder="Ex: 59">
                 </div>
 
                 <!-- Card para Body type -->
@@ -240,20 +246,20 @@
 
                 <!-- Card para Years active -->
                 <div class="form-card">
-                    <label for="years_active">Years active (Ex: 2010-present):</label>
-                    <input type="text" id="years_active" name="years_active">
+                    <label for="years_active">Years active (Start Year):</label> <!-- Adjusted label -->
+                    <input type="text" id="years_active" name="years_active" placeholder="Ex: 2010">
                 </div>
 
-                <!-- Card para Nota (NOVO) -->
+                <!-- Card para Nota -->
                  <div class="form-card">
                     <label for="nota">Nota (0 a 10):</label>
                     <input type="number" id="nota" name="nota" min="0" max="10" step="0.1" placeholder="Ex: 8.5">
                 </div>
 
             </form>
-            <!-- FIM DO FORMULÁRIO (FLEX CONTAINER) -->
+            <!-- FIM DO FORMULÁRIO -->
 
-            <!-- CONTAINER PARA O BOTÃO (Fora do form flex) -->
+            <!-- CONTAINER PARA O BOTÃO -->
             <div class="submit-button-container">
                 <button type="submit" form="create-actress-form">Criar</button>
             </div>
@@ -262,7 +268,7 @@
     </main>
     <!-- FIM ÁREA DE CONTEÚDO -->
 
-    <!-- Script para lidar com o envio do formulário -->
+<!-- ========================== JAVASCRIPT ========================== -->
 <script type="module">
     // Import Firebase functions
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -289,13 +295,13 @@
     const submitButton = document.querySelector('button[form="create-actress-form"]');
     const sourceTextArea = document.getElementById('texto');
     const nameInput = document.getElementById('name');
-    const nameErrorMessage = document.getElementById('name-error-message');
+    const nameErrorMessage = document.getElementById('name-error-message'); // Make sure this ID matches HTML
     console.log("DEBUG: DOM elements obtained:", { // DEBUG
         form: !!form,
         submitButton: !!submitButton,
         sourceTextArea: !!sourceTextArea,
         nameInput: !!nameInput,
-        nameErrorMessage: !!nameErrorMessage
+        nameErrorMessage: !!nameErrorMessage // Check if this is true
     });
 
 
@@ -318,27 +324,48 @@
             const year = match[3];
             const monthMap = {'january': '01', 'february': '02', 'march': '03', 'april': '04', 'may': '05', 'june': '06', 'july': '07', 'august': '08', 'september': '09', 'october': '10', 'november': '11', 'december': '12'};
             const monthNumber = monthMap[monthName.toLowerCase()];
-            if (monthNumber) return `${year}/${monthNumber}/${day}`;
+            if (monthNumber) return `${year}/${monthNumber}/${day}`; // Format YYYY/MM/DD
             else console.warn(`Mês não reconhecido: "${monthName}"`);
         } else {
-            // console.warn(`Formato de data não reconhecido: "${dateString}"`); // Keep original warning if needed
+             // Try YYYY/MM/DD directly
+             const simpleDateRegex = /^(\d{4})[/-](\d{1,2})[/-](\d{1,2})$/;
+             const simpleMatch = dateString.match(simpleDateRegex);
+             if (simpleMatch) {
+                 return `${simpleMatch[1]}/${simpleMatch[2].padStart(2, '0')}/${simpleMatch[3].padStart(2, '0')}`;
+             }
+            // console.warn(`Formato de data não reconhecido: "${dateString}"`);
         }
-        return dateString;
+        return dateString; // Return original if no format matches
     }
     function extractCmValue(heightString) {
-        const cmRegex = /\(\s*(?:or\s+)?(\d+)\s*cm\s*\)/i;
+        const cmRegex = /(\d+)\s*cm/i; // Simpler regex looking for number followed by cm
         const match = heightString.match(cmRegex);
-        return match ? match[1] : '';
+        if (match) return match[1];
+
+        // Also check for pattern like "5' 6" (168 cm)"
+        const parenCmRegex = /\(\s*(\d+)\s*cm\s*\)/i;
+        const parenMatch = heightString.match(parenCmRegex);
+        if (parenMatch) return parenMatch[1];
+
+        return ''; // Return empty if no cm value found
     }
     function extractKgValue(weightString) {
-        const kgRegex = /\(\s*(?:or\s+)?(\d+)\s*kg\s*\)/i;
+         const kgRegex = /(\d+)\s*kg/i; // Simpler regex
         const match = weightString.match(kgRegex);
-        return match ? match[1] : '';
+         if (match) return match[1];
+
+        // Also check for pattern like "110 lbs (50 kg)"
+        const parenKgRegex = /\(\s*(\d+)\s*kg\s*\)/i;
+        const parenMatch = weightString.match(parenKgRegex);
+         if (parenMatch) return parenMatch[1];
+
+        return ''; // Return empty if no kg value found
     }
     function extractStartYear(yearsString) {
+        // Look for the first 4-digit number, assuming it's the start year
         const yearRegex = /(\d{4})/;
         const match = yearsString.match(yearRegex);
-        return match ? match[1] : '';
+        return match ? match[1] : ''; // Return the first year found or empty
     }
 
 
@@ -346,82 +373,90 @@
     function debounce(func, delay) {
       let timeoutId;
       return function(...args) {
-        // console.log(`DEBUG: Debounce called for ${func.name}. Clearing previous timeout.`); // DEBUG (can be noisy)
+        // console.log(`DEBUG: Debounce called for ${func.name}. Clearing previous timeout.`); // DEBUG
         clearTimeout(timeoutId);
         timeoutId = setTimeout(() => {
-          // console.log(`DEBUG: Debounce executing ${func.name} after ${delay}ms delay.`); // DEBUG (can be noisy)
+          // console.log(`DEBUG: Debounce executing ${func.name} after ${delay}ms delay.`); // DEBUG
           func.apply(this, args);
         }, delay);
       };
     }
 
     // --- Function to check if name exists in Firestore ---
-   async function checkNameExists() {
+    async function checkNameExists() {
         // DEBUG: Log when the function starts and the name it's checking
         console.log("DEBUG: checkNameExists running for name:", nameInput ? `"${nameInput.value}"` : 'N/A');
 
-        // ===> ADDED DETAILED CHECK HERE <===
+        // DEBUG: Check variables before the main IF block
         console.log("DEBUG: checkNameExists - Checking variables before main IF:");
         console.log(`DEBUG:   - nameInput valid? : ${!!nameInput}`);
-        console.log(`DEBUG:   - nameErrorMessage valid? : ${!!nameErrorMessage}`);
+        console.log(`DEBUG:   - nameErrorMessage valid? : ${!!nameErrorMessage}`); // THIS IS THE KEY CHECK
         console.log(`DEBUG:   - db valid? : ${!!db}`);
-        // ===> END OF ADDED CHECK <===
 
         if (!nameInput || !nameErrorMessage || !db) {
-            // This is the line that was previously triggered
+            // This log indicates one of the above was false (likely nameErrorMessage)
             console.warn("DEBUG: checkNameExists - PROBLEM: One or more required variables are invalid. Aborting check.");
-            return;
+            return; // Stop execution if essential elements/connections are missing
         }
-
-        // ... (rest of the function remains the same) ...
 
         const enteredName = nameInput.value.trim();
+        // Hide error message initially for every check
         nameErrorMessage.style.display = 'none';
         nameErrorMessage.textContent = '';
-        let shouldBeDisabled = false;
+        let shouldBeDisabled = false; // Assume button should be enabled
 
+        // If name is empty after trimming, no need to check Firestore
         if (enteredName === '') {
             console.log("DEBUG: checkNameExists - Name is empty, skipping Firestore check.");
-            if (submitButton) submitButton.disabled = false;
+            if (submitButton) submitButton.disabled = false; // Ensure button is enabled if name is cleared
             return;
         }
 
+        // Log the actual query being performed
         console.log(`DEBUG: checkNameExists - Querying Firestore for name: "${enteredName}"`);
 
         try {
+            // Perform the Firestore query
             const checkQuery = query(collection(db, "atores"), where("nome", "==", enteredName), limit(1));
             const querySnapshot = await getDocs(checkQuery);
+
+            // Log the result of the query
             console.log(`DEBUG: checkNameExists - Firestore query executed for "${enteredName}". Snapshot empty: ${querySnapshot.empty}, Docs found: ${querySnapshot.size}`);
 
             if (!querySnapshot.empty) {
+                // Name was found in Firestore
                 console.log(`DEBUG: checkNameExists - Name "${enteredName}" FOUND in Firestore. Displaying error.`);
                 nameErrorMessage.textContent = `O nome "${enteredName}" já existe.`;
-                nameErrorMessage.style.display = 'block';
-                shouldBeDisabled = true;
+                nameErrorMessage.style.display = 'block'; // Show the error message
+                shouldBeDisabled = true; // Mark button to be disabled
             } else {
+                // Name was not found in Firestore
                  console.log(`DEBUG: checkNameExists - Name "${enteredName}" NOT found in Firestore.`);
+                // Error message is already hidden, button should be enabled
                 shouldBeDisabled = false;
             }
         } catch (error) {
+            // An error occurred during the Firestore query
             console.error("DEBUG: checkNameExists - Firestore query failed:", error);
-            nameErrorMessage.textContent = 'Erro ao verificar o nome.';
+            nameErrorMessage.textContent = 'Erro ao verificar o nome.'; // Display a generic error
             nameErrorMessage.style.display = 'block';
-            shouldBeDisabled = true;
+            shouldBeDisabled = true; // Disable button on error
         } finally {
+             // Set the final state of the submit button based on the check outcome
              if (submitButton) {
-                 console.log(`DEBUG: checkNameExists - Setting submit button disabled state to: ${shouldBeDisabled}`);
+                 console.log(`DEBUG: checkNameExists - Setting submit button disabled state to: ${shouldBeDisabled}`); // Log final state
                  submitButton.disabled = shouldBeDisabled;
              }
         }
     }
+
 
     // --- Declare debouncedCheck OUTSIDE autoFillForm so it's accessible ---
     let debouncedCheck; // Will hold the debounced version of checkNameExists
 
     // --- FUNÇÃO PRINCIPAL DE AUTO-PREENCHIMENTO ---
     function autoFillForm() {
-        // DEBUG: Log when autofill starts
-        console.log("DEBUG: autoFillForm started.");
+        console.log("DEBUG: autoFillForm started."); // DEBUG
 
         if (!sourceTextArea) {
             console.warn("DEBUG: autoFillForm - Source text area not found.");
@@ -431,33 +466,29 @@
         const lines = textContent.split('\n');
         let nameWasSetByAutofill = false;
 
-        // Limpa campos mapeados (exceto texto/nome/foto/nota E se já preenchidos)
+        // Attempt to clear fields only if they are empty
         Object.keys(firestoreFieldMap).forEach(formId => {
              if(formId === 'texto' || formId === 'name' || formId === 'foto' || formId === 'nota') return;
              const inputElement = document.getElementById(formId);
-             // Only clear if the input element exists AND is currently empty
-             if (inputElement && !inputElement.value) {
-                 // console.log(`DEBUG: autoFillForm - Clearing field ${formId}`); // DEBUG (optional)
+             if (inputElement && !inputElement.value) { // Only clear if empty
                  inputElement.value = '';
              }
          });
 
-        // Preenche Nome se ainda não foi preenchido pelo usuário
+        // Fill Name field only if it's currently empty
         if (lines.length > 0 && nameInput && !nameInput.value) {
             const potentialName = lines[0].trim();
-            // DEBUG: Log potential name
-            console.log("DEBUG: autoFillForm - Potential name from text area:", `"${potentialName}"`);
+            console.log("DEBUG: autoFillForm - Potential name from text area:", `"${potentialName}"`); // DEBUG
             if (potentialName) {
                  nameInput.value = potentialName;
-                 // DEBUG: Log that name was set
-                 console.log("DEBUG: autoFillForm - Name input value set to:", `"${nameInput.value}"`);
+                 console.log("DEBUG: autoFillForm - Name input value set to:", `"${nameInput.value}"`); // DEBUG
                  nameWasSetByAutofill = true;
             }
         } else if (nameInput && nameInput.value) {
              console.log("DEBUG: autoFillForm - Name input already had a value:", `"${nameInput.value}"`); // DEBUG
         }
 
-        // Mapeamento para auto-preenchimento (Label -> Firestore Key)
+        // Mappings for parsing text content
         const fieldMappingsForAutofill = {
             'Born': 'dataNascimento', 'Birthplace': 'pais', 'Ethnicity': 'etnia',
             'Hair color': 'corCabelo', 'Eye color': 'corOlhos', 'Height': 'altura',
@@ -465,7 +496,7 @@
             'Years active': 'AnosAtiva'
          };
 
-        // Preenche outros campos
+        // Fill other fields if they are currently empty
          Object.entries(fieldMappingsForAutofill).forEach(([label, firestoreKey]) => {
              const formId = Object.keys(firestoreFieldMap).find(key => firestoreFieldMap[key] === firestoreKey);
              if(!formId) return;
@@ -474,31 +505,28 @@
              const match = textContent.match(regex);
              if (match) {
                  let value = match[1].trim();
-                 // Formatação
+                 // Apply formatting helpers
                  if (firestoreKey === 'dataNascimento') value = formatBornDate(value);
                  else if (firestoreKey === 'altura') value = extractCmValue(value);
                  else if (firestoreKey === 'peso') value = extractKgValue(value);
                  else if (firestoreKey === 'AnosAtiva') value = extractStartYear(value);
-                 // Preenchimento (only if field is currently empty)
+
                  const inputElement = document.getElementById(formId);
+                 // Only fill if the element exists AND is currently empty
                  if (inputElement && !inputElement.value) {
-                      // console.log(`DEBUG: autoFillForm - Setting field ${formId} to "${value}"`); // DEBUG (optional)
                       inputElement.value = value;
                  }
                  else if (!inputElement) console.warn(`DEBUG: autoFillForm - Elemento de formulário com ID "${formId}" não encontrado para ${firestoreKey}`);
              }
          });
 
-         // --- MODIFICATION: Trigger the name check IF autofill populated the name field ---
-         // DEBUG: Check conditions for triggering the check
-         console.log(`DEBUG: autoFillForm - Checking conditions to trigger name check. nameWasSetByAutofill: ${nameWasSetByAutofill}, typeof debouncedCheck: ${typeof debouncedCheck}`);
+         // Trigger name check only if autofill set the name
+         console.log(`DEBUG: autoFillForm - Checking conditions to trigger name check. nameWasSetByAutofill: ${nameWasSetByAutofill}, typeof debouncedCheck: ${typeof debouncedCheck}`); // DEBUG
          if (nameWasSetByAutofill && typeof debouncedCheck === 'function') {
-             // DEBUG: Log that the check is being triggered
-             console.log("DEBUG: autoFillForm - Autofill set name, triggering debouncedCheck for name:", `"${nameInput.value}"`);
-             debouncedCheck();
+             console.log("DEBUG: autoFillForm - Autofill set name, triggering debouncedCheck for name:", `"${nameInput.value}"`); // DEBUG
+             debouncedCheck(); // Execute the debounced check
          } else {
-             // DEBUG: Log why the check wasn't triggered
-              console.log("DEBUG: autoFillForm - Did NOT trigger debouncedCheck. Conditions unmet.");
+              console.log("DEBUG: autoFillForm - Did NOT trigger debouncedCheck. Conditions unmet."); // DEBUG
          }
          console.log("DEBUG: autoFillForm finished."); // DEBUG
     }
@@ -507,15 +535,12 @@
     // --- EVENT LISTENERS ---
     console.log("DEBUG: Setting up event listeners..."); // DEBUG
 
-    // Listener for the Name input field (with debounce)
+    // Listener for the Name input field
     if (nameInput) {
         console.log("DEBUG: Defining and attaching listeners to Name input."); // DEBUG
-        // Define the debounced function here
-        debouncedCheck = debounce(checkNameExists, 500); // 500ms delay
-        // Attach listener for user typing
-        nameInput.addEventListener('input', debouncedCheck);
-        // Attach listener for when user leaves the field (use non-debounced for immediate check)
-        nameInput.addEventListener('blur', checkNameExists);
+        debouncedCheck = debounce(checkNameExists, 500); // Define the debounced check function (500ms delay)
+        nameInput.addEventListener('input', debouncedCheck); // Trigger on typing (debounced)
+        nameInput.addEventListener('blur', checkNameExists); // Trigger on losing focus (immediate check)
     } else {
         console.warn("DEBUG: Name input element not found, listeners not attached."); // DEBUG
     }
@@ -523,20 +548,20 @@
     // Listener for the Text Area input
     if (sourceTextArea) {
         console.log("DEBUG: Attaching listener to Text Area input."); // DEBUG
-        sourceTextArea.addEventListener('input', autoFillForm);
+        sourceTextArea.addEventListener('input', autoFillForm); // Trigger autofill when text area changes
     } else {
         console.warn("DEBUG: Source text area element not found, listener not attached."); // DEBUG
     }
 
 
-    // Listener para o envio do formulário
+    // Listener for form submission
     if (form && submitButton) {
         console.log("DEBUG: Attaching listener to Form submit."); // DEBUG
         form.addEventListener('submit', async (e) => {
-            e.preventDefault();
+            e.preventDefault(); // Prevent default form submission
             console.log("DEBUG: Form submitted."); // DEBUG
 
-            // Check button state before proceeding
+            // Prevent submission if button is already disabled (e.g., due to name check)
             if (submitButton.disabled) {
                  if (nameErrorMessage && nameErrorMessage.style.display === 'block') {
                     alert('Não é possível criar: ' + nameErrorMessage.textContent);
@@ -548,109 +573,113 @@
             }
 
             const initialButtonText = 'Criar';
-            submitButton.disabled = true;
+            submitButton.disabled = true; // Disable button during processing
             submitButton.textContent = 'Verificando...';
             console.log("DEBUG: Submit - Button disabled, text set to 'Verificando...'"); // DEBUG
 
             const formData = new FormData(form);
             const enteredName = formData.get('name')?.trim();
 
+            // Check if name is provided
             if (!enteredName) {
                 alert('O campo "Nome" é obrigatório.');
-                submitButton.disabled = false;
+                submitButton.disabled = false; // Re-enable button
                 submitButton.textContent = initialButtonText;
                 console.log("DEBUG: Submit prevented - Name field is empty."); // DEBUG
                 return;
             }
 
-            // --- FINAL CHECK before saving ---
+            // --- Perform a final name check right before saving ---
             console.log(`DEBUG: Submit - Performing FINAL check for name: "${enteredName}"`); // DEBUG
             try {
-                const checkQuery = query(collection(db, "atores"), where("nome", "==", enteredName), limit(1));
-                const querySnapshot = await getDocs(checkQuery);
-                console.log(`DEBUG: Submit - FINAL check query executed. Snapshot empty: ${querySnapshot.empty}`); // DEBUG
+                const finalCheckQuery = query(collection(db, "atores"), where("nome", "==", enteredName), limit(1));
+                const finalSnapshot = await getDocs(finalCheckQuery);
+                console.log(`DEBUG: Submit - FINAL check query executed. Snapshot empty: ${finalSnapshot.empty}`); // DEBUG
 
-                if (!querySnapshot.empty) {
-                    if(nameErrorMessage) {
-                        nameErrorMessage.textContent = `O nome "${enteredName}" já existe.`;
+                if (!finalSnapshot.empty) {
+                    // Duplicate found during final check
+                    if(nameErrorMessage) { // Ensure error message element exists
+                        nameErrorMessage.textContent = `O nome "${enteredName}" já existe (verificação final).`;
                         nameErrorMessage.style.display = 'block';
                     }
                     alert(`Já existe uma atriz com o nome "${enteredName}". Não é possível criar duplicados.`);
-                    submitButton.disabled = true; // Keep disabled
-                    submitButton.textContent = initialButtonText;
+                    // Keep button disabled
+                    submitButton.textContent = initialButtonText; // Reset text but keep disabled
                     console.log(`DEBUG: Submit prevented - FINAL check found duplicate name: "${enteredName}"`); // DEBUG
-                    return;
+                    return; // Stop submission
                 }
                 // --- End of Final Check ---
 
+                // If final check passed, proceed to save
                 submitButton.textContent = 'Salvando...';
                 console.log("DEBUG: Submit - FINAL check passed. Proceeding to save. Button text: 'Salvando...'"); // DEBUG
 
                 const firestoreData = {};
-                // Build firestoreData object
-                for (const [formId, firestoreKey] of Object.entries(firestoreFieldMap)) {
+                // Build the data object for Firestore
+                 for (const [formId, firestoreKey] of Object.entries(firestoreFieldMap)) {
                     const rawValue = formData.get(formId);
                      if (rawValue !== null && rawValue !== undefined) {
                         const trimmedValue = typeof rawValue === 'string' ? rawValue.trim() : rawValue;
-                        if (trimmedValue === '' && firestoreKey !== 'nota') continue; // Skip empty except nota
+
+                        // Skip empty fields unless it's 'nota' (which might be 0)
+                        if (trimmedValue === '' && firestoreKey !== 'nota') continue;
 
                         if (formId === 'nota') {
                             const numValue = parseFloat(trimmedValue);
-                            if (!isNaN(numValue)) firestoreData[firestoreKey] = numValue;
-                            else if (trimmedValue === '') {/* Handle empty nota if needed */}
+                            // Store nota only if it's a valid number
+                            if (!isNaN(numValue)) {
+                                firestoreData[firestoreKey] = numValue;
+                            } else if (trimmedValue !== '') {
+                                // Log if nota is provided but not a valid number
+                                console.warn(`DEBUG: Nota "${trimmedValue}" inválida, não será salva.`);
+                            }
+                             // If trimmedValue is empty, 'nota' field is simply omitted
                         } else if (formId === 'measurements') {
-                            firestoreData[firestoreKey] = trimmedValue;
+                            firestoreData[firestoreKey] = trimmedValue; // Save the full string
                             const parts = trimmedValue.split('-');
-                            if (parts.length === 3) {
+                            if (parts.length === 3) { // If it looks like B-W-H
                                 firestoreData['Boobs'] = parts[0].trim();
                                 firestoreData['Waist'] = parts[1].trim();
                                 firestoreData['Ass'] = parts[2].trim();
-                            } else {
-                                 console.warn(`Medidas não divididas: "${trimmedValue}"`);
+                            } else if (trimmedValue !== '') {
+                                 console.warn(`Medidas "${trimmedValue}" não estão no formato B-W-H.`);
                             }
                         } else {
+                            // For all other fields
                             firestoreData[firestoreKey] = trimmedValue;
                         }
                     }
                 }
+                // Add a timestamp for creation
                 firestoreData.createdAt = serverTimestamp();
 
+                console.log('DEBUG: Submit - Dados a serem enviados para Firestore:', firestoreData); // Log data before sending
 
-                // DEBUG: Log data being sent
-                console.log('DEBUG: Submit - Dados a serem enviados para Firestore:', firestoreData);
-
+                // Add the document to Firestore
                 const docRef = await addDoc(collection(db, "atores"), firestoreData);
-                // DEBUG: Log success
-                console.log("DEBUG: Submit - Documento escrito com ID: ", docRef.id);
+                console.log("DEBUG: Submit - Documento escrito com ID: ", docRef.id); // Log success
                 alert('Atriz criada com sucesso!');
-                form.reset();
+                form.reset(); // Clear the form
+                // Ensure error message is hidden after successful creation
                 if (nameErrorMessage) {
                     nameErrorMessage.style.display = 'none';
                     nameErrorMessage.textContent = '';
                 }
-                 submitButton.disabled = false; // Re-enable after successful save
-                 submitButton.textContent = initialButtonText;
+                 submitButton.disabled = false; // Re-enable button
+                 submitButton.textContent = initialButtonText; // Reset button text
                  console.log("DEBUG: Submit - Success. Form reset, button enabled."); // DEBUG
 
-
             } catch (error) {
-                // DEBUG: Log submission error
+                // Handle errors during the save process
                 console.error("DEBUG: Submit - Erro durante o processo de criação: ", error);
-                alert(`Erro: ${error.message}. Verifique o console.`);
-                 submitButton.disabled = false; // Re-enable on error too
-                 submitButton.textContent = initialButtonText;
-                 console.log("DEBUG: Submit - Error occurred. Button enabled."); // DEBUG
+                alert(`Erro ao salvar: ${error.message}. Verifique o console.`);
+                 submitButton.disabled = false; // Re-enable button on error
+                 submitButton.textContent = initialButtonText; // Reset button text
+                 console.log("DEBUG: Submit - Error occurred during save. Button enabled."); // DEBUG
 
             } finally {
-               // Final state check - redundant with specific enable/disable above, but can be a safety net
-               // console.log("DEBUG: Submit - Finally block reached."); // DEBUG
-               // If error message is showing after everything, ensure button is disabled
-               if (nameErrorMessage && nameErrorMessage.style.display === 'block') {
-                   if(submitButton && !submitButton.disabled) { // Only disable if not already disabled
-                       console.log("DEBUG: Submit (Finally) - Error message visible, ensuring button is disabled."); // DEBUG
-                       submitButton.disabled = true;
-                   }
-               }
+                 // This block executes regardless of success or error in the try block
+                 // Could add final cleanup or checks if needed, but specific enabling/disabling is handled above.
             }
         });
     } else {
@@ -659,5 +688,6 @@
     console.log("DEBUG: Script setup complete."); // DEBUG
 
 </script>
+
 </body>
 </html>
