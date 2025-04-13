@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalhes do Vídeo</title> <!-- Título da Página -->
+    <!-- ADD FONT AWESOME FOR ICONS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         /* Estilos Globais e Reset Básico */
         body {
@@ -16,157 +18,186 @@
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
         /* Estilos para o Menu de Navegação */
-        .main-nav {
-            background-color: #1f1f1f;
-            padding: 0.8em 30px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-            text-align: right;
-        }
-        .main-nav ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-        .main-nav li {
-            display: inline-block;
-            margin-left: 20px;
-        }
-        .main-nav a {
-            color: #e0e0e0;
-            text-decoration: none;
-            font-size: 1.1em;
-            padding: 5px 10px;
-            border-radius: 4px;
-            transition: background-color 0.2s ease, color 0.2s ease;
-        }
-        .main-nav a:hover {
-            background-color: #bb86fc;
-            color: #121212;
-        }
+        .main-nav { background-color: #1f1f1f; padding: 0.8em 30px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); text-align: right; }
+        .main-nav ul { list-style: none; margin: 0; padding: 0; }
+        .main-nav li { display: inline-block; margin-left: 20px; }
+        .main-nav a { color: #e0e0e0; text-decoration: none; font-size: 1.1em; padding: 5px 10px; border-radius: 4px; transition: background-color 0.2s ease, color 0.2s ease; }
+        .main-nav a:hover { background-color: #bb86fc; color: #121212; }
 
         /* Estilos do Cabeçalho */
-        header {
-            background-color: #1e1e1e;
-            color: #fff;
-            padding: 2em 0;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-        header h1 {
-            margin: 0;
-            font-size: 2.5em;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
+        header { background-color: #1e1e1e; color: #fff; padding: 2em 0; text-align: center; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); }
+        header h1 { margin: 0; font-size: 2.5em; font-weight: 700; letter-spacing: 0.5px; }
 
         /* --- Estilos Específicos para vid.html --- */
-        .video-detail-container {
-            max-width: 900px; /* Largura máxima */
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #1f1f1f;
-            border-radius: 8px;
-        }
-
-        .back-button-container {
-            margin-bottom: 20px;
-        }
-
-        #back-button {
-            padding: 8px 18px;
-            border: 1px solid #555;
-            background-color: #333;
-            color: #e0e0e0;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.2s ease, border-color 0.2s ease;
-        }
+        .video-detail-container { max-width: 900px; margin: 20px auto; padding: 20px; background-color: #1f1f1f; border-radius: 8px; }
+        .back-button-container { margin-bottom: 20px; }
+        #back-button { padding: 8px 18px; border: 1px solid #555; background-color: #333; color: #e0e0e0; border-radius: 6px; cursor: pointer; font-size: 1em; transition: background-color 0.2s ease, border-color 0.2s ease; }
         #back-button:hover { background-color: #444; }
+        #video-title { color: #bb86fc; margin-top: 0; margin-bottom: 25px; text-align: center; font-size: 1.8em; }
 
-        #video-title {
-            color: #bb86fc;
-            margin-top: 0;
-            margin-bottom: 25px; /* Aumenta espaço abaixo do título */
-            text-align: center;
-            font-size: 1.8em; /* Ligeiramente menor que o header h1 */
-        }
+        #external-link-container { text-align: center; margin: 30px 0; padding: 20px; border: 1px dashed #444; border-radius: 6px; }
+        #external-link-message { color: #ccc; margin-bottom: 15px; font-size: 1.1em; }
+        #external-link-button { display: inline-block; padding: 12px 30px; background-color: #bb86fc; color: #121212; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 1.1em; transition: background-color 0.2s ease, transform 0.1s ease; }
+        #external-link-button:hover { background-color: #a774e6; transform: scale(1.03); }
+        #external-link-url { margin-top: 15px; font-size: 0.9em; color: #888; word-break: break-all; }
 
-        /* Container para Link Externo */
-        #external-link-container {
-            text-align: center;
-            margin: 30px 0; /* Espaçamento vertical */
-            padding: 20px;
-            border: 1px dashed #444; /* Borda para destacar a área */
-            border-radius: 6px;
-        }
-        #external-link-message {
-            color: #ccc;
-            margin-bottom: 15px;
-            font-size: 1.1em;
-        }
-        #external-link-button {
-            display: inline-block;
-            padding: 12px 30px; /* Botão maior */
+        #video-details { margin-top: 30px; padding-top: 20px; border-top: 1px solid #333; }
+        #video-details h3 { margin-bottom: 15px; color: #e0e0e0; font-weight: normal; font-size: 1.4em; border-bottom: 1px solid #444; padding-bottom: 5px; }
+        #video-details p { margin-bottom: 10px; color: #ccc; line-height: 1.6; font-size: 1.05em; }
+        #video-details .actress-link { color: #bb86fc; text-decoration: none; margin: 0 3px; }
+        #video-details .actress-link:hover { text-decoration: underline; }
+
+        .error-message { color: #ff5252; text-align: center; padding: 30px; font-size: 1.2em; }
+        #error-container { display: none; }
+
+
+        /* --- ESTILOS PARA O POPUP DE CRIAÇÃO --- */
+        #open-create-popup-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
             background-color: #bb86fc;
             color: #121212;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            font-size: 1.1em;
-            transition: background-color 0.2s ease, transform 0.1s ease;
-        }
-         #external-link-button:hover {
-             background-color: #a774e6; /* Cor ligeiramente mais escura */
-             transform: scale(1.03); /* Efeito de zoom leve */
-         }
-        #external-link-url {
-             margin-top: 15px;
-             font-size: 0.9em;
-             color: #888;
-             word-break: break-all; /* Quebra URL longa */
-         }
-
-
-        /* Secção de Detalhes (Número, Atrizes, etc.) */
-        #video-details {
-            margin-top: 30px; /* Mais espaço acima dos detalhes */
-            padding-top: 20px;
-            border-top: 1px solid #333; /* Linha separadora */
-        }
-        #video-details h3 {
-             margin-bottom: 15px; /* Mais espaço abaixo do título "Detalhes" */
-             color: #e0e0e0;
-             font-weight: normal;
-             font-size: 1.4em; /* Título de secção um pouco maior */
-             border-bottom: 1px solid #444; /* Sublinhado leve */
-             padding-bottom: 5px;
-        }
-        #video-details p {
-            margin-bottom: 10px; /* Espaço entre parágrafos */
-            color: #ccc;
-            line-height: 1.6; /* Melhor legibilidade */
-            font-size: 1.05em;
-        }
-        #video-details .actress-link {
-             color: #bb86fc;
-             text-decoration: none;
-             margin: 0 3px;
-         }
-         #video-details .actress-link:hover {
-             text-decoration: underline;
-         }
-
-        /* Container e texto de erro geral */
-        .error-message {
-            color: #ff5252;
+            border: none;
+            border-radius: 50%;
+            width: 55px;
+            height: 55px;
+            font-size: 1.5em;
+            line-height: 55px; /* Centraliza ícone verticalmente */
             text-align: center;
-            padding: 30px;
-            font-size: 1.2em;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            z-index: 999; /* Fica acima de outros conteúdos */
         }
-        #error-container {
-             display: none;
+        #open-create-popup-btn:hover {
+            background-color: #a774e6;
+            transform: scale(1.1);
         }
+
+        .create-popup-overlay {
+            display: none; /* Escondido por padrão */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85); /* Mais escuro */
+            z-index: 1050; /* Acima do botão */
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto; /* Permite scroll se conteúdo for maior */
+        }
+
+        .create-popup-content {
+            background-color: #2a2a2a; /* Fundo do popup */
+            padding: 25px 35px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6);
+            max-width: 700px; /* Largura */
+            width: 100%;
+            position: relative;
+             max-height: 90vh; /* Altura máxima */
+             display: flex;
+             flex-direction: column;
+        }
+
+        .create-popup-close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+            border: none;
+            background: none;
+            padding: 5px;
+            line-height: 1;
+        }
+        .create-popup-close-btn:hover { color: #fff; }
+
+        .create-popup-content h2 {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 25px;
+            color: #fff;
+            font-weight: normal;
+        }
+
+        /* Estilos do Formulário dentro do Popup */
+        #create-form-container {
+             flex-grow: 1; /* Ocupa espaço vertical */
+             overflow-y: auto; /* Scroll interno se necessário */
+             padding-right: 10px; /* Espaço para scrollbar */
+        }
+        .create-form-group {
+            margin-bottom: 20px;
+        }
+        .create-form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #b0b0b0;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        .create-form-group input[type="text"],
+        .create-form-group input[type="number"],
+        .create-form-group input[type="url"],
+        .create-form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            background-color: #404040;
+            border: 1px solid #555;
+            border-radius: 5px;
+            color: #e0e0e0;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+        .create-form-group select[multiple] {
+            min-height: 100px; /* Altura mínima para multi-select */
+        }
+
+        .create-form-group input:focus,
+        .create-form-group select:focus {
+           outline: none;
+           border-color: #bb86fc;
+           box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.3);
+        }
+
+        /* Esconder formulários específicos por padrão */
+        #video-form, #scene-form, #movie-form {
+            display: none;
+        }
+
+        /* Botão Salvar e Mensagem de Status */
+        #create-status-message {
+            margin-top: 15px;
+            text-align: center;
+            min-height: 1.2em; /* Evita pulo de layout */
+            font-size: 0.9em;
+        }
+        #create-status-message.success { color: #4CAF50; }
+        #create-status-message.error { color: #f44336; }
+
+        #save-content-button {
+            display: block;
+            width: 100%;
+            margin-top: 25px;
+            background-color: #bb86fc;
+            color: #121212;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        #save-content-button:hover { background-color: #a774e6; }
+        #save-content-button:disabled { background-color: #555; color: #999; cursor: not-allowed; }
 
     </style>
 </head>
@@ -176,7 +207,7 @@
     <nav class="main-nav">
         <ul>
             <li><a href="index.html">Home</a></li>
-            <li><a href="criar.html">Criar</a></li>
+            <li><a href="criar.html">Criar Atriz</a></li> <!-- Renomeado para clareza -->
             <li><a href="videos.html">Videos</a></li>
         </ul>
     </nav>
@@ -186,45 +217,162 @@
         <h1 id="page-title">Detalhes do Vídeo</h1> <!-- Título será atualizado -->
     </header>
 
-    <!-- Container Principal -->
+    <!-- Container Principal (Conteúdo da Página Original) -->
     <div class="video-detail-container">
-
-        <!-- Botão Voltar -->
-        <div class="back-button-container">
-            <button id="back-button">← Voltar</button>
-        </div>
-
-        <!-- Título do Vídeo -->
+        <div class="back-button-container"> <button id="back-button">← Voltar</button> </div>
         <h2 id="video-title">Carregando...</h2>
-
-        <!-- Container para Link Externo (Substitui o Iframe) -->
-        <div id="external-link-container" style="display: none;"> <!-- Começa escondido -->
+        <div id="external-link-container" style="display: none;">
             <p id="external-link-message"></p>
             <a id="external-link-button" href="#" target="_blank" rel="noopener noreferrer">Abrir Conteúdo</a>
             <p id="external-link-url"></p>
         </div>
-
-        <!-- Detalhes Adicionais -->
-        <div id="video-details" style="display: none;"> <!-- Começa escondido -->
+        <div id="video-details" style="display: none;">
             <h3>Detalhes</h3>
             <p id="video-number">Número: Carregando...</p>
             <p id="video-actresses">Atrizes: Carregando...</p>
-            <!-- Adicionar mais campos se necessário -->
         </div>
-
-        <!-- Mensagem de Erro Geral -->
-         <div id="error-container">
-             <p class="error-message" id="error-text"></p>
-         </div>
-
+         <div id="error-container"> <p class="error-message" id="error-text"></p> </div>
     </div>
     <!-- FIM Container Principal -->
+
+    <!-- BOTÃO DE ENGRENAGEM PARA ABRIR POPUP -->
+    <button id="open-create-popup-btn" title="Criar Novo Conteúdo">
+        <i class="fa-solid fa-gear"></i>
+    </button>
+
+    <!-- POPUP DE CRIAÇÃO (Escondido Inicialmente) -->
+    <div class="create-popup-overlay" id="create-popup-overlay">
+        <div class="create-popup-content">
+            <button class="create-popup-close-btn" id="close-create-popup-btn">×</button>
+            <h2>Criar Novo Conteúdo</h2>
+
+            <!-- Seletor de Tipo -->
+            <div class="create-form-group">
+                <label for="content-type-selector">Tipo de Conteúdo:</label>
+                <select id="content-type-selector">
+                    <option value="">-- Selecione --</option>
+                    <option value="video">Vídeo</option>
+                    <option value="scene">Cena</option>
+                    <option value="movie">Filme</option>
+                </select>
+            </div>
+
+            <!-- Container para Formulários Dinâmicos -->
+            <div id="create-form-container">
+
+                <!-- Formulário de Vídeo (Escondido) -->
+                <div id="video-form">
+                     <div class="create-form-group">
+                        <label for="video-nome">Nome:</label>
+                        <input type="text" id="video-nome" required>
+                    </div>
+                    <div class="create-form-group">
+                        <label for="video-ano">Ano:</label>
+                        <input type="number" id="video-ano" placeholder="Ex: 2023">
+                    </div>
+                     <div class="create-form-group">
+                        <label for="video-imagem">Imagem (URL):</label>
+                        <input type="url" id="video-imagem" placeholder="https://...">
+                    </div>
+                    <div class="create-form-group">
+                        <label for="video-pagina">Página (URL Externa):</label>
+                        <input type="url" id="video-pagina" placeholder="https://...">
+                    </div>
+                     <div class="create-form-group">
+                        <label for="video-atores">Atrizes (Selecione uma ou mais):</label>
+                        <select id="video-atores" multiple>
+                            <!-- Opções de atrizes serão carregadas aqui -->
+                            <option value="">Carregando atrizes...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Formulário de Cena (Escondido) -->
+                <div id="scene-form">
+                     <div class="create-form-group">
+                        <label for="scene-nome">Nome da Cena:</label>
+                        <input type="text" id="scene-nome" required>
+                    </div>
+                     <div class="create-form-group">
+                        <label for="scene-filme">Filme:</label>
+                        <select id="scene-filme" required>
+                            <!-- Opções de filmes serão carregadas aqui -->
+                            <option value="">Carregando filmes...</option>
+                        </select>
+                    </div>
+                    <div class="create-form-group">
+                        <label for="scene-numero">Número da Cena:</label>
+                        <select id="scene-numero" required>
+                            <option value="">--</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
+                    </div>
+                    <div class="create-form-group">
+                        <label for="scene-ano">Ano:</label>
+                        <input type="number" id="scene-ano" placeholder="Ex: 2023">
+                    </div>
+                    <div class="create-form-group">
+                        <label for="scene-imagem">Imagem (URL):</label>
+                        <input type="url" id="scene-imagem" placeholder="https://...">
+                    </div>
+                    <div class="create-form-group">
+                        <label for="scene-pagina">Página (URL Externa):</label>
+                        <input type="url" id="scene-pagina" placeholder="https://...">
+                    </div>
+                     <div class="create-form-group">
+                        <label for="scene-atores">Atrizes (Selecione uma ou mais):</label>
+                        <select id="scene-atores" multiple>
+                            <!-- Opções de atrizes serão carregadas aqui -->
+                             <option value="">Carregando atrizes...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Formulário de Filme (Escondido) -->
+                <div id="movie-form">
+                     <div class="create-form-group">
+                        <label for="movie-nome">Nome do Filme:</label>
+                        <input type="text" id="movie-nome" required>
+                    </div>
+                    <div class="create-form-group">
+                        <label for="movie-ano">Ano:</label>
+                        <input type="number" id="movie-ano" placeholder="Ex: 2023">
+                    </div>
+                    <div class="create-form-group">
+                        <label for="movie-imagem">Imagem (URL):</label>
+                        <input type="url" id="movie-imagem" placeholder="https://...">
+                    </div>
+                    <div class="create-form-group">
+                        <label for="movie-pagina">Página (URL Externa):</label>
+                        <input type="url" id="movie-pagina" placeholder="https://...">
+                    </div>
+                </div>
+            </div><!-- Fim #create-form-container -->
+
+            <!-- Mensagem de Status -->
+            <div id="create-status-message"></div>
+
+            <!-- Botão Salvar -->
+            <button id="save-content-button" disabled>Salvar</button> <!-- Começa desabilitado -->
+
+        </div>
+    </div>
+    <!-- FIM POPUP DE CRIAÇÃO -->
 
 
     <!-- Firebase Modular SDKs via CDN -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getFirestore, doc, getDoc, collection } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, doc, getDoc, collection, getDocs, addDoc, serverTimestamp, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         // Firebase Config
         const firebaseConfig = {
@@ -240,26 +388,23 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // --- Definições de Funções ---
+        // --- Definições de Funções (Página Principal vid.html) ---
 
-        // Função para mostrar erros
-        function displayError(message) {
+        function displayError(message) { /* ... (keep existing function) ... */
             const videoTitleElement = document.getElementById('video-title');
-            const externalLinkContainer = document.getElementById('external-link-container'); // Referência atualizada
+            const externalLinkContainer = document.getElementById('external-link-container');
             const videoDetailsSection = document.getElementById('video-details');
             const errorContainer = document.getElementById('error-container');
             const errorText = document.getElementById('error-text');
-
             console.error(message);
             if(videoTitleElement) videoTitleElement.style.display = 'none';
-            if(externalLinkContainer) externalLinkContainer.style.display = 'none'; // Esconde link
+            if(externalLinkContainer) externalLinkContainer.style.display = 'none';
             if(videoDetailsSection) videoDetailsSection.style.display = 'none';
             if(errorText) errorText.textContent = message;
-            if(errorContainer) errorContainer.style.display = 'block'; // Mostra erro
+            if(errorContainer) errorContainer.style.display = 'block';
         }
 
-        // Função para buscar nomes das atrizes
-        async function getActressNames(actressIds) {
+        async function getActressNames(actressIds) { /* ... (keep existing function) ... */
             if (!actressIds || actressIds.length === 0) return 'N/A';
             try {
                 const actressPromises = actressIds.map(id => getDoc(doc(db, "atores", id)));
@@ -277,12 +422,10 @@
             } catch (error) { console.error("Erro nomes atrizes:", error); return 'Erro ao carregar'; }
         }
 
-        // Função Principal para Carregar Dados do Vídeo
-        async function loadVideoDetails() {
-            // Obter referências aos elementos DO DOM
-            const pageTitleElement = document.getElementById('page-title');
+        async function loadVideoDetails() { /* ... (keep existing function) ... */
+             const pageTitleElement = document.getElementById('page-title');
             const videoTitleElement = document.getElementById('video-title');
-            const externalLinkContainer = document.getElementById('external-link-container'); // Referência atualizada
+            const externalLinkContainer = document.getElementById('external-link-container');
             const externalLinkButton = document.getElementById('external-link-button');
             const externalLinkMessage = document.getElementById('external-link-message');
             const externalLinkUrlText = document.getElementById('external-link-url');
@@ -290,116 +433,352 @@
             const videoNumberElement = document.getElementById('video-number');
             const videoActressesElement = document.getElementById('video-actresses');
             const errorContainer = document.getElementById('error-container');
-            const errorText = document.getElementById('error-text'); // Necessário para displayError
+            const errorText = document.getElementById('error-text');
 
-             // Validações iniciais de elementos
              if (!pageTitleElement || !videoTitleElement || !externalLinkContainer || !externalLinkButton || !externalLinkMessage || !externalLinkUrlText || !videoDetailsSection || !videoNumberElement || !videoActressesElement || !errorContainer || !errorText) {
                  console.error("Um ou mais elementos essenciais do DOM não foram encontrados em loadVideoDetails!");
-                 // Não chama displayError aqui pois ele próprio precisa dos elementos
                  const body = document.querySelector('body');
                  if(body) body.innerHTML = '<p style="color: red; text-align: center; padding: 50px;">Erro Crítico: Falha ao carregar estrutura da página.</p>';
                  return;
              }
-
-            // Get Video ID from URL
             const urlParams = new URLSearchParams(window.location.search);
             const videoId = urlParams.get('id');
-
-             // Estado inicial (esconde tudo exceto título principal e talvez botão voltar)
             videoTitleElement.textContent = 'Carregando...';
             externalLinkContainer.style.display = 'none';
             videoDetailsSection.style.display = 'none';
             errorContainer.style.display = 'none';
-
-            if (!videoId) {
-                displayError("Erro: ID do vídeo não encontrado na URL.");
-                return;
-            }
-
+            if (!videoId) { displayError("Erro: ID do vídeo não encontrado na URL."); return; }
             try {
-                // Fetch Video Document
                 const videoRef = doc(db, "videos", videoId);
                 const videoSnap = await getDoc(videoRef);
-
-                if (!videoSnap.exists()) {
-                    displayError(`Erro: Vídeo com ID "${videoId}" não encontrado.`);
-                    return;
-                }
-
-                // Get Video Data
+                if (!videoSnap.exists()) { displayError(`Erro: Vídeo com ID "${videoId}" não encontrado.`); return; }
                 const videoData = videoSnap.data();
-
-                // Populate DOM Elements
                 const videoName = videoData.nome || 'Vídeo sem Título';
-                pageTitleElement.textContent = videoName; // Título da aba do browser
-                videoTitleElement.textContent = videoName; // Título H2 na página
-                videoTitleElement.style.display = 'block'; // Mostra título
-
-                // Mostra secção de detalhes
+                pageTitleElement.textContent = videoName;
+                videoTitleElement.textContent = videoName;
+                videoTitleElement.style.display = 'block';
                 videoDetailsSection.style.display = 'block';
                 videoNumberElement.textContent = `Número: ${videoData.no !== undefined ? videoData.no : 'N/A'}`;
-
-                // Popula Atrizes
                 videoActressesElement.innerHTML = 'Atrizes: Carregando...';
                 const actressNamesHTML = await getActressNames(videoData.atores);
                 videoActressesElement.innerHTML = `Atrizes: ${actressNamesHTML}`;
-
-                // Configurar Link Externo
                 const paginaUrl = videoData.pagina;
-
                 if (paginaUrl && typeof paginaUrl === 'string' && paginaUrl.trim() !== '') {
                     try {
-                        new URL(paginaUrl); // Valida URL
+                        new URL(paginaUrl);
                         externalLinkButton.href = paginaUrl;
                         externalLinkUrlText.textContent = `URL: ${paginaUrl}`;
                         externalLinkMessage.textContent = 'O conteúdo principal está disponível na seguinte página externa:';
-                        externalLinkButton.style.display = 'inline-block'; // Mostra o botão
-                        externalLinkContainer.style.display = 'block'; // Mostra o container do link
-
+                        externalLinkButton.style.display = 'inline-block';
+                        externalLinkContainer.style.display = 'block';
                     } catch (e) {
                         console.error("URL inválida no campo 'pagina':", paginaUrl, e);
                         externalLinkMessage.textContent = 'A URL configurada para o conteúdo externo é inválida.';
                         externalLinkButton.style.display = 'none';
                         externalLinkUrlText.textContent = '';
-                        externalLinkContainer.style.display = 'block'; // Mostra container com a mensagem de erro
+                        externalLinkContainer.style.display = 'block';
                     }
                 } else {
-                    // Campo 'pagina' não encontrado ou vazio
                     externalLinkMessage.textContent = 'Nenhuma página externa associada a este vídeo.';
                     externalLinkButton.style.display = 'none';
                     externalLinkUrlText.textContent = '';
-                    externalLinkContainer.style.display = 'block'; // Mostra container com a mensagem
+                    externalLinkContainer.style.display = 'block';
                 }
+            } catch (error) { displayError("Ocorreu um erro ao carregar os detalhes do vídeo."); console.error("Erro detalhado:", error); }
+        }
 
+        // --- LÓGICA PARA O POPUP DE CRIAÇÃO ---
+
+        // Elementos do DOM para o Popup
+        const openCreatePopupBtn = document.getElementById('open-create-popup-btn');
+        const createPopupOverlay = document.getElementById('create-popup-overlay');
+        const closeCreatePopupBtn = document.getElementById('close-create-popup-btn');
+        const contentTypeSelector = document.getElementById('content-type-selector');
+        const formContainer = document.getElementById('create-form-container');
+        const videoForm = document.getElementById('video-form');
+        const sceneForm = document.getElementById('scene-form');
+        const movieForm = document.getElementById('movie-form');
+        const saveContentButton = document.getElementById('save-content-button');
+        const createStatusMessage = document.getElementById('create-status-message');
+
+        // Selects que precisam ser populados
+        const videoActoresSelect = document.getElementById('video-atores');
+        const sceneActoresSelect = document.getElementById('scene-atores');
+        const sceneFilmeSelect = document.getElementById('scene-filme');
+
+        // Flags para evitar recarregamento desnecessário
+        let actorsLoaded = false;
+        let moviesLoaded = false;
+
+        // Função para carregar atores nos selects
+        async function loadActorsForSelect() {
+            if (actorsLoaded || !videoActoresSelect || !sceneActoresSelect) return; // Já carregado ou elementos não encontrados
+            console.log("Loading actors for select...");
+
+            // Limpa opções existentes (exceto a de carregamento)
+            videoActoresSelect.innerHTML = '<option value="">Carregando...</option>';
+            sceneActoresSelect.innerHTML = '<option value="">Carregando...</option>';
+
+            try {
+                const actorsQuery = query(collection(db, "atores"), orderBy("nome", "asc"));
+                const querySnapshot = await getDocs(actorsQuery);
+                let optionsHTML = '';
+                if (querySnapshot.empty) {
+                    optionsHTML = '<option value="" disabled>Nenhuma atriz encontrada</option>';
+                } else {
+                    querySnapshot.forEach(doc => {
+                        const actor = doc.data();
+                        optionsHTML += `<option value="${doc.id}">${actor.nome || 'Nome Indisponível'}</option>`;
+                    });
+                }
+                videoActoresSelect.innerHTML = optionsHTML;
+                sceneActoresSelect.innerHTML = optionsHTML;
+                actorsLoaded = true;
+                 console.log("Actors loaded successfully.");
             } catch (error) {
-                // Erro geral ao buscar/processar dados
-                displayError("Ocorreu um erro ao carregar os detalhes do vídeo.");
-                console.error("Erro detalhado:", error);
+                console.error("Erro ao carregar atrizes para select:", error);
+                 videoActoresSelect.innerHTML = '<option value="" disabled>Erro ao carregar</option>';
+                 sceneActoresSelect.innerHTML = '<option value="" disabled>Erro ao carregar</option>';
             }
         }
 
+        // Função para carregar filmes no select de cenas
+        async function loadMoviesForSelect() {
+            if (moviesLoaded || !sceneFilmeSelect) return; // Já carregado ou elemento não encontrado
+            console.log("Loading movies for select...");
+            sceneFilmeSelect.innerHTML = '<option value="">Carregando...</option>';
 
-        // --- Espera o DOM estar pronto ---
-        document.addEventListener('DOMContentLoaded', () => {
-
-            // Tenta encontrar o botão AGORA que o DOM está pronto
-            const backButton = document.getElementById('back-button');
-
-            if (backButton) {
-                 // Adiciona o listener
-                 backButton.addEventListener('click', () => {
-                    history.back();
-                });
-            } else {
-                console.error("Botão 'Voltar' não encontrado no DOM!");
+            try {
+                const moviesQuery = query(collection(db, "filmes"), orderBy("nome", "asc"));
+                const querySnapshot = await getDocs(moviesQuery);
+                let optionsHTML = '<option value="">-- Selecione um Filme --</option>'; // Adiciona opção default
+                if (querySnapshot.empty) {
+                     optionsHTML += '<option value="" disabled>Nenhum filme encontrado</option>';
+                } else {
+                    querySnapshot.forEach(doc => {
+                        const movie = doc.data();
+                        optionsHTML += `<option value="${doc.id}">${movie.nome || 'Nome Indisponível'}</option>`;
+                    });
+                }
+                sceneFilmeSelect.innerHTML = optionsHTML;
+                moviesLoaded = true;
+                console.log("Movies loaded successfully.");
+            } catch (error) {
+                console.error("Erro ao carregar filmes para select:", error);
+                 sceneFilmeSelect.innerHTML = '<option value="" disabled>Erro ao carregar</option>';
             }
+        }
 
-            // Chama a função principal para carregar os detalhes
+         // Função para mostrar/esconder formulários e carregar dados necessários
+        function showCorrectForm() {
+            const selectedType = contentTypeSelector.value;
+
+            // Esconde todos os formulários
+            videoForm.style.display = 'none';
+            sceneForm.style.display = 'none';
+            movieForm.style.display = 'none';
+            saveContentButton.disabled = true; // Desabilita salvar ao trocar
+            createStatusMessage.textContent = ''; // Limpa status
+            createStatusMessage.className = ''; // Limpa classe de status
+
+            // Mostra o formulário correto e carrega dados se necessário
+            switch (selectedType) {
+                case 'video':
+                    videoForm.style.display = 'block';
+                    loadActorsForSelect(); // Garante que atores sejam carregados
+                    saveContentButton.disabled = false; // Habilita salvar
+                    break;
+                case 'scene':
+                    sceneForm.style.display = 'block';
+                    loadActorsForSelect(); // Garante atores
+                    loadMoviesForSelect(); // Garante filmes
+                    saveContentButton.disabled = false; // Habilita salvar
+                    break;
+                case 'movie':
+                    movieForm.style.display = 'block';
+                    saveContentButton.disabled = false; // Habilita salvar
+                    break;
+                default:
+                    // Nenhum selecionado, botão permanece desabilitado
+                    break;
+            }
+        }
+
+        // Função para resetar os campos de um formulário específico
+        function resetFormFields(formElement) {
+             if (!formElement) return;
+             const inputs = formElement.querySelectorAll('input[type="text"], input[type="number"], input[type="url"]');
+             const selects = formElement.querySelectorAll('select');
+             inputs.forEach(input => input.value = '');
+             selects.forEach(select => {
+                 if (select.multiple) {
+                     // Desmarca todas as opções em um multi-select
+                     Array.from(select.options).forEach(option => option.selected = false);
+                 } else {
+                      // Reseta para a primeira opção (geralmente a placeholder ou default)
+                     select.selectedIndex = 0;
+                 }
+             });
+        }
+
+         // Função para lidar com o salvamento
+         async function handleSaveContent(event) {
+             event.preventDefault(); // Previne qualquer comportamento default
+             const selectedType = contentTypeSelector.value;
+             if (!selectedType) {
+                 alert("Por favor, selecione um tipo de conteúdo.");
+                 return;
+             }
+
+             saveContentButton.disabled = true;
+             createStatusMessage.textContent = 'Salvando...';
+             createStatusMessage.className = ''; // Reset class
+
+             let dataToSave = {
+                 createdAt: serverTimestamp() // Timestamp adicionado a todos
+             };
+             let targetCollection = '';
+             let currentForm;
+
+             try {
+                 // 1. Coletar Dados Baseado no Tipo
+                 switch (selectedType) {
+                     case 'video':
+                         targetCollection = 'videos';
+                         currentForm = videoForm;
+                         dataToSave.nome = document.getElementById('video-nome').value.trim();
+                         dataToSave.ano = parseInt(document.getElementById('video-ano').value) || null;
+                         dataToSave.imagem = document.getElementById('video-imagem').value.trim() || null;
+                         dataToSave.pagina = document.getElementById('video-pagina').value.trim() || null;
+                         dataToSave.atores = Array.from(videoActoresSelect.selectedOptions).map(option => option.value);
+                         if (!dataToSave.nome) throw new Error("O campo 'Nome' é obrigatório para Vídeo.");
+                         break;
+
+                     case 'scene':
+                         targetCollection = 'cenas';
+                          currentForm = sceneForm;
+                         dataToSave.nome = document.getElementById('scene-nome').value.trim();
+                         dataToSave.filmeId = document.getElementById('scene-filme').value || null;
+                         dataToSave.numeroCena = parseInt(document.getElementById('scene-numero').value) || null;
+                         dataToSave.ano = parseInt(document.getElementById('scene-ano').value) || null;
+                         dataToSave.imagem = document.getElementById('scene-imagem').value.trim() || null;
+                         dataToSave.pagina = document.getElementById('scene-pagina').value.trim() || null;
+                         dataToSave.atores = Array.from(sceneActoresSelect.selectedOptions).map(option => option.value);
+                         if (!dataToSave.nome) throw new Error("O campo 'Nome da Cena' é obrigatório.");
+                         if (!dataToSave.filmeId) throw new Error("O campo 'Filme' é obrigatório para Cena.");
+                          if (!dataToSave.numeroCena) throw new Error("O campo 'Número da Cena' é obrigatório.");
+                         break;
+
+                     case 'movie':
+                         targetCollection = 'filmes';
+                          currentForm = movieForm;
+                         dataToSave.nome = document.getElementById('movie-nome').value.trim();
+                         dataToSave.ano = parseInt(document.getElementById('movie-ano').value) || null;
+                         dataToSave.imagem = document.getElementById('movie-imagem').value.trim() || null;
+                         dataToSave.pagina = document.getElementById('movie-pagina').value.trim() || null;
+                          if (!dataToSave.nome) throw new Error("O campo 'Nome do Filme' é obrigatório.");
+                         break;
+
+                     default:
+                         throw new Error("Tipo de conteúdo inválido selecionado.");
+                 }
+
+                // Remove campos nulos ou vazios (exceto atores que pode ser array vazio)
+                 Object.keys(dataToSave).forEach(key => {
+                     if (dataToSave[key] === null || dataToSave[key] === '') {
+                          if (key !== 'atores') { // Permite array vazio de atores
+                             delete dataToSave[key];
+                         }
+                     }
+                 });
+
+
+                 console.log(`Saving to ${targetCollection}:`, dataToSave);
+
+                 // 2. Salvar no Firestore
+                 const docRef = await addDoc(collection(db, targetCollection), dataToSave);
+                 console.log("Document written with ID: ", docRef.id);
+
+                 // 3. Feedback de Sucesso e Reset
+                 createStatusMessage.textContent = `${selectedType.charAt(0).toUpperCase() + selectedType.slice(1)} criado com sucesso!`;
+                 createStatusMessage.className = 'success';
+                 if (currentForm) resetFormFields(currentForm); // Reseta o formulário específico
+                 contentTypeSelector.selectedIndex = 0; // Reseta o seletor de tipo
+                 showCorrectForm(); // Esconde o formulário atual
+
+                 // Opcional: Fechar popup após um delay
+                 setTimeout(() => {
+                     createPopupOverlay.style.display = 'none';
+                     createStatusMessage.textContent = ''; // Limpa msg ao fechar
+                      createStatusMessage.className = '';
+                 }, 2000);
+
+
+             } catch (error) {
+                 console.error("Erro ao salvar conteúdo:", error);
+                 createStatusMessage.textContent = `Erro: ${error.message}`;
+                 createStatusMessage.className = 'error';
+                 saveContentButton.disabled = false; // Reabilita o botão em caso de erro
+             }
+         }
+
+
+        // --- EVENT LISTENERS ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Listener Botão Voltar (página principal)
+            const backButton = document.getElementById('back-button');
+            if (backButton) { backButton.addEventListener('click', () => history.back()); }
+            else { console.error("Botão 'Voltar' não encontrado no DOM!"); }
+
+            // Carrega detalhes do vídeo da página principal
             loadVideoDetails();
 
-        });
+            // Listeners do Popup de Criação
+            if (openCreatePopupBtn) {
+                openCreatePopupBtn.addEventListener('click', () => {
+                    createPopupOverlay.style.display = 'flex';
+                    // Reseta estado inicial do popup
+                    contentTypeSelector.selectedIndex = 0;
+                    showCorrectForm(); // Garante que nenhum form esteja visível inicialmente
+                     createStatusMessage.textContent = '';
+                     createStatusMessage.className = '';
+                     saveContentButton.disabled = true; // Começa desabilitado
+                });
+            }
 
-        // As definições das funções ficam no escopo do módulo
+            if (closeCreatePopupBtn) {
+                closeCreatePopupBtn.addEventListener('click', () => {
+                    createPopupOverlay.style.display = 'none';
+                });
+            }
+
+            // Fechar ao clicar fora
+             if (createPopupOverlay) {
+                createPopupOverlay.addEventListener('click', (event) => {
+                    if (event.target === createPopupOverlay) {
+                        createPopupOverlay.style.display = 'none';
+                    }
+                });
+            }
+
+            // Listener para troca de tipo de conteúdo
+            if (contentTypeSelector) {
+                 contentTypeSelector.addEventListener('change', showCorrectForm);
+            }
+
+            // Listener para o botão Salvar
+            if (saveContentButton) {
+                 saveContentButton.addEventListener('click', handleSaveContent);
+            }
+
+             // Validações básicas de elementos do popup
+            if (!openCreatePopupBtn || !createPopupOverlay || !closeCreatePopupBtn || !contentTypeSelector || !formContainer || !videoForm || !sceneForm || !movieForm || !saveContentButton || !createStatusMessage || !videoActoresSelect || !sceneActoresSelect || !sceneFilmeSelect) {
+                 console.error("ERRO CRÍTICO: Um ou mais elementos do Popup de Criação não foram encontrados! Funcionalidade de criação pode não funcionar.");
+                 if(openCreatePopupBtn) openCreatePopupBtn.style.display = 'none'; // Esconde botão se algo faltar
+            }
+
+        });
 
     </script>
 
