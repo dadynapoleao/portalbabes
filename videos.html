@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Site de Atrizes - Videos & Filmes</title>
+    <!-- ADD FONT AWESOME FOR ICONS (ADDED FOR THE GEAR ICON) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         /* Estilos Globais e Reset Básico */
         body {
@@ -22,321 +24,201 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
             text-align: right;
         }
-        .main-nav ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-        .main-nav li {
-            display: inline-block;
-            margin-left: 20px;
-        }
-        .main-nav a {
-            color: #e0e0e0;
-            text-decoration: none;
-            font-size: 1.1em;
-            padding: 5px 10px;
-            border-radius: 4px;
-            transition: background-color 0.2s ease, color 0.2s ease;
-        }
-        .main-nav a:hover {
-            background-color: #bb86fc;
-            color: #121212;
-        }
+        .main-nav ul { list-style: none; margin: 0; padding: 0; }
+        .main-nav li { display: inline-block; margin-left: 20px; }
+        .main-nav a { color: #e0e0e0; text-decoration: none; font-size: 1.1em; padding: 5px 10px; border-radius: 4px; transition: background-color 0.2s ease, color 0.2s ease; }
+        .main-nav a:hover { background-color: #bb86fc; color: #121212; }
 
         /* Estilos do Cabeçalho */
-        header {
-            background-color: #1e1e1e;
-            color: #fff;
-            padding: 2em 0;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-        header h1 {
-            margin: 0;
-            font-size: 2.5em;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
+        header { background-color: #1e1e1e; color: #fff; padding: 2em 0; text-align: center; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); }
+        header h1 { margin: 0; font-size: 2.5em; font-weight: 700; letter-spacing: 0.5px; }
 
-        /* Título dentro da lista de sugestões */
-        .suggestion-title {
-            padding: 8px 15px;
-            color: #aaa; /* Cor mais clara/cinza */
-            font-size: 0.9em;
-            font-weight: bold;
-            border-bottom: 1px solid #444; /* Linha separadora */
-            cursor: default; /* Não é clicável */
-        }
+        /* --- ESTILOS EXISTENTES DA PÁGINA DE LISTAGEM --- */
+        .suggestion-title { padding: 8px 15px; color: #aaa; font-size: 0.9em; font-weight: bold; border-bottom: 1px solid #444; cursor: default; }
+        .add-costar-btn { margin-left: auto; padding: 4px 8px; font-size: 0.85em; background-color: #bb86fc; color: #121212; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.2s ease; }
+        .add-costar-btn:hover { background-color: #a774e6; }
+        .filters-container { display: flex; flex-direction: column; padding: 15px 30px; max-width: 1200px; margin: 20px auto 0; background-color: #1f1f1f; border-radius: 8px; gap: 15px; }
+        .top-filter-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .filter-buttons { display: flex; gap: 10px; }
+        .filter-btn { padding: 8px 15px; border: 1px solid #555; background-color: #333; color: #e0e0e0; border-radius: 6px; cursor: pointer; font-size: 0.95em; transition: background-color 0.2s ease, border-color 0.2s ease; }
+        .filter-btn:hover { background-color: #444; }
+        .filter-btn.active { background-color: #bb86fc; color: #121212; border-color: #bb86fc; font-weight: bold; }
+        .actress-search-area { position: relative; width: 100%; }
+        .search-input-wrapper { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; padding: 5px 10px; border: 1px solid #555; border-radius: 6px; background-color: #2e2e2e; cursor: text; }
+        .search-input-wrapper:focus-within { border-color: #bb86fc; box-shadow: 0 0 5px rgba(187, 134, 252, 0.5); }
+        #selected-actresses-container { display: contents; }
+        .actress-pill { display: inline-flex; align-items: center; background-color: #bb86fc; color: #121212; padding: 4px 8px; border-radius: 4px; font-size: 0.9em; margin: 2px; white-space: nowrap; }
+        .actress-pill span { margin-right: 5px; }
+        .remove-actress-btn { background: none; border: none; color: #121212; cursor: pointer; font-weight: bold; font-size: 1.1em; padding: 0 2px; line-height: 1; }
+        .remove-actress-btn:hover { opacity: 0.7; }
+        .search-input { flex-grow: 1; padding: 6px 5px; border: none; background-color: transparent; color: #e0e0e0; font-size: 1em; min-width: 150px; outline: none; }
+        #suggestions-list { display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 10; background-color: #2e2e2e; border: 1px solid #555; border-top: none; border-radius: 0 0 6px 6px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); max-height: 200px; overflow-y: auto; visibility: visible; opacity: 1; height: auto; }
+        .costar-suggestion-item { /* Specific styles if needed */ }
+        .suggestion-item { display: flex; padding: 8px 15px; color: #e0e0e0; cursor: pointer; align-items: center; gap: 10px; }
+        .suggestion-item:hover { background-color: #444; }
+        .suggestion-item.no-results { cursor: default; color: #aaa; justify-content: center; }
+        .suggestion-item img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+        .suggestion-item.related-suggestion { background-color: #3a3a3a; }
+        .suggestion-item.related-suggestion:hover { background-color: #505050; }
+        .content-grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 25px; padding: 30px; max-width: 1200px; margin: 10px auto 20px; }
+        .content-card-link { text-decoration: none; color: inherit; display: block; height: 100%; }
+        .content-card { background-color: #242424; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); transition: transform 0.3s ease, box-shadow 0.3s ease; height: 100%; display: flex; flex-direction: column; position: relative; }
+        .content-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4); }
+        .content-card img { width: 100%; height: 250px; object-fit: cover; display: block; }
+        .content-info { padding: 15px 20px 20px; text-align: center; margin-top: auto; }
+        .content-info h3 { margin: 0 0 8px 0; font-size: 1.3em; font-weight: normal; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .content-info .year { font-size: 0.9em; color: #aaa; margin-top: -5px; }
+        .video-number-badge { position: absolute; top: 10px; left: 10px; background-color: rgba(187, 134, 252, 0.85); color: #121212; font-size: 0.9em; font-weight: bold; padding: 4px 8px; border-radius: 4px; z-index: 1; }
+        .message { color: #aaa; font-size: 1.1em; text-align: center; padding: 40px; grid-column: 1 / -1; }
 
-  /* Botão "Adicionar" na lista de co-estrelas */
-        .add-costar-btn {
-            margin-left: auto; /* Empurra o botão para a direita */
-            padding: 4px 8px;
-            font-size: 0.85em;
-            background-color: #bb86fc; /* Cor de destaque */
+        /* --- ESTILOS PARA O POPUP DE CRIAÇÃO (COPIADOS DO vid.html) --- */
+        #open-create-popup-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background-color: #bb86fc;
             color: #121212;
             border: none;
-            border-radius: 4px;
+            border-radius: 50%;
+            width: 55px;
+            height: 55px;
+            font-size: 1.5em;
+            line-height: 55px; /* Centraliza ícone verticalmente */
+            text-align: center;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            z-index: 999; /* Fica acima de outros conteúdos */
+        }
+        #open-create-popup-btn:hover {
+            background-color: #a774e6;
+            transform: scale(1.1);
+        }
+
+        .create-popup-overlay {
+            display: none; /* Escondido por padrão */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85); /* Mais escuro */
+            z-index: 1050; /* Acima do botão */
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto; /* Permite scroll se conteúdo for maior */
+        }
+
+        .create-popup-content {
+            background-color: #2a2a2a; /* Fundo do popup */
+            padding: 25px 35px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6);
+            max-width: 700px; /* Largura */
+            width: 100%;
+            position: relative;
+             max-height: 90vh; /* Altura máxima */
+             display: flex;
+             flex-direction: column;
+        }
+
+        .create-popup-close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+            border: none;
+            background: none;
+            padding: 5px;
+            line-height: 1;
+        }
+        .create-popup-close-btn:hover { color: #fff; }
+
+        .create-popup-content h2 {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 25px;
+            color: #fff;
+            font-weight: normal;
+        }
+
+        /* Estilos do Formulário dentro do Popup */
+        #create-form-container {
+             flex-grow: 1; /* Ocupa espaço vertical */
+             overflow-y: auto; /* Scroll interno se necessário */
+             padding-right: 10px; /* Espaço para scrollbar */
+        }
+        .create-form-group {
+            margin-bottom: 20px;
+        }
+        .create-form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #b0b0b0;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        .create-form-group input[type="text"],
+        .create-form-group input[type="number"],
+        .create-form-group input[type="url"],
+        .create-form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            background-color: #404040;
+            border: 1px solid #555;
+            border-radius: 5px;
+            color: #e0e0e0;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+        .create-form-group select[multiple] {
+            min-height: 100px; /* Altura mínima para multi-select */
+        }
+
+        .create-form-group input:focus,
+        .create-form-group select:focus {
+           outline: none;
+           border-color: #bb86fc;
+           box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.3);
+        }
+
+        /* Esconder formulários específicos por padrão */
+        #video-form, #scene-form, #movie-form {
+            display: none;
+        }
+
+        /* Botão Salvar e Mensagem de Status */
+        #create-status-message {
+            margin-top: 15px;
+            text-align: center;
+            min-height: 1.2em; /* Evita pulo de layout */
+            font-size: 0.9em;
+        }
+        #create-status-message.success { color: #4CAF50; }
+        #create-status-message.error { color: #f44336; }
+
+        #save-content-button {
+            display: block;
+            width: 100%;
+            margin-top: 25px;
+            background-color: #bb86fc;
+            color: #121212;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: bold;
             cursor: pointer;
             transition: background-color 0.2s ease;
         }
-        .add-costar-btn:hover {
-            background-color: #a774e6; /* Cor ligeiramente mais escura no hover */
-        }
-        
-        
-        /* --- Estilos para Filters and Multi-Actress Search --- */
-        .filters-container {
-            display: flex;
-            flex-direction: column; /* Empilha controlos verticalmente */
-            padding: 15px 30px;
-            max-width: 1200px;
-            margin: 20px auto 0; /* Margem acima, auto dos lados, 0 abaixo */
-            background-color: #1f1f1f; /* Fundo ligeiramente diferente */
-            border-radius: 8px;
-            gap: 15px; /* Espaçamento entre linhas de filtros/pesquisa */
-        }
-
-        .top-filter-row {
-             display: flex;
-             justify-content: space-between; /* Espaça botões */
-             align-items: center;
-             flex-wrap: wrap; /* Permite quebrar linha se necessário */
-             gap: 15px; /* Espaçamento se quebrar linha */
-        }
-
-        .filter-buttons {
-            display: flex;
-            gap: 10px; /* Espaçamento entre botões */
-        }
-
-        .filter-btn {
-            padding: 8px 15px;
-            border: 1px solid #555;
-            background-color: #333;
-            color: #e0e0e0;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.95em;
-            transition: background-color 0.2s ease, border-color 0.2s ease;
-        }
-        .filter-btn:hover { background-color: #444; }
-        .filter-btn.active {
-            background-color: #bb86fc;
-            color: #121212;
-            border-color: #bb86fc;
-            font-weight: bold;
-        }
-
-        /* Actress Search Area (Container pai das pílulas, input e sugestões) */
-        .actress-search-area {
-            position: relative; /* ESSENCIAL para o posicionamento absoluto da lista de sugestões */
-            width: 100%;
-        }
-
-        /* Wrapper para pílulas e input */
-        .search-input-wrapper {
-            display: flex;
-            flex-wrap: wrap; /* Permite que pílulas quebrem linha */
-            align-items: center;
-            gap: 5px; /* Espaçamento entre pílulas e input */
-            padding: 5px 10px; /* Padding à volta */
-            border: 1px solid #555;
-            border-radius: 6px;
-            background-color: #2e2e2e; /* Fundo da área de input */
-            cursor: text; /* Indica que é clicável */
-        }
-        .search-input-wrapper:focus-within { /* Estilo quando wrapper ou input têm foco */
-             border-color: #bb86fc;
-             box-shadow: 0 0 5px rgba(187, 134, 252, 0.5);
-        }
-
-        /* Container das pílulas (usa display: contents para fluir no flex) */
-        #selected-actresses-container {
-            display: contents;
-        }
-
-        /* Estilo individual das pílulas */
-        .actress-pill {
-            display: inline-flex; /* Alinha texto e botão dentro da pílula */
-            align-items: center;
-            background-color: #bb86fc; /* Cor de destaque */
-            color: #121212; /* Cor do texto na pílula */
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.9em;
-            margin: 2px; /* Pequena margem entre pílulas */
-            white-space: nowrap; /* Evita quebra de linha dentro da pílula */
-        }
-        .actress-pill span { margin-right: 5px; /* Espaço entre nome e botão X */ }
-        .remove-actress-btn { /* Botão 'X' para remover pílula */
-            background: none;
-            border: none;
-            color: #121212; /* Mesma cor do texto da pílula */
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 1.1em;
-            padding: 0 2px;
-            line-height: 1; /* Garante alinhamento vertical */
-        }
-        .remove-actress-btn:hover { opacity: 0.7; /* Feedback visual ao passar o rato */ }
-
-        /* Input de texto real onde se digita */
-        .search-input {
-            flex-grow: 1; /* Ocupa o espaço restante na linha */
-            padding: 6px 5px; /* Padding mínimo */
-            border: none; /* Sem borda própria */
-            background-color: transparent; /* Usa o fundo do wrapper */
-            color: #e0e0e0;
-            font-size: 1em;
-            min-width: 150px; /* Largura mínima para não desaparecer */
-            outline: none; /* Sem outline de foco (tratado pelo wrapper) */
-        }
-
-        /* Suggestions Dropdown List */
-        #suggestions-list {
-            /* --- Visibilidade e Posição --- */
-            display: none; /* Começa escondido, JS muda para 'block' */
-            position: absolute;
-            top: 100%; /* Posiciona logo abaixo do search-input-wrapper */
-            left: 0;
-            right: 0;
-            z-index: 10; /* Deve ficar acima da grelha de conteúdo */
-
-            /* --- Aparência --- */
-            background-color: #2e2e2e; /* Fundo da lista */
-            border: 1px solid #555; /* Borda à volta */
-            border-top: none; /* Evita borda dupla com o wrapper */
-            border-radius: 0 0 6px 6px; /* Cantos inferiores arredondados */
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Sombra */
-
-            /* --- Tamanho e Scroll --- */
-            max-height: 200px; /* Altura máxima antes de scroll */
-            overflow-y: auto; /* Adiciona scroll vertical se necessário */
-
-             /* --- Garantir visibilidade --- */
-             visibility: visible;
-             opacity: 1;
-             height: auto; /* Altura baseada no conteúdo até max-height */
-        }
-
-            /* Ajuste opcional para itens da lista de co-estrelas */
-        .costar-suggestion-item {
-             /* Pode adicionar estilos específicos se quiser diferenciar mais */
-        }
-        
-        /* Itens Individuais na Lista de Sugestões */
-        .suggestion-item {
-             display: flex; /* Para alinhar imagem e texto */
-             padding: 8px 15px; /* Espaçamento interno */
-             color: #e0e0e0;
-             cursor: pointer;
-             align-items: center; /* Alinha verticalmente imagem e texto */
-             gap: 10px; /* Espaço entre imagem e texto */
-        }
-        .suggestion-item:hover { background-color: #444; /* Cor ao passar o rato */ }
-        .suggestion-item.no-results { /* Item de "Nenhum resultado" */
-            cursor: default;
-            color: #aaa; /* Cor diferente para indicar inatividade */
-            justify-content: center; /* Centraliza texto */
-        }
-        .suggestion-item img { /* Imagem da atriz na sugestão */
-            width: 30px;
-            height: 30px;
-            border-radius: 50%; /* Imagem redonda */
-            object-fit: cover; /* Cobre a área sem distorcer */
-            flex-shrink: 0; /* Evita que a imagem encolha */
-        }
-         /* Estilo para sugestões relacionadas (co-estrelas) */
-        .suggestion-item.related-suggestion { background-color: #3a3a3a; }
-        .suggestion-item.related-suggestion:hover { background-color: #505050; }
-
-        /* --- Fim dos Estilos de Filtros e Pesquisa --- */
-
-
-        /* Container Grid para os Cards de Vídeos e Filmes */
-        .content-grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Grelha responsiva */
-            gap: 25px; /* Espaçamento entre cards */
-            padding: 30px; /* Espaçamento à volta da grelha */
-            max-width: 1200px; /* Largura máxima */
-            margin: 10px auto 20px; /* Margem abaixo dos filtros, auto dos lados, abaixo */
-        }
-
-        /* Link que envolve o Card */
-        .content-card-link {
-            text-decoration: none; /* Remove sublinhado */
-            color: inherit; /* Herda cor do texto */
-            display: block; /* Ocupa espaço */
-            height: 100%; /* Tenta preencher altura da célula da grelha */
-        }
-
-        /* Estilo Base dos Cards (Vídeo/Filme) */
-        .content-card {
-            background-color: #242424; /* Fundo do card */
-            border-radius: 12px; /* Cantos arredondados */
-            overflow: hidden; /* Esconde conteúdo que transborda */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Sombra */
-            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Animação suave */
-            height: 100%; /* Tenta preencher altura do link pai */
-            display: flex;
-            flex-direction: column; /* Empilha imagem e info */
-            position: relative; /* Necessário para badge de número de vídeo */
-        }
-        .content-card:hover {
-            transform: translateY(-5px); /* Efeito de levantar ao passar o rato */
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4); /* Sombra mais pronunciada */
-        }
-        .content-card img { /* Imagem do card */
-            width: 100%;
-            height: 250px; /* Altura fixa para imagem (ajuste conforme necessário) */
-            object-fit: cover; /* Cobre a área sem distorcer */
-            display: block; /* Remove espaço extra abaixo da imagem */
-        }
-        .content-info { /* Área de texto abaixo da imagem */
-            padding: 15px 20px 20px;
-            text-align: center;
-            margin-top: auto; /* Empurra para baixo se card tiver altura extra */
-        }
-        .content-info h3 { /* Nome (Vídeo/Filme) */
-            margin: 0 0 8px 0;
-            font-size: 1.3em;
-            font-weight: normal;
-            color: #fff;
-            white-space: nowrap;      /* Evita quebra de linha */
-            overflow: hidden;         /* Esconde o excesso */
-            text-overflow: ellipsis;  /* Adiciona "..." */
-        }
-        .content-info .year { /* Ano (Filme) */
-            font-size: 0.9em;
-            color: #aaa;
-            margin-top: -5px; /* Ajusta espaçamento */
-        }
-
-        /* Badge para Número do Vídeo */
-        .video-number-badge {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background-color: rgba(187, 134, 252, 0.85); /* Fundo roxo semi-transparente */
-            color: #121212; /* Texto escuro */
-            font-size: 0.9em;
-            font-weight: bold;
-            padding: 4px 8px;
-            border-radius: 4px;
-            z-index: 1; /* Garante que fica acima da imagem */
-        }
-
-        /* Mensagem de Loading/Erro/Sem Resultados */
-        .message {
-            color: #aaa;
-            font-size: 1.1em;
-            text-align: center;
-            padding: 40px;
-            grid-column: 1 / -1; /* Ocupa toda a largura da grelha */
-        }
+        #save-content-button:hover { background-color: #a774e6; }
+        #save-content-button:disabled { background-color: #555; color: #999; cursor: not-allowed; }
+        /* --- FIM DOS ESTILOS DO POPUP --- */
 
     </style>
 </head>
@@ -365,18 +247,12 @@
                 <button class="filter-btn" data-filter="film">Só Filmes</button>
             </div>
         </div>
-
-        <!-- Actress Search Area -->
-        <div class="actress-search-area">  <!-- Pai com position: relative -->
+        <div class="actress-search-area">
             <div class="search-input-wrapper" onclick="document.getElementById('search-input').focus()">
-                <div id="selected-actresses-container">
-                    <!-- Selected actress pills will be inserted here -->
-                </div>
+                <div id="selected-actresses-container"></div>
                 <input type="text" id="search-input" class="search-input" placeholder="Pesquisar por atriz...">
             </div>
-            <div id="suggestions-list"> <!-- Filho com position: absolute -->
-                <!-- Suggestions will be loaded here -->
-            </div>
+            <div id="suggestions-list"></div>
         </div>
     </div>
     <!-- END FILTERS AND SEARCH AREA -->
@@ -388,10 +264,60 @@
     </div>
     <!-- FIM CONTAINER -->
 
+    <!-- BOTÃO DE ENGRENAGEM PARA ABRIR POPUP (COPIADO) -->
+    <button id="open-create-popup-btn" title="Criar Novo Conteúdo">
+        <i class="fa-solid fa-gear"></i>
+    </button>
+
+    <!-- POPUP DE CRIAÇÃO (COPIADO E Escondido Inicialmente) -->
+    <div class="create-popup-overlay" id="create-popup-overlay">
+        <div class="create-popup-content">
+            <button class="create-popup-close-btn" id="close-create-popup-btn">×</button>
+            <h2>Criar Novo Conteúdo</h2>
+            <div class="create-form-group">
+                <label for="content-type-selector">Tipo de Conteúdo:</label>
+                <select id="content-type-selector">
+                    <option value="">-- Selecione --</option>
+                    <option value="video">Vídeo</option>
+                    <option value="scene">Cena</option>
+                    <option value="movie">Filme</option>
+                </select>
+            </div>
+            <div id="create-form-container">
+                <div id="video-form">
+                     <div class="create-form-group"> <label for="video-nome">Nome:</label> <input type="text" id="video-nome" required> </div>
+                    <div class="create-form-group"> <label for="video-ano">Ano:</label> <input type="number" id="video-ano" placeholder="Ex: 2023"> </div>
+                     <div class="create-form-group"> <label for="video-imagem">Imagem (URL):</label> <input type="url" id="video-imagem" placeholder="https://..."> </div>
+                    <div class="create-form-group"> <label for="video-pagina">Página (URL Externa):</label> <input type="url" id="video-pagina" placeholder="https://..."> </div>
+                     <div class="create-form-group"> <label for="video-atores">Atrizes (Selecione uma ou mais):</label> <select id="video-atores" multiple> <option value="">Carregando atrizes...</option> </select> </div>
+                </div>
+                <div id="scene-form">
+                     <div class="create-form-group"> <label for="scene-nome">Nome da Cena:</label> <input type="text" id="scene-nome" required> </div>
+                     <div class="create-form-group"> <label for="scene-filme">Filme:</label> <select id="scene-filme" required> <option value="">Carregando filmes...</option> </select> </div>
+                    <div class="create-form-group"> <label for="scene-numero">Número da Cena:</label> <select id="scene-numero" required> <option value="">--</option> <option value="1">1</option> <option value="2">2</option> <option value="3">3</option> <option value="4">4</option> <option value="5">5</option> <option value="6">6</option> <option value="7">7</option> <option value="8">8</option> <option value="9">9</option> <option value="10">10</option> </select> </div>
+                    <div class="create-form-group"> <label for="scene-ano">Ano:</label> <input type="number" id="scene-ano" placeholder="Ex: 2023"> </div>
+                    <div class="create-form-group"> <label for="scene-imagem">Imagem (URL):</label> <input type="url" id="scene-imagem" placeholder="https://..."> </div>
+                    <div class="create-form-group"> <label for="scene-pagina">Página (URL Externa):</label> <input type="url" id="scene-pagina" placeholder="https://..."> </div>
+                     <div class="create-form-group"> <label for="scene-atores">Atrizes (Selecione uma ou mais):</label> <select id="scene-atores" multiple> <option value="">Carregando atrizes...</option> </select> </div>
+                </div>
+                <div id="movie-form">
+                     <div class="create-form-group"> <label for="movie-nome">Nome do Filme:</label> <input type="text" id="movie-nome" required> </div>
+                    <div class="create-form-group"> <label for="movie-ano">Ano:</label> <input type="number" id="movie-ano" placeholder="Ex: 2023"> </div>
+                    <div class="create-form-group"> <label for="movie-imagem">Imagem (URL):</label> <input type="url" id="movie-imagem" placeholder="https://..."> </div>
+                    <div class="create-form-group"> <label for="movie-pagina">Página (URL Externa):</label> <input type="url" id="movie-pagina" placeholder="https://..."> </div>
+                </div>
+            </div>
+            <div id="create-status-message"></div>
+            <button id="save-content-button" disabled>Salvar</button>
+        </div>
+    </div>
+    <!-- FIM POPUP DE CRIAÇÃO -->
+
     <!-- Firebase Modular SDKs via CDN -->
-  <script type="module">
+    <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        // ADDED: doc, getDoc, addDoc, serverTimestamp, query, orderBy for popup functionality
+        import { getFirestore, collection, getDocs, doc, getDoc, addDoc, serverTimestamp, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         // Firebase Config (igual)
         const firebaseConfig = {
@@ -407,21 +333,41 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // DOM References (igual)
+        // --- DOM References (Existing Page) ---
         const contentContainer = document.getElementById('videos-filmes-container');
         const filterButtons = document.querySelectorAll('.filter-btn');
         const searchInput = document.getElementById('search-input');
-        const suggestionsList = document.getElementById('suggestions-list'); // Usada para ambas as listas
+        const suggestionsList = document.getElementById('suggestions-list');
         const selectedActressesContainer = document.getElementById('selected-actresses-container');
         const searchInputWrapper = document.querySelector('.search-input-wrapper');
 
-        // --- Global Data Storage (igual) ---
+        // --- DOM References (Popup - ADDED) ---
+        const openCreatePopupBtn = document.getElementById('open-create-popup-btn');
+        const createPopupOverlay = document.getElementById('create-popup-overlay');
+        const closeCreatePopupBtn = document.getElementById('close-create-popup-btn');
+        const contentTypeSelector = document.getElementById('content-type-selector');
+        const formContainer = document.getElementById('create-form-container'); // Parent of specific forms
+        const videoForm = document.getElementById('video-form');
+        const sceneForm = document.getElementById('scene-form');
+        const movieForm = document.getElementById('movie-form');
+        const saveContentButton = document.getElementById('save-content-button');
+        const createStatusMessage = document.getElementById('create-status-message');
+        const videoActoresSelect = document.getElementById('video-atores');
+        const sceneActoresSelect = document.getElementById('scene-atores');
+        const sceneFilmeSelect = document.getElementById('scene-filme');
+
+
+        // --- Global Data Storage (Existing Page) ---
         let allContent = [];
-        let allActresses = [];
+        let allActresses = []; // Used by both main page search and popup selects
         let selectedActresses = [];
         let activeTypeFilter = 'all';
 
-        // --- FUNCTION TO RENDER CONTENT BASED ON FILTERS --- (igual)
+        // --- Popup State Variables (ADDED) ---
+        let actorsLoaded = false;
+        let moviesLoaded = false;
+
+        // --- FUNCTION TO RENDER CONTENT BASED ON FILTERS (Existing Page) ---
         function renderContent() {
             if (!contentContainer) return;
             let contentHTML = '';
@@ -440,74 +386,65 @@
             if (filteredContent.length === 0) {
                 contentHTML = '<p class="message">Nenhum resultado encontrado para os filtros selecionados.</p>';
             } else {
+                 // Ordenar: Vídeos primeiro pelo número (se existir), depois filmes pelo nome
+                filteredContent.sort((a, b) => {
+                    if (a.type === 'video' && b.type === 'film') return -1; // Vídeos antes de filmes
+                    if (a.type === 'film' && b.type === 'video') return 1;  // Filmes depois de vídeos
+                    if (a.type === 'video' && b.type === 'video') {
+                        // Ordena vídeos por número (maior primeiro), ou nome se não tiver número
+                        const noA = typeof a.no === 'number' ? a.no : -Infinity;
+                        const noB = typeof b.no === 'number' ? b.no : -Infinity;
+                        if (noB !== noA) return noB - noA; // Decrescente por número
+                        return (a.nome || '').localeCompare(b.nome || ''); // Desempate por nome
+                    }
+                    // Se ambos são filmes ou nenhum tem tipo definido, ordena por nome
+                    return (a.nome || '').localeCompare(b.nome || '');
+                });
                 filteredContent.forEach(item => { contentHTML += generateCardHTML(item); });
             }
             contentContainer.innerHTML = contentHTML;
         }
 
-        // --- FUNCTION TO GENERATE HTML FOR A SINGLE CARD --- (igual)
+        // --- FUNCTION TO GENERATE HTML FOR A SINGLE CARD (Existing Page) ---
           function generateCardHTML(item) {
             const nome = item.nome || (item.type === 'video' ? 'Vídeo sem nome' : 'Filme sem nome');
             const imagem = item.imagem || 'path/to/default/placeholder.png'; // Use a real path
             const ano = item.ano || 'N/A';
             const videoNo = item.no !== undefined ? item.no : '?';
-
-            // --- Define o link corretamente ---
-            let cardLink = '#'; // Link padrão caso não seja vídeo ou filme
-            if (item.type === 'video') {
-                 // Aponta para vid.html com o ID do vídeo
-                 cardLink = `vid.html?id=${item.id}`;
-            } else if (item.type === 'film') {
-                 // TODO: Definir link para detalhes do filme se necessário (e.g., film.html?id=${item.id})
-                 cardLink = `film_detail.html?id=${item.id}`; // Exemplo, ajuste se tiver página de filme
-            }
-            // --- Fim da definição do link ---
-
-            let cardHTML = `<a href="${cardLink}" class="content-card-link">`; // Wrap in link
-
+            let cardLink = '#';
+            if (item.type === 'video') { cardLink = `vid.html?id=${item.id}`; }
+            else if (item.type === 'film') { cardLink = `film_detail.html?id=${item.id}`; } // Assumes film_detail.html exists
+            let cardHTML = `<a href="${cardLink}" class="content-card-link">`;
             if (item.type === 'video') {
                 cardHTML += `<div class="content-card video-card" data-id="${item.id}">${videoNo !== '?' ? `<span class="video-number-badge">#${videoNo}</span>` : ''}<img src="${imagem}" alt="${nome}"><div class="content-info"><h3>${nome}</h3></div></div>`;
-            } else { // film
+            } else {
                 cardHTML += `<div class="content-card film-card" data-id="${item.id}"><img src="${imagem}" alt="${nome}"><div class="content-info"><h3>${nome}</h3><p class="year">(${ano})</p></div></div>`;
             }
-            cardHTML += `</a>`; // Close link
+            cardHTML += `</a>`;
             return cardHTML;
         }
 
-         // --- FUNCTIONS FOR ACTRESS SEARCH & SELECTION ---
-
-        // Atualiza e mostra lista de CO-ESTRELAS COMUNS (igual)
-        function updateCoStarsList() {
+        // --- FUNCTIONS FOR ACTRESS SEARCH & SELECTION (Existing Page) ---
+        function updateCoStarsList() { /* ... (keep existing function) ... */
             suggestionsList.innerHTML = '';
             suggestionsList.style.display = 'none';
-
             if (selectedActresses.length === 0) return;
-
             const selectedActressIds = selectedActresses.map(a => a.id);
-            let commonContentItems = [];
-
-            commonContentItems = allContent.filter(item => {
+            let commonContentItems = allContent.filter(item => {
                  if (!item.atores || !Array.isArray(item.atores) || item.atores.length < selectedActresses.length) return false;
                  return selectedActressIds.every(selectedId => item.atores.includes(selectedId));
             });
-
             if (commonContentItems.length === 0 && selectedActresses.length > 1) {
                 const noCommonItem = document.createElement('div');
                 noCommonItem.classList.add('suggestion-item', 'no-results');
                 noCommonItem.textContent = 'Nenhum conteúdo encontrado com todas as atrizes selecionadas.';
                 suggestionsList.appendChild(noCommonItem);
-                suggestionsList.style.display = 'block';
-                return;
+                suggestionsList.style.display = 'block'; return;
             }
-
             let potentialCoStarIds = new Set();
-            commonContentItems.forEach(item => {
-                item.atores.forEach(actressId => { potentialCoStarIds.add(actressId); });
-            });
+            commonContentItems.forEach(item => { item.atores.forEach(actressId => { potentialCoStarIds.add(actressId); }); });
             selectedActressIds.forEach(idToRemove => { potentialCoStarIds.delete(idToRemove); });
-
             const validCoStars = allActresses.filter(actress => potentialCoStarIds.has(actress.id));
-
             if (validCoStars.length > 0) {
                 const titleItem = document.createElement('div');
                 titleItem.classList.add('suggestion-title');
@@ -530,104 +467,219 @@
                 suggestionsList.style.display = 'block';
             }
         }
-
-        // Handler para clique no botão "Adicionar" da lista de co-estrelas (igual)
-        function handleAddCoStarClick(event) {
-             const button = event.target;
-             const actressId = button.dataset.id;
-             const actressName = button.dataset.name;
+        function handleAddCoStarClick(event) { /* ... (keep existing function) ... */
+             const button = event.target; const actressId = button.dataset.id; const actressName = button.dataset.name;
              if (!actressId || !actressName) return;
              selectedActresses.push({ id: actressId, nome: actressName });
-             renderSelectedActressesPills();
-             renderContent();
-             updateCoStarsList(); // Atualiza lista após adicionar
-             // searchInput.focus(); // Mantido comentado
+             renderSelectedActressesPills(); renderContent(); updateCoStarsList();
         }
-
-        // Mostra sugestões STANDARD ao DIGITAR (igual)
-        function displayStandardSuggestions(searchTerm) {
-            suggestionsList.innerHTML = '';
-            if (!searchTerm) { suggestionsList.style.display = 'none'; return; }
+        function displayStandardSuggestions(searchTerm) { /* ... (keep existing function) ... */
+            suggestionsList.innerHTML = ''; if (!searchTerm) { suggestionsList.style.display = 'none'; return; }
             const lowerSearchTerm = searchTerm.toLowerCase();
-            const matchedActresses = allActresses.filter(actress =>
-                actress.nome.toLowerCase().includes(lowerSearchTerm) &&
-                !selectedActresses.some(sa => sa.id === actress.id)
-            );
+            const matchedActresses = allActresses.filter(actress => actress.nome.toLowerCase().includes(lowerSearchTerm) && !selectedActresses.some(sa => sa.id === actress.id) );
             if (matchedActresses.length > 0) {
                 matchedActresses.slice(0, 10).forEach(actress => {
-                    const item = document.createElement('div');
-                    item.classList.add('suggestion-item');
-                    item.dataset.id = actress.id;
-                    item.dataset.nome = actress.nome;
+                    const item = document.createElement('div'); item.classList.add('suggestion-item'); item.dataset.id = actress.id; item.dataset.nome = actress.nome;
                     item.innerHTML = `<img src="${actress.foto || 'path/to/default/avatar.png'}" alt=""><span>${actress.nome}</span>`;
-                    item.addEventListener('click', handleSelectActressClick);
-                    suggestionsList.appendChild(item);
+                    item.addEventListener('click', handleSelectActressClick); suggestionsList.appendChild(item);
                 });
                 suggestionsList.style.display = 'block';
-            } else {
-                 suggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma atriz encontrada</div>';
-                 suggestionsList.style.display = 'block';
-            }
+            } else { suggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma atriz encontrada</div>'; suggestionsList.style.display = 'block'; }
         }
-
-        // Handler para clique numa sugestão da lista STANDARD (CORRIGIDO - com setTimeout)
-        function handleSelectActressClick(event) {
-            const target = event.currentTarget;
-            const actressId = target.dataset.id;
-            const actressName = target.dataset.nome;
+        function handleSelectActressClick(event) { /* ... (keep existing function) ... */
+            const target = event.currentTarget; const actressId = target.dataset.id; const actressName = target.dataset.nome;
             if (!actressId || !actressName) { console.error("Data missing!"); return; }
-
             if (!selectedActresses.some(a => a.id === actressId)) {
-                selectedActresses.push({ id: actressId, nome: actressName });
-                renderSelectedActressesPills();
-                renderContent();
-
-                // ---> CORREÇÃO: USA setTimeout para chamar updateCoStarsList <---
-                setTimeout(() => {
-                     updateCoStarsList();
-                }, 0); // Adia a atualização da lista de co-estrelas
-
-            } else {
-                 // Se já selecionada, esconde a lista de pesquisa standard
-                 suggestionsList.innerHTML = '';
-                 suggestionsList.style.display = 'none';
-            }
-            searchInput.value = ''; // Limpa sempre o input após seleção
-            // searchInput.focus(); // Mantido comentado
+                selectedActresses.push({ id: actressId, nome: actressName }); renderSelectedActressesPills(); renderContent();
+                setTimeout(() => { updateCoStarsList(); }, 0); // Keep timeout
+            } else { suggestionsList.innerHTML = ''; suggestionsList.style.display = 'none'; }
+            searchInput.value = '';
         }
-
-        // Renderiza as pílulas (igual)
-        function renderSelectedActressesPills() {
+        function renderSelectedActressesPills() { /* ... (keep existing function) ... */
             selectedActressesContainer.innerHTML = '';
             selectedActresses.forEach(actress => {
-                const pill = document.createElement('div');
-                pill.classList.add('actress-pill');
-                pill.dataset.id = actress.id;
+                const pill = document.createElement('div'); pill.classList.add('actress-pill'); pill.dataset.id = actress.id;
                 pill.innerHTML = `<span>${actress.nome}</span><button class="remove-actress-btn" title="Remover">×</button>`;
                 pill.querySelector('.remove-actress-btn').addEventListener('click', handleRemoveActress);
                 selectedActressesContainer.appendChild(pill);
             });
         }
-
-
-        // Handler para REMOVER uma pílula (igual - já funcionava)
-        function handleRemoveActress(event) {
-            event.stopPropagation();
-            const pill = event.target.closest('.actress-pill');
-            const actressIdToRemove = pill.dataset.id;
-            selectedActresses = selectedActresses.filter(a => a.id !== actressIdToRemove);
-            pill.remove();
-            renderContent();
-
-            // Atualiza a lista de co-estrelas com base nas restantes (chamada direta OK aqui)
-            updateCoStarsList();
-
-            // searchInput.focus(); // Mantido comentado
+        function handleRemoveActress(event) { /* ... (keep existing function) ... */
+            event.stopPropagation(); const pill = event.target.closest('.actress-pill'); const actressIdToRemove = pill.dataset.id;
+            selectedActresses = selectedActresses.filter(a => a.id !== actressIdToRemove); pill.remove(); renderContent(); updateCoStarsList();
         }
 
-        // --- FUNCTION TO LOAD ALL INITIAL DATA --- (igual)
+        // --- FUNCTIONS FOR POPUP (COPIED & ADAPTED) ---
+
+        // Função para carregar atores nos selects do popup (USA allActresses da página principal)
+        async function loadActorsForSelect() {
+            // No need to fetch again if allActresses is populated by loadInitialData
+            if (actorsLoaded || !videoActoresSelect || !sceneActoresSelect) return;
+            console.log("Loading actors for popup select...");
+
+            if (allActresses.length === 0) {
+                console.warn("Attempted to load actors for popup, but 'allActresses' is empty. Waiting for initial load?");
+                // Optionally fetch again here, but better to rely on initial load
+                 videoActoresSelect.innerHTML = '<option value="" disabled>Carregando atrizes...</option>';
+                 sceneActoresSelect.innerHTML = '<option value="" disabled>Carregando atrizes...</option>';
+                 // Try fetching specifically for the popup if needed (less ideal)
+                 // await fetchActorsSpecificallyForPopup(); // Example if needed
+                return;
+            }
+
+            let optionsHTML = '';
+            allActresses.forEach(actor => { // Use the already loaded allActresses
+                optionsHTML += `<option value="${actor.id}">${actor.nome || 'Nome Indisponível'}</option>`;
+            });
+
+            videoActoresSelect.innerHTML = optionsHTML || '<option value="" disabled>Nenhuma atriz encontrada</option>';
+            sceneActoresSelect.innerHTML = optionsHTML || '<option value="" disabled>Nenhuma atriz encontrada</option>';
+            actorsLoaded = true; // Mark as loaded for this popup session
+            console.log("Actors populated in popup selects.");
+        }
+
+        // Função para carregar filmes no select de cenas do popup
+        async function loadMoviesForSelect() {
+            if (moviesLoaded || !sceneFilmeSelect) return;
+            console.log("Loading movies for popup select...");
+            sceneFilmeSelect.innerHTML = '<option value="">Carregando...</option>';
+            try {
+                const moviesQuery = query(collection(db, "filmes"), orderBy("nome", "asc"));
+                const querySnapshot = await getDocs(moviesQuery);
+                let optionsHTML = '<option value="">-- Selecione um Filme --</option>';
+                if (querySnapshot.empty) {
+                     optionsHTML += '<option value="" disabled>Nenhum filme encontrado</option>';
+                } else {
+                    querySnapshot.forEach(doc => {
+                        const movie = doc.data();
+                        optionsHTML += `<option value="${doc.id}">${movie.nome || 'Nome Indisponível'}</option>`;
+                    });
+                }
+                sceneFilmeSelect.innerHTML = optionsHTML;
+                moviesLoaded = true; // Mark as loaded for this popup session
+                console.log("Movies loaded successfully for popup.");
+            } catch (error) {
+                console.error("Erro ao carregar filmes para select popup:", error);
+                 sceneFilmeSelect.innerHTML = '<option value="" disabled>Erro ao carregar</option>';
+            }
+        }
+
+         // Função para mostrar/esconder formulários do popup e carregar dados
+        function showCorrectForm() {
+            const selectedType = contentTypeSelector.value;
+            videoForm.style.display = 'none'; sceneForm.style.display = 'none'; movieForm.style.display = 'none';
+            saveContentButton.disabled = true; createStatusMessage.textContent = ''; createStatusMessage.className = '';
+
+            switch (selectedType) {
+                case 'video':
+                    videoForm.style.display = 'block';
+                    loadActorsForSelect(); // Load/ensure actors are ready
+                    saveContentButton.disabled = false;
+                    break;
+                case 'scene':
+                    sceneForm.style.display = 'block';
+                    loadActorsForSelect(); // Load/ensure actors are ready
+                    loadMoviesForSelect(); // Load/ensure movies are ready
+                    saveContentButton.disabled = false;
+                    break;
+                case 'movie':
+                    movieForm.style.display = 'block';
+                    saveContentButton.disabled = false;
+                    break;
+                default: break; // No selection, button stays disabled
+            }
+        }
+
+        // Função para resetar os campos de um formulário específico do popup
+        function resetFormFields(formElement) {
+             if (!formElement) return;
+             formElement.querySelectorAll('input[type="text"], input[type="number"], input[type="url"]').forEach(input => input.value = '');
+             formElement.querySelectorAll('select').forEach(select => {
+                 if (select.multiple) { Array.from(select.options).forEach(option => option.selected = false); }
+                 else { select.selectedIndex = 0; }
+             });
+        }
+
+         // Função para lidar com o salvamento do popup
+         async function handleSaveContent(event) {
+             event.preventDefault();
+             const selectedType = contentTypeSelector.value;
+             if (!selectedType) { alert("Por favor, selecione um tipo de conteúdo."); return; }
+
+             saveContentButton.disabled = true;
+             createStatusMessage.textContent = 'Salvando...'; createStatusMessage.className = '';
+             let dataToSave = { createdAt: serverTimestamp() };
+             let targetCollection = ''; let currentForm;
+
+             try {
+                 switch (selectedType) {
+                     case 'video':
+                         targetCollection = 'videos'; currentForm = videoForm;
+                         dataToSave.nome = document.getElementById('video-nome').value.trim();
+                         dataToSave.ano = parseInt(document.getElementById('video-ano').value) || null;
+                         dataToSave.imagem = document.getElementById('video-imagem').value.trim() || null;
+                         dataToSave.pagina = document.getElementById('video-pagina').value.trim() || null;
+                         dataToSave.atores = Array.from(videoActoresSelect.selectedOptions).map(option => option.value);
+                         // Add 'no' field specifically for videos, defaulting to 0 or handling logic if needed
+                         // For simplicity, let's assume 'no' isn't set via this form for now, or add an input if required.
+                         // dataToSave.no = parseInt(document.getElementById('video-numero').value) || 0; // Example if you add a number input
+                         if (!dataToSave.nome) throw new Error("O campo 'Nome' é obrigatório para Vídeo.");
+                         break;
+                     case 'scene':
+                         targetCollection = 'cenas'; currentForm = sceneForm;
+                         dataToSave.nome = document.getElementById('scene-nome').value.trim();
+                         dataToSave.filmeId = document.getElementById('scene-filme').value || null;
+                         dataToSave.numeroCena = parseInt(document.getElementById('scene-numero').value) || null;
+                         dataToSave.ano = parseInt(document.getElementById('scene-ano').value) || null;
+                         dataToSave.imagem = document.getElementById('scene-imagem').value.trim() || null;
+                         dataToSave.pagina = document.getElementById('scene-pagina').value.trim() || null;
+                         dataToSave.atores = Array.from(sceneActoresSelect.selectedOptions).map(option => option.value);
+                         if (!dataToSave.nome) throw new Error("O campo 'Nome da Cena' é obrigatório.");
+                         if (!dataToSave.filmeId) throw new Error("O campo 'Filme' é obrigatório para Cena.");
+                         if (!dataToSave.numeroCena) throw new Error("O campo 'Número da Cena' é obrigatório.");
+                         break;
+                     case 'movie':
+                         targetCollection = 'filmes'; currentForm = movieForm;
+                         dataToSave.nome = document.getElementById('movie-nome').value.trim();
+                         dataToSave.ano = parseInt(document.getElementById('movie-ano').value) || null;
+                         dataToSave.imagem = document.getElementById('movie-imagem').value.trim() || null;
+                         dataToSave.pagina = document.getElementById('movie-pagina').value.trim() || null;
+                         if (!dataToSave.nome) throw new Error("O campo 'Nome do Filme' é obrigatório.");
+                         break;
+                     default: throw new Error("Tipo de conteúdo inválido selecionado.");
+                 }
+
+                 Object.keys(dataToSave).forEach(key => { if (dataToSave[key] === null || dataToSave[key] === '') { if (key !== 'atores') { delete dataToSave[key]; } } });
+
+                 console.log(`Saving to ${targetCollection}:`, dataToSave);
+                 const docRef = await addDoc(collection(db, targetCollection), dataToSave);
+                 console.log("Document written with ID: ", docRef.id);
+
+                 createStatusMessage.textContent = `${selectedType.charAt(0).toUpperCase() + selectedType.slice(1)} criado com sucesso!`;
+                 createStatusMessage.className = 'success';
+                 if (currentForm) resetFormFields(currentForm);
+                 contentTypeSelector.selectedIndex = 0; showCorrectForm();
+
+                 // Reload main page data to show the new item
+                 await loadInitialData(); // <<< RELOAD DATA on the main page
+
+                 setTimeout(() => {
+                     createPopupOverlay.style.display = 'none'; createStatusMessage.textContent = ''; createStatusMessage.className = '';
+                 }, 2000);
+
+             } catch (error) {
+                 console.error("Erro ao salvar conteúdo:", error);
+                 createStatusMessage.textContent = `Erro: ${error.message}`; createStatusMessage.className = 'error';
+                 saveContentButton.disabled = false; // Re-enable on error
+             }
+         }
+
+        // --- FUNCTION TO LOAD ALL INITIAL DATA (Existing Page) ---
         async function loadInitialData() {
             contentContainer.innerHTML = '<p class="message">Carregando...</p>';
+            // Reset popup loaded flags when main data reloads
+            actorsLoaded = false;
+            moviesLoaded = false;
             try {
                 const videosCol = collection(db, "videos");
                 const filmesCol = collection(db, "filmes");
@@ -638,61 +690,76 @@
                 allContent = [];
                 videosSnapshot.forEach(doc => allContent.push({ id: doc.id, type: 'video', ...doc.data() }));
                 filmesSnapshot.forEach(doc => allContent.push({ id: doc.id, type: 'film', ...doc.data() }));
-                allActresses = [];
+
+                allActresses = []; // Reset and repopulate
                 atoresSnapshot.forEach(doc => {
                     const data = doc.data();
                     if (data.nome) { allActresses.push({ id: doc.id, nome: data.nome, foto: data.foto }); }
                 });
                 allActresses.sort((a, b) => a.nome.localeCompare(b.nome));
-                renderSelectedActressesPills();
-                renderContent();
+
+                renderSelectedActressesPills(); // Render pills based on potentially changed state
+                renderContent(); // Render main content grid
             } catch (error) {
                 console.error("Erro ao buscar dados:", error);
                 contentContainer.innerHTML = '<p class="message">Erro ao carregar.</p>';
             }
         }
 
-        // --- EVENT LISTENERS ---
+        // --- EVENT LISTENERS (Combined) ---
+        document.addEventListener('DOMContentLoaded', () => {
 
-        // 1. Filter Buttons (igual)
-        filterButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                filterButtons.forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                activeTypeFilter = button.getAttribute('data-filter');
-                suggestionsList.style.display = 'none';
-                renderContent();
+            // --- Listeners for Existing Page Functionality ---
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    filterButtons.forEach(btn => btn.classList.remove('active')); button.classList.add('active');
+                    activeTypeFilter = button.getAttribute('data-filter'); suggestionsList.style.display = 'none'; renderContent();
+                });
             });
-        });
+            searchInput.addEventListener('input', () => { displayStandardSuggestions(searchInput.value); });
+            searchInput.addEventListener('focus', () => { if (searchInput.value) { displayStandardSuggestions(searchInput.value); } });
+            document.addEventListener('click', (event) => {
+                if (!searchInputWrapper.contains(event.target) && !suggestionsList.contains(event.target)) { suggestionsList.style.display = 'none'; }
+            });
+            suggestionsList.addEventListener('click', function(event) { if (event.target.classList.contains('add-costar-btn')) { handleAddCoStarClick(event); } });
 
-        // 2. Actress Search Input (Typing) -> Mostra sugestões standard (igual)
-        searchInput.addEventListener('input', () => {
-            displayStandardSuggestions(searchInput.value);
-        });
+            // --- Listeners for Popup Functionality (ADDED) ---
+            if (openCreatePopupBtn) {
+                openCreatePopupBtn.addEventListener('click', () => {
+                    createPopupOverlay.style.display = 'flex';
+                    // Reset popup state each time it opens
+                    actorsLoaded = false; // Reset flags to allow reloading if needed
+                    moviesLoaded = false;
+                    contentTypeSelector.selectedIndex = 0;
+                    showCorrectForm();
+                    createStatusMessage.textContent = ''; createStatusMessage.className = '';
+                    saveContentButton.disabled = true;
+                    // Pre-load actors/movies if needed upon opening, or rely on showCorrectForm
+                    // loadActorsForSelect(); // Can pre-trigger loading here if desired
+                });
+            }
+            if (closeCreatePopupBtn) { closeCreatePopupBtn.addEventListener('click', () => { createPopupOverlay.style.display = 'none'; }); }
+            if (createPopupOverlay) {
+                createPopupOverlay.addEventListener('click', (event) => { if (event.target === createPopupOverlay) { createPopupOverlay.style.display = 'none'; } });
+            }
+            if (contentTypeSelector) { contentTypeSelector.addEventListener('change', showCorrectForm); }
+            if (saveContentButton) { saveContentButton.addEventListener('click', handleSaveContent); }
 
-        // 3. Actress Search Input (Focus) -> SIMPLIFICADO (igual)
-        searchInput.addEventListener('focus', () => {
-             if (searchInput.value) {
-                 displayStandardSuggestions(searchInput.value);
+            // --- Validation Checks (Combined) ---
+             // Existing page elements check (optional, assumed ok)
+             if (!contentContainer || filterButtons.length === 0 || !searchInput || !suggestionsList || !selectedActressesContainer || !searchInputWrapper) {
+                 console.error("ERRO CRÍTICO: Um ou mais elementos da página principal não foram encontrados!");
              }
-        });
+            // Popup elements check (ADDED)
+            if (!openCreatePopupBtn || !createPopupOverlay || !closeCreatePopupBtn || !contentTypeSelector || !formContainer || !videoForm || !sceneForm || !movieForm || !saveContentButton || !createStatusMessage || !videoActoresSelect || !sceneActoresSelect || !sceneFilmeSelect) {
+                 console.error("ERRO CRÍTICO: Um ou mais elementos do Popup de Criação não foram encontrados! Funcionalidade de criação pode não funcionar.");
+                 if(openCreatePopupBtn) openCreatePopupBtn.style.display = 'none';
+            }
 
-        // 4. Hide suggestions/co-stars on click outside (igual)
-         document.addEventListener('click', (event) => {
-             if (!searchInputWrapper.contains(event.target) && !suggestionsList.contains(event.target)) {
-                 suggestionsList.style.display = 'none';
-             }
-         });
+             // --- INITIALIZATION (Existing Page) ---
+             loadInitialData();
 
-         // 5. EVENT DELEGATION for buttons inside suggestionsList (igual)
-         suggestionsList.addEventListener('click', function(event) {
-             if (event.target.classList.contains('add-costar-btn')) {
-                 handleAddCoStarClick(event);
-             }
-         });
-
-        // --- INITIALIZATION ---
-        loadInitialData();
+        }); // End DOMContentLoaded
 
     </script>
 </body>
