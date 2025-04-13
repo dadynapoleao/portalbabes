@@ -439,32 +439,53 @@
                 return;
             }
 
-            // Query para as últimas 15 (ou simulação com __name__)
-            const actressesQuery = query(collection(db, "atores"), orderBy("__name__", "desc"), limit(15));
+            console.log("Fetching latest actresses ordered by createdAt..."); // Log for clarity
+
+            // Query to get the latest 15 actresses based on the 'createdAt' timestamp
+            // *** THIS IS THE MODIFIED LINE ***
+            const actressesQuery = query(
+                collection(db, "atores"),
+                orderBy("createdAt", "desc"), // Order by the creation timestamp, newest first
+                limit(15)                    // Limit to 15 results
+            );
 
             try {
                 const querySnapshot = await getDocs(actressesQuery);
                 let actressesHTML = '';
-                querySnapshot.forEach((doc) => {
-                    const actressData = doc.data();
-                    const nome = actressData.nome || 'Nome Indisponível';
-                    const foto = actressData.foto || 'path/to/default/image.png';
-                    const actressId = doc.id;
 
-                    actressesHTML += `
-                        <a href="she.html?id=${actressId}" class="actress-card-link">
-                            <div class="actress-card">
-                                <img src="${foto}" alt="${nome}">
-                                <div class="actress-info">
-                                    <h3>${nome}</h3>
+                if (querySnapshot.empty) {
+                    console.log("No actresses found in Firestore."); // Log if empty
+                    actressesHTML = '<p>Nenhuma atriz encontrada.</p>';
+                } else {
+                    console.log(`Found ${querySnapshot.size} actresses.`); // Log how many were found
+                    querySnapshot.forEach((doc) => {
+                        const actressData = doc.data();
+                        const nome = actressData.nome || 'Nome Indisponível';
+                        // Use a default/placeholder image if 'foto' is missing
+                        const foto = actressData.foto || 'https://via.placeholder.com/250x250.png?text=No+Image';
+                        const actressId = doc.id;
+
+                        // Log data for the first few actresses for debugging (optional)
+                        // if (actressesHTML.length < 500) { // Limit logging
+                        //    console.log(`  - ID: ${actressId}, Nome: ${nome}, CreatedAt:`, actressData.createdAt?.toDate());
+                        // }
+
+                        actressesHTML += `
+                            <a href="she.html?id=${actressId}" class="actress-card-link">
+                                <div class="actress-card">
+                                    <img src="${foto}" alt="${nome}" loading="lazy"> <!-- Added lazy loading -->
+                                    <div class="actress-info">
+                                        <h3>${nome}</h3>
+                                    </div>
                                 </div>
-                            </div>
-                        </a>
-                    `;
-                });
+                            </a>
+                        `;
+                    });
+                }
+
                 actressesListElement.innerHTML = actressesHTML; // Insere as atrizes
 
-                // Adiciona o card "More Stars"
+                // Adiciona o card "More Stars" AFTER inserting actress cards
                 const moreStarsHTML = `
                     <div class="actress-card more-stars-card" id="more-stars-card">
                         <div class="actress-info">
@@ -472,17 +493,22 @@
                         </div>
                     </div>
                 `;
+                // Use insertAdjacentHTML to add it at the end without clearing previous content
                 actressesListElement.insertAdjacentHTML('beforeend', moreStarsHTML);
 
-                // Adiciona listeners após adicionar o card "More Stars"
+                // Setup listeners AFTER the "More Stars" card is definitely in the DOM
                 setupPopupListeners();
 
             } catch (error) {
                 console.error("Erro ao buscar atrizes do Firestore:", error);
-                actressesListElement.innerHTML = '<p>Erro ao carregar as atrizes.</p>';
+                // Provide more specific error feedback if possible
+                 if (error.code === 'failed-precondition') {
+                     actressesListElement.innerHTML = '<p>Erro ao carregar: Índice do Firestore necessário. Verifique o console do navegador para um link de criação de índice.</p>';
+                 } else {
+                     actressesListElement.innerHTML = `<p>Erro ao carregar as atrizes (${error.message}).</p>`;
+                 }
             }
         }
-
         // --- FUNÇÃO PARA CONFIGURAR OS LISTENERS DO POPUP ---
         function setupPopupListeners() {
              const moreStarsCard = document.getElementById('more-stars-card');
