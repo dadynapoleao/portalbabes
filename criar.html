@@ -356,64 +356,64 @@
     }
 
     // --- Function to check if name exists in Firestore ---
-    async function checkNameExists() {
+   async function checkNameExists() {
         // DEBUG: Log when the function starts and the name it's checking
         console.log("DEBUG: checkNameExists running for name:", nameInput ? `"${nameInput.value}"` : 'N/A');
 
+        // ===> ADDED DETAILED CHECK HERE <===
+        console.log("DEBUG: checkNameExists - Checking variables before main IF:");
+        console.log(`DEBUG:   - nameInput valid? : ${!!nameInput}`);
+        console.log(`DEBUG:   - nameErrorMessage valid? : ${!!nameErrorMessage}`);
+        console.log(`DEBUG:   - db valid? : ${!!db}`);
+        // ===> END OF ADDED CHECK <===
+
         if (!nameInput || !nameErrorMessage || !db) {
-            console.warn("DEBUG: checkNameExists - Missing required elements or DB connection.");
+            // This is the line that was previously triggered
+            console.warn("DEBUG: checkNameExists - PROBLEM: One or more required variables are invalid. Aborting check.");
             return;
         }
+
+        // ... (rest of the function remains the same) ...
 
         const enteredName = nameInput.value.trim();
         nameErrorMessage.style.display = 'none';
         nameErrorMessage.textContent = '';
-        let shouldBeDisabled = false; // Assume enabled unless proven otherwise
+        let shouldBeDisabled = false;
 
         if (enteredName === '') {
             console.log("DEBUG: checkNameExists - Name is empty, skipping Firestore check.");
-            if (submitButton) submitButton.disabled = false; // Enable if name is cleared
+            if (submitButton) submitButton.disabled = false;
             return;
         }
 
-        // DEBUG: Indicate checking is starting
         console.log(`DEBUG: checkNameExists - Querying Firestore for name: "${enteredName}"`);
-        // Optionally indicate visually, e.g., disable button temporarily
-        // if (submitButton) submitButton.disabled = true;
 
         try {
             const checkQuery = query(collection(db, "atores"), where("nome", "==", enteredName), limit(1));
             const querySnapshot = await getDocs(checkQuery);
-
-            // DEBUG: Log query results
             console.log(`DEBUG: checkNameExists - Firestore query executed for "${enteredName}". Snapshot empty: ${querySnapshot.empty}, Docs found: ${querySnapshot.size}`);
 
             if (!querySnapshot.empty) {
-                // DEBUG: Name found
                 console.log(`DEBUG: checkNameExists - Name "${enteredName}" FOUND in Firestore. Displaying error.`);
                 nameErrorMessage.textContent = `O nome "${enteredName}" já existe.`;
                 nameErrorMessage.style.display = 'block';
-                shouldBeDisabled = true; // Mark button to be disabled
+                shouldBeDisabled = true;
             } else {
-                // DEBUG: Name not found
                  console.log(`DEBUG: checkNameExists - Name "${enteredName}" NOT found in Firestore.`);
-                shouldBeDisabled = false; // Mark button to be enabled
+                shouldBeDisabled = false;
             }
         } catch (error) {
-            // DEBUG: Log Firestore query error
             console.error("DEBUG: checkNameExists - Firestore query failed:", error);
             nameErrorMessage.textContent = 'Erro ao verificar o nome.';
             nameErrorMessage.style.display = 'block';
-            shouldBeDisabled = true; // Disable on error
+            shouldBeDisabled = true;
         } finally {
-             // Set button state based on the outcome
              if (submitButton) {
-                 console.log(`DEBUG: checkNameExists - Setting submit button disabled state to: ${shouldBeDisabled}`); // DEBUG
+                 console.log(`DEBUG: checkNameExists - Setting submit button disabled state to: ${shouldBeDisabled}`);
                  submitButton.disabled = shouldBeDisabled;
              }
         }
     }
-
 
     // --- Declare debouncedCheck OUTSIDE autoFillForm so it's accessible ---
     let debouncedCheck; // Will hold the debounced version of checkNameExists
