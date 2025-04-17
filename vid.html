@@ -395,21 +395,62 @@
             tooltipRating.textContent = actressData.nota || '--'; tooltipRating.className = !actressData.nota ? 'tooltip-na' : '';
         }
 
-        function positionAndShowTooltip(targetLink) {
+       function positionAndShowTooltip(targetLink) {
             if (!actressTooltip || !targetLink) return;
+
             const linkRect = targetLink.getBoundingClientRect();
-            const tooltipRect = actressTooltip.getBoundingClientRect();
-            let top = window.pageYOffset + linkRect.bottom + 5;
-            let left = window.pageXOffset + linkRect.left;
-            if (left + tooltipRect.width > window.innerWidth - 10) { left = window.innerWidth - tooltipRect.width - 10; }
-            if (left < 10) { left = 10; }
-            if (top + tooltipRect.height > window.innerHeight + window.pageYOffset - 10) { top = window.pageYOffset + linkRect.top - tooltipRect.height - 5; }
-            if (top < window.pageYOffset + 10) { top = window.pageYOffset + 10; }
+            // Get tooltip dimensions - important to get this *before* setting position
+            // Temporarily display it off-screen to measure if needed, though offsetHeight/Width might work on hidden elements in some browsers
+            actressTooltip.style.visibility = 'hidden'; // Prevent flash
+            actressTooltip.style.display = 'block';     // Make it measurable
+            const tooltipHeight = actressTooltip.offsetHeight;
+            const tooltipWidth = actressTooltip.offsetWidth;
+            actressTooltip.style.display = 'none';     // Hide again
+            actressTooltip.style.visibility = 'visible'; // Make visible for real display
+
+            const scrollY = window.pageYOffset; // How much the page is scrolled vertically
+            const scrollX = window.pageXOffset; // How much the page is scrolled horizontally
+            const viewportHeight = window.innerHeight;
+            const viewportWidth = window.innerWidth;
+            const spaceAbove = linkRect.top; // Space from top of viewport to top of link
+            const spaceBelow = viewportHeight - linkRect.bottom; // Space from bottom of link to bottom of viewport
+            const verticalOffset = 5; // Desired vertical space between link and tooltip
+
+            // --- Calculate TOP position ---
+            let top;
+
+            // Try placing it ABOVE first
+            const topIfAbove = scrollY + linkRect.top - tooltipHeight - verticalOffset;
+
+            // Check if placing ABOVE fits within the viewport (considering scroll)
+            if (topIfAbove >= scrollY) { // Does it fit without going above the scrolled top?
+                top = topIfAbove;
+            }
+            // ELSE: Place it BELOW as fallback
+            else {
+                top = scrollY + linkRect.bottom + verticalOffset;
+                 // Optional: Add check here if placing below goes off bottom, though less likely if flipping from above failed
+                 // if (top + tooltipHeight > scrollY + viewportHeight - 10) { top = scrollY + viewportHeight - tooltipHeight - 10; }
+            }
+
+
+            // --- Calculate LEFT position (same logic as before) ---
+            let left = scrollX + linkRect.left;
+
+            // Adjust if tooltip goes off-screen horizontally to the right
+            if (left + tooltipWidth > scrollX + viewportWidth - 10) { // 10px buffer
+                left = scrollX + viewportWidth - tooltipWidth - 10;
+            }
+            // Adjust if tooltip goes off-screen horizontally to the left
+            if (left < scrollX + 10) {
+                 left = scrollX + 10;
+            }
+
+            // Apply position and show
             actressTooltip.style.top = `${top}px`;
             actressTooltip.style.left = `${left}px`;
             actressTooltip.style.display = 'block';
         }
-
         function hideTooltip() { if (actressTooltip) { actressTooltip.style.display = 'none'; } }
 
         // --- Main Detail Loading Function ---
