@@ -3,159 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalhes do Conteúdo</title> <!-- Título Genérico -->
+    <title>Detalhes do Conteúdo</title>
+    <!-- ADD FONT AWESOME FOR ICONS (if needed for edit icon) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        /* Estilos Globais e Reset Básico */
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #121212;
-            color: #e0e0e0;
-        }
+        /* ... (Estilos Globais, Nav, Header - Keep Existing) ... */
+        body { font-family: 'Roboto', sans-serif; margin: 0; padding: 0; background-color: #121212; color: #e0e0e0; }
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
-
-        /* Estilos para o Menu de Navegação */
-        .main-nav {
-            background-color: #1f1f1f;
-            padding: 0.8em 30px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-            text-align: right;
-        }
+        .main-nav { background-color: #1f1f1f; padding: 0.8em 30px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); text-align: right; }
         .main-nav ul { list-style: none; margin: 0; padding: 0; }
         .main-nav li { display: inline-block; margin-left: 20px; }
         .main-nav a { color: #e0e0e0; text-decoration: none; font-size: 1.1em; padding: 5px 10px; border-radius: 4px; transition: background-color 0.2s ease, color 0.2s ease; }
         .main-nav a:hover { background-color: #bb86fc; color: #121212; }
-
-        /* Estilos do Cabeçalho */
-        header {
-            background-color: #1e1e1e;
-            color: #fff;
-            padding: 2em 0;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
+        header { background-color: #1e1e1e; color: #fff; padding: 2em 0; text-align: center; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); }
         header h1 { margin: 0; font-size: 2.5em; font-weight: 700; letter-spacing: 0.5px; }
 
         /* --- Estilos Específicos para a Página de Detalhes --- */
-        .detail-container {
-            max-width: 900px; /* Largura máxima */
-            margin: 20px auto;
-            padding: 25px 30px; /* Mais padding */
-            background-color: #1f1f1f;
-            border-radius: 8px;
-        }
+        .detail-container { max-width: 900px; margin: 20px auto; padding: 25px 30px; background-color: #1f1f1f; border-radius: 8px; }
+        .top-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 10px;} /* Flex container for buttons */
+        #back-button, #edit-content-btn { padding: 8px 18px; border: 1px solid #555; background-color: #333; color: #e0e0e0; border-radius: 6px; cursor: pointer; font-size: 1em; transition: background-color 0.2s ease, border-color 0.2s ease; }
+        #back-button:hover, #edit-content-btn:hover { background-color: #444; }
+        #edit-content-btn { background-color: #4a4a4a; } /* Slightly different edit button color */
+        #edit-content-btn:hover { background-color: #5a5a5a; }
+        #content-title { color: #bb86fc; margin-top: 0; margin-bottom: 30px; text-align: center; font-size: 2em; font-weight: normal; }
+        #external-link-container { text-align: center; margin: 30px 0 40px; padding: 25px; border: 1px dashed #444; border-radius: 6px; background-color: #242424; }
+        #external-link-message { color: #ccc; margin-bottom: 20px; font-size: 1.1em; line-height: 1.5; }
+        #external-link-button { display: inline-block; padding: 14px 35px; background-color: #bb86fc; color: #121212; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 1.15em; transition: background-color 0.2s ease, transform 0.1s ease; border: none; cursor: pointer; }
+        #external-link-button:hover { background-color: #a774e6; transform: scale(1.03); }
+        #external-link-url { margin-top: 20px; font-size: 0.9em; color: #888; word-break: break-all; }
+        #content-details { margin-top: 30px; padding-top: 20px; border-top: 1px solid #333; }
+        #content-details h3 { margin-bottom: 15px; color: #e0e0e0; font-weight: normal; font-size: 1.4em; border-bottom: 1px solid #444; padding-bottom: 8px; }
+        #content-details p { margin-bottom: 12px; color: #ccc; line-height: 1.6; font-size: 1.05em; }
+        #content-details .actress-link { color: #bb86fc; text-decoration: none; margin: 0 3px; transition: color 0.2s ease; }
+        #content-details .actress-link:hover { text-decoration: underline; color: #d0a0ff; }
+        #content-details .detail-na { color: #888; font-style: italic; }
+        .error-message { color: #ff5252; text-align: center; padding: 30px; font-size: 1.2em; }
+        #error-container { display: none; }
 
-        .back-button-container { margin-bottom: 25px; } /* Mais espaço abaixo do botão */
+        /* --- ESTILOS PARA O POPUP DE EDIÇÃO --- */
+        .edit-popup-overlay { /* Renamed from create-popup-overlay */
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.85); z-index: 1050; justify-content: center;
+            align-items: center; padding: 20px; box-sizing: border-box; overflow-y: auto;
+        }
+        .edit-popup-content { /* Renamed */
+            background-color: #2a2a2a; padding: 25px 35px; border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6); max-width: 700px; width: 100%;
+            position: relative; max-height: 90vh; display: flex; flex-direction: column;
+        }
+        .edit-popup-close-btn { /* Renamed */
+            position: absolute; top: 10px; right: 15px; font-size: 1.8em; font-weight: bold;
+            color: #aaa; cursor: pointer; border: none; background: none; padding: 5px; line-height: 1;
+        }
+        .edit-popup-close-btn:hover { color: #fff; }
+        .edit-popup-content h2 { text-align: center; margin-top: 0; margin-bottom: 25px; color: #fff; font-weight: normal; }
+        #edit-form-container { flex-grow: 1; overflow-y: auto; padding-right: 10px; } /* Renamed */
+        .edit-form-group { margin-bottom: 20px; } /* Can reuse class */
+        .edit-form-group label { display: block; margin-bottom: 8px; color: #b0b0b0; font-size: 0.9em; font-weight: bold; }
+        .edit-form-group input[type="text"], .edit-form-group input[type="number"],
+        .edit-form-group input[type="url"], .edit-form-group select {
+            width: 100%; padding: 10px 12px; background-color: #404040; border: 1px solid #555;
+            border-radius: 5px; color: #e0e0e0; box-sizing: border-box; font-size: 1em;
+        }
+        .edit-form-group input:focus, .edit-form-group select:focus {
+           outline: none; border-color: #bb86fc; box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.3);
+        }
+        #edit-status-message { /* Renamed */
+            margin-top: 15px; text-align: center; min-height: 1.2em; font-size: 0.9em;
+        }
+        #edit-status-message.success { color: #4CAF50; }
+        #edit-status-message.error { color: #f44336; }
+        #save-edit-button { /* Renamed */
+            display: block; width: 100%; margin-top: 25px; background-color: #bb86fc; color: #121212;
+            padding: 14px 20px; border: none; border-radius: 6px; font-size: 1.1em; font-weight: bold;
+            cursor: pointer; transition: background-color 0.2s ease;
+        }
+        #save-edit-button:hover { background-color: #a774e6; }
+        #save-edit-button:disabled { background-color: #555; color: #999; cursor: not-allowed; }
 
-        #back-button {
-            padding: 8px 18px;
-            border: 1px solid #555;
-            background-color: #333;
-            color: #e0e0e0;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.2s ease, border-color 0.2s ease;
-        }
-        #back-button:hover { background-color: #444; }
+        /* Reuse popup actress search styles, just ensure IDs are unique if needed */
+        /* Styles like .popup-search-wrapper, .suggestions-list-popup, .actress-pill etc. should work */
+        /* We will use specific IDs in the HTML/JS for the edit popup's components */
 
-        #content-title { /* Renomeado de video-title */
-            color: #bb86fc;
-            margin-top: 0;
-            margin-bottom: 30px; /* Aumenta espaço abaixo do título */
-            text-align: center;
-            font-size: 2em; /* Título um pouco maior */
-            font-weight: normal;
-        }
-
-        /* Container para Link Externo */
-        #external-link-container {
-            text-align: center;
-            margin: 30px 0 40px; /* Mais espaço vertical */
-            padding: 25px; /* Mais padding interno */
-            border: 1px dashed #444;
-            border-radius: 6px;
-            background-color: #242424; /* Fundo ligeiramente diferente */
-        }
-        #external-link-message {
-            color: #ccc;
-            margin-bottom: 20px; /* Mais espaço */
-            font-size: 1.1em;
-            line-height: 1.5;
-        }
-        #external-link-button {
-            display: inline-block;
-            padding: 14px 35px; /* Botão maior */
-            background-color: #bb86fc;
-            color: #121212;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            font-size: 1.15em; /* Fonte maior */
-            transition: background-color 0.2s ease, transform 0.1s ease;
-            border: none;
-            cursor: pointer;
-        }
-         #external-link-button:hover {
-             background-color: #a774e6;
-             transform: scale(1.03);
-         }
-        #external-link-url {
-             margin-top: 20px; /* Mais espaço */
-             font-size: 0.9em;
-             color: #888;
-             word-break: break-all; /* Quebra URL longa */
-         }
-
-
-        /* Secção de Detalhes (Número, Atrizes, etc.) */
-        #content-details { /* Renomeado de video-details */
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #333;
-        }
-        #content-details h3 {
-             margin-bottom: 15px;
-             color: #e0e0e0;
-             font-weight: normal;
-             font-size: 1.4em;
-             border-bottom: 1px solid #444;
-             padding-bottom: 8px; /* Ajuste no padding */
-        }
-        #content-details p {
-            margin-bottom: 12px; /* Mais espaço entre parágrafos */
-            color: #ccc;
-            line-height: 1.6;
-            font-size: 1.05em;
-        }
-        /* Estilo para links de atrizes nos detalhes */
-         #content-details .actress-link {
-             color: #bb86fc;
-             text-decoration: none;
-             margin: 0 3px;
-             transition: color 0.2s ease;
-         }
-         #content-details .actress-link:hover {
-             text-decoration: underline;
-             color: #d0a0ff; /* Cor mais clara no hover */
-         }
-         /* Estilo para indicar N/A ou erro */
-         #content-details .detail-na {
-            color: #888;
-            font-style: italic;
-         }
-
-        /* Container e texto de erro geral */
-        .error-message {
-            color: #ff5252;
-            text-align: center;
-            padding: 30px;
-            font-size: 1.2em;
-        }
-        #error-container {
-             display: none; /* Começa escondido */
-        }
+        /* Hide forms for specific types initially if implementing multi-type edit */
+        #edit-scene-fields, #edit-movie-fields { display: none; }
 
     </style>
 </head>
@@ -166,56 +97,101 @@
         <ul>
             <li><a href="index.html">Home</a></li>
             <li><a href="criar.html">Criar</a></li>
-            <li><a href="videos.html">Videos</a></li> <!-- Pode linkar para a página anterior ou um geral -->
+            <li><a href="videos.html">Videos</a></li>
         </ul>
     </nav>
-    <!-- FIM MENU -->
 
     <header>
-        <h1 id="page-title">Detalhes</h1> <!-- Título será atualizado -->
+        <h1 id="page-title">Detalhes</h1>
     </header>
 
     <!-- Container Principal -->
     <div class="detail-container">
 
-        <!-- Botão Voltar -->
-        <div class="back-button-container">
-            <button id="back-button">← Voltar</button>
+        <!-- Top Controls: Back and Edit Buttons -->
+        <div class="top-controls">
+             <button id="back-button">← Voltar</button>
+             <button id="edit-content-btn">Editar <i class="fa-solid fa-pencil"></i></button> <!-- Added Edit Button -->
         </div>
 
-        <!-- Título do Conteúdo -->
         <h2 id="content-title">Carregando...</h2>
 
-        <!-- Container para Link Externo (Substitui o Iframe) -->
-        <div id="external-link-container" style="display: none;"> <!-- Começa escondido -->
+        <div id="external-link-container" style="display: none;">
             <p id="external-link-message"></p>
             <a id="external-link-button" href="#" target="_blank" rel="noopener noreferrer" style="display: none;">Abrir Conteúdo Externo</a>
             <p id="external-link-url"></p>
         </div>
 
-        <!-- Detalhes Adicionais -->
-        <div id="content-details" style="display: none;"> <!-- Começa escondido -->
+        <div id="content-details" style="display: none;">
             <h3>Detalhes</h3>
             <p id="content-number">Número: <span class="detail-na">Carregando...</span></p>
             <p id="content-actresses">Atrizes: <span class="detail-na">Carregando...</span></p>
-            <!-- Adicionar mais campos se necessário -->
         </div>
 
-        <!-- Mensagem de Erro Geral -->
-         <div id="error-container">
-             <p class="error-message" id="error-text"></p>
-         </div>
+        <div id="error-container">
+            <p class="error-message" id="error-text"></p>
+        </div>
 
     </div>
-    <!-- FIM Container Principal -->
+
+    <!-- POPUP DE EDIÇÃO (Escondido Inicialmente) -->
+    <div class="edit-popup-overlay" id="edit-popup-overlay">
+        <div class="edit-popup-content">
+            <button class="edit-popup-close-btn" id="close-edit-popup-btn">×</button>
+            <h2>Editar Conteúdo</h2>
+            <div id="edit-form-container">
+                <!-- Hidden input to store the document ID -->
+                <input type="hidden" id="edit-content-id">
+                <!-- Hidden field to store content type if needed later -->
+                <input type="hidden" id="edit-content-type">
+
+                <!-- Common Fields -->
+                <div class="edit-form-group"> <label for="edit-nome">Nome:</label> <input type="text" id="edit-nome" required> </div>
+                <div class="edit-form-group"> <label for="edit-ano">Ano:</label> <input type="number" id="edit-ano" placeholder="Ex: 2023"> </div>
+                <div class="edit-form-group"> <label for="edit-imagem">Imagem (URL):</label> <input type="url" id="edit-imagem" placeholder="https://..."> </div>
+                <div class="edit-form-group"> <label for="edit-pagina">Página Externa (URL):</label> <input type="url" id="edit-pagina" placeholder="https://..."> </div>
+
+                 <!-- Actress Search/Edit Component -->
+                <div class="edit-form-group">
+                    <label for="popup-edit-search-input">Atrizes:</label>
+                    <div class="actress-search-area" id="popup-edit-actress-search">
+                        <div class="search-input-wrapper popup-search-wrapper" onclick="document.getElementById('popup-edit-search-input').focus()">
+                            <div id="popup-edit-selected-actresses" class="selected-actresses-container-popup"></div>
+                            <input type="text" id="popup-edit-search-input" class="search-input popup-search-input" placeholder="Pesquisar e adicionar atriz...">
+                        </div>
+                        <div id="popup-edit-suggestions" class="suggestions-list-popup"></div>
+                    </div>
+                </div>
+
+                <!-- Video Specific Fields (if any beyond common ones, e.g., 'no') -->
+                 <div id="edit-video-fields">
+                     <div class="edit-form-group"> <label for="edit-numero">Número:</label> <input type="number" id="edit-numero" placeholder="Ex: 123"> </div>
+                 </div>
+
+                <!-- Scene Specific Fields (Initially Hidden) -->
+                <div id="edit-scene-fields" style="display: none;">
+                     <div class="edit-form-group"> <label for="edit-scene-filme">Filme Associado:</label> <select id="edit-scene-filme"> <option value="">Carregando filmes...</option> </select> </div>
+                     <div class="edit-form-group"> <label for="edit-scene-numero">Número da Cena:</label> <input type="number" id="edit-scene-numero" placeholder="Ex: 1"> </div>
+                 </div>
+
+                <!-- Movie Specific Fields (Initially Hidden - if any beyond common) -->
+                 <!-- <div id="edit-movie-fields" style="display: none;"> ... </div> -->
+
+            </div>
+            <div id="edit-status-message"></div>
+            <button id="save-edit-button">Salvar Alterações</button>
+        </div>
+    </div>
+    <!-- FIM POPUP DE EDIÇÃO -->
 
 
     <!-- Firebase Modular SDKs via CDN -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getFirestore, doc, getDoc, collection } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        // *** ADDED updateDoc ***
+        import { getFirestore, doc, getDoc, collection, updateDoc, getDocs, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-        // Firebase Config
+        // Firebase Config (Keep Existing)
         const firebaseConfig = {
             apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0",
             authDomain: "babes-392fd.firebaseapp.com",
@@ -229,187 +205,526 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // --- Definições de Funções ---
+        // --- Global Variables ---
+        let currentContentId = null; // Store ID of the content being viewed/edited
+        let currentContentType = null; // Store type ('videos', 'cenas', 'filmes') - MUST BE SET
+        let allActresses = []; // Cache loaded actresses for popup search
+        let popupEditSelectedActresses = []; // State for actresses in the EDIT popup
+        let allMoviesForSelect = []; // Cache movies for scene editing select
 
-        // Função para mostrar erros
-        function displayError(message) {
-            const contentTitleElement = document.getElementById('content-title');
-            const externalLinkContainer = document.getElementById('external-link-container');
-            const contentDetailsSection = document.getElementById('content-details');
-            const errorContainer = document.getElementById('error-container');
-            const errorText = document.getElementById('error-text');
+        // --- DOM References (Main Page) ---
+        const pageTitleElement = document.getElementById('page-title');
+        const contentTitleElement = document.getElementById('content-title');
+        const externalLinkContainer = document.getElementById('external-link-container');
+        const externalLinkButton = document.getElementById('external-link-button');
+        const externalLinkMessage = document.getElementById('external-link-message');
+        const externalLinkUrlText = document.getElementById('external-link-url');
+        const contentDetailsSection = document.getElementById('content-details');
+        const contentNumberElement = document.getElementById('content-number');
+        const contentActressesElement = document.getElementById('content-actresses');
+        const errorContainer = document.getElementById('error-container');
+        const errorText = document.getElementById('error-text');
+        const backButton = document.getElementById('back-button');
+        const editContentBtn = document.getElementById('edit-content-btn'); // Edit button ref
 
+        // --- DOM References (Edit Popup) ---
+        const editPopupOverlay = document.getElementById('edit-popup-overlay');
+        const closeEditPopupBtn = document.getElementById('close-edit-popup-btn');
+        const editFormContainer = document.getElementById('edit-form-container');
+        const saveEditButton = document.getElementById('save-edit-button');
+        const editStatusMessage = document.getElementById('edit-status-message');
+        const editContentIdInput = document.getElementById('edit-content-id');
+        const editContentTypeInput = document.getElementById('edit-content-type');
+        const editNomeInput = document.getElementById('edit-nome');
+        const editAnoInput = document.getElementById('edit-ano');
+        const editImagemInput = document.getElementById('edit-imagem');
+        const editPaginaInput = document.getElementById('edit-pagina');
+        const popupEditSearchInput = document.getElementById('popup-edit-search-input');
+        const popupEditSuggestions = document.getElementById('popup-edit-suggestions');
+        const popupEditSelectedContainer = document.getElementById('popup-edit-selected-actresses');
+        // Video specific popup fields
+        const editVideoFields = document.getElementById('edit-video-fields');
+        const editNumeroInput = document.getElementById('edit-numero'); // Video number
+        // Scene specific popup fields
+        const editSceneFields = document.getElementById('edit-scene-fields');
+        const editSceneFilmeSelect = document.getElementById('edit-scene-filme');
+        const editSceneNumeroInput = document.getElementById('edit-scene-numero');
+
+
+        // --- Helper Functions ---
+        function displayError(message) { /* ... (keep existing implementation) ... */
             console.error(message);
             if(contentTitleElement) contentTitleElement.style.display = 'none';
-            if(externalLinkContainer) externalLinkContainer.style.display = 'none'; // Esconde link
-            if(contentDetailsSection) contentDetailsSection.style.display = 'none'; // Esconde detalhes
+            if(externalLinkContainer) externalLinkContainer.style.display = 'none';
+            if(contentDetailsSection) contentDetailsSection.style.display = 'none';
             if(errorText) errorText.textContent = message;
-            if(errorContainer) errorContainer.style.display = 'block'; // Mostra erro
-        }
+            if(errorContainer) errorContainer.style.display = 'block';
+         }
 
-        // Função para buscar nomes das atrizes e criar links
-        async function getActressNames(actressIds) {
-            if (!actressIds || !Array.isArray(actressIds) || actressIds.length === 0) {
-                 return '<span class="detail-na">Nenhuma atriz associada</span>';
-             }
+        async function fetchAllActresses() {
+            if (allActresses.length > 0) return allActresses; // Return cached if available
             try {
-                const actressPromises = actressIds.map(id => {
-                    if (typeof id === 'string' && id.trim() !== '') {
-                         return getDoc(doc(db, "atores", id.trim()));
-                     }
-                     return Promise.resolve(null); // Retorna promise resolvida para IDs inválidos/vazios
+                const atoresCol = collection(db, "atores");
+                const atoresSnapshot = await getDocs(query(atoresCol, orderBy("nome", "asc")));
+                allActresses = [];
+                atoresSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.nome) {
+                        allActresses.push({ id: doc.id, nome: data.nome, foto: data.foto });
+                    }
                 });
-                const actressSnaps = await Promise.all(actressPromises);
-
-                const actressLinks = actressSnaps
-                    .map((snap, index) => {
-                        if (snap && snap.exists()) {
-                            const actressData = snap.data();
-                            const actressName = actressData.nome || 'Nome Desconhecido';
-                            // Cria link para página da atriz (ajuste she.html se for diferente)
-                            return `<a href="she.html?id=${snap.id}" class="actress-link">${actressName}</a>`;
-                        } else if (actressIds[index]) { // Só mostra erro se o ID original existia
-                            return `<span class="detail-na">(Atriz ID ${actressIds[index]} não encontrada)</span>`;
-                        }
-                        return null; // Ignora IDs nulos ou vazios completamente
-                    })
-                    .filter(link => link !== null); // Remove entradas nulas
-
-                return actressLinks.length > 0 ? actressLinks.join(', ') : '<span class="detail-na">Nenhuma atriz encontrada</span>';
+                console.log(`Fetched ${allActresses.length} actresses.`);
+                return allActresses;
             } catch (error) {
-                console.error("Erro ao buscar nomes das atrizes:", error);
-                return '<span class="detail-na">Erro ao carregar atrizes</span>';
+                console.error("Error fetching all actresses:", error);
+                return []; // Return empty on error
             }
         }
 
-        // Função Principal para Carregar Dados
-        async function loadContentDetails() {
-            // Obter referências aos elementos DO DOM
-            const pageTitleElement = document.getElementById('page-title');
-            const contentTitleElement = document.getElementById('content-title');
-            const externalLinkContainer = document.getElementById('external-link-container');
-            const externalLinkButton = document.getElementById('external-link-button');
-            const externalLinkMessage = document.getElementById('external-link-message');
-            const externalLinkUrlText = document.getElementById('external-link-url');
-            const contentDetailsSection = document.getElementById('content-details');
-            const contentNumberElement = document.getElementById('content-number');
-            const contentActressesElement = document.getElementById('content-actresses');
-            const errorContainer = document.getElementById('error-container');
-            const errorText = document.getElementById('error-text'); // Necessário para displayError
-
-            // Validações iniciais de elementos essenciais
-            const essentialElements = [pageTitleElement, contentTitleElement, externalLinkContainer, externalLinkButton, externalLinkMessage, externalLinkUrlText, contentDetailsSection, contentNumberElement, contentActressesElement, errorContainer, errorText];
-            if (essentialElements.some(el => !el)) {
-                 const missing = essentialElements.map((el, i) => el ? null : ['pageTitle', 'contentTitle', 'extLinkCont', 'extLinkBtn', 'extLinkMsg', 'extLinkUrl', 'detailsSect', 'numEl', 'actressEl', 'errCont', 'errTxt'][i]).filter(Boolean);
-                 console.error("Elementos essenciais do DOM não encontrados:", missing.join(', '));
-                 displayError("Erro interno: Falha ao carregar elementos da página.");
-                 return;
+        async function fetchAllMovies() {
+            if (allMoviesForSelect.length > 0) return allMoviesForSelect; // Return cached
+            try {
+                const moviesCol = collection(db, "filmes");
+                const moviesSnapshot = await getDocs(query(moviesCol, orderBy("nome", "asc")));
+                allMoviesForSelect = [];
+                 moviesSnapshot.forEach(doc => {
+                    const data = doc.data();
+                     if (data.nome) {
+                         allMoviesForSelect.push({ id: doc.id, nome: data.nome });
+                     }
+                 });
+                 console.log(`Fetched ${allMoviesForSelect.length} movies for select.`);
+                 return allMoviesForSelect;
+            } catch (error) {
+                 console.error("Error fetching all movies:", error);
+                 return [];
             }
+         }
 
-            // Get Content ID from URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const contentId = urlParams.get('id');
 
-            // Estado inicial (esconde tudo exceto título principal e botão voltar)
+        async function getActressObjectsByIds(actressIds) {
+             if (!actressIds || !Array.isArray(actressIds) || actressIds.length === 0) { return []; }
+             const validIds = actressIds.filter(id => typeof id === 'string' && id.trim() !== '');
+             if (validIds.length === 0) return [];
+
+             // Ensure all actresses are loaded for potential matches
+             await fetchAllActresses();
+
+             // Try to find them in the cached 'allActresses' list first for efficiency
+             const foundActresses = validIds.map(id => allActresses.find(a => a.id === id)).filter(Boolean);
+
+             // If any were not found in cache (shouldn't happen often if fetchAllActresses worked), fetch individually
+             const notFoundIds = validIds.filter(id => !foundActresses.some(a => a.id === id));
+
+             if (notFoundIds.length > 0) {
+                 console.warn("Fetching missing actress IDs individually:", notFoundIds);
+                 try {
+                     const fetchPromises = notFoundIds.map(id => getDoc(doc(db, "atores", id)));
+                     const fetchedSnaps = await Promise.all(fetchPromises);
+                     fetchedSnaps.forEach(snap => {
+                         if (snap.exists()) {
+                             const data = snap.data();
+                             if (data.nome) {
+                                 foundActresses.push({ id: snap.id, nome: data.nome, foto: data.foto });
+                             }
+                         }
+                     });
+                 } catch (error) {
+                      console.error("Error fetching individual actress details:", error);
+                 }
+             }
+
+             return foundActresses; // Return array of {id, nome, foto} objects
+         }
+
+
+        // --- Popup Actress Search/Select Functions (Adapted for Edit Popup) ---
+        // These functions now operate on the EDIT popup elements and state
+
+        function renderEditPopupActressPills() {
+            if (!popupEditSelectedContainer) return;
+            popupEditSelectedContainer.innerHTML = '';
+            popupEditSelectedActresses.forEach(actress => {
+                const pill = document.createElement('div');
+                pill.classList.add('actress-pill');
+                pill.dataset.id = actress.id;
+                pill.innerHTML = `<span>${actress.nome}</span><button class="remove-actress-btn" title="Remover">×</button>`;
+                pill.querySelector('.remove-actress-btn').addEventListener('click', handleEditPopupRemoveActress);
+                popupEditSelectedContainer.appendChild(pill);
+            });
+        }
+
+        function handleEditPopupRemoveActress(event) {
+            event.stopPropagation();
+            const pill = event.target.closest('.actress-pill');
+            if (!pill) return;
+            const actressIdToRemove = pill.dataset.id;
+            popupEditSelectedActresses = popupEditSelectedActresses.filter(a => a.id !== actressIdToRemove);
+            renderEditPopupActressPills(); // Re-render pills in the edit popup
+        }
+
+        function displayEditPopupSuggestions(searchTerm) {
+            if (!popupEditSuggestions || !popupEditSearchInput) return;
+            popupEditSuggestions.innerHTML = '';
+            if (!searchTerm) {
+                popupEditSuggestions.style.display = 'none';
+                return;
+            }
+            const lowerSearchTerm = searchTerm.toLowerCase();
+            const matchedActresses = allActresses.filter(actress =>
+                actress.nome.toLowerCase().includes(lowerSearchTerm) &&
+                !popupEditSelectedActresses.some(sa => sa.id === actress.id) // Exclude already selected IN EDIT POPUP
+            );
+             // Sort matched actresses alphabetically
+            matchedActresses.sort((a, b) => a.nome.localeCompare(b.nome));
+
+            if (matchedActresses.length > 0) {
+                matchedActresses.slice(0, 7).forEach(actress => {
+                    const item = document.createElement('div');
+                    item.classList.add('suggestion-item');
+                    item.dataset.id = actress.id; item.dataset.nome = actress.nome;
+                    item.innerHTML = `<img src="${actress.foto || 'path/to/default/avatar.png'}" alt=""><span>${actress.nome}</span>`;
+                    item.addEventListener('click', handleEditPopupSelectActress); // Use edit select handler
+                    popupEditSuggestions.appendChild(item);
+                });
+                popupEditSuggestions.style.display = 'block';
+            } else {
+                popupEditSuggestions.innerHTML = '<div class="suggestion-item no-results">Nenhuma atriz encontrada</div>';
+                popupEditSuggestions.style.display = 'block';
+            }
+        }
+
+        function handleEditPopupSelectActress(event) {
+            const target = event.currentTarget;
+            const actressId = target.dataset.id;
+            const actressName = target.dataset.nome;
+            if (!actressId || !actressName) { console.error("Data missing on suggestion!"); return; }
+
+            // Add to the edit popup's selected array if not already present
+            if (!popupEditSelectedActresses.some(a => a.id === actressId)) {
+                 // Need the photo URL if available from allActresses
+                const selectedActressData = allActresses.find(a => a.id === actressId);
+                popupEditSelectedActresses.push({ id: actressId, nome: actressName, foto: selectedActressData?.foto });
+                renderEditPopupActressPills(); // Re-render pills in the edit popup
+            }
+            if (popupEditSearchInput) popupEditSearchInput.value = '';
+            if (popupEditSuggestions) popupEditSuggestions.style.display = 'none';
+            if (popupEditSearchInput) popupEditSearchInput.focus();
+        }
+
+        // --- Main Detail Loading Function ---
+        async function loadContentDetails() { /* ... (Keep previous implementation, but ensure it sets currentContentId and currentContentType) ... */
+            // Reset state
             contentTitleElement.textContent = 'Carregando...';
             externalLinkContainer.style.display = 'none';
             contentDetailsSection.style.display = 'none';
             errorContainer.style.display = 'none';
+            editContentBtn.style.display = 'none'; // Hide edit button initially
 
-            if (!contentId) {
+            const urlParams = new URLSearchParams(window.location.search);
+            currentContentId = urlParams.get('id');
+            currentContentType = urlParams.get('type') || 'videos'; // Default to 'videos' if type is missing
+
+            if (!currentContentId) {
                 displayError("Erro: ID do conteúdo não encontrado na URL.");
                 return;
             }
+             if (!['videos', 'cenas', 'filmes'].includes(currentContentType)) {
+                 displayError(`Erro: Tipo de conteúdo inválido ('${currentContentType}') na URL.`);
+                 return;
+             }
 
             try {
-                // Assume it's a video for now, adjust collection name if needed
-                // TODO: Determine content type if necessary (e.g., from URL param or another way)
-                const contentRef = doc(db, "videos", contentId); // <<< AJUSTAR "videos" SE NECESSÁRIO
+                const contentRef = doc(db, currentContentType, currentContentId); // Use dynamic collection name
                 const contentSnap = await getDoc(contentRef);
 
                 if (!contentSnap.exists()) {
-                    displayError(`Erro: Conteúdo com ID "${contentId}" não encontrado.`);
+                    displayError(`Erro: Conteúdo (tipo: ${currentContentType}) com ID "${currentContentId}" não encontrado.`);
                     return;
                 }
-
-                // Get Content Data
                 const contentData = contentSnap.data();
-
-                // Populate DOM Elements
                 const contentName = contentData.nome || 'Conteúdo sem Título';
-                pageTitleElement.textContent = `Detalhes: ${contentName}`; // Título da aba
-                contentTitleElement.textContent = contentName; // Título H2 na página
-                contentTitleElement.style.display = 'block'; // Mostra título
+                pageTitleElement.textContent = `Detalhes: ${contentName}`;
+                contentTitleElement.textContent = contentName;
+                contentTitleElement.style.display = 'block';
 
-                // Configurar Link Externo
-                const paginaUrl = contentData.pagina; // Get URL from 'pagina' field
+                // External Link Logic (same as before)
+                const paginaUrl = contentData.pagina;
+                 if (paginaUrl && typeof paginaUrl === 'string' && paginaUrl.trim() !== '') {
+                     try {
+                         new URL(paginaUrl);
+                         externalLinkButton.href = paginaUrl;
+                         externalLinkUrlText.textContent = `URL: ${paginaUrl}`;
+                         externalLinkMessage.textContent = 'Este conteúdo está disponível na seguinte página externa:';
+                         externalLinkButton.style.display = 'inline-block';
+                         externalLinkContainer.style.display = 'block';
+                     } catch (e) { /* ... error handling for invalid URL ... */
+                         externalLinkMessage.textContent = 'A URL configurada para o conteúdo externo parece inválida ou está ausente.';
+                         externalLinkButton.style.display = 'none';
+                         externalLinkUrlText.textContent = `(URL inválida: ${paginaUrl})`;
+                         externalLinkContainer.style.display = 'block';
+                     }
+                 } else { /* ... handling for missing URL ... */
+                     externalLinkMessage.textContent = 'Nenhuma página externa associada a este conteúdo.';
+                     externalLinkButton.style.display = 'none';
+                     externalLinkUrlText.textContent = '';
+                     externalLinkContainer.style.display = 'block';
+                 }
 
-                if (paginaUrl && typeof paginaUrl === 'string' && paginaUrl.trim() !== '') {
-                    try {
-                        new URL(paginaUrl); // Valida URL
-                        externalLinkButton.href = paginaUrl;
-                        externalLinkUrlText.textContent = `URL: ${paginaUrl}`;
-                        externalLinkMessage.textContent = 'Este conteúdo está disponível na seguinte página externa:';
-                        externalLinkButton.style.display = 'inline-block'; // Mostra o botão
-                        externalLinkContainer.style.display = 'block'; // Mostra o container do link
-                    } catch (e) {
-                        console.warn("URL inválida no campo 'pagina':", paginaUrl, e);
-                        externalLinkMessage.textContent = 'A URL configurada para o conteúdo externo parece inválida ou está ausente.';
-                        externalLinkButton.style.display = 'none'; // Esconde botão
-                        externalLinkUrlText.textContent = `(URL inválida: ${paginaUrl})`;
-                        externalLinkContainer.style.display = 'block'; // Mostra container com a mensagem de erro
-                    }
-                } else {
-                    // Campo 'pagina' não encontrado ou vazio
-                    externalLinkMessage.textContent = 'Nenhuma página externa associada a este conteúdo.';
-                    externalLinkButton.style.display = 'none'; // Esconde botão
-                    externalLinkUrlText.textContent = '';
-                    externalLinkContainer.style.display = 'block'; // Mostra container com a mensagem
-                }
-
-                // Mostra secção de detalhes e preenche
+                // Details Section
                 contentDetailsSection.style.display = 'block';
+                // Display Number only if it exists (common in videos/scenes)
+                if (contentData.no !== undefined || contentData.numeroCena !== undefined) {
+                     const numberToShow = contentData.no ?? contentData.numeroCena ?? '<span class="detail-na">N/A</span>';
+                     contentNumberElement.innerHTML = `Número: ${numberToShow}`;
+                     contentNumberElement.style.display = 'block';
+                } else {
+                     contentNumberElement.style.display = 'none'; // Hide if no number field
+                }
+                // Display Actresses (if field exists)
+                if (contentData.atores !== undefined) {
+                    contentActressesElement.innerHTML = 'Atrizes: <span class="detail-na">Carregando...</span>';
+                    contentActressesElement.style.display = 'block'; // Show the paragraph
+                    // Use the improved getActressNames function directly
+                     const actressNamesHTML = await getActressNames(contentData.atores);
+                     contentActressesElement.innerHTML = `Atrizes: ${actressNamesHTML}`;
+                 } else {
+                     contentActressesElement.style.display = 'none'; // Hide if no 'atores' field (e.g., potentially for 'filmes')
+                 }
 
-                // Número (assumindo que existe campo 'no' para videos)
-                contentNumberElement.innerHTML = `Número: ${contentData.no !== undefined ? contentData.no : '<span class="detail-na">N/A</span>'}`;
 
-                // Popula Atrizes
-                contentActressesElement.innerHTML = 'Atrizes: <span class="detail-na">Carregando...</span>'; // Estado inicial
-                const actressNamesHTML = await getActressNames(contentData.atores); // Usa a função para buscar e formatar
-                contentActressesElement.innerHTML = `Atrizes: ${actressNamesHTML}`; // Atualiza com os nomes/links
+                editContentBtn.style.display = 'inline-block'; // Show edit button only after successful load
 
             } catch (error) {
-                // Erro geral ao buscar/processar dados
                 displayError("Ocorreu um erro ao carregar os detalhes do conteúdo.");
                 console.error("Erro detalhado:", error);
             }
         }
 
+         // --- Edit Popup Functions ---
+         async function openEditPopup() {
+             if (!currentContentId || !currentContentType) {
+                 alert("Não é possível editar: ID ou tipo do conteúdo não definido.");
+                 return;
+             }
 
-        // --- Espera o DOM estar pronto ---
+             // 0. Clear previous state & show loading indicator in popup
+             editStatusMessage.textContent = 'Carregando dados para edição...';
+             editStatusMessage.className = '';
+             saveEditButton.disabled = true;
+             popupEditSelectedActresses = []; // Clear selected actresses state
+             renderEditPopupActressPills(); // Clear pills visually
+             if (popupEditSearchInput) popupEditSearchInput.value = ''; // Clear search input
+             if (popupEditSuggestions) popupEditSuggestions.style.display = 'none'; // Hide suggestions
+
+             // 1. Fetch fresh data for the current item
+             try {
+                 const contentRef = doc(db, currentContentType, currentContentId);
+                 const contentSnap = await getDoc(contentRef);
+
+                 if (!contentSnap.exists()) {
+                     alert("Erro: Não foi possível recarregar os dados para edição.");
+                     return;
+                 }
+                 const contentData = contentSnap.data();
+
+                 // 2. Populate common form fields
+                 editContentIdInput.value = currentContentId;
+                 editContentTypeInput.value = currentContentType; // Store type
+                 editNomeInput.value = contentData.nome || '';
+                 editAnoInput.value = contentData.ano || '';
+                 editImagemInput.value = contentData.imagem || '';
+                 editPaginaInput.value = contentData.pagina || '';
+
+                 // 3. Populate Actresses
+                 popupEditSelectedActresses = await getActressObjectsByIds(contentData.atores || []); // Fetch full objects
+                 renderEditPopupActressPills(); // Render the pills
+
+                 // 4. Populate type-specific fields & show/hide sections
+                 editVideoFields.style.display = 'none';
+                 editSceneFields.style.display = 'none';
+
+                 if (currentContentType === 'videos') {
+                      editNumeroInput.value = contentData.no || '';
+                      editVideoFields.style.display = 'block';
+                 } else if (currentContentType === 'cenas') {
+                     editSceneNumeroInput.value = contentData.numeroCena || '';
+                     // Populate movie select (ensure movies are loaded)
+                     await populateMovieSelect(editSceneFilmeSelect, contentData.filmeId);
+                     editSceneFields.style.display = 'block';
+                 }
+                 // Add else if for 'filmes' if it has specific fields
+
+                 // 5. Show popup and enable save button
+                 editStatusMessage.textContent = ''; // Clear loading message
+                 saveEditButton.disabled = false;
+                 editPopupOverlay.style.display = 'flex';
+
+             } catch (error) {
+                 console.error("Erro ao carregar dados para edição:", error);
+                 editStatusMessage.textContent = 'Erro ao carregar dados.';
+                 editStatusMessage.className = 'error';
+             }
+         }
+
+         async function populateMovieSelect(selectElement, selectedMovieId) {
+             await fetchAllMovies(); // Ensure movie list is available
+             let optionsHTML = '<option value="">-- Selecione um Filme --</option>';
+             if (allMoviesForSelect.length === 0) {
+                  optionsHTML += '<option value="" disabled>Nenhum filme encontrado</option>';
+             } else {
+                 allMoviesForSelect.forEach(movie => {
+                     const isSelected = movie.id === selectedMovieId ? ' selected' : '';
+                     optionsHTML += `<option value="${movie.id}"${isSelected}>${movie.nome}</option>`;
+                 });
+             }
+             selectElement.innerHTML = optionsHTML;
+         }
+
+
+         async function handleSaveChanges(event) {
+             event.preventDefault();
+             saveEditButton.disabled = true;
+             editStatusMessage.textContent = 'Salvando alterações...';
+             editStatusMessage.className = '';
+
+             const docId = editContentIdInput.value;
+             const docType = editContentTypeInput.value; // Get the type
+
+             if (!docId || !docType) {
+                 editStatusMessage.textContent = 'Erro: ID ou Tipo do conteúdo ausente.';
+                 editStatusMessage.className = 'error';
+                 saveEditButton.disabled = false;
+                 return;
+             }
+
+             // Build the data object to update
+             const dataToUpdate = {
+                 nome: editNomeInput.value.trim() || null, // Use null if empty for potential deletion via update
+                 ano: parseInt(editAnoInput.value) || null,
+                 imagem: editImagemInput.value.trim() || null,
+                 pagina: editPaginaInput.value.trim() || null,
+                 atores: popupEditSelectedActresses.map(a => a.id), // Get IDs from state
+                 // Add timestamp? Firestore automatically updates metadata, but you might want your own field
+                 // updatedAt: serverTimestamp() // Example if you add an 'updatedAt' field
+             };
+
+             // Add type-specific fields
+             if (docType === 'videos') {
+                  dataToUpdate.no = parseInt(editNumeroInput.value) || null;
+             } else if (docType === 'cenas') {
+                 dataToUpdate.numeroCena = parseInt(editSceneNumeroInput.value) || null;
+                 dataToUpdate.filmeId = editSceneFilmeSelect.value || null;
+                  if (!dataToUpdate.filmeId) { // Basic validation for required scene fields
+                       editStatusMessage.textContent = 'Erro: O campo "Filme Associado" é obrigatório para cenas.';
+                       editStatusMessage.className = 'error';
+                       saveEditButton.disabled = false;
+                       return;
+                   }
+                    if (dataToUpdate.numeroCena === null) {
+                       editStatusMessage.textContent = 'Erro: O campo "Número da Cena" é obrigatório para cenas.';
+                       editStatusMessage.className = 'error';
+                       saveEditButton.disabled = false;
+                       return;
+                   }
+             }
+             // Add else if for 'filmes'
+
+             // Clean up null values BEFORE sending to Firestore if you want to remove fields
+              Object.keys(dataToUpdate).forEach(key => {
+                  if (dataToUpdate[key] === null || dataToUpdate[key] === '') {
+                      // If you want empty strings to REMOVE the field, use delete.
+                      // If you want empty strings to be SAVED as empty, keep them.
+                      // For numbers, null already indicates potential removal if field exists.
+                      if (typeof dataToUpdate[key] === 'string' && dataToUpdate[key] === '') {
+                           delete dataToUpdate[key]; // Example: remove field if string is empty
+                      } else if (dataToUpdate[key] === null) {
+                           delete dataToUpdate[key]; // Example: remove field if value is null
+                      }
+                  }
+                   // Remove NaN values resulting from parseInt
+                  if ((key === 'ano' || key === 'no' || key === 'numeroCena') && isNaN(dataToUpdate[key])) {
+                       delete dataToUpdate[key];
+                  }
+              });
+
+
+             try {
+                 const contentRef = doc(db, docType, docId); // Use correct type
+                 await updateDoc(contentRef, dataToUpdate); // Use updateDoc
+
+                 editStatusMessage.textContent = 'Alterações salvas com sucesso!';
+                 editStatusMessage.className = 'success';
+
+                 // Refresh the main page content AFTER successful save
+                 await loadContentDetails();
+
+                 // Close popup after a delay
+                 setTimeout(() => {
+                     editPopupOverlay.style.display = 'none';
+                 }, 1500);
+
+             } catch (error) {
+                 console.error("Erro ao salvar alterações:", error);
+                 editStatusMessage.textContent = `Erro ao salvar: ${error.message}`;
+                 editStatusMessage.className = 'error';
+                 saveEditButton.disabled = false; // Re-enable on error
+             }
+         }
+
+        // --- Event Listeners ---
         document.addEventListener('DOMContentLoaded', () => {
 
-            const backButton = document.getElementById('back-button');
+            // Pre-fetch actresses and movies for popups
+            fetchAllActresses();
+             fetchAllMovies(); // Fetch movies for scene editing
 
+            // Back Button
             if (backButton) {
-                 backButton.addEventListener('click', () => {
-                    // Tenta voltar para a página anterior no histórico
-                    if (document.referrer) {
-                        history.back();
-                    } else {
-                        // Se não houver histórico, vai para uma página padrão (ex: videos.html)
-                        window.location.href = 'videos.html';
-                    }
+                backButton.addEventListener('click', () => { /* ... (keep existing back logic) ... */
+                    if (document.referrer) { history.back(); }
+                    else { window.location.href = 'videos.html'; } // Fallback page
                 });
-            } else {
-                console.error("Botão 'Voltar' não encontrado no DOM!");
+            } else { console.error("Botão 'Voltar' não encontrado!"); }
+
+            // Edit Button Click
+            if (editContentBtn) {
+                editContentBtn.addEventListener('click', openEditPopup);
+            } else { console.error("Botão 'Editar' não encontrado!"); }
+
+            // Edit Popup Close Button
+            if (closeEditPopupBtn) {
+                closeEditPopupBtn.addEventListener('click', () => { editPopupOverlay.style.display = 'none'; });
             }
 
-            // Chama a função principal para carregar os detalhes
-            loadContentDetails();
+            // Edit Popup Overlay Click (to close)
+            if (editPopupOverlay) {
+                editPopupOverlay.addEventListener('click', (event) => { if (event.target === editPopupOverlay) { editPopupOverlay.style.display = 'none'; } });
+            }
+
+            // Edit Popup Save Button
+            if (saveEditButton) {
+                saveEditButton.addEventListener('click', handleSaveChanges);
+            }
+
+            // Edit Popup Actress Search Input Listeners
+            if (popupEditSearchInput) {
+                popupEditSearchInput.addEventListener('input', () => displayEditPopupSuggestions(popupEditSearchInput.value));
+                popupEditSearchInput.addEventListener('focus', () => displayEditPopupSuggestions(popupEditSearchInput.value));
+            }
+            // Global click listener to hide EDIT suggestions
+            document.addEventListener('click', (event) => {
+                const editSearchArea = document.getElementById('popup-edit-actress-search');
+                if (editSearchArea && !editSearchArea.contains(event.target) && popupEditSuggestions && popupEditSuggestions.style.display !== 'none') {
+                    popupEditSuggestions.style.display = 'none';
+                }
+            });
+
+
+            // Load initial content details
+            loadContentDetails(); // This now also sets currentContentId and currentContentType
 
         });
-
     </script>
 
 </body>
