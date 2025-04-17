@@ -7,14 +7,18 @@
     <!-- ADD FONT AWESOME FOR ICONS (if needed for edit icon) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        /* ... (Estilos Globais, Nav, Header - Keep Existing) ... */
+        /* Estilos Globais e Reset Básico */
         body { font-family: 'Roboto', sans-serif; margin: 0; padding: 0; background-color: #121212; color: #e0e0e0; }
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+        /* Estilos para o Menu de Navegação */
         .main-nav { background-color: #1f1f1f; padding: 0.8em 30px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); text-align: right; }
         .main-nav ul { list-style: none; margin: 0; padding: 0; }
         .main-nav li { display: inline-block; margin-left: 20px; }
         .main-nav a { color: #e0e0e0; text-decoration: none; font-size: 1.1em; padding: 5px 10px; border-radius: 4px; transition: background-color 0.2s ease, color 0.2s ease; }
         .main-nav a:hover { background-color: #bb86fc; color: #121212; }
+
+        /* Estilos do Cabeçalho */
         header { background-color: #1e1e1e; color: #fff; padding: 2em 0; text-align: center; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); }
         header h1 { margin: 0; font-size: 2.5em; font-weight: 700; letter-spacing: 0.5px; }
 
@@ -34,59 +38,58 @@
         #content-details { margin-top: 30px; padding-top: 20px; border-top: 1px solid #333; }
         #content-details h3 { margin-bottom: 15px; color: #e0e0e0; font-weight: normal; font-size: 1.4em; border-bottom: 1px solid #444; padding-bottom: 8px; }
         #content-details p { margin-bottom: 12px; color: #ccc; line-height: 1.6; font-size: 1.05em; }
-        #content-details .actress-link { color: #bb86fc; text-decoration: none; margin: 0 3px; transition: color 0.2s ease; }
+        #content-details .actress-link { color: #bb86fc; text-decoration: none; margin: 0 3px; transition: color 0.2s ease; cursor: pointer; /* Ensure cursor indicates interaction */ }
         #content-details .actress-link:hover { text-decoration: underline; color: #d0a0ff; }
         #content-details .detail-na { color: #888; font-style: italic; }
         .error-message { color: #ff5252; text-align: center; padding: 30px; font-size: 1.2em; }
         #error-container { display: none; }
 
         /* --- ESTILOS PARA O POPUP DE EDIÇÃO --- */
-        .edit-popup-overlay { /* Renamed from create-popup-overlay */
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.85); z-index: 1050; justify-content: center;
-            align-items: center; padding: 20px; box-sizing: border-box; overflow-y: auto;
-        }
-        .edit-popup-content { /* Renamed */
-            background-color: #2a2a2a; padding: 25px 35px; border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6); max-width: 700px; width: 100%;
-            position: relative; max-height: 90vh; display: flex; flex-direction: column;
-        }
-        .edit-popup-close-btn { /* Renamed */
-            position: absolute; top: 10px; right: 15px; font-size: 1.8em; font-weight: bold;
-            color: #aaa; cursor: pointer; border: none; background: none; padding: 5px; line-height: 1;
-        }
+        .edit-popup-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); z-index: 1050; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; overflow-y: auto; }
+        .edit-popup-content { background-color: #2a2a2a; padding: 25px 35px; border-radius: 10px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6); max-width: 700px; width: 100%; position: relative; max-height: 90vh; display: flex; flex-direction: column; }
+        .edit-popup-close-btn { position: absolute; top: 10px; right: 15px; font-size: 1.8em; font-weight: bold; color: #aaa; cursor: pointer; border: none; background: none; padding: 5px; line-height: 1; }
         .edit-popup-close-btn:hover { color: #fff; }
         .edit-popup-content h2 { text-align: center; margin-top: 0; margin-bottom: 25px; color: #fff; font-weight: normal; }
-        #edit-form-container { flex-grow: 1; overflow-y: auto; padding-right: 10px; } /* Renamed */
-        .edit-form-group { margin-bottom: 20px; } /* Can reuse class */
+        #edit-form-container { flex-grow: 1; overflow-y: auto; padding-right: 10px; }
+        .edit-form-group { margin-bottom: 20px; }
         .edit-form-group label { display: block; margin-bottom: 8px; color: #b0b0b0; font-size: 0.9em; font-weight: bold; }
         .edit-form-group input[type="text"], .edit-form-group input[type="number"],
-        .edit-form-group input[type="url"], .edit-form-group select {
-            width: 100%; padding: 10px 12px; background-color: #404040; border: 1px solid #555;
-            border-radius: 5px; color: #e0e0e0; box-sizing: border-box; font-size: 1em;
-        }
-        .edit-form-group input:focus, .edit-form-group select:focus {
-           outline: none; border-color: #bb86fc; box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.3);
-        }
-        #edit-status-message { /* Renamed */
-            margin-top: 15px; text-align: center; min-height: 1.2em; font-size: 0.9em;
-        }
+        .edit-form-group input[type="url"], .edit-form-group select { width: 100%; padding: 10px 12px; background-color: #404040; border: 1px solid #555; border-radius: 5px; color: #e0e0e0; box-sizing: border-box; font-size: 1em; }
+        .edit-form-group input:focus, .edit-form-group select:focus { outline: none; border-color: #bb86fc; box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.3); }
+        #edit-status-message { margin-top: 15px; text-align: center; min-height: 1.2em; font-size: 0.9em; }
         #edit-status-message.success { color: #4CAF50; }
         #edit-status-message.error { color: #f44336; }
-        #save-edit-button { /* Renamed */
-            display: block; width: 100%; margin-top: 25px; background-color: #bb86fc; color: #121212;
-            padding: 14px 20px; border: none; border-radius: 6px; font-size: 1.1em; font-weight: bold;
-            cursor: pointer; transition: background-color 0.2s ease;
-        }
+        #save-edit-button { display: block; width: 100%; margin-top: 25px; background-color: #bb86fc; color: #121212; padding: 14px 20px; border: none; border-radius: 6px; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: background-color 0.2s ease; }
         #save-edit-button:hover { background-color: #a774e6; }
         #save-edit-button:disabled { background-color: #555; color: #999; cursor: not-allowed; }
+        #edit-scene-fields, #edit-video-fields { display: none; } /* Start hidden */
 
-        /* Reuse popup actress search styles, just ensure IDs are unique if needed */
-        /* Styles like .popup-search-wrapper, .suggestions-list-popup, .actress-pill etc. should work */
-        /* We will use specific IDs in the HTML/JS for the edit popup's components */
+        /* --- ESTILOS PARA O TOOLTIP DA ATRIZ --- */
+        #actress-tooltip { display: none; position: absolute; z-index: 1100; background-color: #282828; border: 1px solid #666; border-radius: 8px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.6); width: 280px; padding: 0; overflow: hidden; pointer-events: none; font-size: 0.9em; line-height: 1.4; }
+        #tooltip-content { display: flex; align-items: flex-start; }
+        #tooltip-photo { display: block; width: 100px; height: 150px; object-fit: cover; flex-shrink: 0; background-color: #111; /* Placeholder bg */ }
+        #tooltip-info { padding: 12px 15px; flex-grow: 1; }
+        #tooltip-name { margin: 0 0 10px 0; color: #bb86fc; font-size: 1.2em; font-weight: bold; border-bottom: 1px solid #444; padding-bottom: 5px; }
+        #tooltip-info p { margin: 4px 0; color: #ccc; }
+        .tooltip-label { font-weight: bold; color: #ddd; min-width: 65px; display: inline-block; }
+        #tooltip-info span:not(.tooltip-label) { color: #b0b0b0; }
+        .tooltip-na { color: #777; font-style: italic; }
 
-        /* Hide forms for specific types initially if implementing multi-type edit */
-        #edit-scene-fields, #edit-movie-fields { display: none; }
+        /* Actress Search/Select Styles (Copied/Adapted from Create Popup) */
+        .actress-search-area { position: relative; width: 100%; }
+        .search-input-wrapper { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; padding: 5px 10px; border: 1px solid #555; border-radius: 6px; background-color: #404040; cursor: text; }
+        .search-input-wrapper:focus-within { border-color: #bb86fc; box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.3); }
+        .selected-actresses-container-popup { display: contents; }
+        .search-input-wrapper .actress-pill { display: inline-flex; align-items: center; background-color: #bb86fc; color: #121212; padding: 4px 8px; border-radius: 4px; font-size: 0.9em; margin: 2px; white-space: nowrap; }
+        .search-input-wrapper .actress-pill span { margin-right: 5px; }
+        .search-input-wrapper .remove-actress-btn { background: none; border: none; color: #121212; cursor: pointer; font-weight: bold; font-size: 1.1em; padding: 0 2px; line-height: 1; }
+        .search-input-wrapper .remove-actress-btn:hover { opacity: 0.7; }
+        .search-input.popup-search-input { flex-grow: 1; padding: 6px 5px; border: none; background-color: transparent; color: #e0e0e0; font-size: 1em; min-width: 150px; outline: none; }
+        .suggestions-list-popup { display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 1060; background-color: #2e2e2e; border: 1px solid #555; border-top: none; border-radius: 0 0 6px 6px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); max-height: 180px; overflow-y: auto; }
+        .suggestions-list-popup .suggestion-item { display: flex; padding: 8px 15px; color: #e0e0e0; cursor: pointer; align-items: center; gap: 10px; }
+        .suggestions-list-popup .suggestion-item:hover { background-color: #444; }
+        .suggestions-list-popup .suggestion-item.no-results { cursor: default; color: #aaa; justify-content: center; }
+        .suggestions-list-popup .suggestion-item img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background-color: #555; }
 
     </style>
 </head>
@@ -111,7 +114,7 @@
         <!-- Top Controls: Back and Edit Buttons -->
         <div class="top-controls">
              <button id="back-button">← Voltar</button>
-             <button id="edit-content-btn">Editar <i class="fa-solid fa-pencil"></i></button> <!-- Added Edit Button -->
+             <button id="edit-content-btn" style="display: none;">Editar <i class="fa-solid fa-pencil"></i></button> <!-- Start hidden -->
         </div>
 
         <h2 id="content-title">Carregando...</h2>
@@ -124,8 +127,8 @@
 
         <div id="content-details" style="display: none;">
             <h3>Detalhes</h3>
-            <p id="content-number">Número: <span class="detail-na">Carregando...</span></p>
-            <p id="content-actresses">Atrizes: <span class="detail-na">Carregando...</span></p>
+            <p id="content-number" style="display: none;">Número: <span class="detail-na">Carregando...</span></p>
+            <p id="content-actresses" style="display: none;">Atrizes: <span class="detail-na">Carregando...</span></p>
         </div>
 
         <div id="error-container">
@@ -133,6 +136,7 @@
         </div>
 
     </div>
+    <!-- FIM Container Principal -->
 
     <!-- POPUP DE EDIÇÃO (Escondido Inicialmente) -->
     <div class="edit-popup-overlay" id="edit-popup-overlay">
@@ -140,9 +144,7 @@
             <button class="edit-popup-close-btn" id="close-edit-popup-btn">×</button>
             <h2>Editar Conteúdo</h2>
             <div id="edit-form-container">
-                <!-- Hidden input to store the document ID -->
                 <input type="hidden" id="edit-content-id">
-                <!-- Hidden field to store content type if needed later -->
                 <input type="hidden" id="edit-content-type">
 
                 <!-- Common Fields -->
@@ -152,7 +154,7 @@
                 <div class="edit-form-group"> <label for="edit-pagina">Página Externa (URL):</label> <input type="url" id="edit-pagina" placeholder="https://..."> </div>
 
                  <!-- Actress Search/Edit Component -->
-                <div class="edit-form-group">
+                <div class="edit-form-group" id="edit-actress-section"> <!-- Added ID to hide/show -->
                     <label for="popup-edit-search-input">Atrizes:</label>
                     <div class="actress-search-area" id="popup-edit-actress-search">
                         <div class="search-input-wrapper popup-search-wrapper" onclick="document.getElementById('popup-edit-search-input').focus()">
@@ -163,54 +165,73 @@
                     </div>
                 </div>
 
-                <!-- Video Specific Fields (if any beyond common ones, e.g., 'no') -->
+                <!-- Video Specific Fields -->
                  <div id="edit-video-fields">
-                     <div class="edit-form-group"> <label for="edit-numero">Número:</label> <input type="number" id="edit-numero" placeholder="Ex: 123"> </div>
+                     <div class="edit-form-group"> <label for="edit-numero">Número (Vídeo):</label> <input type="number" id="edit-numero" placeholder="Ex: 123"> </div>
                  </div>
 
-                <!-- Scene Specific Fields (Initially Hidden) -->
-                <div id="edit-scene-fields" style="display: none;">
+                <!-- Scene Specific Fields -->
+                <div id="edit-scene-fields">
                      <div class="edit-form-group"> <label for="edit-scene-filme">Filme Associado:</label> <select id="edit-scene-filme"> <option value="">Carregando filmes...</option> </select> </div>
                      <div class="edit-form-group"> <label for="edit-scene-numero">Número da Cena:</label> <input type="number" id="edit-scene-numero" placeholder="Ex: 1"> </div>
                  </div>
 
-                <!-- Movie Specific Fields (Initially Hidden - if any beyond common) -->
-                 <!-- <div id="edit-movie-fields" style="display: none;"> ... </div> -->
-
             </div>
             <div id="edit-status-message"></div>
-            <button id="save-edit-button">Salvar Alterações</button>
+            <button id="save-edit-button" disabled>Salvar Alterações</button> <!-- Start disabled -->
         </div>
     </div>
     <!-- FIM POPUP DE EDIÇÃO -->
+
+    <!-- ACTRESS INFO TOOLTIP (Initially Hidden) -->
+    <div id="actress-tooltip" style="display: none;">
+        <div id="tooltip-content">
+            <img id="tooltip-photo" src="path/to/default/avatar.png" alt="Actress Photo" /> <!-- Default Src -->
+            <div id="tooltip-info">
+                <h4 id="tooltip-name">Actress Name</h4>
+                <p><span class="tooltip-label">Idade:</span> <span id="tooltip-age">--</span></p>
+                <p><span class="tooltip-label">País:</span> <span id="tooltip-country">--</span></p>
+                <p><span class="tooltip-label">Altura:</span> <span id="tooltip-height">--</span></p>
+                <p><span class="tooltip-label">Peso:</span> <span id="tooltip-weight">--</span></p>
+                <p><span class="tooltip-label">Cabelo:</span> <span id="tooltip-hair">--</span></p>
+                <p><span class="tooltip-label">Olhos:</span> <span id="tooltip-eyes">--</span></p>
+                <p><span class="tooltip-label">Medidas:</span> <span id="tooltip-measurements">--</span></p>
+                <p><span class="tooltip-label">Etnia:</span> <span id="tooltip-ethnicity">--</span></p>
+                <p><span class="tooltip-label">Nascimento:</span> <span id="tooltip-birthdate">--</span></p>
+                <p><span class="tooltip-label">Nota:</span> <span id="tooltip-rating">--</span></p>
+            </div>
+        </div>
+    </div>
+    <!-- FIM TOOLTIP -->
 
 
     <!-- Firebase Modular SDKs via CDN -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        // *** ADDED updateDoc ***
-        import { getFirestore, doc, getDoc, collection, updateDoc, getDocs, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, doc, getDoc, collection, updateDoc, getDocs, query, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'; // Added serverTimestamp
 
-        // Firebase Config (Keep Existing)
+        // Firebase Config
         const firebaseConfig = {
-            apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0",
-            authDomain: "babes-392fd.firebaseapp.com",
-            projectId: "babes-392fd",
-            storageBucket: "babes-392fd.appspot.com",
-            messagingSenderId: "376795361631",
-            appId: "1:376795361631:web:d662f2b2f2cd23b115c6ea"
-        };
+             apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0",
+             authDomain: "babes-392fd.firebaseapp.com",
+             projectId: "babes-392fd",
+             storageBucket: "babes-392fd.appspot.com",
+             messagingSenderId: "376795361631",
+             appId: "1:376795361631:web:d662f2b2f2cd23b115c6ea"
+         };
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
         // --- Global Variables ---
-        let currentContentId = null; // Store ID of the content being viewed/edited
-        let currentContentType = null; // Store type ('videos', 'cenas', 'filmes') - MUST BE SET
-        let allActresses = []; // Cache loaded actresses for popup search
-        let popupEditSelectedActresses = []; // State for actresses in the EDIT popup
-        let allMoviesForSelect = []; // Cache movies for scene editing select
+        let currentContentId = null;
+        let currentContentType = null;
+        let allActresses = [];
+        let popupEditSelectedActresses = [];
+        let allMoviesForSelect = [];
+        let currentContentActressDetails = {};
+        let tooltipHideTimeout = null;
 
         // --- DOM References (Main Page) ---
         const pageTitleElement = document.getElementById('page-title');
@@ -225,7 +246,7 @@
         const errorContainer = document.getElementById('error-container');
         const errorText = document.getElementById('error-text');
         const backButton = document.getElementById('back-button');
-        const editContentBtn = document.getElementById('edit-content-btn'); // Edit button ref
+        const editContentBtn = document.getElementById('edit-content-btn');
 
         // --- DOM References (Edit Popup) ---
         const editPopupOverlay = document.getElementById('edit-popup-overlay');
@@ -239,491 +260,344 @@
         const editAnoInput = document.getElementById('edit-ano');
         const editImagemInput = document.getElementById('edit-imagem');
         const editPaginaInput = document.getElementById('edit-pagina');
+        const editActressSection = document.getElementById('edit-actress-section'); // Actress section container
         const popupEditSearchInput = document.getElementById('popup-edit-search-input');
         const popupEditSuggestions = document.getElementById('popup-edit-suggestions');
         const popupEditSelectedContainer = document.getElementById('popup-edit-selected-actresses');
-        // Video specific popup fields
         const editVideoFields = document.getElementById('edit-video-fields');
-        const editNumeroInput = document.getElementById('edit-numero'); // Video number
-        // Scene specific popup fields
+        const editNumeroInput = document.getElementById('edit-numero');
         const editSceneFields = document.getElementById('edit-scene-fields');
         const editSceneFilmeSelect = document.getElementById('edit-scene-filme');
         const editSceneNumeroInput = document.getElementById('edit-scene-numero');
 
+        // --- DOM References (Tooltip) ---
+        const actressTooltip = document.getElementById('actress-tooltip');
+        const tooltipPhoto = document.getElementById('tooltip-photo');
+        const tooltipName = document.getElementById('tooltip-name');
+        const tooltipAge = document.getElementById('tooltip-age');
+        const tooltipCountry = document.getElementById('tooltip-country');
+        const tooltipHeight = document.getElementById('tooltip-height');
+        const tooltipWeight = document.getElementById('tooltip-weight');
+        const tooltipHair = document.getElementById('tooltip-hair');
+        const tooltipEyes = document.getElementById('tooltip-eyes');
+        const tooltipMeasurements = document.getElementById('tooltip-measurements');
+        const tooltipEthnicity = document.getElementById('tooltip-ethnicity');
+        const tooltipBirthdate = document.getElementById('tooltip-birthdate');
+        const tooltipRating = document.getElementById('tooltip-rating');
+
 
         // --- Helper Functions ---
-        function displayError(message) { /* ... (keep existing implementation) ... */
+        function displayError(message) {
             console.error(message);
             if(contentTitleElement) contentTitleElement.style.display = 'none';
             if(externalLinkContainer) externalLinkContainer.style.display = 'none';
             if(contentDetailsSection) contentDetailsSection.style.display = 'none';
             if(errorText) errorText.textContent = message;
             if(errorContainer) errorContainer.style.display = 'block';
-         }
-
-        async function fetchAllActresses() {
-            if (allActresses.length > 0) return allActresses; // Return cached if available
-            try {
-                const atoresCol = collection(db, "atores");
-                const atoresSnapshot = await getDocs(query(atoresCol, orderBy("nome", "asc")));
-                allActresses = [];
-                atoresSnapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (data.nome) {
-                        allActresses.push({ id: doc.id, nome: data.nome, foto: data.foto });
-                    }
-                });
-                console.log(`Fetched ${allActresses.length} actresses.`);
-                return allActresses;
-            } catch (error) {
-                console.error("Error fetching all actresses:", error);
-                return []; // Return empty on error
-            }
         }
 
-        async function fetchAllMovies() {
-            if (allMoviesForSelect.length > 0) return allMoviesForSelect; // Return cached
-            try {
-                const moviesCol = collection(db, "filmes");
-                const moviesSnapshot = await getDocs(query(moviesCol, orderBy("nome", "asc")));
-                allMoviesForSelect = [];
-                 moviesSnapshot.forEach(doc => {
-                    const data = doc.data();
-                     if (data.nome) {
-                         allMoviesForSelect.push({ id: doc.id, nome: data.nome });
-                     }
+        async function fetchAllActresses() {
+             if (allActresses.length > 0) return allActresses;
+             try {
+                 const atoresCol = collection(db, "atores");
+                 const atoresSnapshot = await getDocs(query(atoresCol, orderBy("nome", "asc")));
+                 allActresses = [];
+                 atoresSnapshot.forEach(doc => {
+                     const data = doc.data();
+                     if (data.nome) { allActresses.push({ id: doc.id, nome: data.nome, foto: data.foto }); }
                  });
-                 console.log(`Fetched ${allMoviesForSelect.length} movies for select.`);
-                 return allMoviesForSelect;
-            } catch (error) {
-                 console.error("Error fetching all movies:", error);
-                 return [];
-            }
+                 console.log(`Fetched ${allActresses.length} actresses.`);
+                 return allActresses;
+             } catch (error) { console.error("Error fetching actresses:", error); return []; }
          }
 
+        async function fetchAllMovies() {
+             if (allMoviesForSelect.length > 0) return allMoviesForSelect;
+             try {
+                 const moviesCol = collection(db, "filmes");
+                 const moviesSnapshot = await getDocs(query(moviesCol, orderBy("nome", "asc")));
+                 allMoviesForSelect = [];
+                  moviesSnapshot.forEach(doc => {
+                     const data = doc.data();
+                      if (data.nome) { allMoviesForSelect.push({ id: doc.id, nome: data.nome }); }
+                  });
+                  console.log(`Fetched ${allMoviesForSelect.length} movies.`);
+                  return allMoviesForSelect;
+             } catch (error) { console.error("Error fetching movies:", error); return []; }
+          }
+
+        async function fetchFullActressDetails(actressIds) {
+             if (!actressIds || !Array.isArray(actressIds) || actressIds.length === 0) { currentContentActressDetails = {}; return; }
+             const validIds = actressIds.filter(id => typeof id === 'string' && id.trim() !== '');
+             if (validIds.length === 0) { currentContentActressDetails = {}; return; }
+             console.log("Fetching full details for:", validIds);
+             currentContentActressDetails = {};
+             const fetchPromises = validIds.map(id => getDoc(doc(db, "atores", id)));
+             try {
+                 const actressSnaps = await Promise.all(fetchPromises);
+                 actressSnaps.forEach(snap => { if (snap.exists()) { currentContentActressDetails[snap.id] = snap.data(); } });
+                 console.log("Actress details cached:", Object.keys(currentContentActressDetails).length);
+             } catch (error) { console.error("Error fetching actress details:", error); currentContentActressDetails = {}; }
+         }
+
+        function getActressNamesForDisplay(actressIds) {
+             if (!actressIds || !Array.isArray(actressIds) || actressIds.length === 0) { return '<span class="detail-na">Nenhuma atriz associada</span>'; }
+             const actressLinks = actressIds
+                 .map(id => {
+                     const actressData = currentContentActressDetails[id];
+                     if (actressData && actressData.nome) { return `<a href="she.html?id=${id}" class="actress-link" data-actress-id="${id}">${actressData.nome}</a>`; }
+                     else if (id) { return `<a href="she.html?id=${id}" class="actress-link" data-actress-id="${id}" style="color: #aaa;">[ID: ${id}]</a>`; }
+                     return null;
+                 })
+                 .filter(link => link !== null);
+             return actressLinks.length > 0 ? actressLinks.join(', ') : '<span class="detail-na">Nenhuma atriz encontrada</span>';
+         }
 
         async function getActressObjectsByIds(actressIds) {
              if (!actressIds || !Array.isArray(actressIds) || actressIds.length === 0) { return []; }
              const validIds = actressIds.filter(id => typeof id === 'string' && id.trim() !== '');
              if (validIds.length === 0) return [];
-
-             // Ensure all actresses are loaded for potential matches
              await fetchAllActresses();
-
-             // Try to find them in the cached 'allActresses' list first for efficiency
              const foundActresses = validIds.map(id => allActresses.find(a => a.id === id)).filter(Boolean);
-
-             // If any were not found in cache (shouldn't happen often if fetchAllActresses worked), fetch individually
              const notFoundIds = validIds.filter(id => !foundActresses.some(a => a.id === id));
-
              if (notFoundIds.length > 0) {
-                 console.warn("Fetching missing actress IDs individually:", notFoundIds);
+                 console.warn("Fetching missing actress objects:", notFoundIds);
                  try {
-                     const fetchPromises = notFoundIds.map(id => getDoc(doc(db, "atores", id)));
-                     const fetchedSnaps = await Promise.all(fetchPromises);
-                     fetchedSnaps.forEach(snap => {
-                         if (snap.exists()) {
-                             const data = snap.data();
-                             if (data.nome) {
-                                 foundActresses.push({ id: snap.id, nome: data.nome, foto: data.foto });
-                             }
-                         }
-                     });
-                 } catch (error) {
-                      console.error("Error fetching individual actress details:", error);
-                 }
+                     const promises = notFoundIds.map(id => getDoc(doc(db, "atores", id)));
+                     const snaps = await Promise.all(promises);
+                     snaps.forEach(snap => { if (snap.exists()) { const d = snap.data(); if(d.nome) foundActresses.push({ id: snap.id, ...d }); }});
+                 } catch (error) { console.error("Error fetching individual actress objects:", error); }
              }
-
-             return foundActresses; // Return array of {id, nome, foto} objects
+             return foundActresses;
          }
 
 
-        // --- Popup Actress Search/Select Functions (Adapted for Edit Popup) ---
-        // These functions now operate on the EDIT popup elements and state
-
-        function renderEditPopupActressPills() {
-            if (!popupEditSelectedContainer) return;
-            popupEditSelectedContainer.innerHTML = '';
-            popupEditSelectedActresses.forEach(actress => {
-                const pill = document.createElement('div');
-                pill.classList.add('actress-pill');
-                pill.dataset.id = actress.id;
-                pill.innerHTML = `<span>${actress.nome}</span><button class="remove-actress-btn" title="Remover">×</button>`;
-                pill.querySelector('.remove-actress-btn').addEventListener('click', handleEditPopupRemoveActress);
-                popupEditSelectedContainer.appendChild(pill);
-            });
+        // --- Tooltip Functions ---
+        function calculateAge(birthDateString) {
+            if (!birthDateString) return null;
+            try { const birthDate = new Date(birthDateString); if (isNaN(birthDate.getTime())) return null; const today = new Date(); let age = today.getFullYear() - birthDate.getFullYear(); const m = today.getMonth() - birthDate.getMonth(); if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) { age--; } return age >= 0 ? age : null; } catch (e) { return null; }
         }
 
-        function handleEditPopupRemoveActress(event) {
-            event.stopPropagation();
-            const pill = event.target.closest('.actress-pill');
-            if (!pill) return;
-            const actressIdToRemove = pill.dataset.id;
-            popupEditSelectedActresses = popupEditSelectedActresses.filter(a => a.id !== actressIdToRemove);
-            renderEditPopupActressPills(); // Re-render pills in the edit popup
+        function populateTooltip(actressData) {
+            if (!actressTooltip || !actressData) return;
+            tooltipPhoto.src = actressData.foto || 'path/to/default/avatar.png';
+            tooltipName.textContent = actressData.nome || 'Nome Desconhecido';
+            const age = calculateAge(actressData.dataNascimento);
+            tooltipAge.textContent = age !== null ? age : '--'; tooltipAge.className = age === null ? 'tooltip-na' : '';
+            tooltipCountry.textContent = actressData.pais || '--'; tooltipCountry.className = !actressData.pais ? 'tooltip-na' : '';
+            tooltipHeight.textContent = actressData.altura ? `${actressData.altura} cm` : '--'; tooltipHeight.className = !actressData.altura ? 'tooltip-na' : '';
+            tooltipWeight.textContent = actressData.peso ? `${actressData.peso} kg` : '--'; tooltipWeight.className = !actressData.peso ? 'tooltip-na' : '';
+            tooltipHair.textContent = actressData.corCabelo || '--'; tooltipHair.className = !actressData.corCabelo ? 'tooltip-na' : '';
+            tooltipEyes.textContent = actressData.corOlhos || '--'; tooltipEyes.className = !actressData.corOlhos ? 'tooltip-na' : '';
+            tooltipMeasurements.textContent = actressData.medidas || '--'; tooltipMeasurements.className = !actressData.medidas ? 'tooltip-na' : '';
+            tooltipEthnicity.textContent = actressData.etnia || '--'; tooltipEthnicity.className = !actressData.etnia ? 'tooltip-na' : '';
+            tooltipBirthdate.textContent = actressData.dataNascimento || '--'; tooltipBirthdate.className = !actressData.dataNascimento ? 'tooltip-na' : '';
+            tooltipRating.textContent = actressData.nota || '--'; tooltipRating.className = !actressData.nota ? 'tooltip-na' : '';
         }
 
-        function displayEditPopupSuggestions(searchTerm) {
-            if (!popupEditSuggestions || !popupEditSearchInput) return;
-            popupEditSuggestions.innerHTML = '';
-            if (!searchTerm) {
-                popupEditSuggestions.style.display = 'none';
-                return;
-            }
-            const lowerSearchTerm = searchTerm.toLowerCase();
-            const matchedActresses = allActresses.filter(actress =>
-                actress.nome.toLowerCase().includes(lowerSearchTerm) &&
-                !popupEditSelectedActresses.some(sa => sa.id === actress.id) // Exclude already selected IN EDIT POPUP
-            );
-             // Sort matched actresses alphabetically
-            matchedActresses.sort((a, b) => a.nome.localeCompare(b.nome));
-
-            if (matchedActresses.length > 0) {
-                matchedActresses.slice(0, 7).forEach(actress => {
-                    const item = document.createElement('div');
-                    item.classList.add('suggestion-item');
-                    item.dataset.id = actress.id; item.dataset.nome = actress.nome;
-                    item.innerHTML = `<img src="${actress.foto || 'path/to/default/avatar.png'}" alt=""><span>${actress.nome}</span>`;
-                    item.addEventListener('click', handleEditPopupSelectActress); // Use edit select handler
-                    popupEditSuggestions.appendChild(item);
-                });
-                popupEditSuggestions.style.display = 'block';
-            } else {
-                popupEditSuggestions.innerHTML = '<div class="suggestion-item no-results">Nenhuma atriz encontrada</div>';
-                popupEditSuggestions.style.display = 'block';
-            }
+        function positionAndShowTooltip(targetLink) {
+            if (!actressTooltip || !targetLink) return;
+            const linkRect = targetLink.getBoundingClientRect();
+            const tooltipRect = actressTooltip.getBoundingClientRect();
+            let top = window.pageYOffset + linkRect.bottom + 5;
+            let left = window.pageXOffset + linkRect.left;
+            if (left + tooltipRect.width > window.innerWidth - 10) { left = window.innerWidth - tooltipRect.width - 10; }
+            if (left < 10) { left = 10; }
+            if (top + tooltipRect.height > window.innerHeight + window.pageYOffset - 10) { top = window.pageYOffset + linkRect.top - tooltipRect.height - 5; }
+            if (top < window.pageYOffset + 10) { top = window.pageYOffset + 10; }
+            actressTooltip.style.top = `${top}px`;
+            actressTooltip.style.left = `${left}px`;
+            actressTooltip.style.display = 'block';
         }
 
-        function handleEditPopupSelectActress(event) {
-            const target = event.currentTarget;
-            const actressId = target.dataset.id;
-            const actressName = target.dataset.nome;
-            if (!actressId || !actressName) { console.error("Data missing on suggestion!"); return; }
-
-            // Add to the edit popup's selected array if not already present
-            if (!popupEditSelectedActresses.some(a => a.id === actressId)) {
-                 // Need the photo URL if available from allActresses
-                const selectedActressData = allActresses.find(a => a.id === actressId);
-                popupEditSelectedActresses.push({ id: actressId, nome: actressName, foto: selectedActressData?.foto });
-                renderEditPopupActressPills(); // Re-render pills in the edit popup
-            }
-            if (popupEditSearchInput) popupEditSearchInput.value = '';
-            if (popupEditSuggestions) popupEditSuggestions.style.display = 'none';
-            if (popupEditSearchInput) popupEditSearchInput.focus();
-        }
+        function hideTooltip() { if (actressTooltip) { actressTooltip.style.display = 'none'; } }
 
         // --- Main Detail Loading Function ---
-        async function loadContentDetails() { /* ... (Keep previous implementation, but ensure it sets currentContentId and currentContentType) ... */
+        async function loadContentDetails() {
             // Reset state
             contentTitleElement.textContent = 'Carregando...';
             externalLinkContainer.style.display = 'none';
             contentDetailsSection.style.display = 'none';
             errorContainer.style.display = 'none';
-            editContentBtn.style.display = 'none'; // Hide edit button initially
+            editContentBtn.style.display = 'none';
+            hideTooltip();
 
             const urlParams = new URLSearchParams(window.location.search);
             currentContentId = urlParams.get('id');
-            currentContentType = urlParams.get('type') || 'videos'; // Default to 'videos' if type is missing
+            currentContentType = urlParams.get('type') || 'videos'; // Default or read from URL
 
-            if (!currentContentId) {
-                displayError("Erro: ID do conteúdo não encontrado na URL.");
-                return;
-            }
-             if (!['videos', 'cenas', 'filmes'].includes(currentContentType)) {
-                 displayError(`Erro: Tipo de conteúdo inválido ('${currentContentType}') na URL.`);
-                 return;
-             }
+            if (!currentContentId) { displayError("Erro: ID do conteúdo não encontrado."); return; }
+            if (!['videos', 'cenas', 'filmes'].includes(currentContentType)) { displayError(`Erro: Tipo inválido ('${currentContentType}').`); return; }
 
             try {
-                const contentRef = doc(db, currentContentType, currentContentId); // Use dynamic collection name
+                const contentRef = doc(db, currentContentType, currentContentId);
                 const contentSnap = await getDoc(contentRef);
 
-                if (!contentSnap.exists()) {
-                    displayError(`Erro: Conteúdo (tipo: ${currentContentType}) com ID "${currentContentId}" não encontrado.`);
-                    return;
-                }
+                if (!contentSnap.exists()) { displayError(`Erro: Conteúdo (tipo: ${currentContentType}) não encontrado.`); return; }
                 const contentData = contentSnap.data();
+
+                await fetchFullActressDetails(contentData.atores); // Fetch details FIRST
+
+                // Populate main page
                 const contentName = contentData.nome || 'Conteúdo sem Título';
                 pageTitleElement.textContent = `Detalhes: ${contentName}`;
                 contentTitleElement.textContent = contentName;
                 contentTitleElement.style.display = 'block';
 
-                // External Link Logic (same as before)
+                // External Link Logic
                 const paginaUrl = contentData.pagina;
                  if (paginaUrl && typeof paginaUrl === 'string' && paginaUrl.trim() !== '') {
-                     try {
-                         new URL(paginaUrl);
-                         externalLinkButton.href = paginaUrl;
-                         externalLinkUrlText.textContent = `URL: ${paginaUrl}`;
-                         externalLinkMessage.textContent = 'Este conteúdo está disponível na seguinte página externa:';
-                         externalLinkButton.style.display = 'inline-block';
-                         externalLinkContainer.style.display = 'block';
-                     } catch (e) { /* ... error handling for invalid URL ... */
-                         externalLinkMessage.textContent = 'A URL configurada para o conteúdo externo parece inválida ou está ausente.';
-                         externalLinkButton.style.display = 'none';
-                         externalLinkUrlText.textContent = `(URL inválida: ${paginaUrl})`;
-                         externalLinkContainer.style.display = 'block';
-                     }
-                 } else { /* ... handling for missing URL ... */
-                     externalLinkMessage.textContent = 'Nenhuma página externa associada a este conteúdo.';
-                     externalLinkButton.style.display = 'none';
-                     externalLinkUrlText.textContent = '';
-                     externalLinkContainer.style.display = 'block';
-                 }
+                     try { new URL(paginaUrl); externalLinkButton.href = paginaUrl; externalLinkUrlText.textContent = `URL: ${paginaUrl}`; externalLinkMessage.textContent = 'Conteúdo disponível na página externa:'; externalLinkButton.style.display = 'inline-block'; externalLinkContainer.style.display = 'block'; }
+                     catch (e) { externalLinkMessage.textContent = 'URL externa inválida.'; externalLinkButton.style.display = 'none'; externalLinkUrlText.textContent = `(URL inválida: ${paginaUrl})`; externalLinkContainer.style.display = 'block'; }
+                 } else { externalLinkMessage.textContent = 'Nenhuma página externa associada.'; externalLinkButton.style.display = 'none'; externalLinkUrlText.textContent = ''; externalLinkContainer.style.display = 'block'; }
 
                 // Details Section
                 contentDetailsSection.style.display = 'block';
-                // Display Number only if it exists (common in videos/scenes)
+                // Number Field (Video 'no' or Scene 'numeroCena')
                 if (contentData.no !== undefined || contentData.numeroCena !== undefined) {
                      const numberToShow = contentData.no ?? contentData.numeroCena ?? '<span class="detail-na">N/A</span>';
                      contentNumberElement.innerHTML = `Número: ${numberToShow}`;
                      contentNumberElement.style.display = 'block';
-                } else {
-                     contentNumberElement.style.display = 'none'; // Hide if no number field
-                }
-                // Display Actresses (if field exists)
+                } else { contentNumberElement.style.display = 'none'; }
+                // Actresses Field (Only if 'atores' field exists)
                 if (contentData.atores !== undefined) {
                     contentActressesElement.innerHTML = 'Atrizes: <span class="detail-na">Carregando...</span>';
-                    contentActressesElement.style.display = 'block'; // Show the paragraph
-                    // Use the improved getActressNames function directly
-                     const actressNamesHTML = await getActressNames(contentData.atores);
-                     contentActressesElement.innerHTML = `Atrizes: ${actressNamesHTML}`;
-                 } else {
-                     contentActressesElement.style.display = 'none'; // Hide if no 'atores' field (e.g., potentially for 'filmes')
-                 }
+                    contentActressesElement.style.display = 'block';
+                    // *** FIXED LINE ***
+                    const actressNamesHTML = getActressNamesForDisplay(contentData.atores);
+                    contentActressesElement.innerHTML = `Atrizes: ${actressNamesHTML}`;
+                } else { contentActressesElement.style.display = 'none'; }
 
 
-                editContentBtn.style.display = 'inline-block'; // Show edit button only after successful load
+                editContentBtn.style.display = 'inline-block'; // Show edit button
 
             } catch (error) {
-                displayError("Ocorreu um erro ao carregar os detalhes do conteúdo.");
+                displayError("Ocorreu um erro ao carregar os detalhes.");
                 console.error("Erro detalhado:", error);
             }
         }
 
-         // --- Edit Popup Functions ---
-         async function openEditPopup() {
-             if (!currentContentId || !currentContentType) {
-                 alert("Não é possível editar: ID ou tipo do conteúdo não definido.");
-                 return;
-             }
-
-             // 0. Clear previous state & show loading indicator in popup
-             editStatusMessage.textContent = 'Carregando dados para edição...';
-             editStatusMessage.className = '';
-             saveEditButton.disabled = true;
-             popupEditSelectedActresses = []; // Clear selected actresses state
-             renderEditPopupActressPills(); // Clear pills visually
-             if (popupEditSearchInput) popupEditSearchInput.value = ''; // Clear search input
-             if (popupEditSuggestions) popupEditSuggestions.style.display = 'none'; // Hide suggestions
-
-             // 1. Fetch fresh data for the current item
+        // --- Edit Popup Functions ---
+        async function openEditPopup() {
+             if (!currentContentId || !currentContentType) { alert("ID/Tipo não definido."); return; }
+             editStatusMessage.textContent = 'Carregando...'; editStatusMessage.className = ''; saveEditButton.disabled = true;
+             popupEditSelectedActresses = []; renderEditPopupActressPills();
+             if (popupEditSearchInput) popupEditSearchInput.value = ''; if (popupEditSuggestions) popupEditSuggestions.style.display = 'none';
              try {
-                 const contentRef = doc(db, currentContentType, currentContentId);
-                 const contentSnap = await getDoc(contentRef);
-
-                 if (!contentSnap.exists()) {
-                     alert("Erro: Não foi possível recarregar os dados para edição.");
-                     return;
-                 }
+                 const contentRef = doc(db, currentContentType, currentContentId); const contentSnap = await getDoc(contentRef);
+                 if (!contentSnap.exists()) { alert("Erro ao recarregar dados."); return; }
                  const contentData = contentSnap.data();
-
-                 // 2. Populate common form fields
-                 editContentIdInput.value = currentContentId;
-                 editContentTypeInput.value = currentContentType; // Store type
-                 editNomeInput.value = contentData.nome || '';
-                 editAnoInput.value = contentData.ano || '';
-                 editImagemInput.value = contentData.imagem || '';
-                 editPaginaInput.value = contentData.pagina || '';
-
-                 // 3. Populate Actresses
-                 popupEditSelectedActresses = await getActressObjectsByIds(contentData.atores || []); // Fetch full objects
-                 renderEditPopupActressPills(); // Render the pills
-
-                 // 4. Populate type-specific fields & show/hide sections
-                 editVideoFields.style.display = 'none';
-                 editSceneFields.style.display = 'none';
-
-                 if (currentContentType === 'videos') {
-                      editNumeroInput.value = contentData.no || '';
-                      editVideoFields.style.display = 'block';
-                 } else if (currentContentType === 'cenas') {
-                     editSceneNumeroInput.value = contentData.numeroCena || '';
-                     // Populate movie select (ensure movies are loaded)
-                     await populateMovieSelect(editSceneFilmeSelect, contentData.filmeId);
-                     editSceneFields.style.display = 'block';
+                 editContentIdInput.value = currentContentId; editContentTypeInput.value = currentContentType;
+                 editNomeInput.value = contentData.nome || ''; editAnoInput.value = contentData.ano || '';
+                 editImagemInput.value = contentData.imagem || ''; editPaginaInput.value = contentData.pagina || '';
+                 // Show/Hide Actress Section based on type (e.g., hide for movies if they don't have actors directly)
+                 if (currentContentType === 'filmes') { // Example: Hide for movies
+                      editActressSection.style.display = 'none';
+                      popupEditSelectedActresses = []; // Ensure it's empty
+                 } else {
+                      editActressSection.style.display = 'block';
+                      popupEditSelectedActresses = await getActressObjectsByIds(contentData.atores || []);
+                      renderEditPopupActressPills();
                  }
-                 // Add else if for 'filmes' if it has specific fields
-
-                 // 5. Show popup and enable save button
-                 editStatusMessage.textContent = ''; // Clear loading message
-                 saveEditButton.disabled = false;
-                 editPopupOverlay.style.display = 'flex';
-
-             } catch (error) {
-                 console.error("Erro ao carregar dados para edição:", error);
-                 editStatusMessage.textContent = 'Erro ao carregar dados.';
-                 editStatusMessage.className = 'error';
-             }
+                 // Show/Hide type-specific fields
+                 editVideoFields.style.display = 'none'; editSceneFields.style.display = 'none';
+                 if (currentContentType === 'videos') { editNumeroInput.value = contentData.no || ''; editVideoFields.style.display = 'block'; }
+                 else if (currentContentType === 'cenas') { editSceneNumeroInput.value = contentData.numeroCena || ''; await populateMovieSelect(editSceneFilmeSelect, contentData.filmeId); editSceneFields.style.display = 'block'; }
+                 editStatusMessage.textContent = ''; saveEditButton.disabled = false; editPopupOverlay.style.display = 'flex';
+             } catch (error) { console.error("Erro ao carregar para edição:", error); editStatusMessage.textContent = 'Erro ao carregar.'; editStatusMessage.className = 'error'; }
          }
 
-         async function populateMovieSelect(selectElement, selectedMovieId) {
-             await fetchAllMovies(); // Ensure movie list is available
-             let optionsHTML = '<option value="">-- Selecione um Filme --</option>';
-             if (allMoviesForSelect.length === 0) {
-                  optionsHTML += '<option value="" disabled>Nenhum filme encontrado</option>';
-             } else {
-                 allMoviesForSelect.forEach(movie => {
-                     const isSelected = movie.id === selectedMovieId ? ' selected' : '';
-                     optionsHTML += `<option value="${movie.id}"${isSelected}>${movie.nome}</option>`;
-                 });
-             }
+        async function populateMovieSelect(selectElement, selectedMovieId) {
+            await fetchAllMovies();
+             let optionsHTML = '<option value="">-- Selecione --</option>';
+             if (allMoviesForSelect.length > 0) { allMoviesForSelect.forEach(movie => { const isSelected = movie.id === selectedMovieId ? ' selected' : ''; optionsHTML += `<option value="${movie.id}"${isSelected}>${movie.nome}</option>`; }); }
+             else { optionsHTML += '<option value="" disabled>Nenhum filme</option>'; }
              selectElement.innerHTML = optionsHTML;
          }
 
-
-         async function handleSaveChanges(event) {
-             event.preventDefault();
-             saveEditButton.disabled = true;
-             editStatusMessage.textContent = 'Salvando alterações...';
-             editStatusMessage.className = '';
-
-             const docId = editContentIdInput.value;
-             const docType = editContentTypeInput.value; // Get the type
-
-             if (!docId || !docType) {
-                 editStatusMessage.textContent = 'Erro: ID ou Tipo do conteúdo ausente.';
-                 editStatusMessage.className = 'error';
-                 saveEditButton.disabled = false;
-                 return;
-             }
-
-             // Build the data object to update
+        async function handleSaveChanges(event) {
+             event.preventDefault(); saveEditButton.disabled = true; editStatusMessage.textContent = 'Salvando...'; editStatusMessage.className = '';
+             const docId = editContentIdInput.value; const docType = editContentTypeInput.value;
+             if (!docId || !docType) { editStatusMessage.textContent = 'Erro: ID/Tipo ausente.'; editStatusMessage.className = 'error'; saveEditButton.disabled = false; return; }
              const dataToUpdate = {
-                 nome: editNomeInput.value.trim() || null, // Use null if empty for potential deletion via update
-                 ano: parseInt(editAnoInput.value) || null,
-                 imagem: editImagemInput.value.trim() || null,
-                 pagina: editPaginaInput.value.trim() || null,
-                 atores: popupEditSelectedActresses.map(a => a.id), // Get IDs from state
-                 // Add timestamp? Firestore automatically updates metadata, but you might want your own field
-                 // updatedAt: serverTimestamp() // Example if you add an 'updatedAt' field
+                 nome: editNomeInput.value.trim() || null, ano: parseInt(editAnoInput.value) || null,
+                 imagem: editImagemInput.value.trim() || null, pagina: editPaginaInput.value.trim() || null,
+                 updatedAt: serverTimestamp() // Add updated timestamp
              };
-
-             // Add type-specific fields
-             if (docType === 'videos') {
-                  dataToUpdate.no = parseInt(editNumeroInput.value) || null;
-             } else if (docType === 'cenas') {
+             // Only add actors if the section is visible (i.e., not for movies in this example)
+             if (editActressSection.style.display !== 'none') {
+                 dataToUpdate.atores = popupEditSelectedActresses.map(a => a.id);
+             }
+             // Type-specific fields
+             if (docType === 'videos') { dataToUpdate.no = parseInt(editNumeroInput.value) || null; }
+             else if (docType === 'cenas') {
                  dataToUpdate.numeroCena = parseInt(editSceneNumeroInput.value) || null;
                  dataToUpdate.filmeId = editSceneFilmeSelect.value || null;
-                  if (!dataToUpdate.filmeId) { // Basic validation for required scene fields
-                       editStatusMessage.textContent = 'Erro: O campo "Filme Associado" é obrigatório para cenas.';
-                       editStatusMessage.className = 'error';
-                       saveEditButton.disabled = false;
-                       return;
-                   }
-                    if (dataToUpdate.numeroCena === null) {
-                       editStatusMessage.textContent = 'Erro: O campo "Número da Cena" é obrigatório para cenas.';
-                       editStatusMessage.className = 'error';
-                       saveEditButton.disabled = false;
-                       return;
-                   }
+                  if (!dataToUpdate.filmeId || dataToUpdate.numeroCena === null) { editStatusMessage.textContent = 'Erro: Filme e Número de Cena são obrigatórios.'; editStatusMessage.className = 'error'; saveEditButton.disabled = false; return; }
              }
-             // Add else if for 'filmes'
-
-             // Clean up null values BEFORE sending to Firestore if you want to remove fields
+             // Clean up null/empty values (optional: decide how to handle empty strings vs null)
               Object.keys(dataToUpdate).forEach(key => {
-                  if (dataToUpdate[key] === null || dataToUpdate[key] === '') {
-                      // If you want empty strings to REMOVE the field, use delete.
-                      // If you want empty strings to be SAVED as empty, keep them.
-                      // For numbers, null already indicates potential removal if field exists.
-                      if (typeof dataToUpdate[key] === 'string' && dataToUpdate[key] === '') {
-                           delete dataToUpdate[key]; // Example: remove field if string is empty
-                      } else if (dataToUpdate[key] === null) {
-                           delete dataToUpdate[key]; // Example: remove field if value is null
-                      }
-                  }
-                   // Remove NaN values resulting from parseInt
-                  if ((key === 'ano' || key === 'no' || key === 'numeroCena') && isNaN(dataToUpdate[key])) {
-                       delete dataToUpdate[key];
-                  }
+                  if (dataToUpdate[key] === null) delete dataToUpdate[key];
+                  if ((key === 'ano' || key === 'no' || key === 'numeroCena') && isNaN(dataToUpdate[key])) delete dataToUpdate[key];
               });
-
-
              try {
-                 const contentRef = doc(db, docType, docId); // Use correct type
-                 await updateDoc(contentRef, dataToUpdate); // Use updateDoc
-
-                 editStatusMessage.textContent = 'Alterações salvas com sucesso!';
-                 editStatusMessage.className = 'success';
-
-                 // Refresh the main page content AFTER successful save
-                 await loadContentDetails();
-
-                 // Close popup after a delay
-                 setTimeout(() => {
-                     editPopupOverlay.style.display = 'none';
-                 }, 1500);
-
-             } catch (error) {
-                 console.error("Erro ao salvar alterações:", error);
-                 editStatusMessage.textContent = `Erro ao salvar: ${error.message}`;
-                 editStatusMessage.className = 'error';
-                 saveEditButton.disabled = false; // Re-enable on error
-             }
+                 const contentRef = doc(db, docType, docId); await updateDoc(contentRef, dataToUpdate);
+                 editStatusMessage.textContent = 'Salvo com sucesso!'; editStatusMessage.className = 'success';
+                 await loadContentDetails(); // Refresh main page
+                 setTimeout(() => { editPopupOverlay.style.display = 'none'; }, 1500);
+             } catch (error) { console.error("Erro ao salvar:", error); editStatusMessage.textContent = `Erro: ${error.message}`; editStatusMessage.className = 'error'; saveEditButton.disabled = false; }
          }
+
+        // --- Edit Popup Actress Search/Select Functions ---
+        function renderEditPopupActressPills() { /* ... keep ... */
+            if (!popupEditSelectedContainer) return; popupEditSelectedContainer.innerHTML = '';
+             popupEditSelectedActresses.forEach(actress => { /* ... create pill ... */ });
+         }
+        function handleEditPopupRemoveActress(event) { /* ... keep ... */
+            event.stopPropagation(); const pill = event.target.closest('.actress-pill'); if (!pill) return; const id = pill.dataset.id; popupEditSelectedActresses = popupEditSelectedActresses.filter(a => a.id !== id); renderEditPopupActressPills();
+         }
+        function displayEditPopupSuggestions(searchTerm) { /* ... keep ... */
+            if (!popupEditSuggestions || !popupEditSearchInput) return; popupEditSuggestions.innerHTML = ''; if (!searchTerm) { popupEditSuggestions.style.display = 'none'; return; } const term = searchTerm.toLowerCase(); const matches = allActresses.filter(a => a.nome.toLowerCase().includes(term) && !popupEditSelectedActresses.some(sa => sa.id === a.id)).sort((a,b)=>a.nome.localeCompare(b.nome)); if (matches.length > 0) { matches.slice(0, 7).forEach(actress => { /* ... create item ... */ }); popupEditSuggestions.style.display = 'block'; } else { /* ... no results ... */ }
+         }
+        function handleEditPopupSelectActress(event) { /* ... keep ... */
+            const target = event.currentTarget; const id = target.dataset.id; const name = target.dataset.nome; if (!id || !name) return; if (!popupEditSelectedActresses.some(a => a.id === id)) { const data = allActresses.find(a => a.id === id); popupEditSelectedActresses.push({ id, nome: name, foto: data?.foto }); renderEditPopupActressPills(); } if (popupEditSearchInput) popupEditSearchInput.value = ''; if (popupEditSuggestions) popupEditSuggestions.style.display = 'none'; if (popupEditSearchInput) popupEditSearchInput.focus();
+         }
+
 
         // --- Event Listeners ---
         document.addEventListener('DOMContentLoaded', () => {
-
-            // Pre-fetch actresses and movies for popups
+            // Pre-fetch data
             fetchAllActresses();
-             fetchAllMovies(); // Fetch movies for scene editing
+            fetchAllMovies();
 
-            // Back Button
-            if (backButton) {
-                backButton.addEventListener('click', () => { /* ... (keep existing back logic) ... */
-                    if (document.referrer) { history.back(); }
-                    else { window.location.href = 'videos.html'; } // Fallback page
-                });
-            } else { console.error("Botão 'Voltar' não encontrado!"); }
+            // Button Listeners
+            if (backButton) { backButton.addEventListener('click', () => { if (document.referrer) history.back(); else window.location.href = 'videos.html'; }); }
+            if (editContentBtn) { editContentBtn.addEventListener('click', openEditPopup); }
 
-            // Edit Button Click
-            if (editContentBtn) {
-                editContentBtn.addEventListener('click', openEditPopup);
-            } else { console.error("Botão 'Editar' não encontrado!"); }
-
-            // Edit Popup Close Button
-            if (closeEditPopupBtn) {
-                closeEditPopupBtn.addEventListener('click', () => { editPopupOverlay.style.display = 'none'; });
-            }
-
-            // Edit Popup Overlay Click (to close)
-            if (editPopupOverlay) {
-                editPopupOverlay.addEventListener('click', (event) => { if (event.target === editPopupOverlay) { editPopupOverlay.style.display = 'none'; } });
-            }
-
-            // Edit Popup Save Button
-            if (saveEditButton) {
-                saveEditButton.addEventListener('click', handleSaveChanges);
-            }
-
-            // Edit Popup Actress Search Input Listeners
+            // Edit Popup Listeners
+            if (closeEditPopupBtn) { closeEditPopupBtn.addEventListener('click', () => { editPopupOverlay.style.display = 'none'; }); }
+            if (editPopupOverlay) { editPopupOverlay.addEventListener('click', (event) => { if (event.target === editPopupOverlay) editPopupOverlay.style.display = 'none'; }); }
+            if (saveEditButton) { saveEditButton.addEventListener('click', handleSaveChanges); }
             if (popupEditSearchInput) {
-                popupEditSearchInput.addEventListener('input', () => displayEditPopupSuggestions(popupEditSearchInput.value));
-                popupEditSearchInput.addEventListener('focus', () => displayEditPopupSuggestions(popupEditSearchInput.value));
+                 popupEditSearchInput.addEventListener('input', () => displayEditPopupSuggestions(popupEditSearchInput.value));
+                 popupEditSearchInput.addEventListener('focus', () => displayEditPopupSuggestions(popupEditSearchInput.value));
+             }
+
+            // Tooltip Listeners
+            const detailsSection = document.getElementById('content-details');
+            if (detailsSection) {
+                detailsSection.addEventListener('mouseover', (event) => { if (event.target.classList.contains('actress-link')) { clearTimeout(tooltipHideTimeout); const id = event.target.dataset.actressId; const data = currentContentActressDetails[id]; if (data) { populateTooltip(data); positionAndShowTooltip(event.target); } else { hideTooltip(); } } });
+                detailsSection.addEventListener('mouseout', (event) => { if (event.target.classList.contains('actress-link')) { clearTimeout(tooltipHideTimeout); tooltipHideTimeout = setTimeout(hideTooltip, 100); } });
             }
+            if (actressTooltip) {
+                 actressTooltip.addEventListener('mouseover', () => { clearTimeout(tooltipHideTimeout); });
+                 actressTooltip.addEventListener('mouseout', () => { clearTimeout(tooltipHideTimeout); tooltipHideTimeout = setTimeout(hideTooltip, 100); });
+             }
             // Global click listener to hide EDIT suggestions
-            document.addEventListener('click', (event) => {
-                const editSearchArea = document.getElementById('popup-edit-actress-search');
-                if (editSearchArea && !editSearchArea.contains(event.target) && popupEditSuggestions && popupEditSuggestions.style.display !== 'none') {
-                    popupEditSuggestions.style.display = 'none';
-                }
-            });
+             document.addEventListener('click', (event) => { const editArea = document.getElementById('popup-edit-actress-search'); if (editArea && !editArea.contains(event.target) && popupEditSuggestions && popupEditSuggestions.style.display !== 'none') { popupEditSuggestions.style.display = 'none'; } });
 
-
-            // Load initial content details
-            loadContentDetails(); // This now also sets currentContentId and currentContentType
-
+            // Load initial details
+            loadContentDetails();
         });
     </script>
 
