@@ -71,7 +71,7 @@
         .video-number-badge { position: absolute; top: 10px; left: 10px; background-color: rgba(187, 134, 252, 0.85); color: #121212; font-size: 0.9em; font-weight: bold; padding: 4px 8px; border-radius: 4px; z-index: 1; }
         .message { color: #aaa; font-size: 1.1em; text-align: center; padding: 40px; grid-column: 1 / -1; }
 
-        /* --- ESTILOS PARA O POPUP DE CRIAÇÃO (COPIADOS DO vid.html) --- */
+        /* --- ESTILOS PARA O POPUP DE CRIAÇÃO --- */
         #open-create-popup-btn {
             position: fixed;
             bottom: 25px;
@@ -176,9 +176,7 @@
             box-sizing: border-box;
             font-size: 1em;
         }
-        .create-form-group select[multiple] {
-            min-height: 100px; /* Altura mínima para multi-select */
-        }
+        /* Removed min-height for multi-select as it's gone */
 
         .create-form-group input:focus,
         .create-form-group select:focus {
@@ -218,8 +216,107 @@
         }
         #save-content-button:hover { background-color: #a774e6; }
         #save-content-button:disabled { background-color: #555; color: #999; cursor: not-allowed; }
-        /* --- FIM DOS ESTILOS DO POPUP --- */
 
+        /* --- NOVOS ESTILOS PARA POPUP ACTRESS SEARCH --- */
+        /* Style for the container holding selected pills inside the popup */
+        .selected-actresses-container-popup {
+            display: contents; /* Behaves like the main page one */
+        }
+
+        /* Style for the suggestions list specifically within the popup */
+        .suggestions-list-popup {
+            /* Copy styles from #suggestions-list */
+            display: none;
+            position: absolute;
+            top: 100%; /* Position below the input wrapper */
+            left: 0;
+            right: 0;
+            z-index: 1060; /* Ensure it's above popup content but below modals if any */
+            background-color: #2e2e2e;
+            border: 1px solid #555;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            max-height: 180px; /* Slightly smaller max-height maybe */
+            overflow-y: auto;
+        }
+
+        /* Ensure popup search wrappers behave correctly */
+        .popup-search-wrapper {
+            /* Re-apply relevant styles if needed, but defaults should work */
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border: 1px solid #555;
+            border-radius: 6px;
+            background-color: #404040; /* Match popup input background */
+            cursor: text;
+            margin-top: 5px; /* Add some space below the label */
+        }
+        .popup-search-wrapper:focus-within {
+           border-color: #bb86fc;
+           box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.3); /* Match popup focus */
+        }
+
+        .popup-search-input {
+            /* Re-apply relevant styles if needed */
+            flex-grow: 1;
+            padding: 6px 5px;
+            border: none;
+            background-color: transparent;
+            color: #e0e0e0;
+            font-size: 1em;
+            min-width: 150px;
+            outline: none;
+        }
+
+        /* Reuse suggestion item styles - ensure they work with the new parent */
+        .suggestions-list-popup .suggestion-item {
+            display: flex;
+            padding: 8px 15px;
+            color: #e0e0e0;
+            cursor: pointer;
+            align-items: center;
+            gap: 10px;
+        }
+        .suggestions-list-popup .suggestion-item:hover {
+            background-color: #444;
+        }
+        .suggestions-list-popup .suggestion-item.no-results {
+            cursor: default;
+            color: #aaa;
+            justify-content: center;
+        }
+        .suggestions-list-popup .suggestion-item img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        /* Ensure pills look the same */
+        .popup-search-wrapper .actress-pill {
+            display: inline-flex;
+            align-items: center;
+            background-color: #bb86fc;
+            color: #121212;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            margin: 2px;
+            white-space: nowrap;
+        }
+        .popup-search-wrapper .actress-pill span { margin-right: 5px; }
+        .popup-search-wrapper .remove-actress-btn {
+            background: none; border: none; color: #121212; cursor: pointer;
+            font-weight: bold; font-size: 1.1em; padding: 0 2px; line-height: 1;
+        }
+        .popup-search-wrapper .remove-actress-btn:hover { opacity: 0.7; }
+
+        /* --- FIM DOS ESTILOS DO POPUP --- */
     </style>
 </head>
 <body>
@@ -264,12 +361,12 @@
     </div>
     <!-- FIM CONTAINER -->
 
-    <!-- BOTÃO DE ENGRENAGEM PARA ABRIR POPUP (COPIADO) -->
+    <!-- BOTÃO DE ENGRENAGEM PARA ABRIR POPUP -->
     <button id="open-create-popup-btn" title="Criar Novo Conteúdo">
         <i class="fa-solid fa-gear"></i>
     </button>
 
-    <!-- POPUP DE CRIAÇÃO (COPIADO E Escondido Inicialmente) -->
+    <!-- POPUP DE CRIAÇÃO (Escondido Inicialmente) -->
     <div class="create-popup-overlay" id="create-popup-overlay">
         <div class="create-popup-content">
             <button class="create-popup-close-btn" id="close-create-popup-btn">×</button>
@@ -284,13 +381,28 @@
                 </select>
             </div>
             <div id="create-form-container">
+                <!-- === Video Form === -->
                 <div id="video-form">
                      <div class="create-form-group"> <label for="video-nome">Nome:</label> <input type="text" id="video-nome" required> </div>
                     <div class="create-form-group"> <label for="video-ano">Ano:</label> <input type="number" id="video-ano" placeholder="Ex: 2023"> </div>
                      <div class="create-form-group"> <label for="video-imagem">Imagem (URL):</label> <input type="url" id="video-imagem" placeholder="https://..."> </div>
                     <div class="create-form-group"> <label for="video-pagina">Página (URL Externa):</label> <input type="url" id="video-pagina" placeholder="https://..."> </div>
-                     <div class="create-form-group"> <label for="video-atores">Atrizes (Selecione uma ou mais):</label> <select id="video-atores" multiple> <option value="">Carregando atrizes...</option> </select> </div>
+                    <!-- *** NEW ACTRESS SEARCH FOR VIDEO *** -->
+                    <div class="create-form-group">
+                        <label for="popup-video-search-input">Atrizes:</label>
+                        <div class="actress-search-area" id="popup-video-actress-search">
+                            <div class="search-input-wrapper popup-search-wrapper" onclick="document.getElementById('popup-video-search-input').focus()">
+                                <!-- Selected actress pills will go here -->
+                                <div id="popup-video-selected-actresses" class="selected-actresses-container-popup"></div>
+                                <input type="text" id="popup-video-search-input" class="search-input popup-search-input" placeholder="Pesquisar e adicionar atriz...">
+                            </div>
+                            <!-- Suggestions list for this input -->
+                            <div id="popup-video-suggestions" class="suggestions-list-popup"></div>
+                        </div>
+                    </div>
+                    <!-- *** END NEW ACTRESS SEARCH FOR VIDEO *** -->
                 </div>
+                <!-- === Scene Form === -->
                 <div id="scene-form">
                      <div class="create-form-group"> <label for="scene-nome">Nome da Cena:</label> <input type="text" id="scene-nome" required> </div>
                      <div class="create-form-group"> <label for="scene-filme">Filme:</label> <select id="scene-filme" required> <option value="">Carregando filmes...</option> </select> </div>
@@ -298,13 +410,28 @@
                     <div class="create-form-group"> <label for="scene-ano">Ano:</label> <input type="number" id="scene-ano" placeholder="Ex: 2023"> </div>
                     <div class="create-form-group"> <label for="scene-imagem">Imagem (URL):</label> <input type="url" id="scene-imagem" placeholder="https://..."> </div>
                     <div class="create-form-group"> <label for="scene-pagina">Página (URL Externa):</label> <input type="url" id="scene-pagina" placeholder="https://..."> </div>
-                     <div class="create-form-group"> <label for="scene-atores">Atrizes (Selecione uma ou mais):</label> <select id="scene-atores" multiple> <option value="">Carregando atrizes...</option> </select> </div>
+                    <!-- *** NEW ACTRESS SEARCH FOR SCENE *** -->
+                     <div class="create-form-group">
+                        <label for="popup-scene-search-input">Atrizes:</label>
+                        <div class="actress-search-area" id="popup-scene-actress-search">
+                            <div class="search-input-wrapper popup-search-wrapper" onclick="document.getElementById('popup-scene-search-input').focus()">
+                                <!-- Selected actress pills will go here -->
+                                <div id="popup-scene-selected-actresses" class="selected-actresses-container-popup"></div>
+                                <input type="text" id="popup-scene-search-input" class="search-input popup-search-input" placeholder="Pesquisar e adicionar atriz...">
+                            </div>
+                            <!-- Suggestions list for this input -->
+                            <div id="popup-scene-suggestions" class="suggestions-list-popup"></div>
+                        </div>
+                    </div>
+                    <!-- *** END NEW ACTRESS SEARCH FOR SCENE *** -->
                 </div>
+                <!-- === Movie Form === -->
                 <div id="movie-form">
                      <div class="create-form-group"> <label for="movie-nome">Nome do Filme:</label> <input type="text" id="movie-nome" required> </div>
                     <div class="create-form-group"> <label for="movie-ano">Ano:</label> <input type="number" id="movie-ano" placeholder="Ex: 2023"> </div>
                     <div class="create-form-group"> <label for="movie-imagem">Imagem (URL):</label> <input type="url" id="movie-imagem" placeholder="https://..."> </div>
                     <div class="create-form-group"> <label for="movie-pagina">Página (URL Externa):</label> <input type="url" id="movie-pagina" placeholder="https://..."> </div>
+                     <!-- Movies don't have actresses directly attached in this form -->
                 </div>
             </div>
             <div id="create-status-message"></div>
@@ -316,7 +443,6 @@
     <!-- Firebase Modular SDKs via CDN -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        // ADDED: doc, getDoc, addDoc, serverTimestamp, query, orderBy for popup functionality
         import { getFirestore, collection, getDocs, doc, getDoc, addDoc, serverTimestamp, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         // Firebase Config (igual)
@@ -341,33 +467,45 @@
         const selectedActressesContainer = document.getElementById('selected-actresses-container');
         const searchInputWrapper = document.querySelector('.search-input-wrapper');
 
-        // --- DOM References (Popup - ADDED) ---
+
+        // --- DOM References (Popup - UPDATED) ---
         const openCreatePopupBtn = document.getElementById('open-create-popup-btn');
         const createPopupOverlay = document.getElementById('create-popup-overlay');
         const closeCreatePopupBtn = document.getElementById('close-create-popup-btn');
         const contentTypeSelector = document.getElementById('content-type-selector');
-        const formContainer = document.getElementById('create-form-container'); // Parent of specific forms
+        const formContainer = document.getElementById('create-form-container');
         const videoForm = document.getElementById('video-form');
         const sceneForm = document.getElementById('scene-form');
         const movieForm = document.getElementById('movie-form');
         const saveContentButton = document.getElementById('save-content-button');
         const createStatusMessage = document.getElementById('create-status-message');
-        const videoActoresSelect = document.getElementById('video-atores');
-        const sceneActoresSelect = document.getElementById('scene-atores');
+        // REMOVED: videoActoresSelect, sceneActoresSelect
         const sceneFilmeSelect = document.getElementById('scene-filme');
+
+        // ADDED: References for new popup actress search elements
+        const popupVideoSearchInput = document.getElementById('popup-video-search-input');
+        const popupVideoSuggestions = document.getElementById('popup-video-suggestions');
+        const popupVideoSelectedContainer = document.getElementById('popup-video-selected-actresses');
+
+        const popupSceneSearchInput = document.getElementById('popup-scene-search-input');
+        const popupSceneSuggestions = document.getElementById('popup-scene-suggestions');
+        const popupSceneSelectedContainer = document.getElementById('popup-scene-selected-actresses');
 
 
         // --- Global Data Storage (Existing Page) ---
         let allContent = [];
-        let allActresses = []; // Used by both main page search and popup selects
-        let selectedActresses = [];
+        let allActresses = []; // Used by BOTH main page and popup searches
+        let selectedActresses = []; // For main page filter
         let activeTypeFilter = 'all';
 
-        // --- Popup State Variables (ADDED) ---
-        let actorsLoaded = false;
+        // --- Popup State Variables (UPDATED) ---
+        // REMOVED: actorsLoaded
         let moviesLoaded = false;
+        let popupSelectedVideoActresses = []; // NEW: Holds selected actresses for the video form
+        let popupSelectedSceneActresses = []; // NEW: Holds selected actresses for the scene form
 
-        // --- FUNCTION TO RENDER CONTENT BASED ON FILTERS (Existing Page) ---
+
+        // --- FUNCTION TO RENDER CONTENT BASED ON FILTERS (Existing Page - UNCHANGED) ---
         function renderContent() {
             if (!contentContainer) return;
             let contentHTML = '';
@@ -404,141 +542,346 @@
             }
             contentContainer.innerHTML = contentHTML;
         }
-
-        // --- FUNCTION TO GENERATE HTML FOR A SINGLE CARD (Existing Page) ---
-          function generateCardHTML(item) {
+        function generateCardHTML(item) {
             const nome = item.nome || (item.type === 'video' ? 'Vídeo sem nome' : 'Filme sem nome');
             const imagem = item.imagem || 'path/to/default/placeholder.png'; // Use a real path
             const ano = item.ano || 'N/A';
             const videoNo = item.no !== undefined ? item.no : '?';
             let cardLink = '#';
-            if (item.type === 'video') { cardLink = `vid.html?id=${item.id}`; }
-            else if (item.type === 'film') { cardLink = `film_detail.html?id=${item.id}`; } // Assumes film_detail.html exists
+            // Determine link based on type - Make sure these target pages exist
+            if (item.type === 'video') { cardLink = `vid.html?id=${item.id}`; } // Assumes vid.html
+            else if (item.type === 'film') { cardLink = `film_detail.html?id=${item.id}`; } // Assumes film_detail.html
+            else if (item.type === 'scene') { cardLink = `scene_detail.html?id=${item.id}`; } // Assumes scene_detail.html (If scenes have detail pages)
+
             let cardHTML = `<a href="${cardLink}" class="content-card-link">`;
             if (item.type === 'video') {
-                cardHTML += `<div class="content-card video-card" data-id="${item.id}">${videoNo !== '?' ? `<span class="video-number-badge">#${videoNo}</span>` : ''}<img src="${imagem}" alt="${nome}"><div class="content-info"><h3>${nome}</h3></div></div>`;
-            } else {
+                cardHTML += `<div class="content-card video-card" data-id="${item.id}">`;
+                if (videoNo !== '?') {
+                    cardHTML += `<span class="video-number-badge">#${videoNo}</span>`;
+                }
+                 cardHTML += `<img src="${imagem}" alt="${nome}"><div class="content-info"><h3>${nome}</h3></div></div>`;
+            } else if (item.type === 'film') { // Film Card
                 cardHTML += `<div class="content-card film-card" data-id="${item.id}"><img src="${imagem}" alt="${nome}"><div class="content-info"><h3>${nome}</h3><p class="year">(${ano})</p></div></div>`;
-            }
+            } else if (item.type === 'scene') { // Scene Card (Example - Adjust as needed)
+                 cardHTML += `<div class="content-card scene-card" data-id="${item.id}">`;
+                 // Maybe display scene number or related movie name?
+                 cardHTML += `<img src="${imagem}" alt="${nome}"><div class="content-info"><h3>${nome}</h3><p class="year">(Cena ${item.numeroCena || ''})</p></div></div>`;
+             }
+             else { // Fallback for unknown type
+                 cardHTML += `<div class="content-card unknown-card" data-id="${item.id}"><img src="${imagem}" alt="${nome}"><div class="content-info"><h3>${nome}</h3></div></div>`;
+             }
             cardHTML += `</a>`;
             return cardHTML;
         }
 
-        // --- FUNCTIONS FOR ACTRESS SEARCH & SELECTION (Existing Page) ---
-        function updateCoStarsList() { /* ... (keep existing function) ... */
-            suggestionsList.innerHTML = '';
-            suggestionsList.style.display = 'none';
-            if (selectedActresses.length === 0) return;
-            const selectedActressIds = selectedActresses.map(a => a.id);
-            let commonContentItems = allContent.filter(item => {
+        // --- FUNCTIONS FOR MAIN PAGE ACTRESS SEARCH & SELECTION (Existing Page - UNCHANGED) ---
+        // These functions ONLY affect the main filter bar
+        function updateCoStarsList() {
+             suggestionsList.innerHTML = '';
+             suggestionsList.style.display = 'none';
+             if (selectedActresses.length === 0 || !allActresses.length) return; // Check if actresses loaded
+
+             const selectedActressIds = selectedActresses.map(a => a.id);
+
+             // Find content items that contain ALL selected actresses
+             let commonContentItems = allContent.filter(item => {
                  if (!item.atores || !Array.isArray(item.atores) || item.atores.length < selectedActresses.length) return false;
                  return selectedActressIds.every(selectedId => item.atores.includes(selectedId));
-            });
-            if (commonContentItems.length === 0 && selectedActresses.length > 1) {
-                const noCommonItem = document.createElement('div');
-                noCommonItem.classList.add('suggestion-item', 'no-results');
-                noCommonItem.textContent = 'Nenhum conteúdo encontrado com todas as atrizes selecionadas.';
-                suggestionsList.appendChild(noCommonItem);
-                suggestionsList.style.display = 'block'; return;
-            }
-            let potentialCoStarIds = new Set();
-            commonContentItems.forEach(item => { item.atores.forEach(actressId => { potentialCoStarIds.add(actressId); }); });
-            selectedActressIds.forEach(idToRemove => { potentialCoStarIds.delete(idToRemove); });
-            const validCoStars = allActresses.filter(actress => potentialCoStarIds.has(actress.id));
-            if (validCoStars.length > 0) {
-                const titleItem = document.createElement('div');
-                titleItem.classList.add('suggestion-title');
-                const titlePrefix = selectedActresses.length === 1 ? `Co-estrelas de ${selectedActresses[0].nome}` : 'Co-estrelas Comuns';
-                titleItem.textContent = `${titlePrefix}:`;
-                suggestionsList.appendChild(titleItem);
-                validCoStars.forEach(coStar => {
-                    const item = document.createElement('div');
-                    item.classList.add('suggestion-item', 'costar-suggestion-item');
-                    item.innerHTML = `<img src="${coStar.foto || 'path/to/default/avatar.png'}" alt="${coStar.nome}"><span>${coStar.nome}</span><button class="add-costar-btn" data-id="${coStar.id}" data-name="${coStar.nome}">Adicionar</button>`;
-                    suggestionsList.appendChild(item);
-                });
-                suggestionsList.style.display = 'block';
-            } else {
-                const noResultsItem = document.createElement('div');
-                noResultsItem.classList.add('suggestion-item', 'no-results');
-                const reasonText = selectedActresses.length === 1 ? `Nenhuma co-estrela adicional encontrada para ${selectedActresses[0].nome}` : 'Nenhuma co-estrela comum adicional encontrada';
-                noResultsItem.textContent = reasonText;
-                suggestionsList.appendChild(noResultsItem);
-                suggestionsList.style.display = 'block';
-            }
-        }
-        function handleAddCoStarClick(event) { /* ... (keep existing function) ... */
-             const button = event.target; const actressId = button.dataset.id; const actressName = button.dataset.name;
-             if (!actressId || !actressName) return;
-             selectedActresses.push({ id: actressId, nome: actressName });
-             renderSelectedActressesPills(); renderContent(); updateCoStarsList();
-        }
-        function displayStandardSuggestions(searchTerm) { /* ... (keep existing function) ... */
-            suggestionsList.innerHTML = ''; if (!searchTerm) { suggestionsList.style.display = 'none'; return; }
-            const lowerSearchTerm = searchTerm.toLowerCase();
-            const matchedActresses = allActresses.filter(actress => actress.nome.toLowerCase().includes(lowerSearchTerm) && !selectedActresses.some(sa => sa.id === actress.id) );
-            if (matchedActresses.length > 0) {
-                matchedActresses.slice(0, 10).forEach(actress => {
-                    const item = document.createElement('div'); item.classList.add('suggestion-item'); item.dataset.id = actress.id; item.dataset.nome = actress.nome;
-                    item.innerHTML = `<img src="${actress.foto || 'path/to/default/avatar.png'}" alt=""><span>${actress.nome}</span>`;
-                    item.addEventListener('click', handleSelectActressClick); suggestionsList.appendChild(item);
-                });
-                suggestionsList.style.display = 'block';
-            } else { suggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma atriz encontrada</div>'; suggestionsList.style.display = 'block'; }
-        }
-        function handleSelectActressClick(event) { /* ... (keep existing function) ... */
-            const target = event.currentTarget; const actressId = target.dataset.id; const actressName = target.dataset.nome;
-            if (!actressId || !actressName) { console.error("Data missing!"); return; }
+             });
+
+             if (commonContentItems.length === 0 && selectedActresses.length > 0) { // Changed condition slightly
+                 const noCommonItem = document.createElement('div');
+                 noCommonItem.classList.add('suggestion-item', 'no-results');
+                 noCommonItem.textContent = 'Nenhum conteúdo encontrado com todas as atrizes selecionadas.';
+                 suggestionsList.appendChild(noCommonItem);
+                 suggestionsList.style.display = 'block';
+                 return;
+             }
+
+             // Collect all actress IDs from these common items
+             let potentialCoStarIds = new Set();
+             commonContentItems.forEach(item => {
+                 item.atores.forEach(actressId => {
+                     potentialCoStarIds.add(actressId);
+                 });
+             });
+
+             // Remove the already selected actresses from the potential co-stars
+             selectedActressIds.forEach(idToRemove => {
+                 potentialCoStarIds.delete(idToRemove);
+             });
+
+             // Filter the main actress list to get the actual co-star objects
+             const validCoStars = allActresses.filter(actress => potentialCoStarIds.has(actress.id));
+
+              // Sort co-stars alphabetically by name
+             validCoStars.sort((a, b) => a.nome.localeCompare(b.nome));
+
+             if (validCoStars.length > 0) {
+                 const titleItem = document.createElement('div');
+                 titleItem.classList.add('suggestion-title');
+                 const titlePrefix = selectedActresses.length === 1 ? `Co-estrelas de ${selectedActresses[0].nome}` : 'Co-estrelas Comuns';
+                 titleItem.textContent = `${titlePrefix}:`;
+                 suggestionsList.appendChild(titleItem);
+
+                 validCoStars.forEach(coStar => {
+                     const item = document.createElement('div');
+                     item.classList.add('suggestion-item', 'costar-suggestion-item');
+                     item.innerHTML = `
+                         <img src="${coStar.foto || 'path/to/default/avatar.png'}" alt="${coStar.nome}">
+                         <span>${coStar.nome}</span>
+                         <button class="add-costar-btn" data-id="${coStar.id}" data-name="${coStar.nome}">Adicionar</button>
+                     `;
+                     suggestionsList.appendChild(item);
+                 });
+                 suggestionsList.style.display = 'block';
+             } else if (selectedActresses.length > 0) { // Only show "no results" if actresses ARE selected
+                 const noResultsItem = document.createElement('div');
+                 noResultsItem.classList.add('suggestion-item', 'no-results');
+                 const reasonText = selectedActresses.length === 1 ? `Nenhuma co-estrela adicional encontrada para ${selectedActresses[0].nome}` : 'Nenhuma co-estrela comum adicional encontrada';
+                 noResultsItem.textContent = reasonText;
+                 suggestionsList.appendChild(noResultsItem);
+                 suggestionsList.style.display = 'block';
+             }
+         }
+        function handleAddCoStarClick(event) {
+            const button = event.target;
+            const actressId = button.dataset.id;
+            const actressName = button.dataset.name;
+            if (!actressId || !actressName) return;
+
+            // Check if already selected
             if (!selectedActresses.some(a => a.id === actressId)) {
-                selectedActresses.push({ id: actressId, nome: actressName }); renderSelectedActressesPills(); renderContent();
-                setTimeout(() => { updateCoStarsList(); }, 0); // Keep timeout
-            } else { suggestionsList.innerHTML = ''; suggestionsList.style.display = 'none'; }
-            searchInput.value = '';
+                selectedActresses.push({ id: actressId, nome: actressName });
+                renderSelectedActressesPills(); // Update main pills
+                renderContent(); // Re-filter main content
+                updateCoStarsList(); // Update suggestions based on new selection
+            }
+         }
+        function displayStandardSuggestions(searchTerm) {
+             suggestionsList.innerHTML = '';
+             if (!searchTerm) {
+                 // If input is empty BUT actresses are selected, show co-stars
+                 if(selectedActresses.length > 0) {
+                     updateCoStarsList();
+                 } else {
+                     suggestionsList.style.display = 'none';
+                 }
+                 return;
+             }
+
+             const lowerSearchTerm = searchTerm.toLowerCase();
+             const matchedActresses = allActresses.filter(actress =>
+                 actress.nome.toLowerCase().includes(lowerSearchTerm) &&
+                 !selectedActresses.some(sa => sa.id === actress.id) // Exclude already selected
+             );
+
+             if (matchedActresses.length > 0) {
+                 // Optional: Add a title for standard suggestions?
+                 // const titleItem = document.createElement('div'); titleItem.classList.add('suggestion-title'); titleItem.textContent = 'Adicionar Atriz:'; suggestionsList.appendChild(titleItem);
+
+                 matchedActresses.slice(0, 10).forEach(actress => {
+                     const item = document.createElement('div');
+                     item.classList.add('suggestion-item');
+                     item.dataset.id = actress.id;
+                     item.dataset.nome = actress.nome;
+                     item.innerHTML = `<img src="${actress.foto || 'path/to/default/avatar.png'}" alt=""><span>${actress.nome}</span>`;
+                     item.addEventListener('click', handleSelectActressClick); // Main page select handler
+                     suggestionsList.appendChild(item);
+                 });
+                 suggestionsList.style.display = 'block';
+             } else {
+                 suggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma atriz encontrada</div>';
+                 suggestionsList.style.display = 'block';
+             }
         }
-        function renderSelectedActressesPills() { /* ... (keep existing function) ... */
-            selectedActressesContainer.innerHTML = '';
-            selectedActresses.forEach(actress => {
-                const pill = document.createElement('div'); pill.classList.add('actress-pill'); pill.dataset.id = actress.id;
-                pill.innerHTML = `<span>${actress.nome}</span><button class="remove-actress-btn" title="Remover">×</button>`;
-                pill.querySelector('.remove-actress-btn').addEventListener('click', handleRemoveActress);
-                selectedActressesContainer.appendChild(pill);
+        function handleSelectActressClick(event) {
+            const target = event.currentTarget;
+            const actressId = target.dataset.id;
+            const actressName = target.dataset.nome;
+            if (!actressId || !actressName) { console.error("Data missing!"); return; }
+
+            if (!selectedActresses.some(a => a.id === actressId)) {
+                selectedActresses.push({ id: actressId, nome: actressName });
+                renderSelectedActressesPills(); // Update main pills
+                renderContent(); // Re-filter main content
+                // Use setTimeout to ensure DOM updates before CoStar list calculation
+                setTimeout(() => { updateCoStarsList(); }, 0);
+            } else {
+                // If already selected, just hide suggestions
+                 suggestionsList.innerHTML = '';
+                 suggestionsList.style.display = 'none';
+            }
+            searchInput.value = ''; // Clear main search input after selection
+        }
+        function renderSelectedActressesPills() {
+            if (!selectedActressesContainer) return;
+             selectedActressesContainer.innerHTML = '';
+             selectedActresses.forEach(actress => {
+                 const pill = document.createElement('div');
+                 pill.classList.add('actress-pill');
+                 pill.dataset.id = actress.id; // Store ID on the pill
+                 pill.innerHTML = `
+                     <span>${actress.nome}</span>
+                     <button class="remove-actress-btn" title="Remover">×</button>
+                 `;
+                 // Add event listener SPECIFIC to the MAIN PAGE remove handler
+                 pill.querySelector('.remove-actress-btn').addEventListener('click', handleRemoveActress);
+                 selectedActressesContainer.appendChild(pill);
+             });
+        }
+        function handleRemoveActress(event) {
+             event.stopPropagation(); // Prevent clicks bubbling up (e.g., to wrapper)
+             const pill = event.target.closest('.actress-pill');
+             if (!pill) return;
+             const actressIdToRemove = pill.dataset.id;
+
+             // Remove from the main selected array
+             selectedActresses = selectedActresses.filter(a => a.id !== actressIdToRemove);
+
+             // Re-render the main pills, content, and suggestions
+             renderSelectedActressesPills();
+             renderContent();
+             // Update suggestions based on remaining selection (or clear if none left)
+             if (searchInput.value) {
+                displayStandardSuggestions(searchInput.value);
+             } else {
+                updateCoStarsList();
+             }
+        }
+
+
+        // --- NEW/ADAPTED FUNCTIONS FOR POPUP ACTRESS SEARCH & SELECTION ---
+
+        /**
+         * Renders actress pills inside the specified popup container.
+         * @param {Array} selectedArray - The array holding selected actresses (e.g., popupSelectedVideoActresses).
+         * @param {HTMLElement} pillsContainerElement - The container element for the pills.
+         */
+        function renderPopupActressPills(selectedArray, pillsContainerElement) {
+            if (!pillsContainerElement) return;
+            pillsContainerElement.innerHTML = '';
+            selectedArray.forEach(actress => {
+                const pill = document.createElement('div');
+                pill.classList.add('actress-pill');
+                pill.dataset.id = actress.id; // Store ID on the pill
+                pill.innerHTML = `
+                    <span>${actress.nome}</span>
+                    <button class="remove-actress-btn" title="Remover">×</button>
+                `;
+                // Add event listener SPECIFIC to the popup remove handler
+                pill.querySelector('.remove-actress-btn').addEventListener('click', (e) => handlePopupRemoveActress(e, selectedArray, pillsContainerElement));
+                pillsContainerElement.appendChild(pill);
             });
         }
-        function handleRemoveActress(event) { /* ... (keep existing function) ... */
-            event.stopPropagation(); const pill = event.target.closest('.actress-pill'); const actressIdToRemove = pill.dataset.id;
-            selectedActresses = selectedActresses.filter(a => a.id !== actressIdToRemove); pill.remove(); renderContent(); updateCoStarsList();
+
+        /**
+         * Handles removing an actress pill from a popup form.
+         * @param {Event} event - The click event.
+         * @param {Array} selectedArray - The array holding selected actresses (e.g., popupSelectedVideoActresses).
+         * @param {HTMLElement} pillsContainerElement - The container element for the pills.
+         */
+        function handlePopupRemoveActress(event, selectedArray, pillsContainerElement) {
+            event.stopPropagation(); // Prevent clicks bubbling up (e.g., to wrapper)
+            const pill = event.target.closest('.actress-pill');
+            if (!pill) return;
+            const actressIdToRemove = pill.dataset.id;
+
+            // Find the index and remove from the specific array
+            const indexToRemove = selectedArray.findIndex(a => a.id === actressIdToRemove);
+            if (indexToRemove > -1) {
+                selectedArray.splice(indexToRemove, 1);
+            }
+
+            // Re-render the pills for that specific container
+            renderPopupActressPills(selectedArray, pillsContainerElement);
         }
 
-        // --- FUNCTIONS FOR POPUP (COPIED & ADAPTED) ---
-
-        // Função para carregar atores nos selects do popup (USA allActresses da página principal)
-        async function loadActorsForSelect() {
-            // No need to fetch again if allActresses is populated by loadInitialData
-            if (actorsLoaded || !videoActoresSelect || !sceneActoresSelect) return;
-            console.log("Loading actors for popup select...");
-
-            if (allActresses.length === 0) {
-                console.warn("Attempted to load actors for popup, but 'allActresses' is empty. Waiting for initial load?");
-                // Optionally fetch again here, but better to rely on initial load
-                 videoActoresSelect.innerHTML = '<option value="" disabled>Carregando atrizes...</option>';
-                 sceneActoresSelect.innerHTML = '<option value="" disabled>Carregando atrizes...</option>';
-                 // Try fetching specifically for the popup if needed (less ideal)
-                 // await fetchActorsSpecificallyForPopup(); // Example if needed
+        /**
+         * Displays actress suggestions within the specified popup suggestion list.
+         * @param {string} searchTerm - The text typed by the user.
+         * @param {HTMLElement} suggestionsListElement - The suggestions list element (e.g., popupVideoSuggestions).
+         * @param {Array} selectedArray - The array holding already selected actresses for THIS form.
+         * @param {HTMLElement} inputElement - The input element being typed into.
+         * @param {HTMLElement} pillsContainerElement - The pill container for THIS form.
+         */
+        function displayPopupSuggestions(searchTerm, suggestionsListElement, selectedArray, inputElement, pillsContainerElement) {
+            if (!suggestionsListElement) return;
+            suggestionsListElement.innerHTML = '';
+            if (!searchTerm) {
+                suggestionsListElement.style.display = 'none';
                 return;
             }
 
-            let optionsHTML = '';
-            allActresses.forEach(actor => { // Use the already loaded allActresses
-                optionsHTML += `<option value="${actor.id}">${actor.nome || 'Nome Indisponível'}</option>`;
-            });
+            const lowerSearchTerm = searchTerm.toLowerCase();
+            // Filter from all available actresses, excluding those already selected IN THIS POPUP FORM
+            const matchedActresses = allActresses.filter(actress =>
+                actress.nome.toLowerCase().includes(lowerSearchTerm) &&
+                !selectedArray.some(sa => sa.id === actress.id) // Check against the specific popup array
+            );
 
-            videoActoresSelect.innerHTML = optionsHTML || '<option value="" disabled>Nenhuma atriz encontrada</option>';
-            sceneActoresSelect.innerHTML = optionsHTML || '<option value="" disabled>Nenhuma atriz encontrada</option>';
-            actorsLoaded = true; // Mark as loaded for this popup session
-            console.log("Actors populated in popup selects.");
+             // Sort matched actresses alphabetically
+             matchedActresses.sort((a, b) => a.nome.localeCompare(b.nome));
+
+            if (matchedActresses.length > 0) {
+                matchedActresses.slice(0, 7).forEach(actress => { // Limit suggestions
+                    const item = document.createElement('div');
+                    item.classList.add('suggestion-item');
+                    // Add necessary data attributes for selection
+                    item.dataset.id = actress.id;
+                    item.dataset.nome = actress.nome;
+                    item.innerHTML = `
+                        <img src="${actress.foto || 'path/to/default/avatar.png'}" alt="">
+                        <span>${actress.nome}</span>
+                    `;
+                    // Add event listener SPECIFIC to the popup select handler
+                    item.addEventListener('click', (e) => handlePopupSelectActress(e, inputElement, suggestionsListElement, selectedArray, pillsContainerElement));
+                    suggestionsListElement.appendChild(item);
+                });
+                suggestionsListElement.style.display = 'block';
+            } else {
+                suggestionsListElement.innerHTML = '<div class="suggestion-item no-results">Nenhuma atriz encontrada</div>';
+                suggestionsListElement.style.display = 'block';
+            }
         }
 
-        // Função para carregar filmes no select de cenas do popup
+        /**
+         * Handles selecting an actress from the popup suggestions list.
+         * @param {Event} event - The click event.
+         * @param {HTMLElement} inputElement - The input element associated with this selection.
+         * @param {HTMLElement} suggestionsListElement - The suggestions list element.
+         * @param {Array} selectedArray - The array to add the selected actress to.
+         * @param {HTMLElement} pillsContainerElement - The container for rendering the pills.
+         */
+        function handlePopupSelectActress(event, inputElement, suggestionsListElement, selectedArray, pillsContainerElement) {
+            const target = event.currentTarget;
+            const actressId = target.dataset.id;
+            const actressName = target.dataset.nome;
+
+            if (!actressId || !actressName) {
+                console.error("Data missing on suggestion item!");
+                return;
+            }
+
+            // Add to the specific popup's selected array if not already present
+            if (!selectedArray.some(a => a.id === actressId)) {
+                selectedArray.push({ id: actressId, nome: actressName });
+                // Render the pills for the specific container
+                renderPopupActressPills(selectedArray, pillsContainerElement);
+            }
+
+            // Clear input and hide suggestions
+            if (inputElement) inputElement.value = '';
+            if (suggestionsListElement) suggestionsListElement.style.display = 'none';
+            if (inputElement) inputElement.focus(); // Keep focus in the input area
+        }
+
+
+        // --- FUNCTIONS FOR POPUP (Main Logic - UPDATED) ---
+
+        // REMOVED loadActorsForSelect()
+
+        // Load movies for scene form (UNCHANGED)
         async function loadMoviesForSelect() {
             if (moviesLoaded || !sceneFilmeSelect) return;
             console.log("Loading movies for popup select...");
@@ -552,7 +895,9 @@
                 } else {
                     querySnapshot.forEach(doc => {
                         const movie = doc.data();
-                        optionsHTML += `<option value="${doc.id}">${movie.nome || 'Nome Indisponível'}</option>`;
+                         if (movie.nome) { // Only add movies with names
+                            optionsHTML += `<option value="${doc.id}">${movie.nome}</option>`;
+                        }
                     });
                 }
                 sceneFilmeSelect.innerHTML = optionsHTML;
@@ -564,203 +909,322 @@
             }
         }
 
-         // Função para mostrar/esconder formulários do popup e carregar dados
+        // Show/hide forms (UPDATED to clear new fields)
         function showCorrectForm() {
             const selectedType = contentTypeSelector.value;
             videoForm.style.display = 'none'; sceneForm.style.display = 'none'; movieForm.style.display = 'none';
             saveContentButton.disabled = true; createStatusMessage.textContent = ''; createStatusMessage.className = '';
 
+            // Clear previous selections when switching forms
+            popupSelectedVideoActresses = [];
+            popupSelectedSceneActresses = [];
+            if(popupVideoSelectedContainer) popupVideoSelectedContainer.innerHTML = ''; // Clear pills visually
+            if(popupSceneSelectedContainer) popupSceneSelectedContainer.innerHTML = ''; // Clear pills visually
+            if(popupVideoSearchInput) popupVideoSearchInput.value = ''; // Clear search input
+            if(popupSceneSearchInput) popupSceneSearchInput.value = ''; // Clear search input
+            if(popupVideoSuggestions) popupVideoSuggestions.style.display = 'none'; // Hide suggestions
+            if(popupSceneSuggestions) popupSceneSuggestions.style.display = 'none'; // Hide suggestions
+
+
             switch (selectedType) {
                 case 'video':
                     videoForm.style.display = 'block';
-                    loadActorsForSelect(); // Load/ensure actors are ready
+                    // No need to explicitly load actors anymore, suggestions use allActresses
                     saveContentButton.disabled = false;
                     break;
                 case 'scene':
                     sceneForm.style.display = 'block';
-                    loadActorsForSelect(); // Load/ensure actors are ready
-                    loadMoviesForSelect(); // Load/ensure movies are ready
+                    loadMoviesForSelect(); // Load movies needed for scene select
+                    // No need to explicitly load actors anymore
                     saveContentButton.disabled = false;
                     break;
                 case 'movie':
                     movieForm.style.display = 'block';
                     saveContentButton.disabled = false;
                     break;
-                default: break; // No selection, button stays disabled
+                default: break;
             }
         }
 
-        // Função para resetar os campos de um formulário específico do popup
+        // Reset form fields (UPDATED to handle new actress inputs/state)
         function resetFormFields(formElement) {
-             if (!formElement) return;
-             formElement.querySelectorAll('input[type="text"], input[type="number"], input[type="url"]').forEach(input => input.value = '');
-             formElement.querySelectorAll('select').forEach(select => {
+            if (!formElement) return;
+            formElement.querySelectorAll('input[type="text"], input[type="number"], input[type="url"]').forEach(input => {
+                // Don't clear the actress search inputs here, handled by showCorrectForm/opening popup
+                if (!input.classList.contains('popup-search-input')) {
+                    input.value = '';
+                }
+            });
+            formElement.querySelectorAll('select').forEach(select => {
                  if (select.multiple) { Array.from(select.options).forEach(option => option.selected = false); }
                  else { select.selectedIndex = 0; }
-             });
+            });
+
+            // Specifically clear the actress state arrays and pills for the form being reset
+            if (formElement.id === 'video-form') {
+                popupSelectedVideoActresses = [];
+                if (popupVideoSelectedContainer) renderPopupActressPills(popupSelectedVideoActresses, popupVideoSelectedContainer);
+                if (popupVideoSearchInput) popupVideoSearchInput.value = '';
+                if (popupVideoSuggestions) popupVideoSuggestions.style.display = 'none';
+            } else if (formElement.id === 'scene-form') {
+                popupSelectedSceneActresses = [];
+                if (popupSceneSelectedContainer) renderPopupActressPills(popupSelectedSceneActresses, popupSceneSelectedContainer);
+                if (popupSceneSearchInput) popupSceneSearchInput.value = '';
+                if (popupSceneSuggestions) popupSceneSuggestions.style.display = 'none';
+            }
         }
 
-         // Função para lidar com o salvamento do popup
-         async function handleSaveContent(event) {
-             event.preventDefault();
-             const selectedType = contentTypeSelector.value;
-             if (!selectedType) { alert("Por favor, selecione um tipo de conteúdo."); return; }
+        // Handle saving (UPDATED to get actress IDs from state arrays)
+        async function handleSaveContent(event) {
+            event.preventDefault();
+            const selectedType = contentTypeSelector.value;
+            if (!selectedType) { alert("Por favor, selecione um tipo de conteúdo."); return; }
 
-             saveContentButton.disabled = true;
-             createStatusMessage.textContent = 'Salvando...'; createStatusMessage.className = '';
-             let dataToSave = { createdAt: serverTimestamp() };
-             let targetCollection = ''; let currentForm;
+            saveContentButton.disabled = true;
+            createStatusMessage.textContent = 'Salvando...'; createStatusMessage.className = '';
+            let dataToSave = { createdAt: serverTimestamp() };
+            let targetCollection = ''; let currentForm;
 
-             try {
-                 switch (selectedType) {
-                     case 'video':
-                         targetCollection = 'videos'; currentForm = videoForm;
-                         dataToSave.nome = document.getElementById('video-nome').value.trim();
-                         dataToSave.ano = parseInt(document.getElementById('video-ano').value) || null;
-                         dataToSave.imagem = document.getElementById('video-imagem').value.trim() || null;
-                         dataToSave.pagina = document.getElementById('video-pagina').value.trim() || null;
-                         dataToSave.atores = Array.from(videoActoresSelect.selectedOptions).map(option => option.value);
-                         // Add 'no' field specifically for videos, defaulting to 0 or handling logic if needed
-                         // For simplicity, let's assume 'no' isn't set via this form for now, or add an input if required.
-                         // dataToSave.no = parseInt(document.getElementById('video-numero').value) || 0; // Example if you add a number input
-                         if (!dataToSave.nome) throw new Error("O campo 'Nome' é obrigatório para Vídeo.");
-                         break;
-                     case 'scene':
-                         targetCollection = 'cenas'; currentForm = sceneForm;
-                         dataToSave.nome = document.getElementById('scene-nome').value.trim();
-                         dataToSave.filmeId = document.getElementById('scene-filme').value || null;
-                         dataToSave.numeroCena = parseInt(document.getElementById('scene-numero').value) || null;
-                         dataToSave.ano = parseInt(document.getElementById('scene-ano').value) || null;
-                         dataToSave.imagem = document.getElementById('scene-imagem').value.trim() || null;
-                         dataToSave.pagina = document.getElementById('scene-pagina').value.trim() || null;
-                         dataToSave.atores = Array.from(sceneActoresSelect.selectedOptions).map(option => option.value);
-                         if (!dataToSave.nome) throw new Error("O campo 'Nome da Cena' é obrigatório.");
-                         if (!dataToSave.filmeId) throw new Error("O campo 'Filme' é obrigatório para Cena.");
-                         if (!dataToSave.numeroCena) throw new Error("O campo 'Número da Cena' é obrigatório.");
-                         break;
-                     case 'movie':
-                         targetCollection = 'filmes'; currentForm = movieForm;
-                         dataToSave.nome = document.getElementById('movie-nome').value.trim();
-                         dataToSave.ano = parseInt(document.getElementById('movie-ano').value) || null;
-                         dataToSave.imagem = document.getElementById('movie-imagem').value.trim() || null;
-                         dataToSave.pagina = document.getElementById('movie-pagina').value.trim() || null;
-                         if (!dataToSave.nome) throw new Error("O campo 'Nome do Filme' é obrigatório.");
-                         break;
-                     default: throw new Error("Tipo de conteúdo inválido selecionado.");
-                 }
+            try {
+                switch (selectedType) {
+                    case 'video':
+                        targetCollection = 'videos'; currentForm = videoForm;
+                        dataToSave.nome = document.getElementById('video-nome').value.trim();
+                        dataToSave.ano = parseInt(document.getElementById('video-ano').value) || null;
+                        dataToSave.imagem = document.getElementById('video-imagem').value.trim() || null;
+                        dataToSave.pagina = document.getElementById('video-pagina').value.trim() || null;
+                        // *** UPDATED: Get IDs from the popup's state array ***
+                        dataToSave.atores = popupSelectedVideoActresses.map(actress => actress.id);
+                        if (!dataToSave.nome) throw new Error("O campo 'Nome' é obrigatório para Vídeo.");
+                        // Ensure atores is an array, even if empty
+                        if (!Array.isArray(dataToSave.atores)) dataToSave.atores = [];
+                        break;
+                    case 'scene':
+                        targetCollection = 'cenas'; currentForm = sceneForm;
+                        dataToSave.nome = document.getElementById('scene-nome').value.trim();
+                        dataToSave.filmeId = document.getElementById('scene-filme').value || null;
+                        dataToSave.numeroCena = parseInt(document.getElementById('scene-numero').value) || null;
+                        dataToSave.ano = parseInt(document.getElementById('scene-ano').value) || null;
+                        dataToSave.imagem = document.getElementById('scene-imagem').value.trim() || null;
+                        dataToSave.pagina = document.getElementById('scene-pagina').value.trim() || null;
+                         // *** UPDATED: Get IDs from the popup's state array ***
+                        dataToSave.atores = popupSelectedSceneActresses.map(actress => actress.id);
+                        if (!dataToSave.nome) throw new Error("O campo 'Nome da Cena' é obrigatório.");
+                        if (!dataToSave.filmeId) throw new Error("O campo 'Filme' é obrigatório para Cena.");
+                        if (dataToSave.numeroCena === null) throw new Error("O campo 'Número da Cena' é obrigatório."); // Check for null explicitly after parseInt
+                         // Ensure atores is an array, even if empty
+                        if (!Array.isArray(dataToSave.atores)) dataToSave.atores = [];
+                        break;
+                    case 'movie':
+                        targetCollection = 'filmes'; currentForm = movieForm;
+                        dataToSave.nome = document.getElementById('movie-nome').value.trim();
+                        dataToSave.ano = parseInt(document.getElementById('movie-ano').value) || null;
+                        dataToSave.imagem = document.getElementById('movie-imagem').value.trim() || null;
+                        dataToSave.pagina = document.getElementById('movie-pagina').value.trim() || null;
+                        // Movies don't have actress list directly on them in this structure
+                        if (!dataToSave.nome) throw new Error("O campo 'Nome do Filme' é obrigatório.");
+                        break;
+                    default: throw new Error("Tipo de conteúdo inválido selecionado.");
+                }
 
-                 Object.keys(dataToSave).forEach(key => { if (dataToSave[key] === null || dataToSave[key] === '') { if (key !== 'atores') { delete dataToSave[key]; } } });
+                // Clean up empty/null fields (excluding potentially empty 'atores' array)
+                Object.keys(dataToSave).forEach(key => {
+                    if ((dataToSave[key] === null || dataToSave[key] === '') && key !== 'atores') {
+                        delete dataToSave[key];
+                    }
+                    // Remove NaN 'ano' or 'numeroCena' if parseInt failed
+                    if ((key === 'ano' || key === 'numeroCena') && isNaN(dataToSave[key])) {
+                        delete dataToSave[key];
+                    }
+                });
 
-                 console.log(`Saving to ${targetCollection}:`, dataToSave);
-                 const docRef = await addDoc(collection(db, targetCollection), dataToSave);
-                 console.log("Document written with ID: ", docRef.id);
 
-                 createStatusMessage.textContent = `${selectedType.charAt(0).toUpperCase() + selectedType.slice(1)} criado com sucesso!`;
-                 createStatusMessage.className = 'success';
-                 if (currentForm) resetFormFields(currentForm);
-                 contentTypeSelector.selectedIndex = 0; showCorrectForm();
+                console.log(`Saving to ${targetCollection}:`, dataToSave);
+                const docRef = await addDoc(collection(db, targetCollection), dataToSave);
+                console.log("Document written with ID: ", docRef.id);
 
-                 // Reload main page data to show the new item
-                 await loadInitialData(); // <<< RELOAD DATA on the main page
+                createStatusMessage.textContent = `${selectedType.charAt(0).toUpperCase() + selectedType.slice(1)} criado com sucesso!`;
+                createStatusMessage.className = 'success';
+                if (currentForm) resetFormFields(currentForm); // Reset fields including clearing actress state
+                contentTypeSelector.selectedIndex = 0; showCorrectForm(); // Reset selector, hide forms
 
-                 setTimeout(() => {
-                     createPopupOverlay.style.display = 'none'; createStatusMessage.textContent = ''; createStatusMessage.className = '';
-                 }, 2000);
+                // ADD SCENES TO ALLCONTENT IF NEEDED AFTER SAVE? Or rely on full reload?
+                // For now, relying on full reload via loadInitialData()
 
-             } catch (error) {
-                 console.error("Erro ao salvar conteúdo:", error);
-                 createStatusMessage.textContent = `Erro: ${error.message}`; createStatusMessage.className = 'error';
-                 saveContentButton.disabled = false; // Re-enable on error
-             }
-         }
+                await loadInitialData(); // Reload main page data
 
-        // --- FUNCTION TO LOAD ALL INITIAL DATA (Existing Page) ---
+                setTimeout(() => {
+                    if(createPopupOverlay) createPopupOverlay.style.display = 'none';
+                    if(createStatusMessage) { createStatusMessage.textContent = ''; createStatusMessage.className = ''; }
+                }, 2000);
+
+            } catch (error) {
+                console.error("Erro ao salvar conteúdo:", error);
+                if(createStatusMessage) { createStatusMessage.textContent = `Erro: ${error.message}`; createStatusMessage.className = 'error'; }
+                if(saveContentButton) saveContentButton.disabled = false; // Re-enable on error
+            }
+        }
+
+        // Load initial data (UPDATED to include scenes)
         async function loadInitialData() {
-            contentContainer.innerHTML = '<p class="message">Carregando...</p>';
-            // Reset popup loaded flags when main data reloads
-            actorsLoaded = false;
+            if(contentContainer) contentContainer.innerHTML = '<p class="message">Carregando...</p>';
+            // Reset popup loaded flags if they existed (like moviesLoaded)
             moviesLoaded = false;
+            // No need for actorsLoaded flag anymore
             try {
                 const videosCol = collection(db, "videos");
                 const filmesCol = collection(db, "filmes");
+                const cenasCol = collection(db, "cenas"); // ADDED: Fetch Cenas
                 const atoresCol = collection(db, "atores");
-                const [videosSnapshot, filmesSnapshot, atoresSnapshot] = await Promise.all([
-                    getDocs(videosCol), getDocs(filmesCol), getDocs(atoresCol)
+
+                const [videosSnapshot, filmesSnapshot, cenasSnapshot, atoresSnapshot] = await Promise.all([
+                    getDocs(videosCol),
+                    getDocs(filmesCol),
+                    getDocs(cenasCol), // ADDED
+                    getDocs(atoresCol)
                 ]);
+
                 allContent = [];
                 videosSnapshot.forEach(doc => allContent.push({ id: doc.id, type: 'video', ...doc.data() }));
                 filmesSnapshot.forEach(doc => allContent.push({ id: doc.id, type: 'film', ...doc.data() }));
+                cenasSnapshot.forEach(doc => allContent.push({ id: doc.id, type: 'scene', ...doc.data() })); // ADDED
 
                 allActresses = []; // Reset and repopulate
                 atoresSnapshot.forEach(doc => {
                     const data = doc.data();
-                    if (data.nome) { allActresses.push({ id: doc.id, nome: data.nome, foto: data.foto }); }
+                    if (data.nome) { // Ensure actress has a name
+                        allActresses.push({ id: doc.id, nome: data.nome, foto: data.foto });
+                    } else {
+                        console.warn(`Actress document ${doc.id} is missing 'nome' field.`);
+                    }
                 });
-                allActresses.sort((a, b) => a.nome.localeCompare(b.nome));
+                 allActresses.sort((a, b) => a.nome.localeCompare(b.nome)); // Sort actresses alphabetically
 
-                renderSelectedActressesPills(); // Render pills based on potentially changed state
-                renderContent(); // Render main content grid
+                 renderSelectedActressesPills(); // Render main page pills based on current state
+                 renderContent(); // Render main content grid including any newly added items
+                 console.log(`Loaded ${allActresses.length} actresses and ${allContent.length} content items.`);
             } catch (error) {
-                console.error("Erro ao buscar dados:", error);
-                contentContainer.innerHTML = '<p class="message">Erro ao carregar.</p>';
+                 console.error("Erro ao buscar dados iniciais:", error);
+                if(contentContainer) contentContainer.innerHTML = '<p class="message">Erro ao carregar.</p>';
             }
         }
 
-        // --- EVENT LISTENERS (Combined) ---
+
+        // --- EVENT LISTENERS (Combined & UPDATED) ---
         document.addEventListener('DOMContentLoaded', () => {
 
             // --- Listeners for Existing Page Functionality ---
             filterButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    filterButtons.forEach(btn => btn.classList.remove('active')); button.classList.add('active');
-                    activeTypeFilter = button.getAttribute('data-filter'); suggestionsList.style.display = 'none'; renderContent();
-                });
-            });
-            searchInput.addEventListener('input', () => { displayStandardSuggestions(searchInput.value); });
-            searchInput.addEventListener('focus', () => { if (searchInput.value) { displayStandardSuggestions(searchInput.value); } });
+                 button.addEventListener('click', () => {
+                     filterButtons.forEach(btn => btn.classList.remove('active'));
+                     button.classList.add('active');
+                     activeTypeFilter = button.getAttribute('data-filter');
+                     // Decide which content types to show based on filter
+                     // This logic might need adjustment if you add 'scene' as a filter button
+                     if (activeTypeFilter === 'video') {
+                         // You might want to adjust renderContent if 'Só Vídeos' should ONLY show videos
+                         // Currently 'video' type will be shown if filter is 'video' or 'all'
+                     } else if (activeTypeFilter === 'film') {
+                         // Similarly adjust if 'Só Filmes' should ONLY show films
+                     }
+                     // Hide suggestions when changing filter
+                     if (suggestionsList) suggestionsList.style.display = 'none';
+                     renderContent(); // Re-render based on the new filter
+                 });
+             });
+            if(searchInput) searchInput.addEventListener('input', () => { displayStandardSuggestions(searchInput.value); });
+            if(searchInput) searchInput.addEventListener('focus', () => {
+                 // Show suggestions on focus only if there's text OR if actresses are already selected (to show co-stars)
+                 if (searchInput.value) {
+                     displayStandardSuggestions(searchInput.value);
+                 } else if (selectedActresses.length > 0) {
+                     updateCoStarsList();
+                 }
+             });
+            // Global click listener (needs adjustment to handle popup lists)
             document.addEventListener('click', (event) => {
-                if (!searchInputWrapper.contains(event.target) && !suggestionsList.contains(event.target)) { suggestionsList.style.display = 'none'; }
+                // Hide main suggestions list
+                if (searchInputWrapper && !searchInputWrapper.contains(event.target) && suggestionsList && !suggestionsList.contains(event.target)) {
+                    suggestionsList.style.display = 'none';
+                }
+                // Hide popup video suggestions list
+                const videoSearchArea = document.getElementById('popup-video-actress-search');
+                if (videoSearchArea && !videoSearchArea.contains(event.target) && popupVideoSuggestions && popupVideoSuggestions.style.display !== 'none') {
+                    popupVideoSuggestions.style.display = 'none';
+                }
+                 // Hide popup scene suggestions list
+                const sceneSearchArea = document.getElementById('popup-scene-actress-search');
+                if (sceneSearchArea && !sceneSearchArea.contains(event.target) && popupSceneSuggestions && popupSceneSuggestions.style.display !== 'none') {
+                    popupSceneSuggestions.style.display = 'none';
+                }
             });
-            suggestionsList.addEventListener('click', function(event) { if (event.target.classList.contains('add-costar-btn')) { handleAddCoStarClick(event); } });
+            // Listener for adding co-stars from the main suggestion list
+             if(suggestionsList) {
+                suggestionsList.addEventListener('click', function(event) {
+                    if (event.target.classList.contains('add-costar-btn')) {
+                        handleAddCoStarClick(event);
+                    }
+                    // Note: Standard suggestions selection is handled by 'handleSelectActressClick' attached directly to items
+                });
+             }
 
-            // --- Listeners for Popup Functionality (ADDED) ---
+            // --- Listeners for Popup Functionality (UPDATED) ---
             if (openCreatePopupBtn) {
                 openCreatePopupBtn.addEventListener('click', () => {
-                    createPopupOverlay.style.display = 'flex';
-                    // Reset popup state each time it opens
-                    actorsLoaded = false; // Reset flags to allow reloading if needed
+                    if (createPopupOverlay) createPopupOverlay.style.display = 'flex';
+                    // Reset popup state completely on open
                     moviesLoaded = false;
-                    contentTypeSelector.selectedIndex = 0;
-                    showCorrectForm();
-                    createStatusMessage.textContent = ''; createStatusMessage.className = '';
-                    saveContentButton.disabled = true;
-                    // Pre-load actors/movies if needed upon opening, or rely on showCorrectForm
-                    // loadActorsForSelect(); // Can pre-trigger loading here if desired
+                    popupSelectedVideoActresses = [];
+                    popupSelectedSceneActresses = [];
+                    if (contentTypeSelector) contentTypeSelector.selectedIndex = 0;
+                    showCorrectForm(); // This will also clear pills/inputs
+                    if (createStatusMessage) { createStatusMessage.textContent = ''; createStatusMessage.className = ''; }
+                    if (saveContentButton) saveContentButton.disabled = true;
+                    // Ensure allActresses is available before enabling search inputs? (Usually loaded by now)
+                    if (allActresses.length === 0) {
+                        console.warn("Popup opened, but 'allActresses' is empty. Actress search might not work until data loads.");
+                        // Optionally, disable search inputs until loaded?
+                    }
                 });
             }
-            if (closeCreatePopupBtn) { closeCreatePopupBtn.addEventListener('click', () => { createPopupOverlay.style.display = 'none'; }); }
+            if (closeCreatePopupBtn) { closeCreatePopupBtn.addEventListener('click', () => { if (createPopupOverlay) createPopupOverlay.style.display = 'none'; }); }
             if (createPopupOverlay) {
                 createPopupOverlay.addEventListener('click', (event) => { if (event.target === createPopupOverlay) { createPopupOverlay.style.display = 'none'; } });
             }
             if (contentTypeSelector) { contentTypeSelector.addEventListener('change', showCorrectForm); }
             if (saveContentButton) { saveContentButton.addEventListener('click', handleSaveContent); }
 
-            // --- Validation Checks (Combined) ---
-             // Existing page elements check (optional, assumed ok)
-             if (!contentContainer || filterButtons.length === 0 || !searchInput || !suggestionsList || !selectedActressesContainer || !searchInputWrapper) {
+            // ADDED: Listeners for the NEW popup actress search inputs
+            if (popupVideoSearchInput && popupVideoSuggestions && popupVideoSelectedContainer) {
+                popupVideoSearchInput.addEventListener('input', () => displayPopupSuggestions(popupVideoSearchInput.value, popupVideoSuggestions, popupSelectedVideoActresses, popupVideoSearchInput, popupVideoSelectedContainer));
+                popupVideoSearchInput.addEventListener('focus', () => displayPopupSuggestions(popupVideoSearchInput.value, popupVideoSuggestions, popupSelectedVideoActresses, popupVideoSearchInput, popupVideoSelectedContainer)); // Show suggestions on focus too if there's text
+            }
+            if (popupSceneSearchInput && popupSceneSuggestions && popupSceneSelectedContainer) {
+                popupSceneSearchInput.addEventListener('input', () => displayPopupSuggestions(popupSceneSearchInput.value, popupSceneSuggestions, popupSelectedSceneActresses, popupSceneSearchInput, popupSceneSelectedContainer));
+                popupSceneSearchInput.addEventListener('focus', () => displayPopupSuggestions(popupSceneSearchInput.value, popupSceneSuggestions, popupSelectedSceneActresses, popupSceneSearchInput, popupSceneSelectedContainer)); // Show suggestions on focus too
+            }
+            // Note: Selection and removal listeners are added dynamically in render/display functions.
+
+            // --- Validation Checks (UPDATED) ---
+             const criticalMainElements = [contentContainer, searchInput, suggestionsList, selectedActressesContainer, searchInputWrapper];
+             if (criticalMainElements.some(el => !el) || filterButtons.length === 0) {
                  console.error("ERRO CRÍTICO: Um ou mais elementos da página principal não foram encontrados!");
              }
-            // Popup elements check (ADDED)
-            if (!openCreatePopupBtn || !createPopupOverlay || !closeCreatePopupBtn || !contentTypeSelector || !formContainer || !videoForm || !sceneForm || !movieForm || !saveContentButton || !createStatusMessage || !videoActoresSelect || !sceneActoresSelect || !sceneFilmeSelect) {
-                 console.error("ERRO CRÍTICO: Um ou mais elementos do Popup de Criação não foram encontrados! Funcionalidade de criação pode não funcionar.");
-                 if(openCreatePopupBtn) openCreatePopupBtn.style.display = 'none';
-            }
+             const criticalPopupElements = [
+                 openCreatePopupBtn, createPopupOverlay, closeCreatePopupBtn, contentTypeSelector, formContainer,
+                 videoForm, sceneForm, movieForm, saveContentButton, createStatusMessage, sceneFilmeSelect,
+                 popupVideoSearchInput, popupVideoSuggestions, popupVideoSelectedContainer,
+                 popupSceneSearchInput, popupSceneSuggestions, popupSceneSelectedContainer
+             ];
+             if (criticalPopupElements.some(el => !el)) {
+                 console.error("ERRO CRÍTICO: Um ou mais elementos do Popup de Criação (incluindo busca de atriz) não foram encontrados! Funcionalidade pode falhar.");
+                 if(openCreatePopupBtn) openCreatePopupBtn.style.display = 'none'; // Hide button if popup is broken
+             }
 
-             // --- INITIALIZATION (Existing Page) ---
-             loadInitialData();
+             // --- INITIALIZATION ---
+             loadInitialData(); // Load data including allActresses and all content types
 
         }); // End DOMContentLoaded
-
     </script>
 </body>
 </html>
