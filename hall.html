@@ -4,6 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Visualizador de Atrizes</title>
+
+
+    <!-- Modal Structure (Initially Hidden) -->
+    <div id="content-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <span class="modal-close-button" onclick="closeModal()">×</span>
+            <h3 id="modal-title">Detalhes do Conteúdo</h3>
+            <div id="modal-body">
+                <!-- Content details will be loaded here -->
+            </div>
+            <div id="modal-link-container" style="margin-top: 15px;">
+                <!-- External link button will be added here -->
+            </div>
+        </div>
+    </div>
+    
     <style>
         body {
             font-family: sans-serif;
@@ -172,6 +188,78 @@
              color: #888;
          }
 
+
+        /* Modal Styling */
+        .modal-overlay {
+            position: fixed; /* Stay in place */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); /* Black background with opacity */
+            z-index: 1000; /* Sit on top */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            max-width: 600px; /* Limit modal width */
+            width: 90%;
+            position: relative;
+            max-height: 80vh; /* Limit modal height */
+            overflow-y: auto; /* Add scroll if content is tall */
+        }
+
+        .modal-close-button {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .modal-close-button:hover {
+            color: #333;
+        }
+
+        #modal-body div {
+            margin-bottom: 8px;
+            word-wrap: break-word;
+        }
+        #modal-body strong {
+           display: inline-block;
+           min-width: 80px; /* Align keys in modal */
+           color: #333;
+        }
+        #modal-link-container button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        #modal-link-container button:hover {
+            background-color: #0056b3;
+        }
+        #modal-body img.modal-detail-image {
+            max-width: 100%;
+            height: auto;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+        
     </style>
 </head>
 <body>
@@ -197,383 +285,501 @@
     </div>
 
     <!-- Firebase SDK -->
-    <script type="module">
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // Your web app's Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0", // IMPORTANT: Secure this in production!
-            authDomain: "babes-392fd.firebaseapp.com",
-            projectId: "babes-392fd",
-            storageBucket: "babes-392fd.appspot.com",
-            messagingSenderId: "376795361631",
-            appId: "1:376795361631:web:d662f2b2f2cd23b115c6ea"
-        };
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0", // IMPORTANT: Secure this in production!
+        authDomain: "babes-392fd.firebaseapp.com",
+        projectId: "babes-392fd",
+        storageBucket: "babes-392fd.appspot.com",
+        messagingSenderId: "376795361631",
+        appId: "1:376795361631:web:d662f2b2f2cd23b115c6ea"
+    };
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-        // --- DOM Elements ---
-        const mainContainer = document.getElementById('main-container');
-        const actressList = document.getElementById('actress-list');
-        const actressDetailsContainer = document.getElementById('actress-details');
-        const contentCardsContainer = document.getElementById('content-cards');
-        const contentMessage = document.getElementById('content-message');
+    // --- DOM Elements ---
+    const mainContainer = document.getElementById('main-container');
+    const actressList = document.getElementById('actress-list');
+    const actressDetailsContainer = document.getElementById('actress-details');
+    const contentCardsContainer = document.getElementById('content-cards');
+    const contentMessage = document.getElementById('content-message');
+    // --- MODAL Elements ---
+    const modal = document.getElementById('content-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalBody = document.getElementById('modal-body');
+    const modalLinkContainer = document.getElementById('modal-link-container');
 
-        let selectedActressElement = null; // Keep track of the selected LI
 
-        // --- Helper Functions ---
-        function calculateAge(birthDateString) {
-            if (!birthDateString) return '?';
-            try {
-                const birthDate = new Date(birthDateString);
-                const today = new Date();
-                let age = today.getFullYear() - birthDate.getFullYear();
-                const m = today.getMonth() - birthDate.getMonth();
-                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-                    age--;
-                }
-                return age;
-            } catch (e) {
-                console.error("Error parsing date:", birthDateString, e);
-                return '?';
+    let selectedActressElement = null;
+
+    // --- Helper Functions ---
+    function calculateAge(birthDateString) {
+        if (!birthDateString) return '?';
+        try {
+            const birthDate = new Date(birthDateString);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
             }
+            return age;
+        } catch (e) {
+            console.error("Error parsing date:", birthDateString, e);
+            return '?';
         }
+    }
 
-        function displayMessage(element, message, isError = false) {
-             element.innerHTML = `<div class="${isError ? 'error' : 'loading'}">${message}</div>`;
-             element.style.display = 'block';
-        }
+    function displayMessage(element, message, isError = false) {
+         element.innerHTML = `<div class="${isError ? 'error' : 'loading'}">${message}</div>`;
+         element.style.display = 'block';
+    }
 
-        function clearMessage(element) {
-            element.innerHTML = '';
-            element.style.display = 'none';
-        }
-
-
-        // --- Core Logic ---
-
-        // 1. Load Actresses List
-        async function loadActresses() {
-            actressList.innerHTML = '<li class="loading">Carregando atrizes...</li>'; // Show loading
-            try {
-                const querySnapshot = await getDocs(collection(db, "atores"));
-                actressList.innerHTML = ''; // Clear loading/previous list
-
-                if (querySnapshot.empty) {
-                     actressList.innerHTML = '<li class="error">Nenhuma atriz encontrada.</li>';
-                     return;
-                }
-
-                const actresses = [];
-                querySnapshot.forEach((doc) => {
-                    actresses.push({ id: doc.id, ...doc.data() });
-                });
-
-                // Sort alphabetically by name (optional)
-                 actresses.sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
+    function clearMessage(element) {
+        element.innerHTML = '';
+        element.style.display = 'none';
+    }
 
 
-                actresses.forEach(actress => {
-                    const li = document.createElement('li');
-                    li.classList.add('actress-item');
-                    li.dataset.id = actress.id; // Store ID for lookup
+    // --- Core Logic ---
 
-                    const age = calculateAge(actress.dataNascimento);
-                    const imageUrl = actress.foto || 'placeholder.png'; // Use a placeholder if no image
-                    const rating = actress.nota !== undefined ? actress.nota : 'N/A';
+    // 1. Load Actresses List (Ensure Sorting)
+    async function loadActresses() {
+        actressList.innerHTML = '<li class="loading">Carregando atrizes...</li>';
+        try {
+            const querySnapshot = await getDocs(collection(db, "atores"));
+            actressList.innerHTML = '';
 
-                    li.innerHTML = `
-                        <img src="${imageUrl}" alt="${actress.nome}" onerror="this.src='placeholder.png'; this.onerror=null;">
-                        <div class="actress-info">
-                            <span class="name">${actress.nome || 'Nome Indisponível'}</span>
-                            <span class="age">Idade: ${age}</span>
-                            <span class="rating">Nota: ${rating}</span>
-                        </div>
-                    `;
-
-                    li.addEventListener('click', () => handleActressClick(actress.id, li));
-                    actressList.appendChild(li);
-                });
-
-            } catch (error) {
-                console.error("Erro ao buscar atrizes: ", error);
-                actressList.innerHTML = '<li class="error">Erro ao carregar atrizes. Verifique o console.</li>';
-            }
-        }
-
-        // 2. Handle Actress Click
-        async function handleActressClick(actressId, listItemElement) {
-            console.log(`%cHandling click for actress ID: ${actressId}`, "color: blue; font-weight: bold;");
-
-            // Highlight selected item
-            if (selectedActressElement) {
-                selectedActressElement.classList.remove('selected');
-            }
-            listItemElement.classList.add('selected');
-            selectedActressElement = listItemElement;
-
-
-            // Show columns and adjust layout
-            mainContainer.classList.add('details-visible');
-
-            // Clear previous details and content
-            actressDetailsContainer.innerHTML = '<div class="loading">Carregando detalhes...</div>';
-            contentCardsContainer.innerHTML = '';
-            displayMessage(contentMessage, 'Carregando conteúdo...');
-
-
-            try {
-                // Fetch and display actress details
-                console.log(`Fetching details for actress ID: ${actressId}`);
-                const actressDoc = await getDoc(doc(db, "atores", actressId));
-                if (actressDoc.exists()) {
-                    console.log("Actress details found:", actressDoc.data());
-                    displayActressDetails(actressDoc.data());
-                } else {
-                    console.warn(`Actress details not found for ID: ${actressId}`);
-                    actressDetailsContainer.innerHTML = '<div class="error">Detalhes da atriz não encontrados.</div>';
-                }
-
-                // Fetch and display related content (scenes, movies, videos)
-                await loadRelatedContent(actressId);
-
-            } catch (error) {
-                console.error(`Erro ao carregar dados para atriz ${actressId}: `, error);
-                actressDetailsContainer.innerHTML = '<div class="error">Erro ao carregar detalhes.</div>';
-                 displayMessage(contentMessage,'Erro ao carregar conteúdo.', true);
-            }
-        }
-
-        // 3. Display Actress Details
-        function displayActressDetails(data) {
-            actressDetailsContainer.innerHTML = ''; // Clear loading/previous
-
-            const detailsTitle = document.createElement('h3');
-            detailsTitle.textContent = data.nome || 'Detalhes';
-            actressDetailsContainer.appendChild(detailsTitle);
-
-            // Display photo prominently if available
-            if (data.foto) {
-                 const img = document.createElement('img');
-                 img.src = data.foto;
-                 img.alt = data.nome;
-                 img.classList.add('detail-photo');
-                 img.onerror = () => { img.style.display = 'none'; }; // Hide if image fails
-                 actressDetailsContainer.appendChild(img);
+            if (querySnapshot.empty) {
+                 actressList.innerHTML = '<li class="error">Nenhuma atriz encontrada.</li>';
+                 return;
             }
 
+            const actresses = [];
+            querySnapshot.forEach((doc) => {
+                actresses.push({ id: doc.id, ...doc.data() });
+            });
 
-            // Display other fields
-            for (const key in data) {
-                if (data.hasOwnProperty(key) && key !== 'foto' && key !== 'nome') { // Don't repeat photo/name
-                    const detailDiv = document.createElement('div');
-                    let value = data[key];
-
-                    // Format specific fields if needed
-                    if (key === 'dataNascimento') {
-                       value = `${value} (Idade: ${calculateAge(value)})`;
-                    } else if (key === 'timestamp') {
-                        // Attempt to format timestamp if it's recognizable
-                         try {
-                            if(value && typeof value === 'object' && value.seconds) {
-                                value = new Date(value.seconds * 1000).toLocaleString('pt-BR');
-                            } else if (typeof value === 'string') {
-                                // Keep original string if it's already formatted like in screenshot
-                                value = value;
-                            }
-                         } catch(e) { /* ignore formatting errors */ }
-                    } else if (key === 'atores' && typeof value === 'object') {
-                         // Don't display the raw 'atores' map here if present in actress details
-                         continue;
-                    }
-                    // Add more formatting as needed for other fields
+            // --- SORTING ---
+             actresses.sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
 
 
-                    detailDiv.innerHTML = `<strong>${key}:</strong> ${value}`;
+            actresses.forEach(actress => {
+                const li = document.createElement('li');
+                li.classList.add('actress-item');
+                li.dataset.id = actress.id;
+
+                const age = calculateAge(actress.dataNascimento);
+                const imageUrl = actress.foto || 'placeholder.png';
+                const rating = actress.nota !== undefined ? actress.nota : 'N/A';
+
+                li.innerHTML = `
+                    <img src="${imageUrl}" alt="${actress.nome}" onerror="this.src='placeholder.png'; this.onerror=null;">
+                    <div class="actress-info">
+                        <span class="name">${actress.nome || 'Nome Indisponível'}</span>
+                        <span class="age">Idade: ${age}</span>
+                        <span class="rating">Nota: ${rating}</span>
+                    </div>
+                `;
+
+                li.addEventListener('click', () => handleActressClick(actress.id, li));
+                actressList.appendChild(li);
+            });
+
+        } catch (error) {
+            console.error("Erro ao buscar atrizes: ", error);
+            actressList.innerHTML = '<li class="error">Erro ao carregar atrizes. Verifique o console.</li>';
+        }
+    }
+
+    // 2. Handle Actress Click
+    async function handleActressClick(actressId, listItemElement) {
+        console.log(`%cHandling click for actress ID: ${actressId}`, "color: blue; font-weight: bold;");
+
+        if (selectedActressElement) {
+            selectedActressElement.classList.remove('selected');
+        }
+        listItemElement.classList.add('selected');
+        selectedActressElement = listItemElement;
+
+        mainContainer.classList.add('details-visible');
+        actressDetailsContainer.innerHTML = '<div class="loading">Carregando detalhes...</div>';
+        contentCardsContainer.innerHTML = '';
+        displayMessage(contentMessage, 'Carregando conteúdo...');
+
+        try {
+            console.log(`Fetching details for actress ID: ${actressId}`);
+            const actressDoc = await getDoc(doc(db, "atores", actressId));
+            if (actressDoc.exists()) {
+                console.log("Actress details found:", actressDoc.data());
+                displayActressDetails(actressDoc.data()); // Call modified display function
+            } else {
+                console.warn(`Actress details not found for ID: ${actressId}`);
+                actressDetailsContainer.innerHTML = '<div class="error">Detalhes da atriz não encontrados.</div>';
+            }
+
+            await loadRelatedContent(actressId);
+
+        } catch (error) {
+            console.error(`Erro ao carregar dados para atriz ${actressId}: `, error);
+            actressDetailsContainer.innerHTML = '<div class="error">Erro ao carregar detalhes.</div>';
+            displayMessage(contentMessage,'Erro ao carregar conteúdo.', true);
+        }
+    }
+
+    // 3. Display Actress Details (Modified Formatting)
+    function displayActressDetails(data) {
+        actressDetailsContainer.innerHTML = ''; // Clear loading/previous
+
+        const detailsTitle = document.createElement('h3');
+        detailsTitle.textContent = data.nome || 'Detalhes';
+        actressDetailsContainer.appendChild(detailsTitle);
+
+        if (data.foto) {
+             const img = document.createElement('img');
+             img.src = data.foto;
+             img.alt = data.nome;
+             img.classList.add('detail-photo'); // Uses the existing smaller style
+             img.onerror = () => { img.style.display = 'none'; };
+             actressDetailsContainer.appendChild(img);
+        }
+
+        // --- Fields to SKIP in actress details ---
+        const skipFields = ['foto', 'nome', 'cenas', 'filmes', 'videos', 'timestamp']; // Add any other fields linking to content
+
+        for (const key in data) {
+            // --- MODIFIED: Skip certain fields ---
+            if (data.hasOwnProperty(key) && !skipFields.includes(key)) {
+                const detailDiv = document.createElement('div');
+                let value = data[key];
+                let label = key;
+
+                // --- MODIFIED: Separate Birth Date and Age ---
+                if (key === 'dataNascimento') {
+                    // Display Birth Date
+                    detailDiv.innerHTML = `<strong>${label}:</strong> ${value || 'N/A'}`;
                     actressDetailsContainer.appendChild(detailDiv);
+
+                    // Display Age on a new line
+                    const ageDiv = document.createElement('div');
+                    const age = calculateAge(value);
+                    ageDiv.innerHTML = `<strong>Idade:</strong> ${age}`;
+                    actressDetailsContainer.appendChild(ageDiv);
+
+                    continue; // Skip the default appending for this key
                 }
-            }
-             if (Object.keys(data).filter(k => k !== 'foto' && k !== 'nome').length === 0) {
-                 // If only foto/nome exist, show message
-                 const noDetailsDiv = document.createElement('div');
-                 noDetailsDiv.textContent = 'Nenhum detalhe adicional disponível.';
-                 actressDetailsContainer.appendChild(noDetailsDiv);
-            }
-        }
-
-        // 4. Load Related Content (Scenes, Movies, Videos)
-        async function loadRelatedContent(actressId) {
-            console.log(`%cStarting content search for actress ID: ${actressId}`, "color: green; font-weight: bold;");
-            contentCardsContainer.innerHTML = ''; // Clear previous
-            let contentFound = false;
-
-            try {
-                // --- Fetch Cenas ---
-                console.log("Fetching 'cenas' collection...");
-                const cenasSnapshot = await getDocs(collection(db, "cenas"));
-                console.log(`Found ${cenasSnapshot.size} documents in 'cenas'.`);
-                cenasSnapshot.forEach(docSnap => {
-                    const cenaData = docSnap.data();
-                    const cenaId = docSnap.id;
-                    console.log(`Checking cena ID: ${cenaId}`);
-                    console.log(`  > Cena data:`, cenaData);
-                    console.log(`  > Type of cenaData.atores: ${typeof cenaData.atores}`, Array.isArray(cenaData.atores) ? `Is Array: ${Array.isArray(cenaData.atores)}` : '', cenaData.atores); // Log if it's an array
-
-                    // CORRECTED CHECK: Check if 'atores' field exists, is an Array, and includes the actressId
-                    if (cenaData.atores && Array.isArray(cenaData.atores) && cenaData.atores.includes(actressId)) {
-                         console.log(`%c  MATCH FOUND in Cena ${cenaId}! (Actress ID found in array)`, "color: lightgreen;");
-                         createContentCard(cenaData.imagem, cenaData.nome, 'Cena', cenaId);
-                         contentFound = true;
-                    } else {
-                         console.log(`  - No match in Cena ${cenaId} for actress ${actressId}. (Field missing, not array, or ID not included)`);
-                    }
-                });
-
-                 // --- Fetch Videos ---
-                console.log("Fetching 'videos' collection...");
-                const videosSnapshot = await getDocs(collection(db, "videos"));
-                console.log(`Found ${videosSnapshot.size} documents in 'videos'.`);
-                 videosSnapshot.forEach(docSnap => {
-                    const videoData = docSnap.data();
-                    const videoId = docSnap.id;
-                    console.log(`Checking video ID: ${videoId}`);
-                    console.log(`  > Video data:`, videoData);
-                     console.log(`  > Type of videoData.atores: ${typeof videoData.atores}`, Array.isArray(videoData.atores) ? `Is Array: ${Array.isArray(videoData.atores)}` : '', videoData.atores); // Log if it's an array
-
-                     // CORRECTED CHECK: Check if 'atores' field exists, is an Array, and includes the actressId
-                     if (videoData.atores && Array.isArray(videoData.atores) && videoData.atores.includes(actressId)) {
-                         console.log(`%c  MATCH FOUND in Video ${videoId}! (Actress ID found in array)`, "color: lightgreen;");
-                         createContentCard(videoData.imagem, videoData.nome, 'Vídeo', videoId);
-                         contentFound = true;
-                     } else {
-                         console.log(`  - No match in Video ${videoId} for actress ${actressId}. (Field missing, not array, or ID not included)`);
-                     }
-                 });
-
-
-                // --- Fetch Filmes (needs nested check) ---
-                console.log("Fetching 'filmes' collection...");
-                const filmesSnapshot = await getDocs(collection(db, "filmes"));
-                console.log(`Found ${filmesSnapshot.size} documents in 'filmes'.`);
-                const moviePromises = [];
-                filmesSnapshot.forEach(filmeDoc => {
-                    const filmeData = filmeDoc.data();
-                    const filmeId = filmeDoc.id;
-                    console.log(`Checking filme ID: ${filmeId}, Data:`, filmeData);
-                    // Check if 'cenas' array exists and is not empty
-                    if (filmeData.cenas && Array.isArray(filmeData.cenas) && filmeData.cenas.length > 0) {
-                        console.log(`  > Movie ${filmeId} has scenes array:`, filmeData.cenas);
-                        // Create a promise to check scenes for this movie
-                        const checkMoviePromise = async () => {
-                            console.log(`    Checking scenes for movie ${filmeId}...`);
-                            for (const cenaRef of filmeData.cenas) {
-                                if (typeof cenaRef === 'string' && cenaRef.trim() !== '') {
-                                     console.log(`      Checking scene ref: ${cenaRef} for movie ${filmeId}`);
-                                     try {
-                                        const cenaDocSnap = await getDoc(doc(db, "cenas", cenaRef));
-                                        if (cenaDocSnap.exists()) {
-                                            const cenaData = cenaDocSnap.data();
-                                            console.log(`        > Fetched scene ${cenaRef} data:`, cenaData);
-                                            console.log(`        > Type of linked cenaData.atores: ${typeof cenaData.atores}`, Array.isArray(cenaData.atores) ? `Is Array: ${Array.isArray(cenaData.atores)}` : '', cenaData.atores); // Log if it's an array
-
-                                             // CORRECTED CHECK: Check if linked scene's 'atores' exists, is an Array, and includes the actressId
-                                             if (cenaData.atores && Array.isArray(cenaData.atores) && cenaData.atores.includes(actressId)) {
-                                                console.log(`%c        MATCH FOUND for actress ${actressId} in scene ${cenaRef} linked to movie ${filmeId}! (Actress ID found in array)`, "color: orange;");
-                                                 return { found: true, data: filmeData, id: filmeId }; // Return movie data and ID
-                                             } else {
-                                                  console.log(`        - No match in linked scene ${cenaRef} for actress ${actressId}. (Field missing, not array, or ID not included)`);
-                                             }
-                                        } else {
-                                            console.warn(`        ! Linked scene ${cenaRef} does not exist in 'cenas' collection.`);
-                                        }
-                                     } catch(sceneError) {
-                                         console.error(`        ! Error fetching/checking scene ${cenaRef} for movie ${filmeId}:`, sceneError);
-                                     }
-                                } else {
-                                     console.warn(`      Invalid scene reference found in movie ${filmeId}:`, cenaRef);
-                                }
-                            }
-                            console.log(`    Finished checking scenes for movie ${filmeId}. No match found.`);
-                            return { found: false }; // Actress not found in any scene of this movie
-                        };
-                        moviePromises.push(checkMoviePromise());
-                    } else {
-                         console.log(`  > Movie ${filmeId} has no valid 'cenas' array.`);
-                    }
-                });
-
-                // Wait for all movie checks to complete
-                console.log(`Waiting for ${moviePromises.length} movie scene checks to complete...`);
-                const movieResults = await Promise.all(moviePromises);
-                console.log("Movie scene check results:", movieResults);
-                movieResults.forEach(result => {
-                    if (result.found) {
-                        console.log(`%cMATCH CONFIRMED for Movie ID: ${result.id}`, "color: lightgreen;");
-                        createContentCard(result.data.imagem, result.data.nome, 'Filme', result.id);
-                         contentFound = true;
-                    }
-                });
-
-
-                 if (!contentFound) {
-                     console.log(`%cNo content found for actress ID: ${actressId} after checking all sources.`, "color: red;");
-                     displayMessage(contentMessage,'Nenhum conteúdo encontrado para esta atriz.');
-                 } else {
-                     console.log(`%cFinished content search. Found content for actress ID: ${actressId}`, "color: green;");
-                     clearMessage(contentMessage); // Hide loading/message if content was found
+                 // Example formatting for 'peso' (weight) if needed
+                 else if (key === 'peso' && value !== undefined && value !== null) {
+                     value = `${value} kg`; // Add units
+                 }
+                 // Example formatting for 'altura' (height) if needed
+                 else if (key === 'altura' && value !== undefined && value !== null) {
+                     value = `${value} cm`; // Add units
                  }
 
 
-            } catch (error) {
-                console.error("Erro geral ao buscar conteúdo relacionado: ", error);
-                 displayMessage(contentMessage,'Erro ao carregar conteúdo relacionado.', true);
+                detailDiv.innerHTML = `<strong>${label}:</strong> ${value}`;
+                actressDetailsContainer.appendChild(detailDiv);
             }
         }
+         if (Object.keys(data).filter(k => !skipFields.includes(k)).length === 0) {
+             const noDetailsDiv = document.createElement('div');
+             noDetailsDiv.textContent = 'Nenhum detalhe adicional disponível.';
+             actressDetailsContainer.appendChild(noDetailsDiv);
+        }
+    }
+
+    // 4. Load Related Content (Using Array.includes())
+    async function loadRelatedContent(actressId) {
+        console.log(`%cStarting content search for actress ID: ${actressId}`, "color: green; font-weight: bold;");
+        contentCardsContainer.innerHTML = ''; // Clear previous
+        let contentFound = false;
+
+        try {
+            // --- Fetch Cenas ---
+            console.log("Fetching 'cenas' collection...");
+            const cenasSnapshot = await getDocs(collection(db, "cenas"));
+            console.log(`Found ${cenasSnapshot.size} documents in 'cenas'.`);
+            cenasSnapshot.forEach(docSnap => {
+                const cenaData = docSnap.data();
+                const cenaId = docSnap.id;
+                // console.log(`Checking cena ID: ${cenaId}`); // Optional: keep for debugging
+                // console.log(`  > Cena data:`, cenaData); // Optional: keep for debugging
+                // console.log(`  > Type of cenaData.atores: ${typeof cenaData.atores}`, Array.isArray(cenaData.atores) ? `Is Array: ${Array.isArray(cenaData.atores)}` : '', cenaData.atores); // Optional: keep for debugging
+
+                if (cenaData.atores && Array.isArray(cenaData.atores) && cenaData.atores.includes(actressId)) {
+                     console.log(`%c  MATCH FOUND in Cena ${cenaId}! (Actress ID found in array)`, "color: lightgreen;");
+                     createContentCard(cenaData.imagem, cenaData.nome, 'Cena', cenaId); // Pass type and ID
+                     contentFound = true;
+                } else {
+                    // console.log(`  - No match in Cena ${cenaId} for actress ${actressId}. (Field missing, not array, or ID not included)`); // Optional: keep for debugging
+                }
+            });
+
+             // --- Fetch Videos ---
+            console.log("Fetching 'videos' collection...");
+            const videosSnapshot = await getDocs(collection(db, "videos"));
+            console.log(`Found ${videosSnapshot.size} documents in 'videos'.`);
+             videosSnapshot.forEach(docSnap => {
+                const videoData = docSnap.data();
+                const videoId = docSnap.id;
+                // console.log(`Checking video ID: ${videoId}`); // Optional: keep for debugging
+                // console.log(`  > Video data:`, videoData); // Optional: keep for debugging
+                // console.log(`  > Type of videoData.atores: ${typeof videoData.atores}`, Array.isArray(videoData.atores) ? `Is Array: ${Array.isArray(videoData.atores)}` : '', videoData.atores); // Optional: keep for debugging
+
+                 if (videoData.atores && Array.isArray(videoData.atores) && videoData.atores.includes(actressId)) {
+                     console.log(`%c  MATCH FOUND in Video ${videoId}! (Actress ID found in array)`, "color: lightgreen;");
+                     createContentCard(videoData.imagem, videoData.nome, 'Vídeo', videoId); // Pass type and ID
+                     contentFound = true;
+                 } else {
+                    // console.log(`  - No match in Video ${videoId} for actress ${actressId}. (Field missing, not array, or ID not included)`); // Optional: keep for debugging
+                 }
+             });
 
 
-        // 5. Create Content Card HTML
-        function createContentCard(imageUrl, title, type, id) { // Added id for logging
-             console.log(`Creating card for ${type} ID: ${id}, Title: ${title}`);
-            const card = document.createElement('div');
-            card.classList.add('content-card');
+            // --- Fetch Filmes (needs nested check) ---
+            console.log("Fetching 'filmes' collection...");
+            const filmesSnapshot = await getDocs(collection(db, "filmes"));
+            console.log(`Found ${filmesSnapshot.size} documents in 'filmes'.`);
+            const moviePromises = [];
+            filmesSnapshot.forEach(filmeDoc => {
+                const filmeData = filmeDoc.data();
+                const filmeId = filmeDoc.id;
+                // console.log(`Checking filme ID: ${filmeId}, Data:`, filmeData); // Optional: keep for debugging
+                if (filmeData.cenas && Array.isArray(filmeData.cenas) && filmeData.cenas.length > 0) {
+                    // console.log(`  > Movie ${filmeId} has scenes array:`, filmeData.cenas); // Optional: keep for debugging
+                    const checkMoviePromise = async () => {
+                        // console.log(`    Checking scenes for movie ${filmeId}...`); // Optional: keep for debugging
+                        for (const cenaRef of filmeData.cenas) {
+                            if (typeof cenaRef === 'string' && cenaRef.trim() !== '') {
+                                 // console.log(`      Checking scene ref: ${cenaRef} for movie ${filmeId}`); // Optional: keep for debugging
+                                 try {
+                                    const cenaDocSnap = await getDoc(doc(db, "cenas", cenaRef));
+                                    if (cenaDocSnap.exists()) {
+                                        const cenaData = cenaDocSnap.data();
+                                        // console.log(`        > Fetched scene ${cenaRef} data:`, cenaData); // Optional: keep for debugging
+                                        // console.log(`        > Type of linked cenaData.atores: ${typeof cenaData.atores}`, Array.isArray(cenaData.atores) ? `Is Array: ${Array.isArray(cenaData.atores)}` : '', cenaData.atores); // Optional: keep for debugging
 
-            const img = document.createElement('img');
-             // Handle potential image URLs within objects (like from cenas screenshot)
-             let finalImageUrl = imageUrl;
-             if (typeof imageUrl === 'object' && imageUrl !== null && imageUrl.hasOwnProperty('width')) {
-                 // Attempt to find a url-like string property if it's an object
-                 const urlKey = Object.keys(imageUrl).find(k => typeof imageUrl[k] === 'string' && imageUrl[k].startsWith('http'));
-                 finalImageUrl = urlKey ? imageUrl[urlKey] : 'placeholder.png';
-                 console.log(`  > Extracted image URL from object: ${finalImageUrl}`);
-             } else if (typeof imageUrl !== 'string' || !imageUrl) {
-                 finalImageUrl = 'placeholder.png'; // Default placeholder
-                 console.log(`  > Using placeholder image.`);
+                                         if (cenaData.atores && Array.isArray(cenaData.atores) && cenaData.atores.includes(actressId)) {
+                                            console.log(`%c        MATCH FOUND for actress ${actressId} in scene ${cenaRef} linked to movie ${filmeId}! (Actress ID found in array)`, "color: orange;");
+                                             return { found: true, data: filmeData, id: filmeId };
+                                         } else {
+                                            // console.log(`        - No match in linked scene ${cenaRef} for actress ${actressId}. (Field missing, not array, or ID not included)`); // Optional: keep for debugging
+                                         }
+                                    } else {
+                                        console.warn(`        ! Linked scene ${cenaRef} does not exist in 'cenas' collection.`);
+                                    }
+                                 } catch(sceneError) {
+                                     console.error(`        ! Error fetching/checking scene ${cenaRef} for movie ${filmeId}:`, sceneError);
+                                 }
+                            } else {
+                                 console.warn(`      Invalid scene reference found in movie ${filmeId}:`, cenaRef);
+                            }
+                        }
+                        // console.log(`    Finished checking scenes for movie ${filmeId}. No match found.`); // Optional: keep for debugging
+                        return { found: false };
+                    };
+                    moviePromises.push(checkMoviePromise());
+                } else {
+                     // console.log(`  > Movie ${filmeId} has no valid 'cenas' array.`); // Optional: keep for debugging
+                }
+            });
+
+            console.log(`Waiting for ${moviePromises.length} movie scene checks to complete...`);
+            const movieResults = await Promise.all(moviePromises);
+            console.log("Movie scene check results:", movieResults);
+            movieResults.forEach(result => {
+                if (result.found) {
+                    console.log(`%cMATCH CONFIRMED for Movie ID: ${result.id}`, "color: lightgreen;");
+                    createContentCard(result.data.imagem, result.data.nome, 'Filme', result.id); // Pass type and ID
+                     contentFound = true;
+                }
+            });
+
+
+             if (!contentFound) {
+                 console.log(`%cNo content found for actress ID: ${actressId} after checking all sources.`, "color: red;");
+                 displayMessage(contentMessage,'Nenhum conteúdo encontrado para esta atriz.');
+             } else {
+                 console.log(`%cFinished content search. Found content for actress ID: ${actressId}`, "color: green;");
+                 clearMessage(contentMessage);
              }
 
-            img.src = finalImageUrl;
-            img.alt = title || type;
-            img.onerror = () => {
-                console.warn(`    ! Failed to load image: ${img.src}. Using placeholder.`);
-                img.src = 'placeholder.png';
-                img.onerror=null;
-             } // Placeholder on error
 
-            const titleDiv = document.createElement('div');
-            titleDiv.classList.add('title');
-            titleDiv.textContent = `${title || 'Sem Título'} (${type})`; // Add type (Scene/Movie/Video)
+        } catch (error) {
+            console.error("Erro geral ao buscar conteúdo relacionado: ", error);
+             displayMessage(contentMessage,'Erro ao carregar conteúdo relacionado.', true);
+        }
+    }
 
-            card.appendChild(img);
-            card.appendChild(titleDiv);
-            contentCardsContainer.appendChild(card);
+
+    // 5. Create Content Card HTML (Add Click Listener)
+    function createContentCard(imageUrl, title, type, id) {
+         console.log(`Creating card for ${type} ID: ${id}, Title: ${title}`);
+        const card = document.createElement('div');
+        card.classList.add('content-card');
+        // --- MODIFIED: Store type and ID for click ---
+        card.dataset.type = type;
+        card.dataset.id = id;
+
+        const img = document.createElement('img');
+         let finalImageUrl = imageUrl;
+         if (typeof imageUrl === 'object' && imageUrl !== null && imageUrl.hasOwnProperty('width')) {
+             const urlKey = Object.keys(imageUrl).find(k => typeof imageUrl[k] === 'string' && imageUrl[k].startsWith('http'));
+             finalImageUrl = urlKey ? imageUrl[urlKey] : 'placeholder.png';
+             // console.log(`  > Extracted image URL from object: ${finalImageUrl}`); // Optional: keep for debugging
+         } else if (typeof imageUrl !== 'string' || !imageUrl) {
+             finalImageUrl = 'placeholder.png';
+             // console.log(`  > Using placeholder image.`); // Optional: keep for debugging
+         }
+
+        img.src = finalImageUrl;
+        img.alt = title || type;
+        img.onerror = () => {
+            console.warn(`    ! Failed to load image: ${img.src}. Using placeholder.`);
+            img.src = 'placeholder.png';
+            img.onerror=null;
+         }
+
+        const titleDiv = document.createElement('div');
+        titleDiv.classList.add('title');
+        titleDiv.textContent = `${title || 'Sem Título'}`; // Removed type from card title
+
+        card.appendChild(img);
+        card.appendChild(titleDiv);
+
+        // --- MODIFIED: Add click listener ---
+        card.addEventListener('click', () => showContentDetails(type, id));
+
+        contentCardsContainer.appendChild(card);
+    }
+
+    // --- NEW: Modal Functions ---
+
+    // 6. Show Content Details in Modal
+    async function showContentDetails(type, id) {
+        console.log(`Showing details for ${type} ID: ${id}`);
+        modalBody.innerHTML = '<div class="loading">Carregando...</div>'; // Clear previous, show loading
+        modalLinkContainer.innerHTML = ''; // Clear previous link
+        modal.style.display = 'flex'; // Show modal overlay
+
+        let collectionName = '';
+        switch (type) {
+            case 'Cena': collectionName = 'cenas'; break;
+            case 'Vídeo': collectionName = 'videos'; break;
+            case 'Filme': collectionName = 'filmes'; break;
+            default:
+                console.error(`Invalid content type: ${type}`);
+                modalBody.innerHTML = '<div class="error">Tipo de conteúdo inválido.</div>';
+                return;
         }
 
-        // --- Initial Load ---
-        loadActresses();
+        try {
+            const docRef = doc(db, collectionName, id);
+            const docSnap = await getDoc(docRef);
 
-    </script>
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                console.log("Content data:", data);
+                modalTitle.textContent = data.nome || `Detalhes de ${type}`;
+                modalBody.innerHTML = ''; // Clear loading
+
+                // Display image if available
+                 let imageUrl = data.imagem;
+                 if (imageUrl) {
+                     let finalImageUrl = imageUrl;
+                     // Handle potential image URLs within objects
+                     if (typeof imageUrl === 'object' && imageUrl !== null && imageUrl.hasOwnProperty('width')) {
+                         const urlKey = Object.keys(imageUrl).find(k => typeof imageUrl[k] === 'string' && imageUrl[k].startsWith('http'));
+                         finalImageUrl = urlKey ? imageUrl[urlKey] : null;
+                     } else if (typeof imageUrl !== 'string') {
+                         finalImageUrl = null; // Not a valid string
+                     }
+
+                     if (finalImageUrl) {
+                        const img = document.createElement('img');
+                        img.src = finalImageUrl;
+                        img.alt = data.nome || type;
+                        img.classList.add('modal-detail-image'); // Style for modal image
+                        img.onerror = () => { img.style.display = 'none'; };
+                        modalBody.appendChild(img);
+                     }
+                 }
+
+
+                // Display other fields (customize as needed)
+                const skipContentFields = ['nome', 'imagem', 'atores', 'cenas', 'timestamp', 'pagina']; // Fields not to show raw or handled elsewhere
+                for (const key in data) {
+                     if (data.hasOwnProperty(key) && !skipContentFields.includes(key)) {
+                         const detailDiv = document.createElement('div');
+                         let value = data[key];
+                         // Handle array display (e.g., for atores/cenas if you decide to show them)
+                         if (Array.isArray(value)) {
+                             value = value.join(', '); // Simple comma separation
+                         }
+                         detailDiv.innerHTML = `<strong>${key}:</strong> ${value}`;
+                         modalBody.appendChild(detailDiv);
+                    }
+                }
+                 // Add timestamp if present, formatted
+                 if(data.timestamp) {
+                     let formattedTimestamp = data.timestamp;
+                     try {
+                        if(typeof data.timestamp === 'object' && data.timestamp.seconds) {
+                            formattedTimestamp = new Date(data.timestamp.seconds * 1000).toLocaleString('pt-BR');
+                        }
+                     } catch(e) {/*ignore*/}
+                     const tsDiv = document.createElement('div');
+                     tsDiv.innerHTML = `<strong>timestamp:</strong> ${formattedTimestamp}`;
+                     modalBody.appendChild(tsDiv);
+                 }
+
+
+                // Add External Link Button if 'pagina' exists
+                if (data.pagina && typeof data.pagina === 'string' && data.pagina.trim() !== '') {
+                    const linkButton = document.createElement('button');
+                    linkButton.textContent = 'Abrir Página Externa';
+                    linkButton.onclick = () => window.open(data.pagina, '_blank'); // Open in new tab
+                    modalLinkContainer.appendChild(linkButton);
+                } else {
+                    modalLinkContainer.innerHTML = '<i>(Nenhuma página externa associada)</i>';
+                }
+
+            } else {
+                console.warn(`Document not found: ${collectionName}/${id}`);
+                modalBody.innerHTML = '<div class="error">Conteúdo não encontrado.</div>';
+            }
+        } catch (error) {
+            console.error(`Erro ao buscar ${type} ${id}: `, error);
+            modalBody.innerHTML = '<div class="error">Erro ao carregar detalhes.</div>';
+        }
+    }
+
+    // 7. Close Modal Function
+    function closeModal() {
+        modal.style.display = 'none';
+        modalBody.innerHTML = ''; // Clear content when closing
+        modalLinkContainer.innerHTML = '';
+    }
+
+    // Close modal if user clicks outside the content area
+    window.addEventListener('click', (event) => {
+        if (event.target == modal) { // Check if the click was directly on the overlay
+            closeModal();
+        }
+    });
+
+
+    // --- Initial Load ---
+    loadActresses();
+
+</script>
 </body>
 </html>
