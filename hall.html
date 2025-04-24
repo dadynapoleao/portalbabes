@@ -31,7 +31,7 @@
         #actress-details { flex-grow: 1; overflow-y: auto; padding-right: 5px; }
         #actress-details h3 { margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 5px; }
         #actress-details div { margin-bottom: 7px; word-wrap: break-word; font-size: 0.9em; }
-        #actress-details strong { display: inline-block; min-width: 90px; color: #333; font-weight: bold; }
+        #actress-details strong { display: inline-block; min-width: 90px; color: #333; font-weight: bold; margin-right: 5px; }
         #actress-details img.detail-photo { max-width: 180px; max-height: 230px; width: auto; height: auto; border-radius: 4px; margin-top: 8px; display: block; }
 
         /* --- Related Content (Right Column) --- */
@@ -58,7 +58,7 @@
         #content-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; flex-grow: 1; overflow-y: auto; padding-top: 5px; align-content: start; }
         .content-card { background-color: #f9f9f9; border: 1px solid #eee; border-radius: 4px; overflow: hidden; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); cursor: pointer; transition: box-shadow 0.2s ease; position: relative; display: flex; flex-direction: column;}
         .content-card:hover { box-shadow: 0 3px 6px rgba(0,0,0,0.1); }
-        .content-card .image-container { position: relative; width: 100%; height: 160px; /* Slightly smaller height */ flex-shrink: 0; }
+        .content-card .image-container { position: relative; width: 100%; height: 160px; flex-shrink: 0; }
         .content-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .content-type-badge { position: absolute; top: 4px; left: 4px; background-color: rgba(0, 0, 0, 0.75); color: white; padding: 2px 5px; font-size: 0.7em; font-weight: bold; border-radius: 3px; z-index: 1; }
         .content-card .title { padding: 6px; font-size: 0.85em; min-height: 35px; display: flex; align-items: center; justify-content: center; line-height: 1.2; flex-grow: 1; }
@@ -93,25 +93,27 @@
         /* --- Movable Actress Popup Styling --- */
         .actress-popup { position: fixed; background-color: white; border: 1px solid #ccc; border-radius: 6px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); z-index: 1050; width: 200px; max-height: 300px; overflow: hidden; display: flex; flex-direction: column; cursor: grab; user-select: none; }
         .actress-popup.dragging { cursor: grabbing; opacity: 0.9; }
-        .actress-popup-header { background-color: #f0f0f0; padding: 5px 8px; border-bottom: 1px solid #ccc; display: flex; justify-content: space-between; align-items: center; }
+        .actress-popup-header { background-color: #f0f0f0; padding: 5px 8px; border-bottom: 1px solid #ccc; display: flex; justify-content: space-between; align-items: center; cursor: grab; } /* Added cursor grab here */
+        .actress-popup-header:active { cursor: grabbing; }
         .actress-popup-header h5 { margin: 0; font-size: 0.9em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; padding-right: 5px; }
-        /* Styles for popup buttons */
-        .actress-popup-close, .actress-popup-compare-btn { font-weight: bold; color: #888; cursor: pointer; border: none; background: none; padding: 0 4px; line-height: 1; }
+        .actress-popup-close, .actress-popup-compare-btn { font-weight: bold; color: #888; cursor: pointer; border: none; background: none; padding: 0 4px; line-height: 1; flex-shrink: 0; } /* Added flex-shrink */
         .actress-popup-close { font-size: 1.1em; }
-        .actress-popup-compare-btn { font-size: 0.9em; margin-right: 5px; } /* Added margin */
+        .actress-popup-compare-btn { font-size: 0.9em; margin-right: 5px; }
         .actress-popup-close:hover, .actress-popup-compare-btn:hover { color: #333; }
         .actress-popup-body { padding: 8px; overflow-y: auto; font-size: 0.8em; flex-grow: 1; }
         .actress-popup-body img { width: 65px; height: 65px; object-fit: cover; border-radius: 50%; display: block; margin: 0 auto 8px auto; }
         .actress-popup-body div { margin-bottom: 4px; }
-        .actress-popup-body strong { display: inline-block; min-width: 55px; color: #444; font-weight: bold;}
+        .actress-popup-body strong { display: inline-block; min-width: 55px; color: #444; font-weight: bold; margin-right: 3px;}
 
         /* --- Comparison Modal --- */
+        #comparison-modal .modal-content { max-width: 80vw; width: auto; } /* Allow wider comparison modal */
         #comparison-modal-body { /* Container for columns */
             display: flex;
             gap: 10px; /* Space between columns */
             align-items: flex-start; /* Align columns at the top */
             overflow-x: auto; /* Allow horizontal scroll if too many columns */
             padding-bottom: 10px; /* Add some padding at the bottom */
+            min-height: 200px; /* Ensure minimum height */
         }
         .comparison-column {
             flex: 1; /* Allow columns to grow */
@@ -126,6 +128,7 @@
             display: flex;
             flex-direction: column;
             box-sizing: border-box; /* Include padding in width */
+            height: min-content; /* Adjust height to content */
         }
         .comparison-column .remove-compare-btn {
             position: absolute;
@@ -143,6 +146,7 @@
             height: 18px;
             text-align: center;
             padding: 0;
+            z-index: 1;
         }
         .comparison-column .remove-compare-btn:hover {
             color: #333;
@@ -155,6 +159,7 @@
             object-fit: cover;
             border-radius: 4px;
             margin-bottom: 8px;
+            display: block; /* Ensure block display */
         }
         .comparison-column h4 {
             font-size: 1em;
@@ -201,6 +206,10 @@
         #comparison-suggestions-list .suggestion-item img { width: 25px; height: 25px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
         #comparison-suggestions-list .suggestion-item.context-actress span { font-weight: bold; color: #0056b3; } /* Highlight context actresses */
 
+        /* General Loading/Error Styles */
+        .loading, .error { padding: 10px; text-align: center; color: #555; font-style: italic; }
+        .error { color: #a00; font-weight: bold; }
+
     </style>
 </head>
 <body>
@@ -240,7 +249,7 @@
             </div>
             <h2 class="related-title">Conteúdo Relacionado</h2>
             <div id="content-cards"></div>
-            <div id="content-message" class="loading" style="display: none;"></div>
+            <div id="content-message" style="display: none;"></div> <!-- Removed initial loading -->
         </div>
     </div>
 
@@ -258,7 +267,7 @@
 
     <!-- Comparison Modal Structure (Initially Hidden) -->
     <div id="comparison-modal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 800px;"> <!-- Wider modal -->
+        <div class="modal-content"> <!-- Adjusted width in CSS -->
             <button class="modal-close-button" onclick="closeComparisonModal()">×</button>
             <h3 id="comparison-modal-title">Comparar Atrizes</h3>
             <div class="comparison-search-area" style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 15px; position: relative;"> <!-- Added position relative -->
@@ -276,7 +285,6 @@
     <div id="actress-popup-template" class="actress-popup" style="display: none;">
         <div class="actress-popup-header">
             <h5>Nome Atriz</h5>
-            <!-- ADDED Compare Button -->
             <button class="actress-popup-compare-btn" title="Comparar Atrizes">🧪</button>
             <button class="actress-popup-close">×</button>
         </div>
@@ -339,7 +347,7 @@
 
         // --- Helper Functions ---
         function calculateAge(birthDateString) { if (!birthDateString) return '?'; try { const birthDate = new Date(birthDateString); const today = new Date(); let age = today.getFullYear() - birthDate.getFullYear(); const m = today.getMonth() - birthDate.getMonth(); if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) { age--; } return age > 0 ? age : '?'; } catch (e) { console.error("Date parse error:", e); return '?'; } }
-        function displayMessage(element, message, isError = false) { element.innerHTML = `<div class="${isError ? 'error' : 'loading'}" style="padding: 10px; text-align: center; color: ${isError ? '#a00' : '#555'};">${message}</div>`; element.style.display = 'block'; }
+        function displayMessage(element, message, isError = false) { element.innerHTML = `<div class="${isError ? 'error' : 'loading'}">${message}</div>`; element.style.display = 'block'; }
         function clearMessage(element) { element.innerHTML = ''; element.style.display = 'none'; }
         function capitalizeFirstLetter(string) { return string ? string.charAt(0).toUpperCase() + string.slice(1) : ''; }
 
@@ -375,7 +383,7 @@
         function renderActressListItem(actress) {
             const li = document.createElement('li'); li.classList.add('actress-item'); li.dataset.id = actress.id;
             const age = calculateAge(actress.dataNascimento);
-            const imageUrl = actress.foto || 'placeholder.png'; // Use placeholder if no photo
+            const imageUrl = actress.foto || 'placeholder.png';
             const rating = actress.nota !== undefined && actress.nota !== null ? actress.nota : 'N/A';
             li.innerHTML = `<img src="${imageUrl}" alt="${actress.nome || ''}" onerror="this.src='placeholder.png'; this.onerror=null;"><div class="actress-info"><span class="name">${actress.nome || 'Nome Indisponível'}</span><span class="age">Idade: ${age}</span><span class="rating">Nota: ${rating}</span></div>`;
             li.addEventListener('click', () => handleMainActressClick(actress.id, li));
@@ -393,7 +401,7 @@
              mainContainer.classList.add('details-visible'); // Show middle and right columns
 
              // Reset UI elements
-             actressDetailsContainer.innerHTML = '<div class="loading" style="padding: 10px;">Carregando detalhes...</div>';
+             actressDetailsContainer.innerHTML = '<div class="loading">Carregando detalhes...</div>';
              contentCardsContainer.innerHTML = '';
              displayMessage(contentMessage, 'Carregando conteúdo...');
              selectedRelatedActresses = [];
@@ -410,268 +418,149 @@
                      const actressDoc = await getDoc(doc(db, "atores", actressId));
                      if (actressDoc.exists()) {
                          actressData = { id: actressId, ...actressDoc.data() };
-                         // Optional: Add to allActressesData if needed elsewhere
                      }
                  }
 
                  if (actressData) {
-                     displayMainActressDetails(actressData);
+                     displayMainActressDetails(actressData); // Display details in middle column
                  } else {
-                     actressDetailsContainer.innerHTML = '<div class="error" style="padding: 10px;">Detalhes não encontrados.</div>';
+                     actressDetailsContainer.innerHTML = '<div class="error">Detalhes não encontrados.</div>';
                  }
-                 // Load related content regardless of whether details were found
+                 // Load related content (videos, films, scenes) for the right column
                  await loadAndDisplayRelatedContent(actressId);
              } catch (error) {
                  console.error(`Erro ao carregar dados da atriz ${actressId}: `, error);
-                 actressDetailsContainer.innerHTML = '<div class="error" style="padding: 10px;">Erro ao carregar detalhes.</div>';
+                 actressDetailsContainer.innerHTML = '<div class="error">Erro ao carregar detalhes.</div>';
                  displayMessage(contentMessage,'Erro ao carregar conteúdo.', true);
              }
         }
 
-        // 3. Display Main Actress Details (Middle Column)
+        // 3. Display Main Actress Details (Middle Column) - MODIFIED for counts
         function displayMainActressDetails(data) {
-             actressDetailsContainer.innerHTML = ''; // Clear previous details or loading message
+             actressDetailsContainer.innerHTML = ''; // Clear previous/loading
              const detailsTitle = document.createElement('h3');
              detailsTitle.textContent = data.nome || 'Detalhes';
              actressDetailsContainer.appendChild(detailsTitle);
 
              if (data.foto) {
                  const img = document.createElement('img');
-                 img.src = data.foto;
-                 img.alt = data.nome || 'Foto';
-                 img.classList.add('detail-photo');
-                 img.onerror = () => { img.style.display = 'none'; }; // Hide if image fails to load
+                 img.src = data.foto; img.alt = data.nome || 'Foto'; img.classList.add('detail-photo');
+                 img.onerror = () => { img.style.display = 'none'; };
                  actressDetailsContainer.appendChild(img);
              }
 
-             const skipFields = ['foto', 'nome', 'cenas', 'filmes', 'videos', 'timestamp', 'id']; // Fields not to display directly
              let detailsAdded = false;
+             const detailFieldsContainer = document.createElement('div'); // Container for text details
 
-             // Order fields for better display (example)
-             const displayOrder = ['dataNascimento', 'altura', 'peso', 'nota', 'olhos', 'cabelo', 'etnia']; // Add other relevant fields
-             const otherFields = Object.keys(data).filter(key => !skipFields.includes(key) && !displayOrder.includes(key) && data[key] != null && data[key] !== '');
+             // --- Specific Fields First ---
+             if (data.dataNascimento) {
+                 const birthDiv = document.createElement('div');
+                 birthDiv.innerHTML = `<strong>Nascimento:</strong> ${data.dataNascimento}`;
+                 detailFieldsContainer.appendChild(birthDiv);
+                 const ageDiv = document.createElement('div');
+                 ageDiv.innerHTML = `<strong>Idade:</strong> ${calculateAge(data.dataNascimento)}`;
+                 detailFieldsContainer.appendChild(ageDiv);
+                 detailsAdded = true;
+             }
+             if (data.altura != null) {
+                 const div = document.createElement('div');
+                 div.innerHTML = `<strong>Altura:</strong> ${data.altura} cm`;
+                 detailFieldsContainer.appendChild(div);
+                 detailsAdded = true;
+             }
+             if (data.peso != null) {
+                 const div = document.createElement('div');
+                 div.innerHTML = `<strong>Peso:</strong> ${data.peso} kg`;
+                 detailFieldsContainer.appendChild(div);
+                 detailsAdded = true;
+             }
+             // *** NEW: Participation Counts ***
+             if (Array.isArray(data.filmes)) {
+                 const div = document.createElement('div');
+                 div.innerHTML = `<strong>Filmes Participados:</strong> ${data.filmes.length}`;
+                 detailFieldsContainer.appendChild(div);
+                 detailsAdded = true;
+             }
+             if (Array.isArray(data.videos)) {
+                 const div = document.createElement('div');
+                 div.innerHTML = `<strong>Vídeos Participados:</strong> ${data.videos.length}`;
+                 detailFieldsContainer.appendChild(div);
+                 detailsAdded = true;
+             }
+              if (Array.isArray(data.cenas)) {
+                 const div = document.createElement('div');
+                 div.innerHTML = `<strong>Cenas Participadas:</strong> ${data.cenas.length}`;
+                 detailFieldsContainer.appendChild(div);
+                 detailsAdded = true;
+             }
 
-             // Display fields in specified order
-             displayOrder.forEach(key => {
-                 if (data.hasOwnProperty(key) && data[key] != null && data[key] !== '') {
-                     const detailDiv = createDetailDiv(key, data[key]);
-                     if (detailDiv) {
-                         actressDetailsContainer.appendChild(detailDiv);
-                         detailsAdded = true;
-                         // Add age immediately after birth date
-                         if (key === 'dataNascimento') {
-                             const ageDiv = document.createElement('div');
-                             ageDiv.innerHTML = `<strong>Idade:</strong> ${calculateAge(data[key])}`;
-                             actressDetailsContainer.appendChild(ageDiv);
-                         }
-                     }
-                 }
-             });
-
-             // Display remaining fields
-             otherFields.forEach(key => {
-                  const detailDiv = createDetailDiv(key, data[key]);
-                  if (detailDiv) {
-                      actressDetailsContainer.appendChild(detailDiv);
+             // --- Other Fields (Generic Handling) ---
+             const skipFields = ['foto', 'nome', 'timestamp', 'id', 'filmes', 'videos', 'cenas', 'dataNascimento', 'altura', 'peso']; // Fields handled above or to ignore
+             for (const key in data) {
+                 if (data.hasOwnProperty(key) && !skipFields.includes(key) && data[key] != null && data[key] !== '') {
+                      const div = document.createElement('div');
+                      div.innerHTML = `<strong>${capitalizeFirstLetter(key)}:</strong> ${data[key]}`;
+                      detailFieldsContainer.appendChild(div);
                       detailsAdded = true;
-                  }
-             });
+                 }
+             }
 
+             actressDetailsContainer.appendChild(detailFieldsContainer); // Add all text details
 
-             if (!detailsAdded && !data.foto) { // Show only if no photo and no details were added
+             if (!detailsAdded && !data.foto) {
                  const noDetailsDiv = document.createElement('div');
                  noDetailsDiv.textContent = 'Sem detalhes adicionais disponíveis.';
                  actressDetailsContainer.appendChild(noDetailsDiv);
              }
         }
 
-        // Helper to create formatted detail divs for actress details
-        function createDetailDiv(key, value) {
-            let label = capitalizeFirstLetter(key);
-            let formattedValue = value;
-
-            // Specific formatting
-            if (key === 'dataNascimento') {
-                label = 'Nascimento';
-                formattedValue = value || 'N/A'; // Already handled age separately
-            } else if (key === 'peso' && typeof value === 'number') {
-                formattedValue = `${value} kg`;
-            } else if (key === 'altura' && typeof value === 'number') {
-                formattedValue = `${value} cm`;
-            } else if (key === 'nota' && (value === null || value === undefined)) {
-                formattedValue = 'N/A';
-            } else if (value === null || value === undefined || value === '') {
-                 return null; // Don't display empty fields
-            }
-
-            const detailDiv = document.createElement('div');
-            detailDiv.innerHTML = `<strong>${label}:</strong> ${formattedValue}`;
-            return detailDiv;
-        }
-
-
         // --- Related Content Loading and Filtering ---
 
         // 4. Load Related Content (Videos, Films, Scenes) for the selected Main Actress
         async function loadAndDisplayRelatedContent(mainActressId) {
-            allRelatedContent = []; // Clear previous content
-            filteredRelatedContent = [];
-            contentCardsContainer.innerHTML = ''; // Clear card display
+            allRelatedContent = []; filteredRelatedContent = []; contentCardsContainer.innerHTML = '';
             displayMessage(contentMessage, 'Buscando conteúdo relacionado...');
-
             try {
-                const collectionsToFetch = ['videos', 'filmes']; // Fetch videos and films first
-                const promises = collectionsToFetch.map(collName => getDocs(collection(db, collName)));
-                const [videosSnapshot, filmesSnapshot] = await Promise.all(promises);
-
+                const [videosSnapshot, filmesSnapshot] = await Promise.all([
+                    getDocs(collection(db, "videos")),
+                    getDocs(collection(db, "filmes"))
+                ]);
                 // Process Videos
-                videosSnapshot.forEach(docSnap => {
-                    const itemData = docSnap.data();
-                    // Check if the main actress is in the 'atores' array
-                    if (itemData.atores && Array.isArray(itemData.atores) && itemData.atores.includes(mainActressId)) {
-                        allRelatedContent.push({ id: docSnap.id, type: 'video', ...itemData });
-                    }
-                });
-
+                videosSnapshot.forEach(docSnap => { const itemData = docSnap.data(); if (itemData.atores?.includes(mainActressId)) { allRelatedContent.push({ id: docSnap.id, type: 'video', ...itemData }); } });
                 // Process Films and their related Scenes from cache
-                filmesSnapshot.forEach(docSnap => {
-                    const movieData = docSnap.data();
-                    let movieIsRelated = false;
-                    const relatedScenesFromMovie = []; // Scenes belonging to this movie
-
-                    // Check scenes associated with the film
-                    if (movieData.cenas && Array.isArray(movieData.cenas)) {
-                        for (const sceneId of movieData.cenas) {
-                            const sceneData = allScenesCache.get(sceneId); // Get scene from cache
-                            if (sceneData) {
-                                const sceneFullData = { id: sceneId, type: 'scene', ...sceneData };
-                                relatedScenesFromMovie.push(sceneFullData);
-                                // Check if the main actress is in this scene
-                                if (sceneData.atores && Array.isArray(sceneData.atores) && sceneData.atores.includes(mainActressId)) {
-                                    movieIsRelated = true; // Mark the movie as related
-                                }
-                            } else {
-                                console.warn(`Scene data for ID ${sceneId} not found in cache.`);
-                            }
-                        }
-                    }
-
-                    // If the movie itself is related (main actress in one of its scenes)
-                    if (movieIsRelated) {
-                        allRelatedContent.push({ id: docSnap.id, type: 'film', ...movieData });
-                        // Add all scenes from this related movie (if not already added)
-                        relatedScenesFromMovie.forEach(scene => {
-                            if (!allRelatedContent.some(item => item.id === scene.id && item.type === 'scene')) {
-                                allRelatedContent.push(scene);
-                            }
-                        });
-                    }
-                    // If the movie isn't directly related, check if any of its scenes are
-                    else {
-                        relatedScenesFromMovie.forEach(scene => {
-                            // Add scene only if the main actress is in it and it's not already added
-                            if (scene.atores && Array.isArray(scene.atores) && scene.atores.includes(mainActressId)) {
-                                if (!allRelatedContent.some(item => item.id === scene.id && item.type === 'scene')) {
-                                    allRelatedContent.push(scene);
-                                }
-                            }
-                        });
-                    }
-                });
-
-                // Finally, check standalone scenes from cache that weren't associated with processed films
-                allScenesCache.forEach((sceneData, sceneId) => {
-                    // If main actress is in the scene and it hasn't been added yet
-                    if (sceneData.atores && Array.isArray(sceneData.atores) && sceneData.atores.includes(mainActressId)) {
-                        if (!allRelatedContent.some(item => item.id === sceneId && item.type === 'scene')) {
-                            allRelatedContent.push({ id: sceneId, type: 'scene', ...sceneData });
-                        }
-                    }
-                });
+                filmesSnapshot.forEach(docSnap => { const movieData = docSnap.data(); let movieIsRelated = false; const relatedScenesFromMovie = []; if (movieData.cenas?.length > 0) { for (const sceneId of movieData.cenas) { const sceneData = allScenesCache.get(sceneId); if (sceneData) { const sceneFullData = { id: sceneId, type: 'scene', ...sceneData }; relatedScenesFromMovie.push(sceneFullData); if (sceneData.atores?.includes(mainActressId)) { movieIsRelated = true; } } } } if (movieIsRelated) { allRelatedContent.push({ id: docSnap.id, type: 'film', ...movieData }); relatedScenesFromMovie.forEach(scene => { if (!allRelatedContent.some(item => item.id === scene.id && item.type === 'scene')) { allRelatedContent.push(scene); } }); } else { relatedScenesFromMovie.forEach(scene => { if (scene.atores?.includes(mainActressId)) { if (!allRelatedContent.some(item => item.id === scene.id && item.type === 'scene')) { allRelatedContent.push(scene); } } }); } });
+                // Check standalone scenes from cache
+                allScenesCache.forEach((sceneData, sceneId) => { if (sceneData.atores?.includes(mainActressId)) { if (!allRelatedContent.some(item => item.id === sceneId && item.type === 'scene')) { allRelatedContent.push({ id: sceneId, type: 'scene', ...sceneData }); } } });
 
                 console.log(`Found ${allRelatedContent.length} related items for actress ${mainActressId}`);
-                applyRelatedContentFilters(); // Apply default filters ('all', no co-actress)
-            } catch (error) {
-                console.error("Erro ao buscar conteúdo relacionado: ", error);
-                displayMessage(contentMessage, 'Erro ao carregar conteúdo relacionado.', true);
-            }
+                applyRelatedContentFilters();
+            } catch (error) { console.error("Erro ao buscar conteúdo relacionado: ", error); displayMessage(contentMessage, 'Erro ao carregar conteúdo relacionado.', true); }
         }
 
         // 5. Apply Filters (Type and Co-Actress) and Render Related Content Cards
         function applyRelatedContentFilters() {
-             contentCardsContainer.innerHTML = ''; // Clear existing cards
-             clearMessage(contentMessage); // Clear any loading/error messages
-
-             const relatedActressIds = selectedRelatedActresses.map(a => a.id); // IDs from pills
-
-             // Filter the 'allRelatedContent' based on active filters
+             contentCardsContainer.innerHTML = ''; clearMessage(contentMessage);
+             const relatedActressIds = selectedRelatedActresses.map(a => a.id);
              filteredRelatedContent = allRelatedContent.filter(item => {
-                 // Filter by type (video, film, scene)
-                 if (activeRelatedFilter !== 'all' && item.type !== activeRelatedFilter) {
-                     return false;
-                 }
-                 // Filter by selected co-actresses (if any)
-                 if (relatedActressIds.length > 0) {
-                     // Item must have an 'atores' array
-                     if (!item.atores || !Array.isArray(item.atores)) {
-                         return false;
-                     }
-                     // *All* selected co-actresses must be present in the item's 'atores'
-                     if (!relatedActressIds.every(relId => item.atores.includes(relId))) {
-                         return false;
-                     }
-                 }
-                 // If it passes both filters, keep it
+                 if (activeRelatedFilter !== 'all' && item.type !== activeRelatedFilter) return false;
+                 if (relatedActressIds.length > 0) { if (!item.atores || !Array.isArray(item.atores)) return false; if (!relatedActressIds.every(relId => item.atores.includes(relId))) return false; }
                  return true;
              });
-
-             // Sort the filtered content alphabetically by name/title
              filteredRelatedContent.sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
-
-             // Display cards or 'no results' message
-             if (filteredRelatedContent.length > 0) {
-                 filteredRelatedContent.forEach(item => createContentCard(item.imagem, item.nome, item.type, item.id));
-             } else {
-                 displayMessage(contentMessage, 'Nenhum conteúdo encontrado com os filtros aplicados.');
-             }
+             if (filteredRelatedContent.length > 0) { filteredRelatedContent.forEach(item => createContentCard(item.imagem, item.nome, item.type, item.id)); }
+             else { displayMessage(contentMessage, 'Nenhum conteúdo encontrado com os filtros aplicados.'); }
         }
 
         // 6. Create HTML for a single Content Card
         function createContentCard(imageUrl, title, type, id) {
              const card = document.createElement('div'); card.classList.add('content-card'); card.dataset.type = type; card.dataset.id = id;
-
-             const imageContainer = document.createElement('div'); imageContainer.classList.add('image-container');
-             const img = document.createElement('img');
-             // Handle complex image objects or simple URLs
-             let finalImageUrl = imageUrl;
-             if (typeof imageUrl === 'object' && imageUrl !== null && imageUrl.width) { // Check if it's Firestore image object
-                 const urlKey = Object.keys(imageUrl).find(k => typeof imageUrl[k] === 'string' && imageUrl[k].startsWith('http'));
-                 finalImageUrl = urlKey ? imageUrl[urlKey] : 'placeholder.png'; // Extract URL or use placeholder
-             } else if (typeof imageUrl !== 'string' || !imageUrl) {
-                 finalImageUrl = 'placeholder.png'; // Use placeholder if not a valid string URL
-             }
-             img.src = finalImageUrl;
-             img.alt = title || type;
-             img.onerror = () => { img.src = 'placeholder.png'; img.onerror=null; }; // Fallback on error
-
-             // Create Type Badge (Film, Video, Scene)
-             const badge = document.createElement('div'); badge.classList.add('content-type-badge');
-             let badgeText = capitalizeFirstLetter(type);
-             if(type === 'film') badgeText = 'Filme';
-             else if(type === 'scene') badgeText = 'Cena';
-             else if(type === 'video') badgeText = 'Vídeo';
-             badge.textContent = badgeText;
-
-             imageContainer.appendChild(badge); // Add badge first (appears on top)
-             imageContainer.appendChild(img);
-
-             // Create Title Div
-             const titleDiv = document.createElement('div'); titleDiv.classList.add('title'); titleDiv.textContent = `${title || 'Sem Título'}`; // Display title or fallback
-
-             // Assemble Card
-             card.appendChild(imageContainer);
-             card.appendChild(titleDiv);
-             card.addEventListener('click', () => showContentDetails(type, id)); // Add click listener to open modal
+             const imageContainer = document.createElement('div'); imageContainer.classList.add('image-container'); const img = document.createElement('img');
+             let finalImageUrl = imageUrl; if (typeof imageUrl === 'object' && imageUrl !== null && imageUrl.width) { const urlKey = Object.keys(imageUrl).find(k=>typeof imageUrl[k]==='string'&&imageUrl[k].startsWith('http')); finalImageUrl = urlKey ? imageUrl[urlKey] : 'placeholder.png';} else if (typeof imageUrl !== 'string' || !imageUrl) { finalImageUrl = 'placeholder.png'; }
+             img.src = finalImageUrl; img.alt = title || type; img.onerror = () => { img.src = 'placeholder.png'; img.onerror=null; }
+             const badge = document.createElement('div'); badge.classList.add('content-type-badge'); let badgeText = capitalizeFirstLetter(type); if(type === 'film') badgeText = 'Filme'; else if(type === 'scene') badgeText = 'Cena'; else if(type === 'video') badgeText = 'Vídeo'; badge.textContent = badgeText;
+             imageContainer.appendChild(badge); imageContainer.appendChild(img);
+             const titleDiv = document.createElement('div'); titleDiv.classList.add('title'); titleDiv.textContent = `${title || 'Sem Título'}`;
+             card.appendChild(imageContainer); card.appendChild(titleDiv); card.addEventListener('click', () => showContentDetails(type, id));
              contentCardsContainer.appendChild(card);
         }
 
@@ -679,750 +568,216 @@
 
         // Display co-actress suggestions based on input and current context
         function displayRelatedSuggestions(searchTerm) {
-            if (!relatedSuggestionsList || !currentMainActressId) return; // Need main actress context
-
-            relatedSuggestionsList.innerHTML = ''; // Clear previous suggestions
-            if (!searchTerm || searchTerm.trim() === '') { // Hide if search is empty
-                relatedSuggestionsList.style.display = 'none';
-                return;
-            }
-
-            // 1. Find all unique co-actress IDs from the main actress's related content
-            const coActressIds = new Set();
-            allRelatedContent.forEach(item => {
-                if (item.atores && Array.isArray(item.atores)) {
-                    item.atores.forEach(id => {
-                        // Add only if it's NOT the main actress herself
-                        if (id !== currentMainActressId) {
-                            coActressIds.add(id);
-                        }
-                    });
-                }
-            });
-
-            // If no co-actresses found in any content, show appropriate message
-            if (coActressIds.size === 0) {
-                 relatedSuggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma co-atriz encontrada no conteúdo</div>';
-                 relatedSuggestionsList.style.display = 'block';
-                 return;
-            }
-
-            // 2. Filter *all* actresses based on:
-            //    - Being a co-star of the main actress
-            //    - Matching the search term (case-insensitive)
-            //    - Not already selected in the filter pills
+            if (!relatedSuggestionsList || !currentMainActressId) return;
+            relatedSuggestionsList.innerHTML = ''; if (!searchTerm || searchTerm.trim() === '') { relatedSuggestionsList.style.display = 'none'; return; }
+            const coActressIds = new Set(); allRelatedContent.forEach(item => { item.atores?.forEach(id => { if (id !== currentMainActressId) coActressIds.add(id); }); });
+            if (coActressIds.size === 0) { relatedSuggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma co-atriz no conteúdo</div>'; relatedSuggestionsList.style.display = 'block'; return; }
             const lowerSearchTerm = searchTerm.toLowerCase();
-            const matchedActresses = allActressesData.filter(actress => {
-                const isCoStar = coActressIds.has(actress.id);
-                const matchesSearch = (actress.nome || '').toLowerCase().includes(lowerSearchTerm);
-                const isNotSelected = !selectedRelatedActresses.some(sa => sa.id === actress.id);
-                return isCoStar && matchesSearch && isNotSelected;
-            });
-
-            // 3. Display suggestions or 'no results' message
-            if (matchedActresses.length > 0) {
-                // Sort alphabetically and take top 7 results
-                matchedActresses.sort((a, b) => (a.nome || '').localeCompare(b.nome || '')).slice(0, 7).forEach(actress => {
-                    const item = document.createElement('div');
-                    item.classList.add('suggestion-item');
-                    item.dataset.id = actress.id;
-                    item.dataset.nome = actress.nome || ''; // Store name for selection
-                    item.innerHTML = `<img src="${actress.foto || 'placeholder.png'}" alt=""><span>${actress.nome || 'Nome Ind.'}</span>`;
-                    item.addEventListener('click', handleSelectRelatedActress); // Add click handler
-                    relatedSuggestionsList.appendChild(item);
-                });
-                relatedSuggestionsList.style.display = 'block'; // Show the list
-            } else {
-                relatedSuggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma co-atriz encontrada com esse nome</div>';
-                relatedSuggestionsList.style.display = 'block';
-            }
+            const matchedActresses = allActressesData.filter(actress => { const isCoStar = coActressIds.has(actress.id); const matchesSearch = (actress.nome || '').toLowerCase().includes(lowerSearchTerm); const isNotSelected = !selectedRelatedActresses.some(sa => sa.id === actress.id); return isCoStar && matchesSearch && isNotSelected; });
+            if (matchedActresses.length > 0) { matchedActresses.sort((a, b) => (a.nome || '').localeCompare(b.nome || '')).slice(0, 7).forEach(actress => { const item = document.createElement('div'); item.classList.add('suggestion-item'); item.dataset.id = actress.id; item.dataset.nome = actress.nome || ''; item.innerHTML = `<img src="${actress.foto || 'placeholder.png'}" alt=""><span>${actress.nome || 'Nome Ind.'}</span>`; item.addEventListener('click', handleSelectRelatedActress); relatedSuggestionsList.appendChild(item); }); relatedSuggestionsList.style.display = 'block'; }
+            else { relatedSuggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma co-atriz encontrada</div>'; relatedSuggestionsList.style.display = 'block'; }
         }
-
         // Handle selecting a co-actress from the suggestions
         function handleSelectRelatedActress(event) {
-             const target = event.currentTarget;
-             const actressId = target.dataset.id;
-             const actressName = target.dataset.nome;
-             if (!actressId || !actressName) return; // Safety check
-
-             // Add to selection if not already present
-             if (!selectedRelatedActresses.some(a => a.id === actressId)) {
-                 selectedRelatedActresses.push({ id: actressId, nome: actressName });
-                 renderRelatedActressPills(); // Update the pills UI
-                 applyRelatedContentFilters(); // Re-filter content based on new selection
-             }
-             if (relatedSearchInput) relatedSearchInput.value = ''; // Clear the search input
-             if (relatedSuggestionsList) relatedSuggestionsList.style.display = 'none'; // Hide suggestions
-             if (relatedSearchInput) relatedSearchInput.focus(); // Keep focus on input
+             const target = event.currentTarget; const actressId = target.dataset.id; const actressName = target.dataset.nome; if (!actressId || !actressName) return;
+             if (!selectedRelatedActresses.some(a => a.id === actressId)) { selectedRelatedActresses.push({ id: actressId, nome: actressName }); renderRelatedActressPills(); applyRelatedContentFilters(); }
+             if (relatedSearchInput) relatedSearchInput.value = ''; if (relatedSuggestionsList) relatedSuggestionsList.style.display = 'none'; if (relatedSearchInput) relatedSearchInput.focus();
         }
-
         // Render the pills for selected co-actresses
         function renderRelatedActressPills() {
-             if (!relatedSelectedActressesContainer) return;
-             relatedSelectedActressesContainer.innerHTML = ''; // Clear existing pills
-             selectedRelatedActresses.forEach(actress => {
-                 const pill = document.createElement('div');
-                 pill.classList.add('related-actress-pill');
-                 pill.dataset.id = actress.id;
-                 pill.innerHTML = `<span>${actress.nome}</span><button class="related-remove-actress-btn" title="Remover">×</button>`;
-                 // Add click listener to the remove button within the pill
-                 pill.querySelector('.related-remove-actress-btn').addEventListener('click', handleRemoveRelatedActress);
-                 relatedSelectedActressesContainer.appendChild(pill);
-             });
+             if (!relatedSelectedActressesContainer) return; relatedSelectedActressesContainer.innerHTML = '';
+             selectedRelatedActresses.forEach(actress => { const pill = document.createElement('div'); pill.classList.add('related-actress-pill'); pill.dataset.id = actress.id; pill.innerHTML = `<span>${actress.nome}</span><button class="related-remove-actress-btn" title="Remover">×</button>`; pill.querySelector('.related-remove-actress-btn').addEventListener('click', handleRemoveRelatedActress); relatedSelectedActressesContainer.appendChild(pill); });
         }
-
         // Handle removing a co-actress pill
         function handleRemoveRelatedActress(event) {
-              event.stopPropagation(); // Prevent event bubbling (e.g., focusing input)
-              const pill = event.target.closest('.related-actress-pill');
-              if (!pill) return;
-              const actressIdToRemove = pill.dataset.id;
-              // Filter out the removed actress
-              selectedRelatedActresses = selectedRelatedActresses.filter(a => a.id !== actressIdToRemove);
-              renderRelatedActressPills(); // Update UI
-              applyRelatedContentFilters(); // Re-filter content
-
-              // Optional: If suggestions were open and input had text, refresh suggestions
-              if (relatedSuggestionsList && relatedSuggestionsList.style.display === 'block' && relatedSearchInput?.value) {
-                  displayRelatedSuggestions(relatedSearchInput.value);
-              }
+              event.stopPropagation(); const pill = event.target.closest('.related-actress-pill'); if (!pill) return; const actressIdToRemove = pill.dataset.id;
+              selectedRelatedActresses = selectedRelatedActresses.filter(a => a.id !== actressIdToRemove); renderRelatedActressPills(); applyRelatedContentFilters();
+              if (relatedSuggestionsList?.style.display === 'block' && relatedSearchInput?.value) { displayRelatedSuggestions(relatedSearchInput.value); }
         }
-
 
         // --- Main Modal Functions (Content Details) ---
         async function showContentDetails(type, id) {
-             modalBody.innerHTML = '<div class="loading" style="padding:10px;">Carregando...</div>'; // Show loading state
-             modalLinkContainer.innerHTML = ''; // Clear previous link button
-             modal.style.display = 'flex'; // Show the modal
-
-             // Determine Firestore collection name based on content type
-             let collectionName = '';
-             switch (type) {
-                 case 'scene': collectionName = 'cenas'; break;
-                 case 'video': collectionName = 'videos'; break;
-                 case 'film': collectionName = 'filmes'; break;
-                 default:
-                     console.error(`Invalid type passed to showContentDetails: ${type}`);
-                     modalBody.innerHTML = '<div class="error" style="padding:10px;">Tipo de conteúdo inválido.</div>';
-                     return; // Stop execution for invalid type
-             }
-
+             modalBody.innerHTML = '<div class="loading">Carregando...</div>'; modalLinkContainer.innerHTML = ''; modal.style.display = 'flex';
+             let collectionName = ''; switch (type) { case 'scene': collectionName = 'cenas'; break; case 'video': collectionName = 'videos'; break; case 'film': collectionName = 'filmes'; break; default: modalBody.innerHTML = '<div class="error">Tipo inválido.</div>'; return; }
              try {
-                 const docSnap = await getDoc(doc(db, collectionName, id)); // Fetch document
-
+                 const docSnap = await getDoc(doc(db, collectionName, id));
                  if (docSnap.exists()) {
-                     const data = docSnap.data();
-                     modalTitle.textContent = data.nome || `Detalhes de ${capitalizeFirstLetter(type)}`; // Set modal title
-                     modalBody.innerHTML = ''; // Clear loading message
-
-                     // Display Image if available
-                     if (data.imagem) {
-                         let finalImageUrl = data.imagem;
-                         // Handle Firestore image object or simple URL string
-                         if (typeof finalImageUrl === 'object' && finalImageUrl !== null && finalImageUrl.width) {
-                             const urlKey = Object.keys(finalImageUrl).find(k => typeof finalImageUrl[k] === 'string' && finalImageUrl[k].startsWith('http'));
-                             finalImageUrl = urlKey ? finalImageUrl[urlKey] : null;
-                         } else if (typeof finalImageUrl !== 'string') {
-                             finalImageUrl = null;
-                         }
-                         if (finalImageUrl) {
-                             const img = document.createElement('img');
-                             img.src = finalImageUrl;
-                             img.alt = data.nome || type;
-                             img.classList.add('modal-detail-image');
-                             if (type === 'film') img.classList.add('movie-image'); // Specific style for movie posters
-                             img.onerror = () => { img.style.display = 'none'; }; // Hide on error
-                             modalBody.appendChild(img);
-                         }
-                     }
-
-                     // Display Year if available
-                     if (data.ano) {
-                         const yearDiv = document.createElement('div');
-                         yearDiv.classList.add('modal-year');
-                         yearDiv.textContent = `Ano: ${data.ano}`;
-                         modalBody.appendChild(yearDiv);
-                     }
-
-                     // Prepare Containers for Actresses and (if film) Scenes
-                     const actressesContainer = document.createElement('div');
-                     actressesContainer.classList.add('modal-actress-list-container');
-                     actressesContainer.innerHTML = `<h4>Atrizes</h4><div class="loading" style="font-size:0.9em;">Carregando...</div>`; // Initial state
-                     modalBody.appendChild(actressesContainer);
-
-                     let scenesContainer = null;
-                     if (type === 'film') { // Only add scenes container for films
-                         scenesContainer = document.createElement('div');
-                         scenesContainer.classList.add('modal-scenes-container');
-                         scenesContainer.innerHTML = `<h4>Cenas do Filme</h4><div class="loading" style="font-size:0.9em;">Carregando...</div>`; // Initial state
-                         modalBody.appendChild(scenesContainer);
-                     }
-
-                     // Add External Link Button if 'pagina' field exists
-                     if (data.pagina && typeof data.pagina === 'string' && data.pagina.trim() !== '') {
-                         const linkButton = document.createElement('button');
-                         linkButton.textContent = 'Abrir Página Externa';
-                         linkButton.onclick = () => window.open(data.pagina, '_blank'); // Open link in new tab
-                         modalLinkContainer.appendChild(linkButton);
-                     } else {
-                         modalLinkContainer.innerHTML = '<i style="font-size:0.9em; color:#777;">(Nenhuma página externa associada)</i>';
-                     }
-
-                     // Get actress IDs from this content for context
+                     const data = docSnap.data(); modalTitle.textContent = data.nome || `Detalhes`; modalBody.innerHTML = '';
+                     // Image
+                     if (data.imagem) { let finalImageUrl = data.imagem; if (typeof finalImageUrl === 'object' && finalImageUrl !== null && finalImageUrl.width) { const urlKey = Object.keys(finalImageUrl).find(k=>typeof finalImageUrl[k]==='string'&&finalImageUrl[k].startsWith('http')); finalImageUrl = urlKey ? finalImageUrl[urlKey] : null;} else if (typeof finalImageUrl !== 'string') { finalImageUrl = null; } if(finalImageUrl){ const img = document.createElement('img'); img.src = finalImageUrl; img.alt = data.nome || type; img.classList.add('modal-detail-image'); if (type === 'film') img.classList.add('movie-image'); img.onerror = () => { img.style.display = 'none'; }; modalBody.appendChild(img); } }
+                     // Year
+                     if (data.ano) { const yearDiv = document.createElement('div'); yearDiv.classList.add('modal-year'); yearDiv.textContent = `Ano: ${data.ano}`; modalBody.appendChild(yearDiv); }
+                     // Actresses Container
+                     const actressesContainer = document.createElement('div'); actressesContainer.classList.add('modal-actress-list-container'); actressesContainer.innerHTML = `<h4>Atrizes</h4><div class="loading" style="font-size:0.9em;">Carregando...</div>`; modalBody.appendChild(actressesContainer);
+                     // Scenes Container (for films)
+                     let scenesContainer = null; if (type === 'film') { scenesContainer = document.createElement('div'); scenesContainer.classList.add('modal-scenes-container'); scenesContainer.innerHTML = `<h4>Cenas do Filme</h4><div class="loading" style="font-size:0.9em;">Carregando...</div>`; modalBody.appendChild(scenesContainer); }
+                     // External Link
+                     if (data.pagina?.trim()) { const linkButton = document.createElement('button'); linkButton.textContent = 'Abrir Página Externa'; linkButton.onclick = () => window.open(data.pagina, '_blank'); modalLinkContainer.appendChild(linkButton); } else { modalLinkContainer.innerHTML = '<i style="font-size:0.9em; color:#777;">(Nenhuma página externa)</i>'; }
+                     // Load Data
                      const contentActressIds = data.atores || [];
-
-                     // Asynchronously load actresses and scenes (if applicable)
                      loadActressesForModal(contentActressIds, actressesContainer, contentActressIds); // Pass context
-                     if (type === 'film' && scenesContainer) {
-                         loadScenesForModal(data.cenas || [], scenesContainer); // Load scenes for the film
-                     }
-
-                 } else {
-                     modalBody.innerHTML = '<div class="error" style="padding:10px;">Conteúdo não encontrado.</div>';
-                 }
-             } catch (error) {
-                 console.error(`Erro ao buscar ${type} (${collectionName}) ${id}: `, error);
-                 modalBody.innerHTML = '<div class="error" style="padding:10px;">Erro ao carregar detalhes do conteúdo.</div>';
-             }
+                     if (type === 'film' && scenesContainer) { loadScenesForModal(data.cenas || [], scenesContainer); }
+                 } else { modalBody.innerHTML = '<div class="error">Conteúdo não encontrado.</div>'; }
+             } catch (error) { console.error(`Erro ao buscar ${type} ${id}: `, error); modalBody.innerHTML = '<div class="error">Erro ao carregar detalhes.</div>'; }
         }
-
-        // Load and display actress thumbnails within the main modal
+        // Load actress thumbnails in the main modal
         async function loadActressesForModal(actressIds, containerElement, contextActressIds = []) {
-             if (!actressIds || actressIds.length === 0) {
-                 containerElement.innerHTML = '<h4>Atrizes</h4><i style="font-size:0.9em; color:#777;">Nenhuma atriz associada a este conteúdo.</i>';
-                 return;
-             }
-
-             const listElement = document.createElement('ul'); listElement.classList.add('modal-actress-list');
-             containerElement.innerHTML = '<h4>Atrizes</h4>'; // Replace loading message
-             containerElement.appendChild(listElement);
-
+             if (!actressIds || actressIds.length === 0) { containerElement.innerHTML = '<h4>Atrizes</h4><i style="font-size:0.9em; color:#777;">Nenhuma atriz associada.</i>'; return; }
+             const listElement = document.createElement('ul'); listElement.classList.add('modal-actress-list'); containerElement.innerHTML = '<h4>Atrizes</h4>'; containerElement.appendChild(listElement);
              let foundCount = 0;
-             // Create promises to fetch/find data for each actress ID
-             const fetchPromises = actressIds.map(async (actressId) => {
-                 try {
-                     // Try finding in the main cache first
-                     let actressData = allActressesData.find(a => a.id === actressId);
-                     // If not in cache, fetch from Firestore
-                     if (!actressData) {
-                         const actressDoc = await getDoc(doc(db, "atores", actressId));
-                         if (actressDoc.exists()) {
-                             actressData = { id: actressId, ...actressDoc.data() };
-                         }
-                     }
-
-                     if (actressData) {
-                         foundCount++;
-                         const li = document.createElement('li'); li.classList.add('modal-actress-item');
-                         // Attach click handler to open the small popup, passing context IDs
-                         li.onclick = () => createActressPopup(actressId, contextActressIds);
-
-                         const img = document.createElement('img');
-                         img.src = actressData.foto || 'placeholder.png';
-                         img.alt = actressData.nome || 'Atriz';
-                         img.onerror = () => { img.src = 'placeholder.png'; img.onerror=null; }
-
-                         const nameSpan = document.createElement('span');
-                         nameSpan.textContent = actressData.nome || 'Nome Ind.';
-
-                         li.appendChild(img);
-                         li.appendChild(nameSpan);
-                         listElement.appendChild(li); // Add the item to the list
-                     } else {
-                         console.warn(`Actress data not found for ID: ${actressId}`);
-                     }
-                 } catch (error) {
-                     console.error(`Error loading actress ${actressId} for modal:`, error);
-                     // Optionally add an error indicator for this specific actress
-                 }
-             });
-
-             await Promise.all(fetchPromises); // Wait for all fetches to complete
-
-             if (foundCount === 0) {
-                 // Show error if no actresses could be loaded
-                 containerElement.innerHTML = '<h4>Atrizes</h4><i style="font-size:0.9em; color:#a00;">Erro ao carregar informações das atrizes.</i>';
-             }
+             const fetchPromises = actressIds.map(async (actressId) => { try { let actressData = allActressesData.find(a => a.id === actressId); if (!actressData) { const docSnap = await getDoc(doc(db, "atores", actressId)); if (docSnap.exists()) actressData = { id: actressId, ...docSnap.data() }; } if (actressData) { foundCount++; const li = document.createElement('li'); li.classList.add('modal-actress-item'); li.onclick = () => createActressPopup(actressId, contextActressIds); const img = document.createElement('img'); img.src = actressData.foto || 'placeholder.png'; img.alt = actressData.nome || 'Atriz'; img.onerror = () => { img.src = 'placeholder.png'; img.onerror=null; } const nameSpan = document.createElement('span'); nameSpan.textContent = actressData.nome || 'Nome Ind.'; li.appendChild(img); li.appendChild(nameSpan); listElement.appendChild(li); } } catch (error) { console.error(`Erro ao carregar atriz ${actressId} para modal:`, error); } });
+             await Promise.all(fetchPromises);
+             if (foundCount === 0) containerElement.innerHTML = '<h4>Atrizes</h4><i class="error">Erro ao carregar atrizes.</i>';
         }
-
-        // Load and display scene thumbnails within the main modal (for films)
+        // Load scene thumbnails in the main modal (uses cache)
         async function loadScenesForModal(sceneIds, containerElement) {
-            if (!sceneIds || sceneIds.length === 0) {
-                containerElement.innerHTML = '<h4>Cenas do Filme</h4><i style="font-size:0.9em; color:#777;">Nenhuma cena associada a este filme.</i>';
-                return;
-            }
-
-            const cardsContainer = document.createElement('div'); cardsContainer.classList.add('modal-scene-cards');
-            containerElement.innerHTML = '<h4>Cenas do Filme</h4>'; // Replace loading message
-            containerElement.appendChild(cardsContainer);
-
+            if (!sceneIds || sceneIds.length === 0) { containerElement.innerHTML = '<h4>Cenas do Filme</h4><i style="font-size:0.9em; color:#777;">Nenhuma cena associada.</i>'; return; }
+            const cardsContainer = document.createElement('div'); cardsContainer.classList.add('modal-scene-cards'); containerElement.innerHTML = '<h4>Cenas do Filme</h4>'; containerElement.appendChild(cardsContainer);
             let foundCount = 0;
-            sceneIds.forEach(sceneId => {
-                const sceneData = allScenesCache.get(sceneId); // Get scene data from the pre-loaded cache
-                if (sceneData) {
-                    foundCount++;
-                    const card = document.createElement('div'); card.classList.add('modal-scene-card');
-
-                    // Image
-                    const img = document.createElement('img');
-                    let finalImageUrl = sceneData.imagem;
-                    // Handle complex image object or simple URL
-                    if (typeof finalImageUrl === 'object' && finalImageUrl !== null && finalImageUrl.width) {
-                         const urlKey = Object.keys(finalImageUrl).find(k=>typeof finalImageUrl[k]==='string'&&finalImageUrl[k].startsWith('http'));
-                         finalImageUrl = urlKey ? finalImageUrl[urlKey] : 'placeholder.png';
-                    } else if (typeof finalImageUrl !== 'string' || !finalImageUrl) {
-                        finalImageUrl = 'placeholder.png';
-                    }
-                    img.src = finalImageUrl;
-                    img.alt = sceneData.nome || 'Cena';
-                    img.onerror = () => { img.src = 'placeholder.png'; img.onerror=null; }
-
-                    // Title
-                    const titleDiv = document.createElement('div'); titleDiv.classList.add('title');
-                    titleDiv.textContent = sceneData.nome || 'Sem Título';
-
-                    card.appendChild(img);
-                    card.appendChild(titleDiv);
-                    // Optional: Add click listener if scenes should also open details
-                    // card.addEventListener('click', () => showContentDetails('scene', sceneId));
-                    cardsContainer.appendChild(card);
-                } else {
-                    console.warn(`Scene ${sceneId} not found in cache for modal.`);
-                    // Optionally display a placeholder for missing scenes
-                }
-            });
-
-            if (foundCount === 0) {
-                containerElement.innerHTML = '<h4>Cenas do Filme</h4><i style="font-size:0.9em; color:#a00;">Erro ao carregar cenas ou nenhuma cena encontrada no cache.</i>';
-            }
+            sceneIds.forEach(sceneId => { const sceneData = allScenesCache.get(sceneId); if (sceneData) { foundCount++; const card = document.createElement('div'); card.classList.add('modal-scene-card'); const img = document.createElement('img'); let finalImageUrl = sceneData.imagem; if (typeof finalImageUrl === 'object' && finalImageUrl !== null && finalImageUrl.width) { const urlKey = Object.keys(finalImageUrl).find(k=>typeof finalImageUrl[k]==='string'&&finalImageUrl[k].startsWith('http')); finalImageUrl = urlKey ? finalImageUrl[urlKey] : 'placeholder.png'; } else if (typeof finalImageUrl !== 'string' || !finalImageUrl) { finalImageUrl = 'placeholder.png'; } img.src = finalImageUrl; img.alt = sceneData.nome || 'Cena'; img.onerror = () => { img.src = 'placeholder.png'; img.onerror=null; } const titleDiv = document.createElement('div'); titleDiv.classList.add('title'); titleDiv.textContent = sceneData.nome || 'Sem Título'; card.appendChild(img); card.appendChild(titleDiv); cardsContainer.appendChild(card); } else { console.warn(`Cena ${sceneId} não encontrada no cache para modal.`); } });
+            if (foundCount === 0) containerElement.innerHTML = '<h4>Cenas do Filme</h4><i class="error">Erro ao carregar cenas.</i>';
         }
-
-        // Make closeModal globally accessible for the onclick attribute
-        window.closeModal = function() {
-             if(modal) modal.style.display = 'none';
-             if(modalBody) modalBody.innerHTML = ''; // Clear content
-             if(modalLinkContainer) modalLinkContainer.innerHTML = ''; // Clear link button
-        }
-
+        // Close main modal
+        window.closeModal = function() { if(modal) modal.style.display = 'none'; if(modalBody) modalBody.innerHTML = ''; if(modalLinkContainer) modalLinkContainer.innerHTML = ''; }
 
         // --- Movable Actress Popup Functions ---
 
-        // Create and display a small, draggable popup with actress details
+        // Create and display a small, draggable popup
         function createActressPopup(actressId, contextActressIds = []) {
-             const template = document.getElementById('actress-popup-template');
-             if (!template) { console.error("Actress popup template not found!"); return; }
-
-             // Clone the template
-             const popup = template.cloneNode(true);
-             popup.id = `actress-popup-${actressId}-${popupsOpen++}`; // Unique ID
-             popup.style.display = 'flex'; // Make it visible
-
-             // Simple positioning logic to avoid complete overlap
-             const vpWidth = window.innerWidth;
-             const vpHeight = window.innerHeight;
-             const popupWidth = 200; // Matches CSS
-             const popupHeight = 300; // Matches CSS max-height
-             const startTop = 50 + (popupsOpen * 20) % Math.max(100, vpHeight - popupHeight - 20); // Ensure some variation and bounds
-             const startLeft = 50 + (popupsOpen * 25) % Math.max(100, vpWidth - popupWidth - 20);
-             popup.style.top = `${startTop}px`;
-             popup.style.left = `${startLeft}px`;
-
-             // Get elements within the cloned popup
-             const header = popup.querySelector('.actress-popup-header h5');
-             const body = popup.querySelector('.actress-popup-body');
-             const closeBtn = popup.querySelector('.actress-popup-close');
-             const compareBtn = popup.querySelector('.actress-popup-compare-btn');
-
-             if(!header || !body || !closeBtn || !compareBtn) { console.error("Popup structure invalid", popup); return; }
-
-             // Set initial state and event handlers
-             header.textContent = 'Carregando...';
-             body.innerHTML = '<div class="loading">...</div>';
-             closeBtn.onclick = () => popup.remove(); // Simple close action
-             compareBtn.onclick = (e) => {
-                 e.stopPropagation(); // Prevent triggering drag start
-                 openComparisonModal(contextActressIds); // Open comparison modal with context
-             };
-
-             document.body.appendChild(popup); // Add the popup to the page
-             makeDraggable(popup); // Enable dragging behavior
-
-             // Fetch and populate data for the popup
-             const actressData = allActressesData.find(a => a.id === actressId);
-             if (actressData) {
-                 populateActressPopup(popup, actressData); // Populate if found in cache
-             } else {
-                 // Fetch from Firestore if not in cache
-                 getDoc(doc(db, "atores", actressId))
-                     .then(docSnap => {
-                         if (docSnap.exists()) {
-                             populateActressPopup(popup, { id: actressId, ...docSnap.data() });
-                         } else {
-                             header.textContent = 'Erro';
-                             body.innerHTML = '<div class="error">Atriz não encontrada.</div>';
-                         }
-                     })
-                     .catch(err => {
-                         console.error("Popup fetch error:", err);
-                         header.textContent = 'Erro';
-                         body.innerHTML = '<div class="error">Erro ao carregar.</div>';
-                     });
-             }
+             const template = document.getElementById('actress-popup-template'); if (!template) return;
+             const popup = template.cloneNode(true); popup.id = `actress-popup-${actressId}-${popupsOpen++}`; popup.style.display = 'flex';
+             const vpWidth = window.innerWidth; const vpHeight = window.innerHeight; const popupWidth = 200; const popupHeight = 300;
+             const startTop = 50 + (popupsOpen * 20) % Math.max(100, vpHeight - popupHeight - 20); const startLeft = 50 + (popupsOpen * 25) % Math.max(100, vpWidth - popupWidth - 20);
+             popup.style.top = `${startTop}px`; popup.style.left = `${startLeft}px`;
+             const header = popup.querySelector('.actress-popup-header h5'); const body = popup.querySelector('.actress-popup-body'); const closeBtn = popup.querySelector('.actress-popup-close'); const compareBtn = popup.querySelector('.actress-popup-compare-btn');
+             if(!header || !body || !closeBtn || !compareBtn) { console.error("Popup structure invalid"); return; }
+             header.textContent = 'Carregando...'; body.innerHTML = '<div class="loading">...</div>';
+             closeBtn.onclick = () => popup.remove();
+             // *** MODIFIED: Compare button opens modal AND closes this popup ***
+             compareBtn.onclick = (e) => { e.stopPropagation(); openComparisonModal(contextActressIds); popup.remove(); }; // Close popup after opening compare
+             document.body.appendChild(popup); makeDraggable(popup);
+             // Fetch/populate data
+             const actressData = allActressesData.find(a => a.id === actressId); if (actressData) { populateActressPopup(popup, actressData); }
+             else { getDoc(doc(db, "atores", actressId)).then(docSnap => { if (docSnap.exists()) { populateActressPopup(popup, { id: actressId, ...docSnap.data() }); } else { header.textContent = 'Erro'; body.innerHTML = '<div class="error">Não encontrada.</div>'; } }).catch(err => { header.textContent = 'Erro'; body.innerHTML = '<div class="error">Erro.</div>'; }); }
         }
-
-        // Populate the content of the small actress popup
+        // Populate the small actress popup content (using the same count logic as main details)
         function populateActressPopup(popupElement, data) {
-             const header = popupElement.querySelector('.actress-popup-header h5');
-             const body = popupElement.querySelector('.actress-popup-body');
-             if(!header || !body) return; // Safety check
-
-             header.textContent = data.nome || 'Detalhes';
-             body.innerHTML = ''; // Clear loading/previous content
-
-             // Add Image
-             if (data.foto) {
-                 const img = document.createElement('img');
-                 img.src = data.foto;
-                 img.alt = data.nome || 'Foto';
-                 img.onerror = () => { img.style.display = 'none'; }; // Hide on error
-                 body.appendChild(img);
-             }
-
-             // Add Details (similar logic to main details but adapted for popup)
-             const skipFields = ['foto', 'nome', 'timestamp', 'cenas', 'filmes', 'videos', 'id'];
-             const displayOrder = ['dataNascimento', 'altura', 'peso', 'nota']; // Prioritize these
-             const otherFields = Object.keys(data).filter(key => !skipFields.includes(key) && !displayOrder.includes(key) && data[key] != null && data[key] !== '');
-
+             const header = popupElement.querySelector('.actress-popup-header h5'); const body = popupElement.querySelector('.actress-popup-body'); if(!header || !body) return;
+             header.textContent = data.nome || 'Detalhes'; body.innerHTML = '';
+             if (data.foto) { const img = document.createElement('img'); img.src = data.foto; img.alt = data.nome || 'Foto'; img.onerror = () => { img.style.display = 'none'; }; body.appendChild(img); }
              let detailsAdded = false;
-
-             // Display ordered fields
-             displayOrder.forEach(key => {
-                 if (data.hasOwnProperty(key) && data[key] != null && data[key] !== '') {
-                    const detailDiv = createDetailDiv(key, data[key]); // Reuse helper
-                    if(detailDiv){
-                        body.appendChild(detailDiv);
-                        detailsAdded = true;
-                        if (key === 'dataNascimento') {
-                            const ageDiv = document.createElement('div');
-                            ageDiv.innerHTML = `<strong>Idade:</strong> ${calculateAge(data[key])}`;
-                            body.appendChild(ageDiv);
-                        }
-                    }
-                 }
-             });
-
-             // Display other fields
-             otherFields.forEach(key => {
-                 const detailDiv = createDetailDiv(key, data[key]); // Reuse helper
-                 if(detailDiv){
-                     body.appendChild(detailDiv);
-                     detailsAdded = true;
-                 }
-             });
-
-
-             if (!detailsAdded && !data.foto) {
-                 body.innerHTML += '<i style="font-size:0.9em; color:#777;">(Sem detalhes adicionais)</i>';
-             }
+             // Specific fields first
+             if (data.dataNascimento) { const div = document.createElement('div'); div.innerHTML = `<strong>Nasc:</strong> ${data.dataNascimento}`; body.appendChild(div); const ageDiv = document.createElement('div'); ageDiv.innerHTML = `<strong>Idade:</strong> ${calculateAge(data.dataNascimento)}`; body.appendChild(ageDiv); detailsAdded = true; }
+             if (data.altura != null) { const div = document.createElement('div'); div.innerHTML = `<strong>Altura:</strong> ${data.altura} cm`; body.appendChild(div); detailsAdded = true; }
+             if (data.peso != null) { const div = document.createElement('div'); div.innerHTML = `<strong>Peso:</strong> ${data.peso} kg`; body.appendChild(div); detailsAdded = true; }
+              // Participation Counts
+             if (Array.isArray(data.filmes)) { const div = document.createElement('div'); div.innerHTML = `<strong>Filmes:</strong> ${data.filmes.length}`; body.appendChild(div); detailsAdded = true; }
+             if (Array.isArray(data.videos)) { const div = document.createElement('div'); div.innerHTML = `<strong>Vídeos:</strong> ${data.videos.length}`; body.appendChild(div); detailsAdded = true; }
+             if (Array.isArray(data.cenas)) { const div = document.createElement('div'); div.innerHTML = `<strong>Cenas:</strong> ${data.cenas.length}`; body.appendChild(div); detailsAdded = true; }
+             // Other fields
+             const skipFields = ['foto', 'nome', 'timestamp', 'id', 'filmes', 'videos', 'cenas', 'dataNascimento', 'altura', 'peso'];
+             for (const key in data) { if (data.hasOwnProperty(key) && !skipFields.includes(key) && data[key] != null && data[key] !== '') { const div = document.createElement('div'); div.innerHTML = `<strong>${capitalizeFirstLetter(key)}:</strong> ${data[key]}`; body.appendChild(div); detailsAdded = true; } }
+             if (!detailsAdded && !data.foto) { body.innerHTML += '<i style="font-size:0.9em; color:#777;">(Sem detalhes)</i>'; }
         }
-
         // Make an element draggable by its header
         function makeDraggable(element) {
-             let isDragging = false;
-             let offsetX, offsetY;
-             const header = element.querySelector('.actress-popup-header');
-             if (!header) return; // Need a header to initiate drag
-
-             header.onmousedown = (e) => {
-                 // Prevent dragging if clicking the close or compare button
-                 if (e.target.tagName === 'BUTTON') return;
-
-                 isDragging = true;
-                 element.classList.add('dragging');
-                 // Calculate mouse offset relative to the element's top-left corner
-                 offsetX = e.clientX - element.getBoundingClientRect().left;
-                 offsetY = e.clientY - element.getBoundingClientRect().top;
-                 header.style.cursor = 'grabbing'; // Change cursor while dragging
-                 e.preventDefault(); // Prevent text selection
-             };
-
-             document.onmousemove = (e) => {
-                 if (!isDragging) return;
-
-                 let newX = e.clientX - offsetX;
-                 let newY = e.clientY - offsetY;
-
-                 // Constrain movement within the viewport
-                 const vpWidth = window.innerWidth;
-                 const vpHeight = window.innerHeight;
-                 const elWidth = element.offsetWidth;
-                 const elHeight = element.offsetHeight;
-
-                 newX = Math.max(0, Math.min(newX, vpWidth - elWidth));
-                 newY = Math.max(0, Math.min(newY, vpHeight - elHeight));
-
-                 element.style.left = `${newX}px`;
-                 element.style.top = `${newY}px`;
-             };
-
-             document.onmouseup = () => {
-                 if (isDragging) {
-                     isDragging = false;
-                     element.classList.remove('dragging');
-                     header.style.cursor = 'grab'; // Restore cursor
-                 }
-             };
-
-             // Prevent default browser drag behavior (like image ghosting)
+             let isDragging = false; let offsetX, offsetY; const header = element.querySelector('.actress-popup-header'); if (!header) return;
+             header.onmousedown = (e) => { if (e.target.tagName === 'BUTTON') return; isDragging = true; element.classList.add('dragging'); offsetX = e.clientX - element.getBoundingClientRect().left; offsetY = e.clientY - element.getBoundingClientRect().top; header.style.cursor = 'grabbing'; e.preventDefault(); };
+             document.onmousemove = (e) => { if (!isDragging) return; let newX = e.clientX - offsetX; let newY = e.clientY - offsetY; const vpWidth = window.innerWidth; const vpHeight = window.innerHeight; const elWidth = element.offsetWidth; const elHeight = element.offsetHeight; newX = Math.max(0, Math.min(newX, vpWidth - elWidth)); newY = Math.max(0, Math.min(newY, vpHeight - elHeight)); element.style.left = `${newX}px`; element.style.top = `${newY}px`; };
+             document.onmouseup = () => { if (isDragging) { isDragging = false; element.classList.remove('dragging'); header.style.cursor = 'grab'; } };
              header.ondragstart = () => false;
         }
 
-
         // --- Comparison Modal Functions ---
 
-        // Open the comparison modal and set initial state
+        // Open the comparison modal
         function openComparisonModal(contextIds = []) {
-            console.log("Opening comparison with context:", contextIds);
-            comparisonContextActressIds = contextIds; // Store IDs from the content
-            actressesToCompare = []; // Reset the list of actresses to compare
-            if(comparisonSearchInput) comparisonSearchInput.value = ''; // Clear search input
-            if(comparisonSuggestionsList) comparisonSuggestionsList.style.display = 'none'; // Hide suggestions
-            renderComparisonView(); // Render the initial empty state or placeholder
-            if(comparisonModal) comparisonModal.style.display = 'flex'; // Show the modal
-            if(comparisonSearchInput) comparisonSearchInput.focus(); // Focus the search input
-        }
-
-        // Make close function globally available for onclick attribute
-        window.closeComparisonModal = function() {
-            if(comparisonModal) comparisonModal.style.display = 'none';
-            comparisonContextActressIds = []; // Clear context
-            actressesToCompare = []; // Clear comparison list
-            // Optional: Remove comparison columns from DOM if necessary, though renderComparisonView handles clearing
-        }
-
-        // Display actress suggestions for the comparison search input
-        function displayComparisonSuggestions(searchTerm) {
-            if (!comparisonSuggestionsList || !comparisonSearchInput) return;
-            comparisonSuggestionsList.innerHTML = ''; // Clear previous suggestions
-
-            if (!searchTerm || searchTerm.trim() === '') {
-                comparisonSuggestionsList.style.display = 'none'; // Hide if search is empty
-                return;
-            }
-
-            const lowerSearchTerm = searchTerm.toLowerCase();
-            // Filter *all* actresses based on:
-            // - Matching search term
-            // - Not already being in the comparison list
-            let matchedActresses = allActressesData.filter(actress =>
-                (actress.nome || '').toLowerCase().includes(lowerSearchTerm) &&
-                !actressesToCompare.some(ca => ca.id === actress.id) // Exclude already added actresses
-            );
-
-            // Sort results:
-            // 1. Actresses who are part of the context (from the original content) appear first.
-            // 2. Within context/non-context groups, sort alphabetically.
-            matchedActresses.sort((a, b) => {
-                const aIsInContext = comparisonContextActressIds.includes(a.id);
-                const bIsInContext = comparisonContextActressIds.includes(b.id);
-                if (aIsInContext && !bIsInContext) return -1; // Context actress 'a' comes first
-                if (!aIsInContext && bIsInContext) return 1;  // Context actress 'b' comes first
-                return (a.nome || '').localeCompare(b.nome || ''); // Otherwise, sort alphabetically
-            });
-
-            // Display suggestions or 'no results'
-            if (matchedActresses.length > 0) {
-                matchedActresses.slice(0, 10).forEach(actress => { // Limit suggestions shown
-                    const item = document.createElement('div');
-                    item.classList.add('suggestion-item');
-                    // Add a special class to highlight context actresses
-                    if (comparisonContextActressIds.includes(actress.id)) {
-                         item.classList.add('context-actress');
-                    }
-                    item.dataset.id = actress.id; // Store ID for selection
-                    item.innerHTML = `<img src="${actress.foto || 'placeholder.png'}" alt=""><span>${actress.nome || 'Nome Ind.'}</span>`;
-                    item.addEventListener('click', () => handleSelectActressForComparison(actress.id));
-                    comparisonSuggestionsList.appendChild(item);
-                });
-                comparisonSuggestionsList.style.display = 'block'; // Show the list
-            } else {
-                comparisonSuggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma atriz encontrada</div>';
-                comparisonSuggestionsList.style.display = 'block';
-            }
-        }
-
-        // Handle selecting an actress from the comparison suggestions
-        function handleSelectActressForComparison(actressId) {
-            // Prevent adding duplicates
-            if (actressesToCompare.some(a => a.id === actressId)) return;
-
-            // Find the full data for the selected actress from the cache
-            const actressData = allActressesData.find(a => a.id === actressId);
-            if (actressData) {
-                // Add the actress (with her data) to the comparison list
-                actressesToCompare.push({ id: actressId, nome: actressData.nome, data: actressData });
-                renderComparisonView(); // Update the comparison display
-            } else {
-                console.error("Actress data not found in cache for comparison:", actressId);
-                // Ideally, all actresses should be in the cache. Fetching here might be needed as a fallback.
-            }
-
-            // Reset search UI
+            console.log("Abrindo comparação com contexto:", contextIds);
+            comparisonContextActressIds = contextIds; actressesToCompare = []; // Reset
             if(comparisonSearchInput) comparisonSearchInput.value = '';
             if(comparisonSuggestionsList) comparisonSuggestionsList.style.display = 'none';
+            renderComparisonView(); // Render empty state
+            if(comparisonModal) comparisonModal.style.display = 'flex';
             if(comparisonSearchInput) comparisonSearchInput.focus();
         }
-
-        // Remove an actress from the comparison view
-        function removeActressFromComparison(actressId) {
-            actressesToCompare = actressesToCompare.filter(a => a.id !== actressId); // Filter out the actress
-            renderComparisonView(); // Re-render the comparison columns
+        // Close comparison modal (globally accessible)
+        window.closeComparisonModal = function() { if(comparisonModal) comparisonModal.style.display = 'none'; comparisonContextActressIds = []; actressesToCompare = []; }
+        // Display suggestions in comparison search
+        function displayComparisonSuggestions(searchTerm) {
+            if (!comparisonSuggestionsList || !comparisonSearchInput) return;
+            comparisonSuggestionsList.innerHTML = ''; if (!searchTerm || searchTerm.trim() === '') { comparisonSuggestionsList.style.display = 'none'; return; }
+            const lowerSearchTerm = searchTerm.toLowerCase();
+            let matchedActresses = allActressesData.filter(actress => (actress.nome || '').toLowerCase().includes(lowerSearchTerm) && !actressesToCompare.some(ca => ca.id === actress.id) );
+            matchedActresses.sort((a, b) => { const aIsInContext = comparisonContextActressIds.includes(a.id); const bIsInContext = comparisonContextActressIds.includes(b.id); if (aIsInContext && !bIsInContext) return -1; if (!aIsInContext && bIsInContext) return 1; return (a.nome || '').localeCompare(b.nome || ''); });
+            if (matchedActresses.length > 0) { matchedActresses.slice(0, 10).forEach(actress => { const item = document.createElement('div'); item.classList.add('suggestion-item'); if (comparisonContextActressIds.includes(actress.id)) { item.classList.add('context-actress'); } item.dataset.id = actress.id; item.innerHTML = `<img src="${actress.foto || 'placeholder.png'}" alt=""><span>${actress.nome || 'Nome Ind.'}</span>`; item.addEventListener('click', () => handleSelectActressForComparison(actress.id)); comparisonSuggestionsList.appendChild(item); }); comparisonSuggestionsList.style.display = 'block'; }
+            else { comparisonSuggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma atriz encontrada</div>'; comparisonSuggestionsList.style.display = 'block'; }
         }
-
-        // Render the comparison columns based on the actressesToCompare array
+        // Handle selecting an actress to compare
+        function handleSelectActressForComparison(actressId) {
+            if (actressesToCompare.some(a => a.id === actressId)) return;
+            const actressData = allActressesData.find(a => a.id === actressId);
+            if (actressData) { actressesToCompare.push({ id: actressId, nome: actressData.nome, data: actressData }); renderComparisonView(); }
+            else { console.error("Dados da atriz não encontrados para comparação:", actressId); }
+            if(comparisonSearchInput) comparisonSearchInput.value = ''; if(comparisonSuggestionsList) comparisonSuggestionsList.style.display = 'none'; if(comparisonSearchInput) comparisonSearchInput.focus();
+        }
+        // Remove an actress from comparison
+        function removeActressFromComparison(actressId) { actressesToCompare = actressesToCompare.filter(a => a.id !== actressId); renderComparisonView(); }
+        // Render the comparison columns - MODIFIED for counts
         function renderComparisonView() {
              if (!comparisonModalBody || !comparisonPlaceholder) return;
-             comparisonModalBody.innerHTML = ''; // Clear previous columns
-
-             if (actressesToCompare.length === 0) {
-                 // Show the placeholder message if no actresses are selected
-                 comparisonPlaceholder.style.display = 'block';
-                 comparisonModalBody.appendChild(comparisonPlaceholder);
-             } else {
-                 comparisonPlaceholder.style.display = 'none'; // Hide placeholder
-                 // Create a column for each actress
+             comparisonModalBody.innerHTML = ''; // Clear previous
+             if (actressesToCompare.length === 0) { comparisonPlaceholder.style.display = 'block'; comparisonModalBody.appendChild(comparisonPlaceholder); }
+             else {
+                 comparisonPlaceholder.style.display = 'none';
                  actressesToCompare.forEach(actress => {
-                     const column = document.createElement('div');
-                     column.classList.add('comparison-column');
-                     column.dataset.id = actress.id; // Store ID on the column
-
-                     // Add Remove button
-                     const removeBtn = document.createElement('button');
-                     removeBtn.classList.add('remove-compare-btn');
-                     removeBtn.innerHTML = '×'; // '×' symbol
-                     removeBtn.title = `Remover ${actress.nome || 'Atriz'} da Comparação`;
-                     removeBtn.onclick = () => removeActressFromComparison(actress.id);
-                     column.appendChild(removeBtn); // Add button first for absolute positioning
-
-                     // Add Actress Name Header
-                     const nameHeader = document.createElement('h4');
-                     nameHeader.textContent = actress.nome || 'Nome Indisponível';
-                     column.appendChild(nameHeader);
-
-                     // Add Image
-                     if (actress.data.foto) {
-                         const img = document.createElement('img');
-                         img.src = actress.data.foto;
-                         img.alt = actress.nome || 'Foto';
-                         img.onerror = () => { img.style.display='none'; }; // Hide on error
-                         column.appendChild(img);
-                     }
-
-                     // Add Details (using the same helper as other detail views)
-                     const skipFields = ['foto', 'nome', 'timestamp', 'cenas', 'filmes', 'videos', 'id'];
-                     const displayOrder = ['dataNascimento', 'altura', 'peso', 'nota']; // Customize order
-                     const otherFields = Object.keys(actress.data).filter(key => !skipFields.includes(key) && !displayOrder.includes(key) && actress.data[key] != null && actress.data[key] !== '');
+                     const column = document.createElement('div'); column.classList.add('comparison-column'); column.dataset.id = actress.id;
+                     let content = ''; // Build HTML string for efficiency
                      let detailsAdded = false;
+                     // Remove button
+                     content += `<button class="remove-compare-btn" title="Remover ${actress.nome || 'Atriz'}" onclick="event.stopPropagation(); removeActressFromComparison('${actress.id}')">×</button>`;
+                     // Header
+                     content += `<h4>${actress.nome || 'Nome Indisponível'}</h4>`;
+                     // Image
+                     if (actress.data.foto) { content += `<img src="${actress.data.foto}" alt="${actress.nome || 'Foto'}" onerror="this.style.display='none';">`; }
+                     // Specific Details + Counts
+                     if (actress.data.dataNascimento) { content += `<div><strong>Nasc:</strong> ${actress.data.dataNascimento}</div><div><strong>Idade:</strong> ${calculateAge(actress.data.dataNascimento)}</div>`; detailsAdded = true; }
+                     if (actress.data.altura != null) { content += `<div><strong>Altura:</strong> ${actress.data.altura} cm</div>`; detailsAdded = true; }
+                     if (actress.data.peso != null) { content += `<div><strong>Peso:</strong> ${actress.data.peso} kg</div>`; detailsAdded = true; }
+                     if (Array.isArray(actress.data.filmes)) { content += `<div><strong>Filmes:</strong> ${actress.data.filmes.length}</div>`; detailsAdded = true; }
+                     if (Array.isArray(actress.data.videos)) { content += `<div><strong>Vídeos:</strong> ${actress.data.videos.length}</div>`; detailsAdded = true; }
+                     if (Array.isArray(actress.data.cenas)) { content += `<div><strong>Cenas:</strong> ${actress.data.cenas.length}</div>`; detailsAdded = true; }
+                     // Other details
+                     const skipFieldsCompare = ['foto', 'nome', 'timestamp', 'id', 'filmes', 'videos', 'cenas', 'dataNascimento', 'altura', 'peso'];
+                     for (const key in actress.data) { if (actress.data.hasOwnProperty(key) && !skipFieldsCompare.includes(key) && actress.data[key] != null && actress.data[key] !== '') { content += `<div><strong>${capitalizeFirstLetter(key)}:</strong> ${actress.data[key]}</div>`; detailsAdded = true; } }
+                     // No details message
+                     if (!detailsAdded && !actress.data.foto) { content += '<i style="font-size:0.8em; color:#777; display: block; text-align: center; margin-top: 10px;">(Sem detalhes)</i>'; }
 
-                     // Display ordered fields
-                     displayOrder.forEach(key => {
-                         if (actress.data.hasOwnProperty(key) && actress.data[key] != null && actress.data[key] !== '') {
-                             const detailDiv = createDetailDiv(key, actress.data[key]);
-                             if (detailDiv) {
-                                 column.appendChild(detailDiv);
-                                 detailsAdded = true;
-                                 if (key === 'dataNascimento') { // Add age right after birthdate
-                                     const ageDiv = document.createElement('div');
-                                     ageDiv.innerHTML = `<strong>Idade:</strong> ${calculateAge(actress.data[key])}`;
-                                     column.appendChild(ageDiv);
-                                 }
-                             }
-                         }
-                     });
-                     // Display other fields
-                     otherFields.forEach(key => {
-                          const detailDiv = createDetailDiv(key, actress.data[key]);
-                          if (detailDiv) {
-                              column.appendChild(detailDiv);
-                              detailsAdded = true;
-                          }
-                     });
-
-                     if (!detailsAdded && !actress.data.foto) {
-                         column.innerHTML += '<i style="font-size:0.8em; color:#777; display: block; text-align: center; margin-top: 10px;">(Sem detalhes)</i>';
-                     }
-
-                     comparisonModalBody.appendChild(column); // Add the completed column
+                     column.innerHTML = content; // Set innerHTML once
+                     comparisonModalBody.appendChild(column);
                  });
              }
         }
 
         // --- Event Listeners ---
         document.addEventListener('DOMContentLoaded', () => {
-            loadInitialData(); // Load initial actress list and scene cache
-
-            // Main Modal (Content Details) Close on overlay click
-             if(modal) modal.addEventListener('click', (event) => {
-                 if (event.target === modal) { // Only close if the overlay itself is clicked
-                     closeModal();
-                 }
-             });
-
-             // Comparison Modal Close on overlay click
-             if (comparisonModal) {
-                  comparisonModal.addEventListener('click', (event) => {
-                      if (event.target === comparisonModal) { // Only if clicking the overlay
-                          closeComparisonModal();
-                      }
-                  });
-             }
-
-            // Right Column Filter Buttons (Video/Film/Scene/All)
-            relatedFilterButtons.forEach(button => {
-                 button.addEventListener('click', () => {
-                     relatedFilterButtons.forEach(btn => btn.classList.remove('active')); // Deactivate all
-                     button.classList.add('active'); // Activate clicked one
-                     activeRelatedFilter = button.dataset.filter; // Update state
-                     applyRelatedContentFilters(); // Re-filter content cards
-                 });
-             });
-
-             // Right Column Co-Actress Search Input Listeners
-             if(relatedSearchInput) {
-                 relatedSearchInput.addEventListener('input', () => displayRelatedSuggestions(relatedSearchInput.value));
-                 relatedSearchInput.addEventListener('focus', () => displayRelatedSuggestions(relatedSearchInput.value)); // Show suggestions on focus too
-             }
-             // Focus input when clicking the wrapper (unless clicking a pill/button)
-             if(relatedSearchInputWrapper) {
-                 relatedSearchInputWrapper.addEventListener('click', (e) => {
-                     if (!e.target.closest('.related-actress-pill')) {
-                        relatedSearchInput?.focus();
-                     }
-                 });
-             }
-
-             // Comparison Modal Search Input Listeners
-             if (comparisonSearchInput) {
-                comparisonSearchInput.addEventListener('input', () => displayComparisonSuggestions(comparisonSearchInput.value));
-                comparisonSearchInput.addEventListener('focus', () => displayComparisonSuggestions(comparisonSearchInput.value));
-             }
-
-             // Global click listener to hide suggestion lists when clicking outside
+            loadInitialData();
+            // Main Modal Close
+             if(modal) modal.addEventListener('click', (event) => { if (event.target === modal) closeModal(); });
+             // Comparison Modal Close
+             if (comparisonModal) comparisonModal.addEventListener('click', (event) => { if (event.target === comparisonModal) closeComparisonModal(); });
+            // Filter Buttons
+            relatedFilterButtons.forEach(button => { button.addEventListener('click', () => { relatedFilterButtons.forEach(btn => btn.classList.remove('active')); button.classList.add('active'); activeRelatedFilter = button.dataset.filter; applyRelatedContentFilters(); }); });
+             // Related Search Input
+             if(relatedSearchInput) { relatedSearchInput.addEventListener('input', () => displayRelatedSuggestions(relatedSearchInput.value)); relatedSearchInput.addEventListener('focus', () => displayRelatedSuggestions(relatedSearchInput.value)); }
+             if(relatedSearchInputWrapper) { relatedSearchInputWrapper.addEventListener('click', (e) => { if (!e.target.closest('.related-actress-pill')) relatedSearchInput?.focus(); }); }
+             // Comparison Search Input
+             if (comparisonSearchInput) { comparisonSearchInput.addEventListener('input', () => displayComparisonSuggestions(comparisonSearchInput.value)); comparisonSearchInput.addEventListener('focus', () => displayComparisonSuggestions(comparisonSearchInput.value)); }
+             // Global Click Listener (Hide Suggestions)
              document.addEventListener('click', (event) => {
-                 // Hide Related Suggestions list
-                 const isClickInsideRelatedSearch = relatedSearchInputWrapper?.contains(event.target);
-                 const isClickInsideRelatedSuggestions = relatedSuggestionsList?.contains(event.target);
-                 if (relatedSuggestionsList && !isClickInsideRelatedSearch && !isClickInsideRelatedSuggestions) {
-                     relatedSuggestionsList.style.display = 'none';
-                 }
-
-                 // Hide Comparison Suggestions list
-                 const comparisonSearchArea = comparisonSearchInput?.closest('.comparison-search-area');
-                 const isClickInsideComparisonSearch = comparisonSearchArea?.contains(event.target);
-                 const isClickInsideComparisonSuggestions = comparisonSuggestionsList?.contains(event.target);
-                  if (comparisonSuggestionsList && !isClickInsideComparisonSearch && !isClickInsideComparisonSuggestions) {
-                      comparisonSuggestionsList.style.display = 'none';
-                  }
+                 const isClickInsideRelatedSearch = relatedSearchInputWrapper?.contains(event.target); const isClickInsideRelatedSuggestions = relatedSuggestionsList?.contains(event.target);
+                 if (relatedSuggestionsList && !isClickInsideRelatedSearch && !isClickInsideRelatedSuggestions) { relatedSuggestionsList.style.display = 'none'; }
+                 const comparisonSearchArea = comparisonSearchInput?.closest('.comparison-search-area'); const isClickInsideComparisonSearch = comparisonSearchArea?.contains(event.target); const isClickInsideComparisonSuggestions = comparisonSuggestionsList?.contains(event.target);
+                 if (comparisonSuggestionsList && !isClickInsideComparisonSearch && !isClickInsideComparisonSuggestions) { comparisonSuggestionsList.style.display = 'none'; }
              });
         }); // End DOMContentLoaded
 
