@@ -435,7 +435,7 @@
              }
         }
 
-        // 3. Display Main Actress Details (Middle Column) - MODIFIED for counts
+        // 3. Display Main Actress Details (Middle Column)
         function displayMainActressDetails(data) {
              actressDetailsContainer.innerHTML = ''; // Clear previous/loading
              const detailsTitle = document.createElement('h3');
@@ -452,56 +452,31 @@
              let detailsAdded = false;
              const detailFieldsContainer = document.createElement('div'); // Container for text details
 
+             // Function to add a detail row
+             const addDetailRow = (label, value) => {
+                 if (value != null && value !== '') {
+                     const div = document.createElement('div');
+                     div.innerHTML = `<strong>${label}:</strong> ${value}`;
+                     detailFieldsContainer.appendChild(div);
+                     detailsAdded = true;
+                 }
+             };
+
              // --- Specific Fields First ---
-             if (data.dataNascimento) {
-                 const birthDiv = document.createElement('div');
-                 birthDiv.innerHTML = `<strong>Nascimento:</strong> ${data.dataNascimento}`;
-                 detailFieldsContainer.appendChild(birthDiv);
-                 const ageDiv = document.createElement('div');
-                 ageDiv.innerHTML = `<strong>Idade:</strong> ${calculateAge(data.dataNascimento)}`;
-                 detailFieldsContainer.appendChild(ageDiv);
-                 detailsAdded = true;
-             }
-             if (data.altura != null) {
-                 const div = document.createElement('div');
-                 div.innerHTML = `<strong>Altura:</strong> ${data.altura} cm`;
-                 detailFieldsContainer.appendChild(div);
-                 detailsAdded = true;
-             }
-             if (data.peso != null) {
-                 const div = document.createElement('div');
-                 div.innerHTML = `<strong>Peso:</strong> ${data.peso} kg`;
-                 detailFieldsContainer.appendChild(div);
-                 detailsAdded = true;
-             }
+             addDetailRow('Nascimento', data.dataNascimento);
+             if (data.dataNascimento) { addDetailRow('Idade', calculateAge(data.dataNascimento)); }
+             if (data.altura != null) { addDetailRow('Altura', `${data.altura} cm`); }
+             if (data.peso != null) { addDetailRow('Peso', `${data.peso} kg`); }
              // *** NEW: Participation Counts ***
-             if (Array.isArray(data.filmes)) {
-                 const div = document.createElement('div');
-                 div.innerHTML = `<strong>Filmes Participados:</strong> ${data.filmes.length}`;
-                 detailFieldsContainer.appendChild(div);
-                 detailsAdded = true;
-             }
-             if (Array.isArray(data.videos)) {
-                 const div = document.createElement('div');
-                 div.innerHTML = `<strong>Vídeos Participados:</strong> ${data.videos.length}`;
-                 detailFieldsContainer.appendChild(div);
-                 detailsAdded = true;
-             }
-              if (Array.isArray(data.cenas)) {
-                 const div = document.createElement('div');
-                 div.innerHTML = `<strong>Cenas Participadas:</strong> ${data.cenas.length}`;
-                 detailFieldsContainer.appendChild(div);
-                 detailsAdded = true;
-             }
+             if (Array.isArray(data.filmes)) { addDetailRow('Filmes Participados', data.filmes.length); }
+             if (Array.isArray(data.videos)) { addDetailRow('Vídeos Participados', data.videos.length); }
+             if (Array.isArray(data.cenas)) { addDetailRow('Cenas Participadas', data.cenas.length); }
 
              // --- Other Fields (Generic Handling) ---
              const skipFields = ['foto', 'nome', 'timestamp', 'id', 'filmes', 'videos', 'cenas', 'dataNascimento', 'altura', 'peso']; // Fields handled above or to ignore
              for (const key in data) {
-                 if (data.hasOwnProperty(key) && !skipFields.includes(key) && data[key] != null && data[key] !== '') {
-                      const div = document.createElement('div');
-                      div.innerHTML = `<strong>${capitalizeFirstLetter(key)}:</strong> ${data[key]}`;
-                      detailFieldsContainer.appendChild(div);
-                      detailsAdded = true;
+                 if (data.hasOwnProperty(key) && !skipFields.includes(key)) {
+                     addDetailRow(capitalizeFirstLetter(key), data[key]);
                  }
              }
 
@@ -509,6 +484,7 @@
 
              if (!detailsAdded && !data.foto) {
                  const noDetailsDiv = document.createElement('div');
+                 noDetailsDiv.classList.add('error'); // Use error style for visibility
                  noDetailsDiv.textContent = 'Sem detalhes adicionais disponíveis.';
                  actressDetailsContainer.appendChild(noDetailsDiv);
              }
@@ -516,7 +492,7 @@
 
         // --- Related Content Loading and Filtering ---
 
-        // 4. Load Related Content (Videos, Films, Scenes) for the selected Main Actress
+        // 4. Load Related Content
         async function loadAndDisplayRelatedContent(mainActressId) {
             allRelatedContent = []; filteredRelatedContent = []; contentCardsContainer.innerHTML = '';
             displayMessage(contentMessage, 'Buscando conteúdo relacionado...');
@@ -537,7 +513,7 @@
             } catch (error) { console.error("Erro ao buscar conteúdo relacionado: ", error); displayMessage(contentMessage, 'Erro ao carregar conteúdo relacionado.', true); }
         }
 
-        // 5. Apply Filters (Type and Co-Actress) and Render Related Content Cards
+        // 5. Apply Filters and Render Related Content Cards
         function applyRelatedContentFilters() {
              contentCardsContainer.innerHTML = ''; clearMessage(contentMessage);
              const relatedActressIds = selectedRelatedActresses.map(a => a.id);
@@ -556,7 +532,7 @@
              const card = document.createElement('div'); card.classList.add('content-card'); card.dataset.type = type; card.dataset.id = id;
              const imageContainer = document.createElement('div'); imageContainer.classList.add('image-container'); const img = document.createElement('img');
              let finalImageUrl = imageUrl; if (typeof imageUrl === 'object' && imageUrl !== null && imageUrl.width) { const urlKey = Object.keys(imageUrl).find(k=>typeof imageUrl[k]==='string'&&imageUrl[k].startsWith('http')); finalImageUrl = urlKey ? imageUrl[urlKey] : 'placeholder.png';} else if (typeof imageUrl !== 'string' || !imageUrl) { finalImageUrl = 'placeholder.png'; }
-             img.src = finalImageUrl; img.alt = title || type; img.onerror = () => { img.src = 'placeholder.png'; img.onerror=null; }
+             img.src = finalImageUrl; img.alt = title || type; img.onerror = () => { img.src = 'placeholder.png'; img.onerror=null; };
              const badge = document.createElement('div'); badge.classList.add('content-type-badge'); let badgeText = capitalizeFirstLetter(type); if(type === 'film') badgeText = 'Filme'; else if(type === 'scene') badgeText = 'Cena'; else if(type === 'video') badgeText = 'Vídeo'; badge.textContent = badgeText;
              imageContainer.appendChild(badge); imageContainer.appendChild(img);
              const titleDiv = document.createElement('div'); titleDiv.classList.add('title'); titleDiv.textContent = `${title || 'Sem Título'}`;
@@ -566,7 +542,7 @@
 
         // --- Right Column Search Functions ---
 
-        // Display co-actress suggestions based on input and current context
+        // Display co-actress suggestions
         function displayRelatedSuggestions(searchTerm) {
             if (!relatedSuggestionsList || !currentMainActressId) return;
             relatedSuggestionsList.innerHTML = ''; if (!searchTerm || searchTerm.trim() === '') { relatedSuggestionsList.style.display = 'none'; return; }
@@ -577,13 +553,13 @@
             if (matchedActresses.length > 0) { matchedActresses.sort((a, b) => (a.nome || '').localeCompare(b.nome || '')).slice(0, 7).forEach(actress => { const item = document.createElement('div'); item.classList.add('suggestion-item'); item.dataset.id = actress.id; item.dataset.nome = actress.nome || ''; item.innerHTML = `<img src="${actress.foto || 'placeholder.png'}" alt=""><span>${actress.nome || 'Nome Ind.'}</span>`; item.addEventListener('click', handleSelectRelatedActress); relatedSuggestionsList.appendChild(item); }); relatedSuggestionsList.style.display = 'block'; }
             else { relatedSuggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma co-atriz encontrada</div>'; relatedSuggestionsList.style.display = 'block'; }
         }
-        // Handle selecting a co-actress from the suggestions
+        // Handle selecting a co-actress
         function handleSelectRelatedActress(event) {
              const target = event.currentTarget; const actressId = target.dataset.id; const actressName = target.dataset.nome; if (!actressId || !actressName) return;
              if (!selectedRelatedActresses.some(a => a.id === actressId)) { selectedRelatedActresses.push({ id: actressId, nome: actressName }); renderRelatedActressPills(); applyRelatedContentFilters(); }
              if (relatedSearchInput) relatedSearchInput.value = ''; if (relatedSuggestionsList) relatedSuggestionsList.style.display = 'none'; if (relatedSearchInput) relatedSearchInput.focus();
         }
-        // Render the pills for selected co-actresses
+        // Render co-actress pills
         function renderRelatedActressPills() {
              if (!relatedSelectedActressesContainer) return; relatedSelectedActressesContainer.innerHTML = '';
              selectedRelatedActresses.forEach(actress => { const pill = document.createElement('div'); pill.classList.add('related-actress-pill'); pill.dataset.id = actress.id; pill.innerHTML = `<span>${actress.nome}</span><button class="related-remove-actress-btn" title="Remover">×</button>`; pill.querySelector('.related-remove-actress-btn').addEventListener('click', handleRemoveRelatedActress); relatedSelectedActressesContainer.appendChild(pill); });
@@ -660,25 +636,42 @@
              const actressData = allActressesData.find(a => a.id === actressId); if (actressData) { populateActressPopup(popup, actressData); }
              else { getDoc(doc(db, "atores", actressId)).then(docSnap => { if (docSnap.exists()) { populateActressPopup(popup, { id: actressId, ...docSnap.data() }); } else { header.textContent = 'Erro'; body.innerHTML = '<div class="error">Não encontrada.</div>'; } }).catch(err => { header.textContent = 'Erro'; body.innerHTML = '<div class="error">Erro.</div>'; }); }
         }
+
         // Populate the small actress popup content (using the same count logic as main details)
         function populateActressPopup(popupElement, data) {
              const header = popupElement.querySelector('.actress-popup-header h5'); const body = popupElement.querySelector('.actress-popup-body'); if(!header || !body) return;
              header.textContent = data.nome || 'Detalhes'; body.innerHTML = '';
              if (data.foto) { const img = document.createElement('img'); img.src = data.foto; img.alt = data.nome || 'Foto'; img.onerror = () => { img.style.display = 'none'; }; body.appendChild(img); }
+
              let detailsAdded = false;
+             const addDetailRow = (label, value) => {
+                 if (value != null && value !== '') {
+                     const div = document.createElement('div');
+                     div.innerHTML = `<strong>${label}:</strong> ${value}`;
+                     body.appendChild(div);
+                     detailsAdded = true;
+                 }
+             };
+
              // Specific fields first
-             if (data.dataNascimento) { const div = document.createElement('div'); div.innerHTML = `<strong>Nasc:</strong> ${data.dataNascimento}`; body.appendChild(div); const ageDiv = document.createElement('div'); ageDiv.innerHTML = `<strong>Idade:</strong> ${calculateAge(data.dataNascimento)}`; body.appendChild(ageDiv); detailsAdded = true; }
-             if (data.altura != null) { const div = document.createElement('div'); div.innerHTML = `<strong>Altura:</strong> ${data.altura} cm`; body.appendChild(div); detailsAdded = true; }
-             if (data.peso != null) { const div = document.createElement('div'); div.innerHTML = `<strong>Peso:</strong> ${data.peso} kg`; body.appendChild(div); detailsAdded = true; }
-              // Participation Counts
-             if (Array.isArray(data.filmes)) { const div = document.createElement('div'); div.innerHTML = `<strong>Filmes:</strong> ${data.filmes.length}`; body.appendChild(div); detailsAdded = true; }
-             if (Array.isArray(data.videos)) { const div = document.createElement('div'); div.innerHTML = `<strong>Vídeos:</strong> ${data.videos.length}`; body.appendChild(div); detailsAdded = true; }
-             if (Array.isArray(data.cenas)) { const div = document.createElement('div'); div.innerHTML = `<strong>Cenas:</strong> ${data.cenas.length}`; body.appendChild(div); detailsAdded = true; }
+             addDetailRow('Nasc', data.dataNascimento); // Abbreviated label for popup
+             if (data.dataNascimento) { addDetailRow('Idade', calculateAge(data.dataNascimento)); }
+             if (data.altura != null) { addDetailRow('Altura', `${data.altura} cm`); }
+             if (data.peso != null) { addDetailRow('Peso', `${data.peso} kg`); }
+             // *** Participation Counts ***
+             if (Array.isArray(data.filmes)) { addDetailRow('Filmes', data.filmes.length); } // Shorter label
+             if (Array.isArray(data.videos)) { addDetailRow('Vídeos', data.videos.length); } // Shorter label
+             if (Array.isArray(data.cenas)) { addDetailRow('Cenas', data.cenas.length); }   // Shorter label
              // Other fields
              const skipFields = ['foto', 'nome', 'timestamp', 'id', 'filmes', 'videos', 'cenas', 'dataNascimento', 'altura', 'peso'];
-             for (const key in data) { if (data.hasOwnProperty(key) && !skipFields.includes(key) && data[key] != null && data[key] !== '') { const div = document.createElement('div'); div.innerHTML = `<strong>${capitalizeFirstLetter(key)}:</strong> ${data[key]}`; body.appendChild(div); detailsAdded = true; } }
+             for (const key in data) {
+                 if (data.hasOwnProperty(key) && !skipFields.includes(key)) {
+                     addDetailRow(capitalizeFirstLetter(key), data[key]);
+                 }
+             }
              if (!detailsAdded && !data.foto) { body.innerHTML += '<i style="font-size:0.9em; color:#777;">(Sem detalhes)</i>'; }
         }
+
         // Make an element draggable by its header
         function makeDraggable(element) {
              let isDragging = false; let offsetX, offsetY; const header = element.querySelector('.actress-popup-header'); if (!header) return;
@@ -722,41 +715,77 @@
         }
         // Remove an actress from comparison
         function removeActressFromComparison(actressId) { actressesToCompare = actressesToCompare.filter(a => a.id !== actressId); renderComparisonView(); }
-        // Render the comparison columns - MODIFIED for counts
+
+        // Render the comparison columns
         function renderComparisonView() {
              if (!comparisonModalBody || !comparisonPlaceholder) return;
              comparisonModalBody.innerHTML = ''; // Clear previous
-             if (actressesToCompare.length === 0) { comparisonPlaceholder.style.display = 'block'; comparisonModalBody.appendChild(comparisonPlaceholder); }
-             else {
+             if (actressesToCompare.length === 0) {
+                 comparisonPlaceholder.style.display = 'block';
+                 comparisonModalBody.appendChild(comparisonPlaceholder);
+             } else {
                  comparisonPlaceholder.style.display = 'none';
                  actressesToCompare.forEach(actress => {
-                     const column = document.createElement('div'); column.classList.add('comparison-column'); column.dataset.id = actress.id;
-                     let content = ''; // Build HTML string for efficiency
+                     const column = document.createElement('div');
+                     column.classList.add('comparison-column');
+                     column.dataset.id = actress.id;
+
+                     let content = ''; // Build HTML string
                      let detailsAdded = false;
-                     // Remove button
-                     content += `<button class="remove-compare-btn" title="Remover ${actress.nome || 'Atriz'}" onclick="event.stopPropagation(); removeActressFromComparison('${actress.id}')">×</button>`;
+
+                     // --- Build Column Content ---
+                     // Remove button (HTML part)
+                     content += `<button class="remove-compare-btn" title="Remover ${actress.nome || 'Atriz'}">×</button>`;
                      // Header
                      content += `<h4>${actress.nome || 'Nome Indisponível'}</h4>`;
                      // Image
                      if (actress.data.foto) { content += `<img src="${actress.data.foto}" alt="${actress.nome || 'Foto'}" onerror="this.style.display='none';">`; }
+
+                     // Helper to add detail row to string
+                     const addDetailToString = (label, value) => {
+                         if (value != null && value !== '') {
+                             content += `<div><strong>${label}:</strong> ${value}</div>`;
+                             detailsAdded = true;
+                         }
+                     };
+
                      // Specific Details + Counts
-                     if (actress.data.dataNascimento) { content += `<div><strong>Nasc:</strong> ${actress.data.dataNascimento}</div><div><strong>Idade:</strong> ${calculateAge(actress.data.dataNascimento)}</div>`; detailsAdded = true; }
-                     if (actress.data.altura != null) { content += `<div><strong>Altura:</strong> ${actress.data.altura} cm</div>`; detailsAdded = true; }
-                     if (actress.data.peso != null) { content += `<div><strong>Peso:</strong> ${actress.data.peso} kg</div>`; detailsAdded = true; }
-                     if (Array.isArray(actress.data.filmes)) { content += `<div><strong>Filmes:</strong> ${actress.data.filmes.length}</div>`; detailsAdded = true; }
-                     if (Array.isArray(actress.data.videos)) { content += `<div><strong>Vídeos:</strong> ${actress.data.videos.length}</div>`; detailsAdded = true; }
-                     if (Array.isArray(actress.data.cenas)) { content += `<div><strong>Cenas:</strong> ${actress.data.cenas.length}</div>`; detailsAdded = true; }
+                     addDetailToString('Nasc', actress.data.dataNascimento);
+                     if (actress.data.dataNascimento) { addDetailToString('Idade', calculateAge(actress.data.dataNascimento)); }
+                     if (actress.data.altura != null) { addDetailToString('Altura', `${actress.data.altura} cm`); }
+                     if (actress.data.peso != null) { addDetailToString('Peso', `${actress.data.peso} kg`); }
+                     if (Array.isArray(actress.data.filmes)) { addDetailToString('Filmes', actress.data.filmes.length); }
+                     if (Array.isArray(actress.data.videos)) { addDetailToString('Vídeos', actress.data.videos.length); }
+                     if (Array.isArray(actress.data.cenas)) { addDetailToString('Cenas', actress.data.cenas.length); }
+
                      // Other details
                      const skipFieldsCompare = ['foto', 'nome', 'timestamp', 'id', 'filmes', 'videos', 'cenas', 'dataNascimento', 'altura', 'peso'];
-                     for (const key in actress.data) { if (actress.data.hasOwnProperty(key) && !skipFieldsCompare.includes(key) && actress.data[key] != null && actress.data[key] !== '') { content += `<div><strong>${capitalizeFirstLetter(key)}:</strong> ${actress.data[key]}</div>`; detailsAdded = true; } }
+                     for (const key in actress.data) {
+                         if (actress.data.hasOwnProperty(key) && !skipFieldsCompare.includes(key)) {
+                             addDetailToString(capitalizeFirstLetter(key), actress.data[key]);
+                         }
+                     }
                      // No details message
                      if (!detailsAdded && !actress.data.foto) { content += '<i style="font-size:0.8em; color:#777; display: block; text-align: center; margin-top: 10px;">(Sem detalhes)</i>'; }
 
-                     column.innerHTML = content; // Set innerHTML once
-                     comparisonModalBody.appendChild(column);
+                     // --- Set Content and Attach Listener ---
+                     column.innerHTML = content; // Set the generated HTML
+
+                     // Find the remove button *within this specific column* and attach listener properly
+                     const removeBtn = column.querySelector('.remove-compare-btn');
+                     if (removeBtn) {
+                         removeBtn.onclick = (event) => {
+                             event.stopPropagation(); // Prevent modal close
+                             removeActressFromComparison(actress.id);
+                         };
+                     } else {
+                         console.error("Remove button not found in comparison column for", actress.id);
+                     }
+
+                     comparisonModalBody.appendChild(column); // Add column to modal body
                  });
              }
-        }
+        } // <--- THIS IS THE CORRECTED/ADDED BRACE
 
         // --- Event Listeners ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -777,7 +806,9 @@
                  const isClickInsideRelatedSearch = relatedSearchInputWrapper?.contains(event.target); const isClickInsideRelatedSuggestions = relatedSuggestionsList?.contains(event.target);
                  if (relatedSuggestionsList && !isClickInsideRelatedSearch && !isClickInsideRelatedSuggestions) { relatedSuggestionsList.style.display = 'none'; }
                  const comparisonSearchArea = comparisonSearchInput?.closest('.comparison-search-area'); const isClickInsideComparisonSearch = comparisonSearchArea?.contains(event.target); const isClickInsideComparisonSuggestions = comparisonSuggestionsList?.contains(event.target);
-                 if (comparisonSuggestionsList && !isClickInsideComparisonSearch && !isClickInsideComparisonSuggestions) { comparisonSuggestionsList.style.display = 'none'; }
+                  if (comparisonSuggestionsList && !isClickInsideComparisonSearch && !isClickInsideComparisonSuggestions) {
+                      comparisonSuggestionsList.style.display = 'none';
+                  }
              });
         }); // End DOMContentLoaded
 
