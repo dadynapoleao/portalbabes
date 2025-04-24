@@ -412,25 +412,24 @@
             let contentFound = false;
 
             try {
-                 // --- Fetch Cenas ---
+                // --- Fetch Cenas ---
                 console.log("Fetching 'cenas' collection...");
                 const cenasSnapshot = await getDocs(collection(db, "cenas"));
                 console.log(`Found ${cenasSnapshot.size} documents in 'cenas'.`);
-                cenasSnapshot.forEach(docSnap => { // Renamed 'doc' to 'docSnap' to avoid conflict
+                cenasSnapshot.forEach(docSnap => {
                     const cenaData = docSnap.data();
                     const cenaId = docSnap.id;
                     console.log(`Checking cena ID: ${cenaId}`);
-                    // **DEBUG LOG:** Check the structure of 'atores' field
                     console.log(`  > Cena data:`, cenaData);
-                    console.log(`  > Type of cenaData.atores: ${typeof cenaData.atores}`, cenaData.atores);
+                    console.log(`  > Type of cenaData.atores: ${typeof cenaData.atores}`, Array.isArray(cenaData.atores) ? `Is Array: ${Array.isArray(cenaData.atores)}` : '', cenaData.atores); // Log if it's an array
 
-                    // Check if 'atores' field exists, is an object (map), and contains the actressId as a key
-                    if (cenaData.atores && typeof cenaData.atores === 'object' && cenaData.atores !== null && cenaData.atores.hasOwnProperty(actressId)) {
-                         console.log(`%c  MATCH FOUND in Cena ${cenaId}!`, "color: lightgreen;");
+                    // CORRECTED CHECK: Check if 'atores' field exists, is an Array, and includes the actressId
+                    if (cenaData.atores && Array.isArray(cenaData.atores) && cenaData.atores.includes(actressId)) {
+                         console.log(`%c  MATCH FOUND in Cena ${cenaId}! (Actress ID found in array)`, "color: lightgreen;");
                          createContentCard(cenaData.imagem, cenaData.nome, 'Cena', cenaId);
                          contentFound = true;
                     } else {
-                         console.log(`  - No match in Cena ${cenaId} for actress ${actressId}.`);
+                         console.log(`  - No match in Cena ${cenaId} for actress ${actressId}. (Field missing, not array, or ID not included)`);
                     }
                 });
 
@@ -442,16 +441,16 @@
                     const videoData = docSnap.data();
                     const videoId = docSnap.id;
                     console.log(`Checking video ID: ${videoId}`);
-                    // **DEBUG LOG:** Check the structure of 'atores' field
                     console.log(`  > Video data:`, videoData);
-                    console.log(`  > Type of videoData.atores: ${typeof videoData.atores}`, videoData.atores);
+                     console.log(`  > Type of videoData.atores: ${typeof videoData.atores}`, Array.isArray(videoData.atores) ? `Is Array: ${Array.isArray(videoData.atores)}` : '', videoData.atores); // Log if it's an array
 
-                     if (videoData.atores && typeof videoData.atores === 'object' && videoData.atores !== null && videoData.atores.hasOwnProperty(actressId)) {
-                         console.log(`%c  MATCH FOUND in Video ${videoId}!`, "color: lightgreen;");
+                     // CORRECTED CHECK: Check if 'atores' field exists, is an Array, and includes the actressId
+                     if (videoData.atores && Array.isArray(videoData.atores) && videoData.atores.includes(actressId)) {
+                         console.log(`%c  MATCH FOUND in Video ${videoId}! (Actress ID found in array)`, "color: lightgreen;");
                          createContentCard(videoData.imagem, videoData.nome, 'Vídeo', videoId);
                          contentFound = true;
                      } else {
-                         console.log(`  - No match in Video ${videoId} for actress ${actressId}.`);
+                         console.log(`  - No match in Video ${videoId} for actress ${actressId}. (Field missing, not array, or ID not included)`);
                      }
                  });
 
@@ -472,7 +471,6 @@
                         const checkMoviePromise = async () => {
                             console.log(`    Checking scenes for movie ${filmeId}...`);
                             for (const cenaRef of filmeData.cenas) {
-                                // Assuming cenaRef is an ID string like 'LRGBI1VcIONbVoNrTqCi'
                                 if (typeof cenaRef === 'string' && cenaRef.trim() !== '') {
                                      console.log(`      Checking scene ref: ${cenaRef} for movie ${filmeId}`);
                                      try {
@@ -480,14 +478,14 @@
                                         if (cenaDocSnap.exists()) {
                                             const cenaData = cenaDocSnap.data();
                                             console.log(`        > Fetched scene ${cenaRef} data:`, cenaData);
-                                            // **DEBUG LOG:** Check the 'atores' field in the linked scene
-                                            console.log(`        > Type of linked cenaData.atores: ${typeof cenaData.atores}`, cenaData.atores);
-                                             if (cenaData.atores && typeof cenaData.atores === 'object' && cenaData.atores !== null && cenaData.atores.hasOwnProperty(actressId)) {
-                                                // Actress found in one of the movie's scenes
-                                                 console.log(`%c        MATCH FOUND for actress ${actressId} in scene ${cenaRef} linked to movie ${filmeId}!`, "color: orange;");
+                                            console.log(`        > Type of linked cenaData.atores: ${typeof cenaData.atores}`, Array.isArray(cenaData.atores) ? `Is Array: ${Array.isArray(cenaData.atores)}` : '', cenaData.atores); // Log if it's an array
+
+                                             // CORRECTED CHECK: Check if linked scene's 'atores' exists, is an Array, and includes the actressId
+                                             if (cenaData.atores && Array.isArray(cenaData.atores) && cenaData.atores.includes(actressId)) {
+                                                console.log(`%c        MATCH FOUND for actress ${actressId} in scene ${cenaRef} linked to movie ${filmeId}! (Actress ID found in array)`, "color: orange;");
                                                  return { found: true, data: filmeData, id: filmeId }; // Return movie data and ID
                                              } else {
-                                                  console.log(`        - No match in linked scene ${cenaRef} for actress ${actressId}.`);
+                                                  console.log(`        - No match in linked scene ${cenaRef} for actress ${actressId}. (Field missing, not array, or ID not included)`);
                                              }
                                         } else {
                                             console.warn(`        ! Linked scene ${cenaRef} does not exist in 'cenas' collection.`);
