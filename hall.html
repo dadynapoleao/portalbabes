@@ -5,429 +5,295 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Visualizador de Atrizes</title>
     <style>
-        body {
-            font-family: sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            display: flex; /* Use flexbox for overall layout */
-            min-height: 100vh;
-        }
+        /* --- Base & Layout --- */
+        body { font-family: sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; display: flex; min-height: 100vh; }
+        .container { display: flex; width: 100%; padding: 15px; box-sizing: border-box; gap: 10px; }
+        .column { background-color: #fff; padding: 15px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); overflow-y: auto; height: calc(100vh - 30px); box-sizing: border-box; display: flex; flex-direction: column; }
+        #actress-list-col { flex: 1; }
+        #actress-detail-col, #content-col { display: none; }
+        .container.details-visible #actress-list-col { flex: 0 0 25%; max-width: 300px; }
+        .container.details-visible #actress-detail-col { display: flex; flex: 0 0 30%; max-width: 400px; }
+        .container.details-visible #content-col { display: flex; flex: 1; }
+        .column h2 { margin-top: 0; margin-bottom: 15px; font-size: 1.4em; color: #333; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .column h2.related-title { margin-top: 15px; } /* Space above related content title */
 
-        .container {
-            display: flex;
-            width: 100%;
-            padding: 15px;
-            box-sizing: border-box;
-        }
+        /* --- Actress List (Left Column) --- */
+        #actress-list { list-style: none; padding: 0; margin: 0; flex-grow: 1; overflow-y: auto; }
+        .actress-item { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; transition: background-color 0.2s ease; }
+        .actress-item:hover { background-color: #f0f0f0; }
+        .actress-item.selected { background-color: #e0e0e0; font-weight: bold; }
+        .actress-item img { width: 50px; height: 50px; object-fit: cover; border-radius: 50%; margin-right: 10px; flex-shrink: 0; }
+        .actress-info span { display: block; font-size: 0.9em; }
+        .actress-info .name { font-weight: bold; font-size: 1em; }
+        .actress-info .age, .actress-info .rating { color: #555; }
 
-        .column {
-            background-color: #fff;
-            margin: 0 5px;
-            padding: 15px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            overflow-y: auto; /* Add scroll if content overflows */
-            height: calc(100vh - 30px); /* Adjust height based on body padding */
-            box-sizing: border-box;
-        }
+        /* --- Actress Details (Middle Column) --- */
+        #actress-details { flex-grow: 1; overflow-y: auto; }
+        #actress-details h3 { margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        #actress-details div { margin-bottom: 8px; word-wrap: break-word; }
+        #actress-details strong { display: inline-block; min-width: 100px; color: #333; }
+        #actress-details img.detail-photo { max-width: 200px; max-height: 250px; width: auto; height: auto; border-radius: 4px; margin-top: 10px; display: block; }
 
-        /* Initial State: Only Left Column Visible */
-        #actress-list-col {
-            flex: 1; /* Take full width initially */
-        }
-
-        #actress-detail-col,
-        #content-col {
-            display: none; /* Hide middle and right columns initially */
-        }
-
-        /* State when an actress is selected */
-        .container.details-visible #actress-list-col {
-            flex: 0 0 25%; /* Fixed width for actress list */
-            max-width: 300px; /* Optional max width */
-        }
-
-        .container.details-visible #actress-detail-col {
-            display: block;
-            flex: 0 0 30%; /* Fixed width for details */
-            max-width: 400px; /* Optional max width */
-        }
-
-        .container.details-visible #content-col {
-            display: block;
-            flex: 1; /* Takes remaining space */
-        }
-
-        /* Actress List Styling */
-        #actress-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .actress-item {
-            display: flex;
-            align-items: center;
-            padding: 10px;
+        /* --- Related Content (Right Column) --- */
+        #content-col-header { /* Container for search and filters */
+            margin-bottom: 15px;
             border-bottom: 1px solid #eee;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
+            padding-bottom: 15px;
         }
+        /* --- Related Content Filters --- */
+        .related-filter-buttons { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+        .related-filter-btn { padding: 5px 10px; border: 1px solid #ccc; background-color: #eee; color: #333; border-radius: 4px; cursor: pointer; font-size: 0.85em; transition: background-color 0.2s ease, border-color 0.2s ease; }
+        .related-filter-btn:hover { background-color: #ddd; }
+        .related-filter-btn.active { background-color: #6c757d; color: white; border-color: #6c757d; font-weight: bold; }
 
-        .actress-item:hover {
-            background-color: #f0f0f0;
-        }
+        /* --- Related Co-Star Search (Adapting provided styles) --- */
+        .related-actress-search-area { position: relative; width: 100%; }
+        .related-search-input-wrapper { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; padding: 5px 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; cursor: text; min-height: 34px; }
+        .related-search-input-wrapper:focus-within { border-color: #80bdff; box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25); }
+        #related-selected-actresses { display: contents; }
+        .related-actress-pill { display: inline-flex; align-items: center; background-color: #007bff; color: white; padding: 3px 6px; border-radius: 3px; font-size: 0.85em; margin: 2px; white-space: nowrap; }
+        .related-actress-pill span { margin-right: 4px; }
+        .related-remove-actress-btn { background: none; border: none; color: white; cursor: pointer; font-weight: bold; font-size: 1em; padding: 0 2px; line-height: 1; opacity: 0.8; }
+        .related-remove-actress-btn:hover { opacity: 1; }
+        .related-search-input { flex-grow: 1; padding: 4px 5px; border: none; background-color: transparent; color: #333; font-size: 0.9em; min-width: 120px; outline: none; }
+        #related-suggestions-list { display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 100; background-color: #fff; border: 1px solid #ccc; border-top: none; border-radius: 0 0 4px 4px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-height: 180px; overflow-y: auto; }
+        #related-suggestions-list .suggestion-item { display: flex; padding: 6px 10px; color: #333; cursor: pointer; align-items: center; gap: 8px; font-size: 0.9em; }
+        #related-suggestions-list .suggestion-item:hover { background-color: #f0f0f0; }
+        #related-suggestions-list .suggestion-item.no-results { cursor: default; color: #888; justify-content: center; }
+        #related-suggestions-list .suggestion-item img { width: 25px; height: 25px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
 
-         .actress-item.selected {
-            background-color: #e0e0e0;
-            font-weight: bold;
-        }
-
-        .actress-item img {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: 50%;
-            margin-right: 10px;
-        }
-
-        .actress-info span {
-            display: block;
-            font-size: 0.9em;
-        }
-         .actress-info .name {
-            font-weight: bold;
-            font-size: 1em;
-         }
-         .actress-info .age,
-         .actress-info .rating {
-            color: #555;
-         }
-
-
-        /* Actress Detail Styling */
-        #actress-details h3 {
-            margin-top: 0;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
-        }
-         #actress-details div {
-             margin-bottom: 8px;
-             word-wrap: break-word; /* Prevent long strings from overflowing */
-         }
-         #actress-details strong {
-            display: inline-block;
-            min-width: 100px; /* Align keys */
-            color: #333;
-         }
-         #actress-details img.detail-photo {
-             max-width: 200px; /* Limit width */
-             max-height: 250px; /* Optional: Limit height */
-             width: auto; /* Maintain aspect ratio */
-             height: auto; /* Maintain aspect ratio */
-             border-radius: 4px;
-             margin-top: 10px;
-             display: block; /* Ensure it takes block layout */
-         }
-
-
-        /* Content Card Styling */
-        #content-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Responsive grid */
-            gap: 15px;
-        }
-
-        .content-card {
-            background-color: #f9f9f9;
-            border: 1px solid #eee;
-            border-radius: 4px;
-            overflow: hidden;
-            text-align: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            cursor: pointer; /* Indicate clickable */
-        }
-
-        .content-card img {
-            width: 100%;
-            height: 180px; /* Fixed height for consistency */
-            object-fit: cover;
-            display: block;
-        }
-
-        .content-card .title {
-            padding: 8px;
-            font-size: 0.9em;
-            min-height: 40px; /* Ensure space for title */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-         /* Loading/Error indicators */
-         .loading, .error {
-             text-align: center;
-             padding: 20px;
-             color: #888;
-         }
-
-        /* --- Modal Styling --- */
-        .modal-overlay {
-            position: fixed; /* Stay in place */
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.6); /* Black background with opacity */
-            z-index: 1000; /* Sit on top */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        .modal-content {
-            background-color: #fff;
-            padding: 25px;
-            border-radius: 5px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            max-width: 700px; /* Adjusted max width */
-            width: 90%;
-            position: relative;
-            max-height: 85vh; /* Limit modal height */
-            overflow-y: auto; /* Add scroll if content is tall */
-        }
-
-        .modal-close-button {
+        /* --- Content Cards Grid (Right Column) --- */
+        #content-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; flex-grow: 1; overflow-y: auto; align-content: start; /* Align items to top */ }
+        .content-card { background-color: #f9f9f9; border: 1px solid #eee; border-radius: 4px; overflow: hidden; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); cursor: pointer; transition: box-shadow 0.2s ease; position: relative; /* Needed for badge */ }
+        .content-card:hover { box-shadow: 0 3px 6px rgba(0,0,0,0.1); }
+        .content-card .image-container { position: relative; width: 100%; height: 180px; }
+        .content-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        /* --- NEW: Content Type Badge --- */
+        .content-type-badge {
             position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 28px;
+            top: 5px;
+            left: 5px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 3px 6px;
+            font-size: 0.75em;
             font-weight: bold;
-            color: #aaa;
+            border-radius: 3px;
+            z-index: 1;
+        }
+        .content-card .title { padding: 8px; font-size: 0.9em; min-height: 40px; display: flex; align-items: center; justify-content: center; line-height: 1.3; }
+        #content-message { grid-column: 1 / -1; /* Span full grid width */ }
+
+
+        /* --- Main Modal Styling --- */
+        .modal-overlay { /* ... keep previous styles ... */
+            position: fixed; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: 1000; display: flex; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
+        }
+        .modal-content { /* ... keep previous styles ... */
+             background-color: #fff; padding: 25px; border-radius: 5px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); max-width: 700px; width: 90%; position: relative; max-height: 85vh; overflow-y: auto; display: flex; flex-direction: column;
+        }
+        .modal-close-button { /* ... keep previous styles ... */
+            position: absolute; top: 10px; right: 15px; font-size: 28px; font-weight: bold; color: #aaa; cursor: pointer; line-height: 1;
+        }
+        .modal-close-button:hover { color: #333; }
+        #modal-body { flex-grow: 1; overflow-y: auto; padding-right: 5px; /* space for scrollbar */ }
+        #modal-body div:not(.modal-actress-list-container):not(.modal-scenes-container) { margin-bottom: 8px; word-wrap: break-word; } /* Avoid double margin */
+        #modal-body strong { display: inline-block; min-width: 80px; color: #333; }
+        #modal-link-container button { /* ... keep previous styles ... */
+            padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1em;
+        }
+        #modal-link-container button:hover { background-color: #0056b3; }
+        #modal-body img.modal-detail-image { /* ... keep previous styles ... */
+            max-width: 100%; height: auto; max-height: 300px; margin-top: 10px; border-radius: 4px; display: block; margin-left: auto; margin-right: auto; margin-bottom: 15px;
+        }
+        #modal-body img.modal-detail-image.movie-image { max-width: 250px; max-height: 250px; }
+        #modal-body .modal-year { font-size: 1.1em; color: #555; margin-bottom: 15px; }
+        .modal-actress-list-container, .modal-scenes-container { /* ... keep previous styles ... */
+             margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;
+        }
+        .modal-actress-list-container h4, .modal-scenes-container h4 { margin-top: 0; margin-bottom: 10px; color: #333; }
+        .modal-actress-list { /* ... keep previous styles ... */
+            display: flex; flex-wrap: wrap; gap: 15px; padding: 0; list-style: none;
+        }
+        .modal-actress-item { /* ... keep previous styles ... */
+            display: flex; flex-direction: column; align-items: center; text-align: center; cursor: pointer; padding: 5px; border-radius: 4px; transition: background-color 0.2s ease; max-width: 80px;
+        }
+        .modal-actress-item:hover { background-color: #f0f0f0; }
+        .modal-actress-item img { /* ... keep previous styles ... */
+             width: 60px; height: 60px; object-fit: cover; border-radius: 50%; margin-bottom: 5px;
+        }
+        .modal-actress-item span { font-size: 0.85em; word-wrap: break-word; line-height: 1.2; max-width: 100%;}
+        .modal-scene-cards { /* ... keep previous styles ... */
+             display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px;
+        }
+        .modal-scene-card { /* ... keep previous styles ... */
+            background-color: #f9f9f9; border: 1px solid #eee; border-radius: 4px; overflow: hidden; text-align: center; font-size: 0.8em;
+        }
+        .modal-scene-card img { /* ... keep previous styles ... */
+             width: 100%; height: 80px; object-fit: cover; display: block;
+        }
+        .modal-scene-card .title { /* ... keep previous styles ... */
+            padding: 5px; min-height: 25px; display: flex; align-items: center; justify-content: center;
+        }
+        /* REMOVED Back button container - no longer needed */
+
+        /* --- Movable Actress Popup Styling --- */
+        .actress-popup {
+            position: fixed; /* Use fixed to position relative to viewport */
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 1050; /* Above modal overlay */
+            width: 220px; /* Small fixed width */
+            max-height: 350px; /* Limit height */
+            overflow: hidden; /* Hide overflow initially */
+            display: flex;
+            flex-direction: column;
+            /* Initial position set by JS */
+            cursor: grab; /* Indicate draggable */
+            user-select: none; /* Prevent text selection during drag */
+        }
+        .actress-popup.dragging {
+            cursor: grabbing;
+            opacity: 0.9;
+        }
+        .actress-popup-header {
+            background-color: #f0f0f0;
+            padding: 6px 10px;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .actress-popup-header h5 {
+            margin: 0;
+            font-size: 0.95em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex-grow: 1;
+            padding-right: 5px;
+        }
+        .actress-popup-close {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #888;
             cursor: pointer;
+            border: none;
+            background: none;
+            padding: 0 5px;
             line-height: 1;
         }
+        .actress-popup-close:hover { color: #333; }
+        .actress-popup-body {
+            padding: 10px;
+            overflow-y: auto; /* Scroll if content exceeds max-height */
+            font-size: 0.85em;
+            flex-grow: 1;
+        }
+        .actress-popup-body img {
+            width: 80px; /* Smaller image */
+            height: 80px;
+            object-fit: cover;
+            border-radius: 50%;
+            display: block;
+            margin: 0 auto 10px auto;
+        }
+        .actress-popup-body div { margin-bottom: 5px; }
+        .actress-popup-body strong { display: inline-block; min-width: 60px; color: #444; }
 
-        .modal-close-button:hover {
-            color: #333;
-        }
-
-        #modal-body div {
-            margin-bottom: 8px;
-            word-wrap: break-word;
-        }
-        #modal-body strong {
-           display: inline-block;
-           min-width: 80px; /* Align keys in modal */
-           color: #333;
-        }
-        #modal-link-container button {
-            padding: 10px 15px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1em;
-        }
-        #modal-link-container button:hover {
-            background-color: #0056b3;
-        }
-
-        /* Image Styling in Modal */
-        #modal-body img.modal-detail-image {
-            max-width: 100%; /* Default max width */
-            height: auto;
-            max-height: 300px; /* Limit height */
-            margin-top: 10px;
-            border-radius: 4px;
-            display: block; /* Center if needed */
-            margin-left: auto;
-            margin-right: auto;
-            margin-bottom: 15px;
-        }
-         /* Specific style for smaller movie images in modal */
-        #modal-body img.modal-detail-image.movie-image {
-            max-width: 250px; /* Smaller max width for movies */
-             max-height: 250px;
-        }
-
-        /* Year Display */
-        #modal-body .modal-year {
-            font-size: 1.1em;
-            color: #555;
-            margin-bottom: 15px;
-        }
-
-        /* Actresses List in Modal */
-        .modal-actress-list-container {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid #eee;
-        }
-        .modal-actress-list-container h4 {
-            margin-top: 0;
-            margin-bottom: 10px;
-            color: #333;
-        }
-         .modal-actress-list {
-             display: flex;
-             flex-wrap: wrap;
-             gap: 15px; /* Spacing between actresses */
-             padding: 0;
-             list-style: none;
-         }
-         .modal-actress-item {
-             display: flex;
-             flex-direction: column; /* Stack image and name */
-             align-items: center;
-             text-align: center;
-             cursor: pointer;
-             padding: 5px;
-             border-radius: 4px;
-             transition: background-color 0.2s ease;
-             max-width: 80px; /* Control width */
-         }
-          .modal-actress-item:hover {
-              background-color: #f0f0f0;
-          }
-         .modal-actress-item img {
-             width: 60px; /* Size of actress image */
-             height: 60px;
-             object-fit: cover;
-             border-radius: 50%;
-             margin-bottom: 5px;
-         }
-         .modal-actress-item span {
-             font-size: 0.85em;
-             word-wrap: break-word; /* Allow name wrapping */
-             line-height: 1.2;
-             max-width: 100%;
-         }
-
-        /* Movie Scenes List in Modal */
-        .modal-scenes-container {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid #eee;
-        }
-        .modal-scenes-container h4 {
-            margin-top: 0;
-            margin-bottom: 10px;
-            color: #333;
-        }
-        .modal-scene-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* Responsive grid */
-            gap: 10px;
-        }
-        .modal-scene-card {
-            background-color: #f9f9f9;
-            border: 1px solid #eee;
-            border-radius: 4px;
-            overflow: hidden;
-            text-align: center;
-            font-size: 0.8em;
-        }
-         .modal-scene-card img {
-             width: 100%;
-             height: 80px; /* Smaller height for scene thumbs */
-             object-fit: cover;
-             display: block;
-         }
-         .modal-scene-card .title {
-             padding: 5px;
-             min-height: 25px;
-             display: flex;
-             align-items: center;
-             justify-content: center;
-         }
-
-         /* Back Button Styling */
-         #modal-back-button-container button {
-             padding: 8px 12px;
-             background-color: #6c757d; /* Grey color */
-             color: white;
-             border: none;
-             border-radius: 4px;
-             cursor: pointer;
-             font-size: 0.9em;
-             margin-right: 10px; /* Space between back and external link */
-         }
-         #modal-back-button-container button:hover {
-             background-color: #5a6268;
-         }
     </style>
 </head>
 <body>
     <div class="container" id="main-container">
+        <!-- Left Column: Actress List -->
         <div class="column" id="actress-list-col">
             <h2>Atrizes</h2>
             <ul id="actress-list">
-                <li class="loading">Carregando atrizes...</li>
+                <li class="loading">Carregando...</li>
             </ul>
         </div>
+
+        <!-- Middle Column: Actress Details -->
         <div class="column" id="actress-detail-col">
+            <h2>Detalhes da Atriz</h2>
             <div id="actress-details">
-                <!-- Details will be loaded here -->
+                <!-- Details loaded here -->
             </div>
         </div>
+
+        <!-- Right Column: Related Content -->
         <div class="column" id="content-col">
-            <h2>Conteúdo Relacionado</h2>
-            <div id="content-cards">
-                <!-- Content cards will be loaded here -->
+             <!-- NEW: Search and Filter Header -->
+            <div id="content-col-header">
+                <div class="related-filter-buttons">
+                    <button class="related-filter-btn active" data-filter="all">Todos</button>
+                    <button class="related-filter-btn" data-filter="video">Vídeos</button>
+                    <button class="related-filter-btn" data-filter="film">Filmes</button>
+                    <button class="related-filter-btn" data-filter="scene">Cenas</button>
+                </div>
+                <div class="related-actress-search-area">
+                    <div class="related-search-input-wrapper" onclick="document.getElementById('related-search-input').focus()">
+                        <div id="related-selected-actresses"></div>
+                        <input type="text" id="related-search-input" class="related-search-input" placeholder="Filtrar por co-atriz...">
+                    </div>
+                    <div id="related-suggestions-list"></div>
+                </div>
             </div>
-             <div id="content-message" class="loading" style="display: none;"></div>
+            <!-- End Search and Filter Header -->
+
+            <h2 class="related-title">Conteúdo Relacionado</h2>
+            <div id="content-cards">
+                <!-- Content cards loaded here -->
+            </div>
+            <div id="content-message" class="loading" style="display: none;"></div>
         </div>
     </div>
 
-     <!-- Modal Structure (Initially Hidden) -->
+     <!-- Main Modal Structure (for Content Details) -->
     <div id="content-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <span class="modal-close-button" onclick="closeModal()">×</span>
-            <h3 id="modal-title">Detalhes do Conteúdo</h3>
-            <div id="modal-body">
-                <!-- Content details will be loaded here -->
+            <h3 id="modal-title">Detalhes</h3>
+            <div id="modal-body"> <!-- Content details loaded here --> </div>
+            <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 15px;">
+                <!-- Back button removed -->
+                <div id="modal-link-container"> <!-- External link button added here --> </div>
             </div>
-            <!-- Button Container at the bottom -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; flex-wrap: wrap; gap: 10px;">
-                <div id="modal-back-button-container">
-                     <!-- Back button will be added here -->
-                </div>
-                <div id="modal-link-container">
-                    <!-- External link button will be added here -->
-                </div>
-            </div>
+        </div>
+    </div>
+
+    <!-- Template for Movable Actress Popups (Initially Hidden) -->
+    <div id="actress-popup-template" class="actress-popup" style="display: none;">
+        <div class="actress-popup-header">
+            <h5>Nome Atriz</h5>
+            <button class="actress-popup-close">×</button>
+        </div>
+        <div class="actress-popup-body">
+            <!-- Actress details will be loaded here -->
         </div>
     </div>
 
 
     <!-- Firebase SDK -->
     <script type="module">
-        // Import the functions you need from the SDKs you need
+        // --- Imports ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // --- SINGLE DECLARATION of Firebase Config ---
+        // --- Firebase Config ---
         const firebaseConfig = {
-            apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0",
-            authDomain: "babes-392fd.firebaseapp.com",
-            projectId: "babes-392fd",
-            storageBucket: "babes-392fd.appspot.com",
-            messagingSenderId: "376795361631",
-            appId: "1:376795361631:web:d662f2b2f2cd23b115c6ea"
+             apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0", authDomain: "babes-392fd.firebaseapp.com",
+             projectId: "babes-392fd", storageBucket: "babes-392fd.appspot.com",
+             messagingSenderId: "376795361631", appId: "1:376795361631:web:d662f2b2f2cd23b115c6ea"
         };
-
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
         // --- DOM Elements ---
         const mainContainer = document.getElementById('main-container');
-        const actressList = document.getElementById('actress-list');
+        const actressListUl = document.getElementById('actress-list'); // Renamed for clarity
         const actressDetailsContainer = document.getElementById('actress-details');
         const contentCardsContainer = document.getElementById('content-cards');
         const contentMessage = document.getElementById('content-message');
@@ -435,51 +301,49 @@
         const modalTitle = document.getElementById('modal-title');
         const modalBody = document.getElementById('modal-body');
         const modalLinkContainer = document.getElementById('modal-link-container');
-        const modalBackButtonContainer = document.getElementById('modal-back-button-container');
+        // Right Column Filter/Search Elements
+        const relatedFilterButtons = document.querySelectorAll('.related-filter-btn');
+        const relatedSearchInput = document.getElementById('related-search-input');
+        const relatedSuggestionsList = document.getElementById('related-suggestions-list');
+        const relatedSelectedActressesContainer = document.getElementById('related-selected-actresses');
+        const relatedSearchInputWrapper = document.querySelector('.related-search-input-wrapper');
 
-        let selectedActressElement = null;
-        let previousModalState = null; // To store { type, id } for back button
+        // --- State Variables ---
+        let selectedMainActressElement = null; // For left column selection highlight
+        let currentMainActressId = null; // ID of the actress selected in the left column
+        let allActressesData = []; // Cache for all actress data {id, nome, foto, ...}
+        let allRelatedContent = []; // Cache for content related to the main selected actress
+        let filteredRelatedContent = []; // Content currently displayed in the right column after filtering
+        let selectedRelatedActresses = []; // Actresses selected in the right column's search bar
+        let activeRelatedFilter = 'all'; // 'all', 'video', 'film', 'scene'
+        let popupCounter = 0; // To position new popups
 
-        // --- Helper Functions ---
-        function calculateAge(birthDateString) {
-            if (!birthDateString) return '?';
-            try {
-                const birthDate = new Date(birthDateString);
-                const today = new Date();
-                let age = today.getFullYear() - birthDate.getFullYear();
-                const m = today.getMonth() - birthDate.getMonth();
-                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-                    age--;
-                }
-                return age;
-            } catch (e) { console.error("Error parsing date:", birthDateString, e); return '?'; }
+        // --- Helper Functions (calculateAge, displayMessage, clearMessage) ---
+        function calculateAge(birthDateString) { /* ... (same as before) ... */
+             if (!birthDateString) return '?'; try { const birthDate = new Date(birthDateString); const today = new Date(); let age = today.getFullYear() - birthDate.getFullYear(); const m = today.getMonth() - birthDate.getMonth(); if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) { age--; } return age; } catch (e) { console.error("Date parse error:", e); return '?'; }
         }
-
-        function displayMessage(element, message, isError = false) {
-             element.innerHTML = `<div class="${isError ? 'error' : 'loading'}">${message}</div>`;
-             element.style.display = 'block';
+        function displayMessage(element, message, isError = false) { /* ... (same as before) ... */
+             element.innerHTML = `<div class="${isError ? 'error' : 'loading'}">${message}</div>`; element.style.display = 'block';
         }
-
-        function clearMessage(element) {
-            element.innerHTML = '';
-            element.style.display = 'none';
+        function clearMessage(element) { /* ... (same as before) ... */
+             element.innerHTML = ''; element.style.display = 'none';
         }
 
         // --- Core Logic ---
 
-        // 1. Load Actresses List (Sorted)
-        async function loadActresses() {
-            actressList.innerHTML = '<li class="loading">Carregando atrizes...</li>';
+        // 1. Load ALL Actresses (on page load)
+        async function loadAllActresses() {
+            actressListUl.innerHTML = '<li class="loading">Carregando...</li>';
             try {
                 const querySnapshot = await getDocs(collection(db, "atores"));
-                actressList.innerHTML = '';
-                if (querySnapshot.empty) { actressList.innerHTML = '<li class="error">Nenhuma atriz encontrada.</li>'; return; }
+                actressListUl.innerHTML = '';
+                if (querySnapshot.empty) { actressListUl.innerHTML = '<li class="error">Nenhuma atriz encontrada.</li>'; return; }
 
-                const actresses = [];
-                querySnapshot.forEach((doc) => actresses.push({ id: doc.id, ...doc.data() }));
-                actresses.sort((a, b) => (a.nome || '').localeCompare(b.nome || '')); // Sort
+                allActressesData = []; // Clear cache
+                querySnapshot.forEach((doc) => allActressesData.push({ id: doc.id, ...doc.data() }));
+                allActressesData.sort((a, b) => (a.nome || '').localeCompare(b.nome || '')); // Sort
 
-                actresses.forEach(actress => {
+                allActressesData.forEach(actress => {
                     const li = document.createElement('li');
                     li.classList.add('actress-item');
                     li.dataset.id = actress.id;
@@ -487,36 +351,51 @@
                     const imageUrl = actress.foto || 'placeholder.png';
                     const rating = actress.nota !== undefined ? actress.nota : 'N/A';
                     li.innerHTML = `
-                        <img src="${imageUrl}" alt="${actress.nome}" onerror="this.src='placeholder.png'; this.onerror=null;">
+                        <img src="${imageUrl}" alt="${actress.nome || ''}" onerror="this.src='placeholder.png'; this.onerror=null;">
                         <div class="actress-info">
-                            <span class="name">${actress.nome || 'Nome Indisponível'}</span>
+                            <span class="name">${actress.nome || 'Nome Ind.'}</span>
                             <span class="age">Idade: ${age}</span>
                             <span class="rating">Nota: ${rating}</span>
                         </div>`;
-                    li.addEventListener('click', () => handleActressClick(actress.id, li));
-                    actressList.appendChild(li);
+                    li.addEventListener('click', () => handleMainActressClick(actress.id, li));
+                    actressListUl.appendChild(li);
                 });
+                console.log(`Loaded ${allActressesData.length} actresses.`);
             } catch (error) {
                 console.error("Erro ao buscar atrizes: ", error);
-                actressList.innerHTML = '<li class="error">Erro ao carregar atrizes.</li>';
+                actressListUl.innerHTML = '<li class="error">Erro ao carregar.</li>';
             }
         }
 
-        // 2. Handle Actress Click (Main List)
-        async function handleActressClick(actressId, listItemElement) {
-            if (selectedActressElement) selectedActressElement.classList.remove('selected');
+        // 2. Handle Main Actress Click (Left Column)
+        async function handleMainActressClick(actressId, listItemElement) {
+            if (selectedMainActressElement) selectedMainActressElement.classList.remove('selected');
             listItemElement.classList.add('selected');
-            selectedActressElement = listItemElement;
+            selectedMainActressElement = listItemElement;
+            currentMainActressId = actressId; // Store the selected main actress ID
             mainContainer.classList.add('details-visible');
-            actressDetailsContainer.innerHTML = '<div class="loading">Carregando detalhes...</div>';
+            actressDetailsContainer.innerHTML = '<div class="loading">Carregando...</div>';
             contentCardsContainer.innerHTML = '';
             displayMessage(contentMessage, 'Carregando conteúdo...');
+            // Reset right column filters/search
+            selectedRelatedActresses = [];
+            activeRelatedFilter = 'all';
+            if(relatedSearchInput) relatedSearchInput.value = '';
+            renderRelatedActressPills();
+            relatedFilterButtons.forEach(btn => btn.classList.remove('active'));
+            document.querySelector('.related-filter-btn[data-filter="all"]')?.classList.add('active');
+
 
             try {
-                const actressDoc = await getDoc(doc(db, "atores", actressId));
-                if (actressDoc.exists()) displayActressDetails(actressDoc.data());
-                else actressDetailsContainer.innerHTML = '<div class="error">Detalhes da atriz não encontrados.</div>';
-                await loadRelatedContent(actressId);
+                const actressData = allActressesData.find(a => a.id === actressId); // Use cached data if available
+                if (actressData) {
+                    displayMainActressDetails(actressData);
+                } else { // Fetch if not in cache (shouldn't happen with current flow)
+                    const actressDoc = await getDoc(doc(db, "atores", actressId));
+                    if (actressDoc.exists()) displayMainActressDetails(actressDoc.data());
+                    else actressDetailsContainer.innerHTML = '<div class="error">Detalhes não encontrados.</div>';
+                }
+                await loadAndDisplayRelatedContent(actressId); // Load content for the right column
             } catch (error) {
                 console.error(`Erro ao carregar dados para atriz ${actressId}: `, error);
                 actressDetailsContainer.innerHTML = '<div class="error">Erro ao carregar detalhes.</div>';
@@ -524,356 +403,465 @@
             }
         }
 
-        // 3. Display Actress Details (Main Column)
-        function displayActressDetails(data) {
+        // 3. Display Main Actress Details (Middle Column)
+        function displayMainActressDetails(data) { /* ... (same as before, function renamed) ... */
             actressDetailsContainer.innerHTML = '';
-            const detailsTitle = document.createElement('h3');
-            detailsTitle.textContent = data.nome || 'Detalhes';
-            actressDetailsContainer.appendChild(detailsTitle);
-
-            if (data.foto) { /* ... Add image ... */
-                const img = document.createElement('img');
-                img.src = data.foto; img.alt = data.nome; img.classList.add('detail-photo');
-                img.onerror = () => { img.style.display = 'none'; };
-                actressDetailsContainer.appendChild(img);
-            }
-
-            const skipFields = ['foto', 'nome', 'cenas', 'filmes', 'videos', 'timestamp'];
-            let detailsAdded = false;
-            for (const key in data) {
-                if (data.hasOwnProperty(key) && !skipFields.includes(key)) {
-                    detailsAdded = true;
-                    const detailDiv = document.createElement('div');
-                    let value = data[key]; let label = key;
-
-                    if (key === 'dataNascimento') {
-                        detailDiv.innerHTML = `<strong>${label}:</strong> ${value || 'N/A'}`;
-                        actressDetailsContainer.appendChild(detailDiv);
-                        const ageDiv = document.createElement('div');
-                        ageDiv.innerHTML = `<strong>Idade:</strong> ${calculateAge(value)}`;
-                        actressDetailsContainer.appendChild(ageDiv);
-                        continue;
-                    }
-                    else if (key === 'peso' && value !== undefined && value !== null) { value = `${value} kg`; }
-                    else if (key === 'altura' && value !== undefined && value !== null) { value = `${value} cm`; }
-                    detailDiv.innerHTML = `<strong>${label}:</strong> ${value}`;
-                    actressDetailsContainer.appendChild(detailDiv);
-                }
-            }
-             if (!detailsAdded) {
-                 const noDetailsDiv = document.createElement('div');
-                 noDetailsDiv.textContent = 'Nenhum detalhe adicional disponível.';
-                 actressDetailsContainer.appendChild(noDetailsDiv);
-            }
+            const detailsTitle = document.createElement('h3'); detailsTitle.textContent = data.nome || 'Detalhes'; actressDetailsContainer.appendChild(detailsTitle);
+            if (data.foto) { const img = document.createElement('img'); img.src = data.foto; img.alt = data.nome; img.classList.add('detail-photo'); img.onerror = () => { img.style.display = 'none'; }; actressDetailsContainer.appendChild(img); }
+            const skipFields = ['foto', 'nome', 'cenas', 'filmes', 'videos', 'timestamp']; let detailsAdded = false;
+            for (const key in data) { if (data.hasOwnProperty(key) && !skipFields.includes(key)) { detailsAdded = true; const detailDiv = document.createElement('div'); let value = data[key]; let label = key; if (key === 'dataNascimento') { detailDiv.innerHTML = `<strong>${label}:</strong> ${value || 'N/A'}`; actressDetailsContainer.appendChild(detailDiv); const ageDiv = document.createElement('div'); ageDiv.innerHTML = `<strong>Idade:</strong> ${calculateAge(value)}`; actressDetailsContainer.appendChild(ageDiv); continue; } else if (key === 'peso' && value !== undefined && value !== null) { value = `${value} kg`; } else if (key === 'altura' && value !== undefined && value !== null) { value = `${value} cm`; } detailDiv.innerHTML = `<strong>${label}:</strong> ${value}`; actressDetailsContainer.appendChild(detailDiv); } }
+            if (!detailsAdded) { const noDetailsDiv = document.createElement('div'); noDetailsDiv.textContent = 'Nenhum detalhe adicional.'; actressDetailsContainer.appendChild(noDetailsDiv); }
         }
 
-        // 4. Load Related Content (Right Column)
-        async function loadRelatedContent(actressId) {
-            contentCardsContainer.innerHTML = '';
-            let contentFound = false;
-            try {
-                const collectionsToSearch = ['cenas', 'videos'];
-                const movieCheckPromises = [];
 
-                // Search Cenas and Videos
+        // --- Related Content Loading and Filtering (Right Column) ---
+
+        // 4. Load Initial Related Content (Called on Main Actress Click)
+        async function loadAndDisplayRelatedContent(mainActressId) {
+            allRelatedContent = []; // Clear previous related content cache
+            filteredRelatedContent = [];
+            contentCardsContainer.innerHTML = ''; // Clear display
+            displayMessage(contentMessage, 'Buscando conteúdo...');
+
+            try {
+                const collectionsToSearch = ['cenas', 'videos', 'filmes'];
+                const contentPromises = [];
+
                 for (const collName of collectionsToSearch) {
-                    const snapshot = await getDocs(collection(db, collName));
-                    snapshot.forEach(docSnap => {
-                        const itemData = docSnap.data();
-                        if (itemData.atores && Array.isArray(itemData.atores) && itemData.atores.includes(actressId)) {
-                            createContentCard(itemData.imagem, itemData.nome, collName === 'cenas' ? 'Cena' : 'Vídeo', docSnap.id);
-                            contentFound = true;
-                        }
-                    });
+                    contentPromises.push(getDocs(collection(db, collName)).then(snapshot => {
+                        snapshot.forEach(docSnap => {
+                            const itemData = docSnap.data();
+                            let isRelated = false;
+                            let type = collName.slice(0, -1); // 'cena', 'video', 'filme' -> 'film'
+                             if(collName === 'filmes') type = 'film'; // Correct type
+
+                            if (collName === 'filmes') {
+                                // For movies, check if ANY of its scenes contain the main actress
+                                // This requires an *additional* async check per movie if not cached
+                                // For simplicity here, we assume movie data might already have actress IDs
+                                // or we rely on a simplified check. A full check is more complex.
+                                // Let's assume 'filmes' collection DOES NOT directly link actresses for now.
+                                // We will link them via scenes later if needed.
+                                // If a movie structure *guarantees* a scene list, we'd check those scenes.
+                                // --> Let's stick to checking 'cenas' and 'videos' for direct relation for now.
+                            } else {
+                                // Check Cenas and Videos directly
+                                if (itemData.atores && Array.isArray(itemData.atores) && itemData.atores.includes(mainActressId)) {
+                                    isRelated = true;
+                                }
+                            }
+
+                             // ADD CHECK FOR MOVIES BASED ON THEIR SCENES
+                             if(type === 'film' && itemData.cenas && Array.isArray(itemData.cenas)) {
+                                 // This part needs careful implementation - potentially pre-fetch all scenes
+                                 // or do lookups. Let's add a flag for now.
+                                 // To make this work efficiently, we'd ideally have all scene data available.
+                                 // --> Let's add movie content later if needed, focus on scene/video first.
+                             }
+
+
+                            if (isRelated && (type === 'scene' || type === 'video')) { // Only add scenes/videos for now
+                                allRelatedContent.push({ id: docSnap.id, type: type, ...itemData });
+                            }
+                        });
+                    }));
                 }
 
-                // Prepare Movie Checks
-                const filmesSnapshot = await getDocs(collection(db, "filmes"));
-                filmesSnapshot.forEach(filmeDoc => {
-                    const filmeData = filmeDoc.data();
-                    if (filmeData.cenas && Array.isArray(filmeData.cenas) && filmeData.cenas.length > 0) {
-                        const checkMoviePromise = async () => {
-                            for (const cenaRef of filmeData.cenas) {
-                                if (typeof cenaRef === 'string' && cenaRef.trim() !== '') {
-                                     try {
-                                        const cenaDocSnap = await getDoc(doc(db, "cenas", cenaRef));
-                                        if (cenaDocSnap.exists()) {
-                                            const cenaData = cenaDocSnap.data();
-                                             if (cenaData.atores && Array.isArray(cenaData.atores) && cenaData.atores.includes(actressId)) {
-                                                 return { found: true, data: filmeData, id: filmeDoc.id };
-                                             }
-                                        }
-                                     } catch(sceneError) { console.error(`Error checking scene ${cenaRef} for movie ${filmeDoc.id}:`, sceneError); }
-                                }
-                            } return { found: false };
-                        };
-                        movieCheckPromises.push(checkMoviePromise());
-                    }
-                });
+                 // Fetch all scenes separately to check movie relations
+                 const allScenesData = new Map();
+                 await getDocs(collection(db, "cenas")).then(snapshot => {
+                     snapshot.forEach(docSnap => allScenesData.set(docSnap.id, docSnap.data()));
+                 });
 
-                // Execute Movie Checks
-                const movieResults = await Promise.all(movieCheckPromises);
-                movieResults.forEach(result => {
-                    if (result.found) {
-                        createContentCard(result.data.imagem, result.data.nome, 'Filme', result.id);
-                        contentFound = true;
-                    }
-                });
+                 // Now check movies
+                 await getDocs(collection(db, "filmes")).then(snapshot => {
+                     snapshot.forEach(docSnap => {
+                         const movieData = docSnap.data();
+                         let movieIsRelated = false;
+                         if (movieData.cenas && Array.isArray(movieData.cenas)) {
+                             for (const sceneId of movieData.cenas) {
+                                 const sceneData = allScenesData.get(sceneId);
+                                 if (sceneData && sceneData.atores && Array.isArray(sceneData.atores) && sceneData.atores.includes(mainActressId)) {
+                                     movieIsRelated = true;
+                                     break; // Found one related scene, movie is related
+                                 }
+                             }
+                         }
+                         if (movieIsRelated) {
+                             allRelatedContent.push({ id: docSnap.id, type: 'film', ...movieData });
+                         }
+                     });
+                 });
 
-                if (!contentFound) displayMessage(contentMessage,'Nenhum conteúdo encontrado para esta atriz.');
-                else clearMessage(contentMessage);
+
+                // Wait for all initial fetches (excluding detailed movie checks for now)
+                await Promise.all(contentPromises);
+
+                console.log(`Found ${allRelatedContent.length} potentially related items for ${mainActressId}`);
+                applyRelatedContentFilters(); // Initial display
 
             } catch (error) {
-                console.error("Erro geral ao buscar conteúdo relacionado: ", error);
-                displayMessage(contentMessage,'Erro ao carregar conteúdo relacionado.', true);
+                console.error("Erro ao buscar conteúdo relacionado: ", error);
+                displayMessage(contentMessage, 'Erro ao carregar conteúdo.', true);
             }
         }
 
-        // 5. Create Content Card HTML (Right Column)
+        // 5. Apply Filters and Render Related Content (Right Column)
+        function applyRelatedContentFilters() {
+            contentCardsContainer.innerHTML = ''; // Clear existing cards
+            clearMessage(contentMessage);
+
+            const relatedActressIds = selectedRelatedActresses.map(a => a.id);
+
+            filteredRelatedContent = allRelatedContent.filter(item => {
+                // 1. Filter by Type (All, Video, Film, Scene)
+                if (activeRelatedFilter !== 'all' && item.type !== activeRelatedFilter) {
+                    return false;
+                }
+
+                // 2. Filter by Selected Co-Stars
+                if (relatedActressIds.length > 0) {
+                    if (!item.atores || !Array.isArray(item.atores)) return false; // Item must have actors to match co-stars
+                    // Check if ALL selected related actresses are present in the item's actors
+                    const itemActressIds = item.atores;
+                    if (!relatedActressIds.every(relId => itemActressIds.includes(relId))) {
+                        return false;
+                    }
+                }
+                return true; // Passed all filters
+            });
+
+            // Sort filtered content (e.g., by year or name) - Optional
+            filteredRelatedContent.sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
+
+
+            if (filteredRelatedContent.length > 0) {
+                filteredRelatedContent.forEach(item => {
+                    createContentCard(item.imagem, item.nome, item.type, item.id);
+                });
+            } else {
+                displayMessage(contentMessage, 'Nenhum conteúdo encontrado com os filtros aplicados.');
+            }
+        }
+
+        // 6. Create Content Card HTML (Right Column - with Badge)
         function createContentCard(imageUrl, title, type, id) {
             const card = document.createElement('div');
             card.classList.add('content-card');
             card.dataset.type = type; card.dataset.id = id;
 
+            const imageContainer = document.createElement('div');
+            imageContainer.classList.add('image-container');
+
             const img = document.createElement('img');
             let finalImageUrl = imageUrl;
-            if (typeof imageUrl === 'object' && imageUrl !== null && imageUrl.width) { /* Extract URL */
-                const urlKey = Object.keys(imageUrl).find(k => typeof imageUrl[k] === 'string' && imageUrl[k].startsWith('http'));
-                finalImageUrl = urlKey ? imageUrl[urlKey] : 'placeholder.png';
-            } else if (typeof imageUrl !== 'string' || !imageUrl) { finalImageUrl = 'placeholder.png'; }
+            if (typeof imageUrl === 'object' && imageUrl !== null && imageUrl.width) { const urlKey = Object.keys(imageUrl).find(k=>typeof imageUrl[k]==='string'&&imageUrl[k].startsWith('http')); finalImageUrl = urlKey ? imageUrl[urlKey] : 'placeholder.png';}
+            else if (typeof imageUrl !== 'string' || !imageUrl) { finalImageUrl = 'placeholder.png'; }
             img.src = finalImageUrl; img.alt = title || type;
             img.onerror = () => { img.src = 'placeholder.png'; img.onerror=null; }
 
+            // --- ADD BADGE ---
+            const badge = document.createElement('div');
+            badge.classList.add('content-type-badge');
+            let badgeText = type.charAt(0).toUpperCase() + type.slice(1);
+            if(type === 'film') badgeText = 'Filme';
+            else if(type === 'scene') badgeText = 'Cena';
+            else if(type === 'video') badgeText = 'Vídeo';
+            badge.textContent = badgeText;
+            imageContainer.appendChild(badge);
+            // --- END BADGE ---
+
+            imageContainer.appendChild(img);
+
             const titleDiv = document.createElement('div');
             titleDiv.classList.add('title');
-            titleDiv.textContent = `${title || 'Sem Título'}`; // Display only title on card
+            titleDiv.textContent = `${title || 'Sem Título'}`;
 
-            card.appendChild(img); card.appendChild(titleDiv);
-            card.addEventListener('click', () => showContentDetails(type, id));
+            card.appendChild(imageContainer); card.appendChild(titleDiv);
+            card.addEventListener('click', () => showContentDetails(type, id)); // Open main modal
             contentCardsContainer.appendChild(card);
         }
 
-        // --- MODAL Functions ---
+        // --- Right Column Search Functions (Adapted) ---
+        function displayRelatedSuggestions(searchTerm) {
+            if (!relatedSuggestionsList) return;
+            relatedSuggestionsList.innerHTML = '';
+            if (!searchTerm) { relatedSuggestionsList.style.display = 'none'; return; }
 
-        // 6. Show Content Details in Modal
-        async function showContentDetails(type, id) {
-            previousModalState = null; modalBackButtonContainer.innerHTML = '';
+            const lowerSearchTerm = searchTerm.toLowerCase();
+            const matchedActresses = allActressesData.filter(actress =>
+                actress.id !== currentMainActressId && // Exclude the main actress
+                actress.nome.toLowerCase().includes(lowerSearchTerm) &&
+                !selectedRelatedActresses.some(sa => sa.id === actress.id) // Exclude already selected co-stars
+            );
+
+            if (matchedActresses.length > 0) {
+                matchedActresses.slice(0, 7).forEach(actress => {
+                    const item = document.createElement('div'); item.classList.add('suggestion-item');
+                    item.dataset.id = actress.id; item.dataset.nome = actress.nome;
+                    item.innerHTML = `<img src="${actress.foto || 'placeholder.png'}" alt=""><span>${actress.nome}</span>`;
+                    item.addEventListener('click', handleSelectRelatedActress);
+                    relatedSuggestionsList.appendChild(item);
+                });
+                relatedSuggestionsList.style.display = 'block';
+            } else {
+                relatedSuggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma atriz encontrada</div>';
+                relatedSuggestionsList.style.display = 'block';
+            }
+        }
+        function handleSelectRelatedActress(event) {
+            const target = event.currentTarget;
+            const actressId = target.dataset.id; const actressName = target.dataset.nome;
+            if (!actressId || !actressName) return;
+            if (!selectedRelatedActresses.some(a => a.id === actressId)) {
+                selectedRelatedActresses.push({ id: actressId, nome: actressName });
+                renderRelatedActressPills();
+                applyRelatedContentFilters(); // Re-filter content
+            }
+            if (relatedSearchInput) relatedSearchInput.value = ''; // Clear input
+            if (relatedSuggestionsList) relatedSuggestionsList.style.display = 'none'; // Hide suggestions
+            if (relatedSearchInput) relatedSearchInput.focus();
+        }
+        function renderRelatedActressPills() {
+            if (!relatedSelectedActressesContainer) return;
+            relatedSelectedActressesContainer.innerHTML = '';
+            selectedRelatedActresses.forEach(actress => {
+                const pill = document.createElement('div'); pill.classList.add('related-actress-pill'); pill.dataset.id = actress.id;
+                pill.innerHTML = `<span>${actress.nome}</span><button class="related-remove-actress-btn" title="Remover">×</button>`;
+                pill.querySelector('.related-remove-actress-btn').addEventListener('click', handleRemoveRelatedActress);
+                relatedSelectedActressesContainer.appendChild(pill);
+            });
+        }
+        function handleRemoveRelatedActress(event) {
+             event.stopPropagation();
+             const pill = event.target.closest('.related-actress-pill');
+             if (!pill) return;
+             const actressIdToRemove = pill.dataset.id;
+             selectedRelatedActresses = selectedRelatedActresses.filter(a => a.id !== actressIdToRemove);
+             renderRelatedActressPills();
+             applyRelatedContentFilters(); // Re-filter content
+             if (relatedSuggestionsList.style.display === 'block' && relatedSearchInput?.value) {
+                 displayRelatedSuggestions(relatedSearchInput.value); // Refresh suggestions if needed
+             }
+        }
+
+
+        // --- Main Modal Functions (Content Details) ---
+        async function showContentDetails(type, id) { /* ... (same as before, calls loadActressesForModal) ... */
             modalBody.innerHTML = '<div class="loading">Carregando...</div>';
             modalLinkContainer.innerHTML = ''; modal.style.display = 'flex';
-
-            // Store current content type/id on modal for back navigation reference
-            const modalContentElement = modal.querySelector('.modal-content');
-            if(modalContentElement) {
-                modalContentElement.dataset.contentType = type;
-                modalContentElement.dataset.contentId = id;
-            }
-
             let collectionName = '';
-            switch (type) {
-                case 'Cena': collectionName = 'cenas'; break;
-                case 'Vídeo': collectionName = 'videos'; break;
-                case 'Filme': collectionName = 'filmes'; break;
-                default: modalBody.innerHTML = '<div class="error">Tipo inválido.</div>'; return;
-            }
-
+            switch (type) { case 'Cena': collectionName = 'cenas'; break; case 'Vídeo': collectionName = 'videos'; break; case 'Filme': collectionName = 'filmes'; break; default: modalBody.innerHTML = '<div class="error">Tipo inválido.</div>'; return; }
             try {
                 const docSnap = await getDoc(doc(db, collectionName, id));
                 if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    modalTitle.textContent = data.nome || `Detalhes de ${type}`;
-                    modalBody.innerHTML = '';
-
-                    // Display Image (Conditional Size)
-                    if (data.imagem) { /* ... Add modal image ... */
-                        let finalImageUrl = data.imagem;
-                        if (typeof finalImageUrl === 'object' && finalImageUrl !== null && finalImageUrl.width) {
-                            const urlKey = Object.keys(finalImageUrl).find(k => typeof finalImageUrl[k] === 'string' && finalImageUrl[k].startsWith('http'));
-                            finalImageUrl = urlKey ? finalImageUrl[urlKey] : null;
-                        } else if (typeof finalImageUrl !== 'string') { finalImageUrl = null; }
-                        if (finalImageUrl) {
-                           const img = document.createElement('img');
-                           img.src = finalImageUrl; img.alt = data.nome || type;
-                           img.classList.add('modal-detail-image');
-                           if (type === 'Filme') img.classList.add('movie-image'); // Smaller movie image
-                           img.onerror = () => { img.style.display = 'none'; };
-                           modalBody.appendChild(img);
-                        }
+                    const data = docSnap.data(); modalTitle.textContent = data.nome || `Detalhes`; modalBody.innerHTML = '';
+                    if (data.imagem) { /* ... Add image ... */
+                        let finalImageUrl = data.imagem; if (typeof finalImageUrl === 'object' && finalImageUrl !== null && finalImageUrl.width) { const urlKey = Object.keys(finalImageUrl).find(k=>typeof finalImageUrl[k]==='string'&&finalImageUrl[k].startsWith('http')); finalImageUrl = urlKey ? finalImageUrl[urlKey] : null;} else if (typeof finalImageUrl !== 'string') { finalImageUrl = null; }
+                        if(finalImageUrl){ const img = document.createElement('img'); img.src = finalImageUrl; img.alt = data.nome || type; img.classList.add('modal-detail-image'); if (type === 'film') img.classList.add('movie-image'); img.onerror = () => { img.style.display = 'none'; }; modalBody.appendChild(img); }
                     }
-
-                    // Display Year
-                    if (data.ano) { /* ... Add year ... */
-                        const yearDiv = document.createElement('div');
-                        yearDiv.classList.add('modal-year');
-                        yearDiv.textContent = `Ano: ${data.ano}`;
-                        modalBody.appendChild(yearDiv);
-                    }
-
-                    // Placeholders for Actresses & Scenes (to be filled async)
-                    const actressesContainer = document.createElement('div');
-                    actressesContainer.classList.add('modal-actress-list-container');
-                    actressesContainer.innerHTML = `<h4>Atrizes</h4><div class="loading">Carregando...</div>`;
-                    modalBody.appendChild(actressesContainer);
-
-                    let scenesContainer = null;
-                    if (type === 'Filme') {
-                        scenesContainer = document.createElement('div');
-                        scenesContainer.classList.add('modal-scenes-container');
-                        scenesContainer.innerHTML = `<h4>Cenas do Filme</h4><div class="loading">Carregando...</div>`;
-                        modalBody.appendChild(scenesContainer);
-                    }
-
-                    // External Link Button
-                    if (data.pagina && typeof data.pagina === 'string' && data.pagina.trim() !== '') { /* ... Add link button ... */
-                         const linkButton = document.createElement('button');
-                         linkButton.textContent = 'Abrir Página Externa';
-                         linkButton.onclick = () => window.open(data.pagina, '_blank');
-                         modalLinkContainer.appendChild(linkButton);
-                    } else { modalLinkContainer.innerHTML = '<i>(Nenhuma página externa)</i>'; }
-
-                    // Load Actresses & Scenes Async
+                    if (data.ano) { /* ... Add year ... */ const yearDiv = document.createElement('div'); yearDiv.classList.add('modal-year'); yearDiv.textContent = `Ano: ${data.ano}`; modalBody.appendChild(yearDiv); }
+                    const actressesContainer = document.createElement('div'); actressesContainer.classList.add('modal-actress-list-container'); actressesContainer.innerHTML = `<h4>Atrizes</h4><div class="loading">Carregando...</div>`; modalBody.appendChild(actressesContainer);
+                    let scenesContainer = null; if (type === 'film') { scenesContainer = document.createElement('div'); scenesContainer.classList.add('modal-scenes-container'); scenesContainer.innerHTML = `<h4>Cenas do Filme</h4><div class="loading">Carregando...</div>`; modalBody.appendChild(scenesContainer); }
+                    if (data.pagina && typeof data.pagina === 'string' && data.pagina.trim() !== '') { /* ... Add link button ... */ const linkButton = document.createElement('button'); linkButton.textContent = 'Abrir Página Externa'; linkButton.onclick = () => window.open(data.pagina, '_blank'); modalLinkContainer.appendChild(linkButton); } else { modalLinkContainer.innerHTML = '<i>(Nenhuma página externa)</i>'; }
                     loadActressesForModal(data.atores || [], actressesContainer);
-                    if (type === 'Filme') loadScenesForModal(data.cenas || [], scenesContainer);
-
+                    if (type === 'film') loadScenesForModal(data.cenas || [], scenesContainer);
                 } else { modalBody.innerHTML = '<div class="error">Conteúdo não encontrado.</div>'; }
             } catch (error) { console.error(`Erro ao buscar ${type} ${id}: `, error); modalBody.innerHTML = '<div class="error">Erro ao carregar.</div>'; }
         }
-
-        // 7. Load Actresses into Modal
-        async function loadActressesForModal(actressIds, containerElement) {
-            const modalContentElement = containerElement.closest('.modal-content'); // Get modal content element
-            const currentContent = { // Get current content info from modal dataset
-                type: modalContentElement?.dataset.contentType,
-                id: modalContentElement?.dataset.contentId
-            };
-
-            if (!actressIds || actressIds.length === 0) { containerElement.innerHTML = '<h4>Atrizes</h4><i>Nenhuma atriz associada.</i>'; return; }
-
+        async function loadActressesForModal(actressIds, containerElement) { /* ... (Modified onclick) ... */
+            if (!actressIds || actressIds.length === 0) { containerElement.innerHTML = '<h4>Atrizes</h4><i>Nenhuma atriz.</i>'; return; }
             const listElement = document.createElement('ul'); listElement.classList.add('modal-actress-list');
-            containerElement.innerHTML = '<h4>Atrizes</h4>'; containerElement.appendChild(listElement);
-            let foundCount = 0;
-
+            containerElement.innerHTML = '<h4>Atrizes</h4>'; containerElement.appendChild(listElement); let foundCount = 0;
             const fetchPromises = actressIds.map(async (actressId) => {
                 try {
-                    const actressDoc = await getDoc(doc(db, "atores", actressId));
-                    if (actressDoc.exists()) {
-                        foundCount++; const actressData = actressDoc.data();
-                        const li = document.createElement('li'); li.classList.add('modal-actress-item');
-                        // Pass the current content state when setting up the click
-                        li.onclick = () => showActressDetailsInModal(actressId, currentContent);
-
-                        const img = document.createElement('img'); /* ... set src, alt, onerror ... */
-                        img.src = actressData.foto || 'placeholder.png'; img.alt = actressData.nome;
-                        img.onerror = () => { img.src = 'placeholder.png'; img.onerror=null; }
-
-                        const nameSpan = document.createElement('span'); nameSpan.textContent = actressData.nome || 'Nome';
-                        li.appendChild(img); li.appendChild(nameSpan); listElement.appendChild(li);
+                    // Use cache first
+                    let actressData = allActressesData.find(a => a.id === actressId);
+                    if (!actressData) { // Fetch if not in cache
+                        const actressDoc = await getDoc(doc(db, "atores", actressId));
+                        if (actressDoc.exists()) actressData = { id: actressId, ...actressDoc.data() };
                     }
-                } catch (error) { console.error(`Error fetching actress ${actressId}:`, error); }
+                    if (actressData) {
+                        foundCount++; const li = document.createElement('li'); li.classList.add('modal-actress-item');
+                        // --- MODIFIED: Call createActressPopup ---
+                        li.onclick = () => createActressPopup(actressId); // Pass only ID
+                        const img = document.createElement('img'); img.src = actressData.foto || 'placeholder.png'; img.alt = actressData.nome; img.onerror = () => { img.src = 'placeholder.png'; img.onerror=null; }
+                        const nameSpan = document.createElement('span'); nameSpan.textContent = actressData.nome || 'Nome'; li.appendChild(img); li.appendChild(nameSpan); listElement.appendChild(li);
+                    }
+                } catch (error) { console.error(`Error loading actress ${actressId} for modal:`, error); }
             });
             await Promise.all(fetchPromises);
-            if (foundCount === 0) containerElement.innerHTML = '<h4>Atrizes</h4><i>Erro ao carregar atrizes.</i>';
+            if (foundCount === 0) containerElement.innerHTML = '<h4>Atrizes</h4><i>Erro ao carregar.</i>';
         }
-
-        // 8. Load Scene Cards into Modal (for Movies)
-        async function loadScenesForModal(sceneIds, containerElement) {
-            if (!sceneIds || sceneIds.length === 0) { containerElement.innerHTML = '<h4>Cenas</h4><i>Nenhuma cena associada.</i>'; return; }
-
+        async function loadScenesForModal(sceneIds, containerElement) { /* ... (same as before) ... */
+            if (!sceneIds || sceneIds.length === 0) { containerElement.innerHTML = '<h4>Cenas</h4><i>Nenhuma cena.</i>'; return; }
             const cardsContainer = document.createElement('div'); cardsContainer.classList.add('modal-scene-cards');
-            containerElement.innerHTML = '<h4>Cenas do Filme</h4>'; containerElement.appendChild(cardsContainer);
-            let foundCount = 0;
+            containerElement.innerHTML = '<h4>Cenas do Filme</h4>'; containerElement.appendChild(cardsContainer); let foundCount = 0;
+            const fetchPromises = sceneIds.map(async (sceneId) => { try { const sceneDoc = await getDoc(doc(db, "cenas", sceneId)); if (sceneDoc.exists()) { foundCount++; const sceneData = sceneDoc.data(); const card = document.createElement('div'); card.classList.add('modal-scene-card'); const img = document.createElement('img'); let finalImageUrl = sceneData.imagem; if (typeof finalImageUrl === 'object' && finalImageUrl !== null && finalImageUrl.width) { const urlKey = Object.keys(finalImageUrl).find(k=>typeof finalImageUrl[k]==='string'&&finalImageUrl[k].startsWith('http')); finalImageUrl = urlKey ? finalImageUrl[urlKey] : 'placeholder.png'; } else if (typeof finalImageUrl !== 'string' || !finalImageUrl) { finalImageUrl = 'placeholder.png'; } img.src = finalImageUrl; img.alt = sceneData.nome; img.onerror = () => { img.src = 'placeholder.png'; img.onerror=null; } const titleDiv = document.createElement('div'); titleDiv.classList.add('title'); titleDiv.textContent = sceneData.nome || 'Sem Título'; card.appendChild(img); card.appendChild(titleDiv); cardsContainer.appendChild(card); } } catch (error) { console.error(`Error fetching scene ${sceneId}:`, error); } });
+            await Promise.all(fetchPromises); if (foundCount === 0) containerElement.innerHTML = '<h4>Cenas</h4><i>Erro ao carregar.</i>';
+        }
+        function closeModal() { /* ... (same as before, no back button logic) ... */
+            modal.style.display = 'none'; modalBody.innerHTML = ''; modalLinkContainer.innerHTML = '';
+        }
 
-            const fetchPromises = sceneIds.map(async (sceneId) => {
-                try {
-                    const sceneDoc = await getDoc(doc(db, "cenas", sceneId));
-                    if (sceneDoc.exists()) {
-                        foundCount++; const sceneData = sceneDoc.data();
-                        const card = document.createElement('div'); card.classList.add('modal-scene-card');
+        // --- Movable Actress Popup Functions ---
+        function createActressPopup(actressId) {
+            const template = document.getElementById('actress-popup-template');
+            if (!template) { console.error("Actress popup template not found!"); return; }
 
-                        const img = document.createElement('img'); /* ... set scene img src, alt, onerror ... */
-                        let finalImageUrl = sceneData.imagem;
-                        if (typeof finalImageUrl === 'object' && finalImageUrl !== null && finalImageUrl.width) {
-                            const urlKey = Object.keys(finalImageUrl).find(k => typeof finalImageUrl[k] === 'string' && finalImageUrl[k].startsWith('http'));
-                            finalImageUrl = urlKey ? finalImageUrl[urlKey] : 'placeholder.png';
-                        } else if (typeof finalImageUrl !== 'string' || !finalImageUrl) { finalImageUrl = 'placeholder.png'; }
-                        img.src = finalImageUrl; img.alt = sceneData.nome;
-                        img.onerror = () => { img.src = 'placeholder.png'; img.onerror=null; }
+            const popup = template.cloneNode(true);
+            popup.id = `actress-popup-${actressId}-${Date.now()}`; // Unique ID
+            popup.style.display = 'flex'; // Make it visible
 
-                        const titleDiv = document.createElement('div'); titleDiv.classList.add('title'); titleDiv.textContent = sceneData.nome || 'Sem Título';
-                        card.appendChild(img); card.appendChild(titleDiv); cardsContainer.appendChild(card);
+            // Position calculations (simple cascade)
+            const existingPopups = document.querySelectorAll('.actress-popup:not(#actress-popup-template)').length;
+            const topOffset = 50 + (existingPopups * 30);
+            const leftOffset = 50 + (existingPopups * 30);
+            popup.style.top = `${topOffset}px`;
+            popup.style.left = `${leftOffset}px`;
+
+
+            const header = popup.querySelector('.actress-popup-header h5');
+            const body = popup.querySelector('.actress-popup-body');
+            const closeBtn = popup.querySelector('.actress-popup-close');
+
+            header.textContent = 'Carregando...';
+            body.innerHTML = '<div class="loading">...</div>';
+            closeBtn.onclick = () => popup.remove(); // Simple close
+
+            document.body.appendChild(popup); // Add to page
+
+            // Make it draggable
+            makeDraggable(popup);
+
+            // Fetch and populate data
+            const actressData = allActressesData.find(a => a.id === actressId);
+            if (actressData) {
+                populateActressPopup(popup, actressData);
+            } else {
+                getDoc(doc(db, "atores", actressId)).then(docSnap => {
+                    if (docSnap.exists()) {
+                        populateActressPopup(popup, { id: actressId, ...docSnap.data() });
+                    } else {
+                        header.textContent = 'Erro';
+                        body.innerHTML = '<div class="error">Atriz não encontrada.</div>';
                     }
-                } catch (error) { console.error(`Error fetching scene ${sceneId}:`, error); }
-            });
-            await Promise.all(fetchPromises);
-            if (foundCount === 0) containerElement.innerHTML = '<h4>Cenas</h4><i>Erro ao carregar cenas.</i>';
+                }).catch(err => {
+                    console.error("Error fetching actress for popup:", err);
+                    header.textContent = 'Erro';
+                    body.innerHTML = '<div class="error">Erro ao carregar.</div>';
+                });
+            }
         }
 
-        // 9. Show Actress Details IN Modal
-        async function showActressDetailsInModal(actressId, currentContentState) {
-            previousModalState = currentContentState; // Store where we came from
-            modalBody.innerHTML = '<div class="loading">Carregando...</div>';
-            modalLinkContainer.innerHTML = ''; modalBackButtonContainer.innerHTML = ''; // Clear buttons
+        function populateActressPopup(popupElement, data) {
+            const header = popupElement.querySelector('.actress-popup-header h5');
+            const body = popupElement.querySelector('.actress-popup-body');
 
-            try {
-                const actressDoc = await getDoc(doc(db, "atores", actressId));
-                if (actressDoc.exists()) {
-                    const data = actressDoc.data();
-                    modalTitle.textContent = data.nome || 'Detalhes da Atriz';
-                    modalBody.innerHTML = '';
+            header.textContent = data.nome || 'Detalhes';
+            body.innerHTML = ''; // Clear loading
 
-                    if (data.foto) { /* ... Add actress image ... */
-                        const img = document.createElement('img'); img.src = data.foto; img.alt = data.nome;
-                        img.classList.add('modal-detail-image'); img.onerror = () => { img.style.display = 'none'; };
-                        modalBody.appendChild(img);
-                    }
+            if (data.foto) {
+                 const img = document.createElement('img'); img.src = data.foto; img.alt = data.nome;
+                 img.onerror = () => { img.style.display = 'none'; }; body.appendChild(img);
+            }
 
-                    const skipActressFields = ['foto', 'nome', 'timestamp'];
-                    for (const key in data) { /* ... Display details similar to main column ... */
-                        if (data.hasOwnProperty(key) && !skipActressFields.includes(key)) {
-                           const detailDiv = document.createElement('div');
-                           let value = data[key]; let label = key;
-                           if (key === 'dataNascimento') {
-                               detailDiv.innerHTML = `<strong>${label}:</strong> ${value || 'N/A'}`;
-                               modalBody.appendChild(detailDiv);
-                               const ageDiv = document.createElement('div'); ageDiv.innerHTML = `<strong>Idade:</strong> ${calculateAge(value)}`;
-                               modalBody.appendChild(ageDiv); continue;
-                           }
-                           else if (key === 'peso' && value !== undefined && value !== null) { value = `${value} kg`; }
-                           else if (key === 'altura' && value !== undefined && value !== null) { value = `${value} cm`; }
-                           detailDiv.innerHTML = `<strong>${label}:</strong> ${value}`;
-                           modalBody.appendChild(detailDiv);
-                       }
-                    }
-
-                    // Add Back Button
-                    const backButton = document.createElement('button'); backButton.textContent = '← Voltar';
-                    backButton.onclick = () => restoreContentDetailsModal();
-                    modalBackButtonContainer.appendChild(backButton);
-
-                } else { modalBody.innerHTML = '<div class="error">Atriz não encontrada.</div>'; }
-            } catch (error) { console.error(`Error fetching actress ${actressId}:`, error); modalBody.innerHTML = '<div class="error">Erro ao carregar.</div>'; }
+            const skipFields = ['foto', 'nome', 'timestamp', 'cenas', 'filmes', 'videos'];
+            let detailsAdded = false;
+            for (const key in data) {
+                if (data.hasOwnProperty(key) && !skipFields.includes(key)) {
+                    detailsAdded = true; const detailDiv = document.createElement('div');
+                    let value = data[key]; let label = key;
+                    if (key === 'dataNascimento') { detailDiv.innerHTML = `<strong>${label}:</strong> ${value || 'N/A'}`; body.appendChild(detailDiv); const ageDiv = document.createElement('div'); ageDiv.innerHTML = `<strong>Idade:</strong> ${calculateAge(value)}`; body.appendChild(ageDiv); continue; }
+                    else if (key === 'peso' && value != null) { value = `${value} kg`; }
+                    else if (key === 'altura' && value != null) { value = `${value} cm`; }
+                    detailDiv.innerHTML = `<strong>${label}:</strong> ${value}`; body.appendChild(detailDiv);
+                }
+            }
+             if (!detailsAdded) { body.innerHTML += '<i>(Sem detalhes adicionais)</i>'; }
         }
 
-        // 10. Restore Previous Content View in Modal
-        function restoreContentDetailsModal() {
-            if (previousModalState && previousModalState.type && previousModalState.id) {
-                showContentDetails(previousModalState.type, previousModalState.id); // Re-run showContentDetails
-            } else { closeModal(); } // Fallback: just close if state is lost
+        function makeDraggable(element) {
+            let isDragging = false;
+            let offsetX, offsetY;
+
+            const header = element.querySelector('.actress-popup-header'); // Drag only by header
+
+            header.onmousedown = (e) => {
+                // Prevent drag start on close button
+                if (e.target.classList.contains('actress-popup-close')) return;
+
+                isDragging = true;
+                element.classList.add('dragging');
+                // Calculate offset from the top-left corner of the element
+                offsetX = e.clientX - element.getBoundingClientRect().left;
+                offsetY = e.clientY - element.getBoundingClientRect().top;
+                // Prevent default text selection behavior
+                e.preventDefault();
+            };
+
+            document.onmousemove = (e) => {
+                if (!isDragging) return;
+                // Calculate new position
+                let newX = e.clientX - offsetX;
+                let newY = e.clientY - offsetY;
+
+                 // Optional: Boundary checks (keep within viewport)
+                 const vpWidth = window.innerWidth;
+                 const vpHeight = window.innerHeight;
+                 const elWidth = element.offsetWidth;
+                 const elHeight = element.offsetHeight;
+
+                 newX = Math.max(0, Math.min(newX, vpWidth - elWidth));
+                 newY = Math.max(0, Math.min(newY, vpHeight - elHeight));
+
+                element.style.left = `${newX}px`;
+                element.style.top = `${newY}px`;
+            };
+
+            document.onmouseup = () => {
+                if (isDragging) {
+                    isDragging = false;
+                    element.classList.remove('dragging');
+                }
+            };
+
+             header.ondragstart = () => false; // Prevent default browser drag
         }
 
-        // 11. Close Modal Function
-        function closeModal() {
-            modal.style.display = 'none';
-            modalBody.innerHTML = ''; modalLinkContainer.innerHTML = '';
-            modalBackButtonContainer.innerHTML = ''; previousModalState = null;
-        }
 
-        // Close modal on overlay click
-        window.addEventListener('click', (event) => {
-            if (event.target == modal) closeModal();
-        });
+        // --- Event Listeners ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAllActresses(); // Load actresses on page start
 
-        // --- Initial Load ---
-        loadActresses();
+            // Main Modal Close
+             modal.addEventListener('click', (event) => { if (event.target == modal) closeModal(); });
+             // The 'x' button uses onclick="closeModal()" in HTML
+
+            // Right Column Filter Buttons
+            relatedFilterButtons.forEach(button => {
+                 button.addEventListener('click', () => {
+                     relatedFilterButtons.forEach(btn => btn.classList.remove('active'));
+                     button.classList.add('active');
+                     activeRelatedFilter = button.dataset.filter;
+                     applyRelatedContentFilters();
+                 });
+             });
+
+             // Right Column Search Input/Suggestions
+             if(relatedSearchInput) relatedSearchInput.addEventListener('input', () => displayRelatedSuggestions(relatedSearchInput.value));
+             if(relatedSearchInput) relatedSearchInput.addEventListener('focus', () => displayRelatedSuggestions(relatedSearchInput.value));
+             if(relatedSearchInputWrapper) relatedSearchInputWrapper.addEventListener('click', () => relatedSearchInput?.focus()); // Focus input on wrapper click
+
+             // Global click listener to hide related suggestions
+             document.addEventListener('click', (event) => {
+                 if (relatedSearchInputWrapper && !relatedSearchInputWrapper.contains(event.target) && relatedSuggestionsList && !relatedSuggestionsList.contains(event.target)) {
+                    relatedSuggestionsList.style.display = 'none';
+                 }
+                 // Add similar logic here for other suggestion lists if they exist
+             });
+
+        }); // End DOMContentLoaded
 
     </script>
 
