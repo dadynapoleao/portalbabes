@@ -431,11 +431,28 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-    const firebaseConfig = { /* ... Your config ... */ };
+  const firebaseConfig = { /* ... Your config ... */ }; // <--- PROBLEM AREA
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // --- DOM Elements ---
+
+// Your web app's Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0",
+        authDomain: "babes-392fd.firebaseapp.com",
+        projectId: "babes-392fd", // <<< Make sure this line exists and is correct
+        storageBucket: "babes-392fd.appspot.com",
+        messagingSenderId: "376795361631",
+        appId: "1:376795361631:web:d662f2b2f2cd23b115c6ea"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig); // Now this should work
+    const db = getFirestore(app);
+
+
+
+     
     // ... (Keep main elements: mainContainer, actressList, etc.) ...
     const modal = document.getElementById('content-modal');
     const modalTitle = document.getElementById('modal-title');
