@@ -112,7 +112,7 @@
 
         /* --- Comparison Modal --- */
         #comparison-modal .modal-content { max-width: 80vw; width: auto; }
-        #comparison-modal-body { display: flex; gap: 10px; align-items: flex-start; overflow-x: auto; padding-bottom: 10px; min-height: 200px; flex-grow: 1; /* Allow body to take space */ }
+        #comparison-modal-body { display: flex; gap: 10px; align-items: flex-start; overflow-x: auto; padding-bottom: 10px; min-height: 200px; flex-grow: 1; }
         .comparison-column { flex: 1; min-width: 180px; max-width: 220px; background-color: #f9f9f9; border: 1px solid #eee; border-radius: 4px; padding: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); position: relative; display: flex; flex-direction: column; box-sizing: border-box; height: min-content; }
         .comparison-column .remove-compare-btn { position: absolute; top: 3px; right: 3px; background: rgba(255, 255, 255, 0.7); border: none; border-radius: 50%; color: #888; cursor: pointer; font-weight: bold; font-size: 14px; line-height: 16px; width: 18px; height: 18px; text-align: center; padding: 0; z-index: 1; }
         .comparison-column .remove-compare-btn:hover { color: #333; background: rgba(230, 230, 230, 0.9); }
@@ -128,115 +128,32 @@
         #comparison-suggestions-list .suggestion-item.context-actress span { font-weight: bold; color: #0056b3; }
 
         /* --- Floating Action Button (FAB) & Menu --- */
-        #fab-create {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            width: 55px;
-            height: 55px;
-            background-color: #007bff; /* Primary blue */
-            color: white;
-            border: none;
-            border-radius: 50%;
-            font-size: 28px; /* Icon size */
-            line-height: 55px; /* Center icon vertically */
-            text-align: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            z-index: 1060; /* Above content, below modals/popups */
-            transition: background-color 0.2s ease, transform 0.1s ease;
-        }
+        #fab-create { position: fixed; bottom: 25px; right: 25px; width: 55px; height: 55px; background-color: #007bff; color: white; border: none; border-radius: 50%; font-size: 28px; line-height: 55px; text-align: center; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); cursor: pointer; z-index: 1060; transition: background-color 0.2s ease, transform 0.1s ease; }
         #fab-create:hover { background-color: #0056b3; }
         #fab-create:active { transform: scale(0.95); }
-
-        #create-menu-popup {
-            position: fixed; /* Fixed relative to viewport */
-            bottom: 90px; /* Position above FAB */
-            right: 25px;
-            background-color: #fff;
-            border-radius: 6px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            padding: 8px 0; /* Padding top/bottom */
-            z-index: 1070; /* Above FAB */
-            display: none; /* Hidden by default */
-            min-width: 160px;
-        }
-        .create-menu-button {
-            display: block;
-            background: none;
-            border: none;
-            color: #333;
-            padding: 10px 15px;
-            text-align: left;
-            width: 100%;
-            cursor: pointer;
-            font-size: 0.95em;
-            transition: background-color 0.2s ease;
-        }
+        #create-menu-popup { position: fixed; bottom: 90px; right: 25px; background-color: #fff; border-radius: 6px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); padding: 8px 0; z-index: 1070; display: none; min-width: 160px; }
+        .create-menu-button { display: block; background: none; border: none; color: #333; padding: 10px 15px; text-align: left; width: 100%; cursor: pointer; font-size: 0.95em; transition: background-color 0.2s ease; }
         .create-menu-button:hover { background-color: #f0f0f0; }
 
         /* --- Create Actress Modal Specific Styles --- */
-        #create-actress-modal .modal-content {
-            max-width: 1000px; /* Wider modal for the form */
-            background-color: #242424; /* Dark background from form CSS */
-            color: #e0e0e0;
-        }
-        #create-actress-modal .modal-content h3 { /* Style title for dark bg */
-            color: #fff;
-            border-bottom-color: #444;
-        }
-        #create-actress-modal .modal-close-button { color: #aaa; } /* Ensure close button is visible */
+        #create-actress-modal .modal-content { max-width: 1000px; background-color: #242424; color: #e0e0e0; }
+        #create-actress-modal .modal-content h3 { color: #fff; border-bottom-color: #444; }
+        #create-actress-modal .modal-close-button { color: #aaa; }
         #create-actress-modal .modal-close-button:hover { color: #fff; }
-
-        /* Form styles copied from form page, nested under modal ID */
-        #create-actress-modal .modal-body-content { /* Container for the form */
-           padding: 5px; /* Small padding around form area */
-        }
-        #create-actress-modal #create-actress-form {
-            display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 30px;
-        }
-        #create-actress-modal .form-card {
-            background-color: #333; padding: 18px; border-radius: 8px;
-            border: 1px solid #444; flex-basis: calc(50% - 8px); flex-grow: 1;
-            box-sizing: border-box; min-width: 250px;
-        }
+        #create-actress-modal .modal-body-content { padding: 5px; }
+        #create-actress-modal #create-actress-form { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 30px; }
+        #create-actress-modal .form-card { background-color: #333; padding: 18px; border-radius: 8px; border: 1px solid #444; flex-basis: calc(50% - 8px); flex-grow: 1; box-sizing: border-box; min-width: 250px; }
         #create-actress-modal .form-card.full-width { flex-basis: 100%; }
-        #create-actress-modal label {
-             display: block; margin-bottom: 10px; color: #b0b0b0;
-             font-size: 0.9em; font-weight: bold;
-         }
-        #create-actress-modal input[type="text"],
-        #create-actress-modal input[type="url"],
-        #create-actress-modal input[type="number"],
-        #create-actress-modal textarea {
-             width: 100%; padding: 10px 12px; background-color: #404040;
-             border: 1px solid #555; border-radius: 5px; color: #e0e0e0;
-             box-sizing: border-box; font-size: 1em;
-             transition: border-color 0.2s ease, box-shadow 0.2s ease;
-             margin-bottom: 0;
-         }
+        #create-actress-modal label { display: block; margin-bottom: 10px; color: #b0b0b0; font-size: 0.9em; font-weight: bold; }
+        #create-actress-modal input[type="text"], #create-actress-modal input[type="url"], #create-actress-modal input[type="number"], #create-actress-modal textarea { width: 100%; padding: 10px 12px; background-color: #404040; border: 1px solid #555; border-radius: 5px; color: #e0e0e0; box-sizing: border-box; font-size: 1em; transition: border-color 0.2s ease, box-shadow 0.2s ease; margin-bottom: 0; }
         #create-actress-modal textarea { min-height: 120px; resize: vertical; }
-        #create-actress-modal input:focus,
-        #create-actress-modal textarea:focus {
-            outline: none; border-color: #bb86fc;
-            box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.3);
-         }
-        #create-actress-modal .error-message {
-            color: #f44336; font-size: 0.85em; display: block;
-            margin-top: 5px; font-weight: bold;
-        }
-         #create-actress-modal .submit-button-container { text-align: center; }
-         #create-actress-modal button[type="submit"] {
-             min-width: 200px; margin-top: 10px; background-color: #bb86fc;
-             color: #121212; padding: 14px 35px; border: none; border-radius: 6px;
-             font-size: 1.2em; font-weight: bold; cursor: pointer;
-             transition: background-color 0.2s ease, transform 0.1s ease;
-         }
-         #create-actress-modal button[type="submit"]:hover { background-color: #a772e3; }
-         #create-actress-modal button[type="submit"]:active { transform: scale(0.98); }
-         #create-actress-modal button[type="submit"]:disabled {
-            background-color: #555; color: #999; cursor: not-allowed; transform: none;
-        }
+        #create-actress-modal input:focus, #create-actress-modal textarea:focus { outline: none; border-color: #bb86fc; box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.3); }
+        #create-actress-modal .error-message { color: #f44336; font-size: 0.85em; display: block; margin-top: 5px; font-weight: bold; }
+        #create-actress-modal .submit-button-container { text-align: center; }
+        #create-actress-modal button[type="submit"] { min-width: 200px; margin-top: 10px; background-color: #bb86fc; color: #121212; padding: 14px 35px; border: none; border-radius: 6px; font-size: 1.2em; font-weight: bold; cursor: pointer; transition: background-color 0.2s ease, transform 0.1s ease; }
+        #create-actress-modal button[type="submit"]:hover { background-color: #a772e3; }
+        #create-actress-modal button[type="submit"]:active { transform: scale(0.98); }
+        #create-actress-modal button[type="submit"]:disabled { background-color: #555; color: #999; cursor: not-allowed; transform: none; }
 
         /* General Loading/Error Styles */
         .loading, .error { padding: 10px; text-align: center; color: #555; font-style: italic; }
@@ -253,15 +170,11 @@
                 <li class="loading">Carregando...</li>
             </ul>
         </div>
-
         <!-- Middle Column: Actress Details -->
         <div class="column" id="actress-detail-col">
             <h2>Detalhes da Atriz</h2>
-            <div id="actress-details">
-                <!-- Details loaded here -->
-            </div>
+            <div id="actress-details"></div>
         </div>
-
         <!-- Right Column: Related Content -->
         <div class="column" id="content-col">
             <div id="content-col-header">
@@ -276,12 +189,12 @@
                         <div id="related-selected-actresses"></div>
                         <input type="text" id="related-search-input" class="related-search-input" placeholder="Filtrar por co-atriz...">
                     </div>
-                    <div id="related-suggestions-list"></div> <!-- Suggestions for related search -->
+                    <div id="related-suggestions-list"></div>
                 </div>
             </div>
             <h2 class="related-title">Conteúdo Relacionado</h2>
             <div id="content-cards"></div>
-            <div id="content-message" style="display: none;"></div> <!-- Removed initial loading -->
+            <div id="content-message" style="display: none;"></div>
         </div>
     </div>
 
@@ -290,10 +203,8 @@
         <div class="modal-content">
             <button class="modal-close-button" onclick="closeModal()">×</button>
             <h3 id="modal-title">Detalhes</h3>
-            <div id="modal-body-content"></div> <!-- Changed ID -->
-            <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 15px;">
-                <div id="modal-link-container"></div>
-            </div>
+            <div class="modal-body-content"></div> <!-- Changed ID -->
+            <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 15px;"> <div id="modal-link-container"></div> </div>
         </div>
     </div>
 
@@ -306,9 +217,7 @@
                  <input type="text" id="comparison-search-input" placeholder="Buscar atriz para comparar..." style="width: 100%; padding: 8px; font-size: 0.9em; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
                  <div id="comparison-suggestions-list"></div>
             </div>
-            <div id="comparison-modal-body"> <!-- Scrollable body -->
-                <div id="comparison-placeholder" style="width: 100%; text-align: center; color: #888; padding-top: 20px;">Selecione atrizes na busca acima para comparar.</div>
-            </div>
+            <div id="comparison-modal-body"> <div id="comparison-placeholder" style="width: 100%; text-align: center; color: #888; padding-top: 20px;">Selecione atrizes na busca acima para comparar.</div> </div>
         </div>
     </div>
 
@@ -317,20 +226,13 @@
         <div class="modal-content">
             <button class="modal-close-button" onclick="closeCreateActressModal()">×</button>
             <h3>Criar Nova Atriz</h3>
-            <div class="modal-body-content" id="create-actress-modal-body">
-                <!-- Form HTML will be injected here -->
-                 <div class="loading">Carregando formulário...</div>
-            </div>
+            <div class="modal-body-content" id="create-actress-modal-body"> <div class="loading">Carregando formulário...</div> </div>
         </div>
     </div>
 
     <!-- Template for Movable Actress Popups -->
     <div id="actress-popup-template" class="actress-popup" style="display: none;">
-        <div class="actress-popup-header">
-            <h5>Nome Atriz</h5>
-            <button class="actress-popup-compare-btn" title="Comparar Atrizes">🧪</button>
-            <button class="actress-popup-close">×</button>
-        </div>
+        <div class="actress-popup-header"> <h5>Nome Atriz</h5> <button class="actress-popup-compare-btn" title="Comparar Atrizes">🧪</button> <button class="actress-popup-close">×</button> </div>
         <div class="actress-popup-body"></div>
     </div>
 
@@ -347,17 +249,11 @@
     <!-- Firebase SDK -->
     <script type="module">
         // --- Imports ---
-        // Main Firestore imports
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"; // Use a consistent version
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, getDoc, addDoc, query, where, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         // --- Firebase Config ---
-        const firebaseConfig = {
-             apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0", authDomain: "babes-392fd.firebaseapp.com",
-             projectId: "babes-392fd", storageBucket: "babes-392fd.appspot.com",
-             messagingSenderId: "376795361631", appId: "1:376795361631:web:d662f2b2f2cd23b115c6ea"
-        };
-        // --- Initialize Firebase ---
+        const firebaseConfig = { apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0", authDomain: "babes-392fd.firebaseapp.com", projectId: "babes-392fd", storageBucket: "babes-392fd.appspot.com", messagingSenderId: "376795361631", appId: "1:376795361631:web:d662f2b2f2cd23b115c6ea" };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
@@ -367,9 +263,8 @@
         const actressDetailsContainer = document.getElementById('actress-details');
         const contentCardsContainer = document.getElementById('content-cards');
         const contentMessage = document.getElementById('content-message');
-        // Modals & Related
         const contentModal = document.getElementById('content-modal');
-        const contentModalBody = contentModal.querySelector('.modal-body-content'); // Use class selector
+        const contentModalBody = contentModal.querySelector('.modal-body-content');
         const contentModalTitle = document.getElementById('modal-title');
         const modalLinkContainer = document.getElementById('modal-link-container');
         const comparisonModal = document.getElementById('comparison-modal');
@@ -379,13 +274,11 @@
         const comparisonPlaceholder = document.getElementById('comparison-placeholder');
         const createActressModal = document.getElementById('create-actress-modal');
         const createActressModalBody = document.getElementById('create-actress-modal-body');
-        // Right Column
         const relatedFilterButtons = document.querySelectorAll('.related-filter-btn');
         const relatedSearchInput = document.getElementById('related-search-input');
         const relatedSuggestionsList = document.getElementById('related-suggestions-list');
         const relatedSelectedActressesContainer = document.getElementById('related-selected-actresses');
         const relatedSearchInputWrapper = document.querySelector('.related-search-input-wrapper');
-        // FAB & Menu
         const fabCreate = document.getElementById('fab-create');
         const createMenuPopup = document.getElementById('create-menu-popup');
         const menuCreateActressBtn = document.getElementById('menu-create-actress');
@@ -403,7 +296,7 @@
         let popupsOpen = 0;
         let actressesToCompare = [];
         let comparisonContextActressIds = [];
-        let createFormInitialized = false; // Flag to track if create form listeners are set
+        let createFormInitialized = false;
 
         // --- Helper Functions ---
         function calculateAge(birthDateString) { if (!birthDateString) return '?'; try { const birthDate = new Date(birthDateString); const today = new Date(); let age = today.getFullYear() - birthDate.getFullYear(); const m = today.getMonth() - birthDate.getMonth(); if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) { age--; } return age > 0 ? age : '?'; } catch (e) { return '?'; } }
@@ -412,394 +305,134 @@
         function capitalizeFirstLetter(string) { return string ? string.charAt(0).toUpperCase() + string.slice(1) : ''; }
         function debounce(func, delay) { let timeoutId; return function(...args) { clearTimeout(timeoutId); timeoutId = setTimeout(() => { func.apply(this, args); }, delay); }; }
 
-
         // --- Core Logic: Main Page Display ---
-
-        // 1. Load Initial Data
-        async function loadInitialData() { /* ... no changes needed ... */
-            displayMessage(actressListUl, 'Carregando atrizes...');
-            allScenesCache.clear();
-            try { const [actoresSnapshot, cenasSnapshot] = await Promise.all([ getDocs(collection(db, "atores")), getDocs(collection(db, "cenas")) ]); actressListUl.innerHTML = ''; if (actoresSnapshot.empty) { displayMessage(actressListUl, 'Nenhuma atriz encontrada.', true); } else { allActressesData = []; actoresSnapshot.forEach((doc) => allActressesData.push({ id: doc.id, ...doc.data() })); allActressesData.sort((a, b) => (a.nome || '').localeCompare(b.nome || '')); allActressesData.forEach(renderActressListItem); console.log(`Loaded ${allActressesData.length} actresses.`); } cenasSnapshot.forEach(docSnap => allScenesCache.set(docSnap.id, docSnap.data())); console.log(`Cached ${allScenesCache.size} scenes.`);
-            } catch (error) { console.error("Erro ao carregar dados iniciais: ", error); displayMessage(actressListUl, 'Erro ao carregar dados.', true); }
-        }
-        // Render Actress List Item
-        function renderActressListItem(actress) { /* ... no changes needed ... */
-             const li = document.createElement('li'); li.classList.add('actress-item'); li.dataset.id = actress.id; const age = calculateAge(actress.dataNascimento); const imageUrl = actress.foto || 'placeholder.png'; const rating = actress.nota !== undefined && actress.nota !== null ? actress.nota : 'N/A'; li.innerHTML = `<img src="${imageUrl}" alt="${actress.nome || ''}" onerror="this.src='placeholder.png'; this.onerror=null;"><div class="actress-info"><span class="name">${actress.nome || 'Nome Indisponível'}</span><span class="age">Idade: ${age}</span><span class="rating">Nota: ${rating}</span></div>`; li.addEventListener('click', () => handleMainActressClick(actress.id, li)); actressListUl.appendChild(li);
-        }
-        // Handle Main Actress Click
-        async function handleMainActressClick(actressId, listItemElement) { /* ... no changes needed ... */
-             if (selectedMainActressElement === listItemElement) return; if (selectedMainActressElement) selectedMainActressElement.classList.remove('selected'); listItemElement.classList.add('selected'); selectedMainActressElement = listItemElement; currentMainActressId = actressId; mainContainer.classList.add('details-visible'); actressDetailsContainer.innerHTML = '<div class="loading">Carregando detalhes...</div>'; contentCardsContainer.innerHTML = ''; displayMessage(contentMessage, 'Carregando conteúdo...'); selectedRelatedActresses = []; activeRelatedFilter = 'all'; if(relatedSearchInput) relatedSearchInput.value = ''; renderRelatedActressPills(); relatedFilterButtons.forEach(btn => btn.classList.remove('active')); document.querySelector('.related-filter-btn[data-filter="all"]')?.classList.add('active'); try { let actressData = allActressesData.find(a => a.id === actressId); if (!actressData) { const actressDoc = await getDoc(doc(db, "atores", actressId)); if (actressDoc.exists()) { actressData = { id: actressId, ...actressDoc.data() }; } } if (actressData) { displayMainActressDetails(actressData); } else { actressDetailsContainer.innerHTML = '<div class="error">Detalhes não encontrados.</div>'; } await loadAndDisplayRelatedContent(actressId);
-             } catch (error) { console.error(`Erro ao carregar dados da atriz ${actressId}: `, error); actressDetailsContainer.innerHTML = '<div class="error">Erro ao carregar detalhes.</div>'; displayMessage(contentMessage,'Erro ao carregar conteúdo.', true); }
-        }
-        // Display Main Actress Details (Handles Counts)
-        function displayMainActressDetails(data) { /* ... uses counts, no functional changes needed from previous version ... */
-             actressDetailsContainer.innerHTML = ''; const detailsTitle = document.createElement('h3'); detailsTitle.textContent = data.nome || 'Detalhes'; actressDetailsContainer.appendChild(detailsTitle); if (data.foto) { const img = document.createElement('img'); img.src = data.foto; img.alt = data.nome || 'Foto'; img.classList.add('detail-photo'); img.onerror = () => { img.style.display = 'none'; }; actressDetailsContainer.appendChild(img); } let detailsAdded = false; const detailFieldsContainer = document.createElement('div'); const addDetailRow = (label, value) => { if (value != null && value !== '') { const div = document.createElement('div'); div.innerHTML = `<strong>${label}:</strong> ${value}`; detailFieldsContainer.appendChild(div); detailsAdded = true; } }; addDetailRow('Nascimento', data.dataNascimento); if (data.dataNascimento) { addDetailRow('Idade', calculateAge(data.dataNascimento)); } if (data.altura != null) { addDetailRow('Altura', `${data.altura} cm`); } if (data.peso != null) { addDetailRow('Peso', `${data.peso} kg`); } if (Array.isArray(data.filmes)) { addDetailRow('Filmes Participados', data.filmes.length); } if (Array.isArray(data.videos)) { addDetailRow('Vídeos Participados', data.videos.length); } if (Array.isArray(data.cenas)) { addDetailRow('Cenas Participadas', data.cenas.length); } const skipFields = ['foto', 'nome', 'timestamp', 'id', 'filmes', 'videos', 'cenas', 'dataNascimento', 'altura', 'peso']; for (const key in data) { if (data.hasOwnProperty(key) && !skipFields.includes(key)) { addDetailRow(capitalizeFirstLetter(key), data[key]); } } actressDetailsContainer.appendChild(detailFieldsContainer); if (!detailsAdded && !data.foto) { const noDetailsDiv = document.createElement('div'); noDetailsDiv.classList.add('error'); noDetailsDiv.textContent = 'Sem detalhes adicionais disponíveis.'; actressDetailsContainer.appendChild(noDetailsDiv); }
-        }
+        async function loadInitialData() { displayMessage(actressListUl, 'Carregando atrizes...'); allScenesCache.clear(); try { const [actoresSnapshot, cenasSnapshot] = await Promise.all([ getDocs(collection(db, "atores")), getDocs(collection(db, "cenas")) ]); actressListUl.innerHTML = ''; if (actoresSnapshot.empty) { displayMessage(actressListUl, 'Nenhuma atriz encontrada.', true); } else { allActressesData = []; actoresSnapshot.forEach((doc) => allActressesData.push({ id: doc.id, ...doc.data() })); allActressesData.sort((a, b) => (a.nome || '').localeCompare(b.nome || '')); allActressesData.forEach(renderActressListItem); console.log(`Loaded ${allActressesData.length} actresses.`); } cenasSnapshot.forEach(docSnap => allScenesCache.set(docSnap.id, docSnap.data())); console.log(`Cached ${allScenesCache.size} scenes.`); } catch (error) { console.error("Erro ao carregar dados iniciais: ", error); displayMessage(actressListUl, 'Erro ao carregar dados.', true); } }
+        function renderActressListItem(actress) { const li = document.createElement('li'); li.classList.add('actress-item'); li.dataset.id = actress.id; const age = calculateAge(actress.dataNascimento); const imageUrl = actress.foto || 'placeholder.png'; const rating = actress.nota !== undefined && actress.nota !== null ? actress.nota : 'N/A'; li.innerHTML = `<img src="${imageUrl}" alt="${actress.nome || ''}" onerror="this.src='placeholder.png'; this.onerror=null;"><div class="actress-info"><span class="name">${actress.nome || 'Nome Indisponível'}</span><span class="age">Idade: ${age}</span><span class="rating">Nota: ${rating}</span></div>`; li.addEventListener('click', () => handleMainActressClick(actress.id, li)); actressListUl.appendChild(li); }
+        async function handleMainActressClick(actressId, listItemElement) { if (selectedMainActressElement === listItemElement) return; if (selectedMainActressElement) selectedMainActressElement.classList.remove('selected'); listItemElement.classList.add('selected'); selectedMainActressElement = listItemElement; currentMainActressId = actressId; mainContainer.classList.add('details-visible'); actressDetailsContainer.innerHTML = '<div class="loading">Carregando detalhes...</div>'; contentCardsContainer.innerHTML = ''; displayMessage(contentMessage, 'Carregando conteúdo...'); selectedRelatedActresses = []; activeRelatedFilter = 'all'; if(relatedSearchInput) relatedSearchInput.value = ''; renderRelatedActressPills(); relatedFilterButtons.forEach(btn => btn.classList.remove('active')); document.querySelector('.related-filter-btn[data-filter="all"]')?.classList.add('active'); try { let actressData = allActressesData.find(a => a.id === actressId); if (!actressData) { const actressDoc = await getDoc(doc(db, "atores", actressId)); if (actressDoc.exists()) { actressData = { id: actressId, ...actressDoc.data() }; } } if (actressData) { displayMainActressDetails(actressData); } else { actressDetailsContainer.innerHTML = '<div class="error">Detalhes não encontrados.</div>'; } await loadAndDisplayRelatedContent(actressId); } catch (error) { console.error(`Erro ao carregar dados da atriz ${actressId}: `, error); actressDetailsContainer.innerHTML = '<div class="error">Erro ao carregar detalhes.</div>'; displayMessage(contentMessage,'Erro ao carregar conteúdo.', true); } }
+        function displayMainActressDetails(data) { actressDetailsContainer.innerHTML = ''; const detailsTitle = document.createElement('h3'); detailsTitle.textContent = data.nome || 'Detalhes'; actressDetailsContainer.appendChild(detailsTitle); if (data.foto) { const img = document.createElement('img'); img.src = data.foto; img.alt = data.nome || 'Foto'; img.classList.add('detail-photo'); img.onerror = () => { img.style.display = 'none'; }; actressDetailsContainer.appendChild(img); } let detailsAdded = false; const detailFieldsContainer = document.createElement('div'); const addDetailRow = (label, value) => { if (value != null && value !== '') { const div = document.createElement('div'); div.innerHTML = `<strong>${label}:</strong> ${value}`; detailFieldsContainer.appendChild(div); detailsAdded = true; } }; addDetailRow('Nascimento', data.dataNascimento); if (data.dataNascimento) { addDetailRow('Idade', calculateAge(data.dataNascimento)); } if (data.altura != null) { addDetailRow('Altura', `${data.altura} cm`); } if (data.peso != null) { addDetailRow('Peso', `${data.peso} kg`); } if (Array.isArray(data.filmes)) { addDetailRow('Filmes Participados', data.filmes.length); } if (Array.isArray(data.videos)) { addDetailRow('Vídeos Participados', data.videos.length); } if (Array.isArray(data.cenas)) { addDetailRow('Cenas Participadas', data.cenas.length); } const skipFields = ['foto', 'nome', 'timestamp', 'id', 'filmes', 'videos', 'cenas', 'dataNascimento', 'altura', 'peso']; for (const key in data) { if (data.hasOwnProperty(key) && !skipFields.includes(key)) { addDetailRow(capitalizeFirstLetter(key), data[key]); } } actressDetailsContainer.appendChild(detailFieldsContainer); if (!detailsAdded && !data.foto) { const noDetailsDiv = document.createElement('div'); noDetailsDiv.classList.add('error'); noDetailsDiv.textContent = 'Sem detalhes adicionais disponíveis.'; actressDetailsContainer.appendChild(noDetailsDiv); } }
 
         // --- Related Content Logic ---
-        async function loadAndDisplayRelatedContent(mainActressId) { /* ... no changes needed ... */
-            allRelatedContent = []; filteredRelatedContent = []; contentCardsContainer.innerHTML = ''; displayMessage(contentMessage, 'Buscando conteúdo relacionado...'); try { const [videosSnapshot, filmesSnapshot] = await Promise.all([ getDocs(collection(db, "videos")), getDocs(collection(db, "filmes")) ]); videosSnapshot.forEach(docSnap => { const itemData = docSnap.data(); if (itemData.atores?.includes(mainActressId)) { allRelatedContent.push({ id: docSnap.id, type: 'video', ...itemData }); } }); filmesSnapshot.forEach(docSnap => { const movieData = docSnap.data(); let movieIsRelated = false; const relatedScenesFromMovie = []; if (movieData.cenas?.length > 0) { for (const sceneId of movieData.cenas) { const sceneData = allScenesCache.get(sceneId); if (sceneData) { const sceneFullData = { id: sceneId, type: 'scene', ...sceneData }; relatedScenesFromMovie.push(sceneFullData); if (sceneData.atores?.includes(mainActressId)) { movieIsRelated = true; } } } } if (movieIsRelated) { allRelatedContent.push({ id: docSnap.id, type: 'film', ...movieData }); relatedScenesFromMovie.forEach(scene => { if (!allRelatedContent.some(item => item.id === scene.id && item.type === 'scene')) { allRelatedContent.push(scene); } }); } else { relatedScenesFromMovie.forEach(scene => { if (scene.atores?.includes(mainActressId)) { if (!allRelatedContent.some(item => item.id === scene.id && item.type === 'scene')) { allRelatedContent.push(scene); } } }); } }); allScenesCache.forEach((sceneData, sceneId) => { if (sceneData.atores?.includes(mainActressId)) { if (!allRelatedContent.some(item => item.id === sceneId && item.type === 'scene')) { allRelatedContent.push({ id: sceneId, type: 'scene', ...sceneData }); } } }); console.log(`Found ${allRelatedContent.length} related items for actress ${mainActressId}`); applyRelatedContentFilters();
-            } catch (error) { console.error("Erro ao buscar conteúdo relacionado: ", error); displayMessage(contentMessage, 'Erro ao carregar conteúdo relacionado.', true); }
-        }
-        function applyRelatedContentFilters() { /* ... no changes needed ... */
-             contentCardsContainer.innerHTML = ''; clearMessage(contentMessage); const relatedActressIds = selectedRelatedActresses.map(a => a.id); filteredRelatedContent = allRelatedContent.filter(item => { if (activeRelatedFilter !== 'all' && item.type !== activeRelatedFilter) return false; if (relatedActressIds.length > 0) { if (!item.atores || !Array.isArray(item.atores)) return false; if (!relatedActressIds.every(relId => item.atores.includes(relId))) return false; } return true; }); filteredRelatedContent.sort((a, b) => (a.nome || '').localeCompare(b.nome || '')); if (filteredRelatedContent.length > 0) { filteredRelatedContent.forEach(item => createContentCard(item.imagem, item.nome, item.type, item.id)); } else { displayMessage(contentMessage, 'Nenhum conteúdo encontrado com os filtros aplicados.'); }
-        }
-        function createContentCard(imageUrl, title, type, id) { /* ... no changes needed ... */
-             const card = document.createElement('div'); card.classList.add('content-card'); card.dataset.type = type; card.dataset.id = id; const imageContainer = document.createElement('div'); imageContainer.classList.add('image-container'); const img = document.createElement('img'); let finalImageUrl = imageUrl; if (typeof imageUrl === 'object' && imageUrl !== null && imageUrl.width) { const urlKey = Object.keys(imageUrl).find(k=>typeof imageUrl[k]==='string'&&imageUrl[k].startsWith('http')); finalImageUrl = urlKey ? imageUrl[urlKey] : 'placeholder.png';} else if (typeof imageUrl !== 'string' || !imageUrl) { finalImageUrl = 'placeholder.png'; } img.src = finalImageUrl; img.alt = title || type; img.onerror = () => { img.src = 'placeholder.png'; img.onerror=null; }; const badge = document.createElement('div'); badge.classList.add('content-type-badge'); let badgeText = capitalizeFirstLetter(type); if(type === 'film') badgeText = 'Filme'; else if(type === 'scene') badgeText = 'Cena'; else if(type === 'video') badgeText = 'Vídeo'; badge.textContent = badgeText; imageContainer.appendChild(badge); imageContainer.appendChild(img); const titleDiv = document.createElement('div'); titleDiv.classList.add('title'); titleDiv.textContent = `${title || 'Sem Título'}`; card.appendChild(imageContainer); card.appendChild(titleDiv); card.addEventListener('click', () => showContentDetails(type, id)); contentCardsContainer.appendChild(card);
-        }
+        async function loadAndDisplayRelatedContent(mainActressId) { allRelatedContent = []; filteredRelatedContent = []; contentCardsContainer.innerHTML = ''; displayMessage(contentMessage, 'Buscando conteúdo relacionado...'); try { const [videosSnapshot, filmesSnapshot] = await Promise.all([ getDocs(collection(db, "videos")), getDocs(collection(db, "filmes")) ]); videosSnapshot.forEach(docSnap => { const itemData = docSnap.data(); if (itemData.atores?.includes(mainActressId)) { allRelatedContent.push({ id: docSnap.id, type: 'video', ...itemData }); } }); filmesSnapshot.forEach(docSnap => { const movieData = docSnap.data(); let movieIsRelated = false; const relatedScenesFromMovie = []; if (movieData.cenas?.length > 0) { for (const sceneId of movieData.cenas) { const sceneData = allScenesCache.get(sceneId); if (sceneData) { const sceneFullData = { id: sceneId, type: 'scene', ...sceneData }; relatedScenesFromMovie.push(sceneFullData); if (sceneData.atores?.includes(mainActressId)) { movieIsRelated = true; } } } } if (movieIsRelated) { allRelatedContent.push({ id: docSnap.id, type: 'film', ...movieData }); relatedScenesFromMovie.forEach(scene => { if (!allRelatedContent.some(item => item.id === scene.id && item.type === 'scene')) { allRelatedContent.push(scene); } }); } else { relatedScenesFromMovie.forEach(scene => { if (scene.atores?.includes(mainActressId)) { if (!allRelatedContent.some(item => item.id === scene.id && item.type === 'scene')) { allRelatedContent.push(scene); } } }); } }); allScenesCache.forEach((sceneData, sceneId) => { if (sceneData.atores?.includes(mainActressId)) { if (!allRelatedContent.some(item => item.id === sceneId && item.type === 'scene')) { allRelatedContent.push({ id: sceneId, type: 'scene', ...sceneData }); } } }); console.log(`Found ${allRelatedContent.length} related items for actress ${mainActressId}`); applyRelatedContentFilters(); } catch (error) { console.error("Erro ao buscar conteúdo relacionado: ", error); displayMessage(contentMessage, 'Erro ao carregar conteúdo relacionado.', true); } }
+        function applyRelatedContentFilters() { contentCardsContainer.innerHTML = ''; clearMessage(contentMessage); const relatedActressIds = selectedRelatedActresses.map(a => a.id); filteredRelatedContent = allRelatedContent.filter(item => { if (activeRelatedFilter !== 'all' && item.type !== activeRelatedFilter) return false; if (relatedActressIds.length > 0) { if (!item.atores || !Array.isArray(item.atores)) return false; if (!relatedActressIds.every(relId => item.atores.includes(relId))) return false; } return true; }); filteredRelatedContent.sort((a, b) => (a.nome || '').localeCompare(b.nome || '')); if (filteredRelatedContent.length > 0) { filteredRelatedContent.forEach(item => createContentCard(item.imagem, item.nome, item.type, item.id)); } else { displayMessage(contentMessage, 'Nenhum conteúdo encontrado com os filtros aplicados.'); } }
+        function createContentCard(imageUrl, title, type, id) { const card = document.createElement('div'); card.classList.add('content-card'); card.dataset.type = type; card.dataset.id = id; const imageContainer = document.createElement('div'); imageContainer.classList.add('image-container'); const img = document.createElement('img'); let finalImageUrl = imageUrl; if (typeof imageUrl === 'object' && imageUrl !== null && imageUrl.width) { const urlKey = Object.keys(imageUrl).find(k=>typeof imageUrl[k]==='string'&&imageUrl[k].startsWith('http')); finalImageUrl = urlKey ? imageUrl[urlKey] : 'placeholder.png';} else if (typeof imageUrl !== 'string' || !imageUrl) { finalImageUrl = 'placeholder.png'; } img.src = finalImageUrl; img.alt = title || type; img.onerror = () => { img.src = 'placeholder.png'; img.onerror=null; }; const badge = document.createElement('div'); badge.classList.add('content-type-badge'); let badgeText = capitalizeFirstLetter(type); if(type === 'film') badgeText = 'Filme'; else if(type === 'scene') badgeText = 'Cena'; else if(type === 'video') badgeText = 'Vídeo'; badge.textContent = badgeText; imageContainer.appendChild(badge); imageContainer.appendChild(img); const titleDiv = document.createElement('div'); titleDiv.classList.add('title'); titleDiv.textContent = `${title || 'Sem Título'}`; card.appendChild(imageContainer); card.appendChild(titleDiv); card.addEventListener('click', () => showContentDetails(type, id)); contentCardsContainer.appendChild(card); }
 
         // --- Right Column Search Functions ---
-        function displayRelatedSuggestions(searchTerm) { /* ... no changes needed ... */
-            if (!relatedSuggestionsList || !currentMainActressId) return; relatedSuggestionsList.innerHTML = ''; if (!searchTerm || searchTerm.trim() === '') { relatedSuggestionsList.style.display = 'none'; return; } const coActressIds = new Set(); allRelatedContent.forEach(item => { item.atores?.forEach(id => { if (id !== currentMainActressId) coActressIds.add(id); }); }); if (coActressIds.size === 0) { relatedSuggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma co-atriz no conteúdo</div>'; relatedSuggestionsList.style.display = 'block'; return; } const lowerSearchTerm = searchTerm.toLowerCase(); const matchedActresses = allActressesData.filter(actress => { const isCoStar = coActressIds.has(actress.id); const matchesSearch = (actress.nome || '').toLowerCase().includes(lowerSearchTerm); const isNotSelected = !selectedRelatedActresses.some(sa => sa.id === actress.id); return isCoStar && matchesSearch && isNotSelected; }); if (matchedActresses.length > 0) { matchedActresses.sort((a, b) => (a.nome || '').localeCompare(b.nome || '')).slice(0, 7).forEach(actress => { const item = document.createElement('div'); item.classList.add('suggestion-item'); item.dataset.id = actress.id; item.dataset.nome = actress.nome || ''; item.innerHTML = `<img src="${actress.foto || 'placeholder.png'}" alt=""><span>${actress.nome || 'Nome Ind.'}</span>`; item.addEventListener('click', handleSelectRelatedActress); relatedSuggestionsList.appendChild(item); }); relatedSuggestionsList.style.display = 'block'; } else { relatedSuggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma co-atriz encontrada</div>'; relatedSuggestionsList.style.display = 'block'; }
-        }
-        function handleSelectRelatedActress(event) { /* ... no changes needed ... */
-             const target = event.currentTarget; const actressId = target.dataset.id; const actressName = target.dataset.nome; if (!actressId || !actressName) return; if (!selectedRelatedActresses.some(a => a.id === actressId)) { selectedRelatedActresses.push({ id: actressId, nome: actressName }); renderRelatedActressPills(); applyRelatedContentFilters(); } if (relatedSearchInput) relatedSearchInput.value = ''; if (relatedSuggestionsList) relatedSuggestionsList.style.display = 'none'; if (relatedSearchInput) relatedSearchInput.focus();
-        }
-        function renderRelatedActressPills() { /* ... no changes needed ... */
-             if (!relatedSelectedActressesContainer) return; relatedSelectedActressesContainer.innerHTML = ''; selectedRelatedActresses.forEach(actress => { const pill = document.createElement('div'); pill.classList.add('related-actress-pill'); pill.dataset.id = actress.id; pill.innerHTML = `<span>${actress.nome}</span><button class="related-remove-actress-btn" title="Remover">×</button>`; pill.querySelector('.related-remove-actress-btn').addEventListener('click', handleRemoveRelatedActress); relatedSelectedActressesContainer.appendChild(pill); });
-        }
-        function handleRemoveRelatedActress(event) { /* ... no changes needed ... */
-              event.stopPropagation(); const pill = event.target.closest('.related-actress-pill'); if (!pill) return; const actressIdToRemove = pill.dataset.id; selectedRelatedActresses = selectedRelatedActresses.filter(a => a.id !== actressIdToRemove); renderRelatedActressPills(); applyRelatedContentFilters(); if (relatedSuggestionsList?.style.display === 'block' && relatedSearchInput?.value) { displayRelatedSuggestions(relatedSearchInput.value); }
-        }
+        function displayRelatedSuggestions(searchTerm) { if (!relatedSuggestionsList || !currentMainActressId) return; relatedSuggestionsList.innerHTML = ''; if (!searchTerm || searchTerm.trim() === '') { relatedSuggestionsList.style.display = 'none'; return; } const coActressIds = new Set(); allRelatedContent.forEach(item => { item.atores?.forEach(id => { if (id !== currentMainActressId) coActressIds.add(id); }); }); if (coActressIds.size === 0) { relatedSuggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma co-atriz no conteúdo</div>'; relatedSuggestionsList.style.display = 'block'; return; } const lowerSearchTerm = searchTerm.toLowerCase(); const matchedActresses = allActressesData.filter(actress => { const isCoStar = coActressIds.has(actress.id); const matchesSearch = (actress.nome || '').toLowerCase().includes(lowerSearchTerm); const isNotSelected = !selectedRelatedActresses.some(sa => sa.id === actress.id); return isCoStar && matchesSearch && isNotSelected; }); if (matchedActresses.length > 0) { matchedActresses.sort((a, b) => (a.nome || '').localeCompare(b.nome || '')).slice(0, 7).forEach(actress => { const item = document.createElement('div'); item.classList.add('suggestion-item'); item.dataset.id = actress.id; item.dataset.nome = actress.nome || ''; item.innerHTML = `<img src="${actress.foto || 'placeholder.png'}" alt=""><span>${actress.nome || 'Nome Ind.'}</span>`; item.addEventListener('click', handleSelectRelatedActress); relatedSuggestionsList.appendChild(item); }); relatedSuggestionsList.style.display = 'block'; } else { relatedSuggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma co-atriz encontrada</div>'; relatedSuggestionsList.style.display = 'block'; } }
+        function handleSelectRelatedActress(event) { const target = event.currentTarget; const actressId = target.dataset.id; const actressName = target.dataset.nome; if (!actressId || !actressName) return; if (!selectedRelatedActresses.some(a => a.id === actressId)) { selectedRelatedActresses.push({ id: actressId, nome: actressName }); renderRelatedActressPills(); applyRelatedContentFilters(); } if (relatedSearchInput) relatedSearchInput.value = ''; if (relatedSuggestionsList) relatedSuggestionsList.style.display = 'none'; if (relatedSearchInput) relatedSearchInput.focus(); }
+        function renderRelatedActressPills() { if (!relatedSelectedActressesContainer) return; relatedSelectedActressesContainer.innerHTML = ''; selectedRelatedActresses.forEach(actress => { const pill = document.createElement('div'); pill.classList.add('related-actress-pill'); pill.dataset.id = actress.id; pill.innerHTML = `<span>${actress.nome}</span><button class="related-remove-actress-btn" title="Remover">×</button>`; pill.querySelector('.related-remove-actress-btn').addEventListener('click', handleRemoveRelatedActress); relatedSelectedActressesContainer.appendChild(pill); }); }
+        function handleRemoveRelatedActress(event) { event.stopPropagation(); const pill = event.target.closest('.related-actress-pill'); if (!pill) return; const actressIdToRemove = pill.dataset.id; selectedRelatedActresses = selectedRelatedActresses.filter(a => a.id !== actressIdToRemove); renderRelatedActressPills(); applyRelatedContentFilters(); if (relatedSuggestionsList?.style.display === 'block' && relatedSearchInput?.value) { displayRelatedSuggestions(relatedSearchInput.value); } }
 
         // --- Content Detail Modal Functions ---
-        async function showContentDetails(type, id) { /* ... uses renamed modal body ID, no other changes needed ... */
-             contentModalBody.innerHTML = '<div class="loading">Carregando...</div>'; modalLinkContainer.innerHTML = ''; contentModal.style.display = 'flex'; let collectionName = ''; switch (type) { case 'scene': collectionName = 'cenas'; break; case 'video': collectionName = 'videos'; break; case 'film': collectionName = 'filmes'; break; default: contentModalBody.innerHTML = '<div class="error">Tipo inválido.</div>'; return; } try { const docSnap = await getDoc(doc(db, collectionName, id)); if (docSnap.exists()) { const data = docSnap.data(); contentModalTitle.textContent = data.nome || `Detalhes`; contentModalBody.innerHTML = ''; if (data.imagem) { let finalImageUrl = data.imagem; if (typeof finalImageUrl === 'object' && finalImageUrl !== null && finalImageUrl.width) { const urlKey = Object.keys(finalImageUrl).find(k=>typeof finalImageUrl[k]==='string'&&finalImageUrl[k].startsWith('http')); finalImageUrl = urlKey ? finalImageUrl[urlKey] : null;} else if (typeof finalImageUrl !== 'string') { finalImageUrl = null; } if(finalImageUrl){ const img = document.createElement('img'); img.src = finalImageUrl; img.alt = data.nome || type; img.classList.add('modal-detail-image'); if (type === 'film') img.classList.add('movie-image'); img.onerror = () => { img.style.display = 'none'; }; contentModalBody.appendChild(img); } } if (data.ano) { const yearDiv = document.createElement('div'); yearDiv.classList.add('modal-year'); yearDiv.textContent = `Ano: ${data.ano}`; contentModalBody.appendChild(yearDiv); } const actressesContainer = document.createElement('div'); actressesContainer.classList.add('modal-actress-list-container'); actressesContainer.innerHTML = `<h4>Atrizes</h4><div class="loading" style="font-size:0.9em;">Carregando...</div>`; contentModalBody.appendChild(actressesContainer); let scenesContainer = null; if (type === 'film') { scenesContainer = document.createElement('div'); scenesContainer.classList.add('modal-scenes-container'); scenesContainer.innerHTML = `<h4>Cenas do Filme</h4><div class="loading" style="font-size:0.9em;">Carregando...</div>`; contentModalBody.appendChild(scenesContainer); } if (data.pagina?.trim()) { const linkButton = document.createElement('button'); linkButton.textContent = 'Abrir Página Externa'; linkButton.onclick = () => window.open(data.pagina, '_blank'); modalLinkContainer.appendChild(linkButton); } else { modalLinkContainer.innerHTML = '<i style="font-size:0.9em; color:#777;">(Nenhuma página externa)</i>'; } const contentActressIds = data.atores || []; loadActressesForModal(contentActressIds, actressesContainer, contentActressIds); if (type === 'film' && scenesContainer) { loadScenesForModal(data.cenas || [], scenesContainer); } } else { contentModalBody.innerHTML = '<div class="error">Conteúdo não encontrado.</div>'; }
-             } catch (error) { console.error(`Erro ao buscar ${type} ${id}: `, error); contentModalBody.innerHTML = '<div class="error">Erro ao carregar detalhes.</div>'; }
-        }
-        async function loadActressesForModal(actressIds, containerElement, contextActressIds = []) { /* ... no changes needed ... */
-             if (!actressIds || actressIds.length === 0) { containerElement.innerHTML = '<h4>Atrizes</h4><i style="font-size:0.9em; color:#777;">Nenhuma atriz associada.</i>'; return; } const listElement = document.createElement('ul'); listElement.classList.add('modal-actress-list'); containerElement.innerHTML = '<h4>Atrizes</h4>'; containerElement.appendChild(listElement); let foundCount = 0; const fetchPromises = actressIds.map(async (actressId) => { try { let actressData = allActressesData.find(a => a.id === actressId); if (!actressData) { const docSnap = await getDoc(doc(db, "atores", actressId)); if (docSnap.exists()) actressData = { id: actressId, ...docSnap.data() }; } if (actressData) { foundCount++; const li = document.createElement('li'); li.classList.add('modal-actress-item'); li.onclick = () => createActressPopup(actressId, contextActressIds); const img = document.createElement('img'); img.src = actressData.foto || 'placeholder.png'; img.alt = actressData.nome || 'Atriz'; img.onerror = () => { img.src = 'placeholder.png'; img.onerror=null; } const nameSpan = document.createElement('span'); nameSpan.textContent = actressData.nome || 'Nome Ind.'; li.appendChild(img); li.appendChild(nameSpan); listElement.appendChild(li); } } catch (error) { console.error(`Erro ao carregar atriz ${actressId} para modal:`, error); } }); await Promise.all(fetchPromises); if (foundCount === 0) containerElement.innerHTML = '<h4>Atrizes</h4><i class="error">Erro ao carregar atrizes.</i>';
-        }
-        async function loadScenesForModal(sceneIds, containerElement) { /* ... no changes needed ... */
-            if (!sceneIds || sceneIds.length === 0) { containerElement.innerHTML = '<h4>Cenas do Filme</h4><i style="font-size:0.9em; color:#777;">Nenhuma cena associada.</i>'; return; } const cardsContainer = document.createElement('div'); cardsContainer.classList.add('modal-scene-cards'); containerElement.innerHTML = '<h4>Cenas do Filme</h4>'; containerElement.appendChild(cardsContainer); let foundCount = 0; sceneIds.forEach(sceneId => { const sceneData = allScenesCache.get(sceneId); if (sceneData) { foundCount++; const card = document.createElement('div'); card.classList.add('modal-scene-card'); const img = document.createElement('img'); let finalImageUrl = sceneData.imagem; if (typeof finalImageUrl === 'object' && finalImageUrl !== null && finalImageUrl.width) { const urlKey = Object.keys(finalImageUrl).find(k=>typeof finalImageUrl[k]==='string'&&finalImageUrl[k].startsWith('http')); finalImageUrl = urlKey ? finalImageUrl[urlKey] : 'placeholder.png'; } else if (typeof finalImageUrl !== 'string' || !finalImageUrl) { finalImageUrl = 'placeholder.png'; } img.src = finalImageUrl; img.alt = sceneData.nome || 'Cena'; img.onerror = () => { img.src = 'placeholder.png'; img.onerror=null; } const titleDiv = document.createElement('div'); titleDiv.classList.add('title'); titleDiv.textContent = sceneData.nome || 'Sem Título'; card.appendChild(img); card.appendChild(titleDiv); cardsContainer.appendChild(card); } else { console.warn(`Cena ${sceneId} não encontrada no cache para modal.`); } }); if (foundCount === 0) containerElement.innerHTML = '<h4>Cenas do Filme</h4><i class="error">Erro ao carregar cenas.</i>';
-        }
-        window.closeModal = function() { /* ... uses renamed modal body ID, no other changes needed ... */
-             if(contentModal) contentModal.style.display = 'none'; if(contentModalBody) contentModalBody.innerHTML = ''; if(modalLinkContainer) modalLinkContainer.innerHTML = '';
-        }
+        async function showContentDetails(type, id) { contentModalBody.innerHTML = '<div class="loading">Carregando...</div>'; modalLinkContainer.innerHTML = ''; contentModal.style.display = 'flex'; let collectionName = ''; switch (type) { case 'scene': collectionName = 'cenas'; break; case 'video': collectionName = 'videos'; break; case 'film': collectionName = 'filmes'; break; default: contentModalBody.innerHTML = '<div class="error">Tipo inválido.</div>'; return; } try { const docSnap = await getDoc(doc(db, collectionName, id)); if (docSnap.exists()) { const data = docSnap.data(); contentModalTitle.textContent = data.nome || `Detalhes`; contentModalBody.innerHTML = ''; if (data.imagem) { let finalImageUrl = data.imagem; if (typeof finalImageUrl === 'object' && finalImageUrl !== null && finalImageUrl.width) { const urlKey = Object.keys(finalImageUrl).find(k=>typeof finalImageUrl[k]==='string'&&finalImageUrl[k].startsWith('http')); finalImageUrl = urlKey ? finalImageUrl[urlKey] : null;} else if (typeof finalImageUrl !== 'string') { finalImageUrl = null; } if(finalImageUrl){ const img = document.createElement('img'); img.src = finalImageUrl; img.alt = data.nome || type; img.classList.add('modal-detail-image'); if (type === 'film') img.classList.add('movie-image'); img.onerror = () => { img.style.display = 'none'; }; contentModalBody.appendChild(img); } } if (data.ano) { const yearDiv = document.createElement('div'); yearDiv.classList.add('modal-year'); yearDiv.textContent = `Ano: ${data.ano}`; contentModalBody.appendChild(yearDiv); } const actressesContainer = document.createElement('div'); actressesContainer.classList.add('modal-actress-list-container'); actressesContainer.innerHTML = `<h4>Atrizes</h4><div class="loading" style="font-size:0.9em;">Carregando...</div>`; contentModalBody.appendChild(actressesContainer); let scenesContainer = null; if (type === 'film') { scenesContainer = document.createElement('div'); scenesContainer.classList.add('modal-scenes-container'); scenesContainer.innerHTML = `<h4>Cenas do Filme</h4><div class="loading" style="font-size:0.9em;">Carregando...</div>`; contentModalBody.appendChild(scenesContainer); } if (data.pagina?.trim()) { const linkButton = document.createElement('button'); linkButton.textContent = 'Abrir Página Externa'; linkButton.onclick = () => window.open(data.pagina, '_blank'); modalLinkContainer.appendChild(linkButton); } else { modalLinkContainer.innerHTML = '<i style="font-size:0.9em; color:#777;">(Nenhuma página externa)</i>'; } const contentActressIds = data.atores || []; loadActressesForModal(contentActressIds, actressesContainer, contentActressIds); if (type === 'film' && scenesContainer) { loadScenesForModal(data.cenas || [], scenesContainer); } } else { contentModalBody.innerHTML = '<div class="error">Conteúdo não encontrado.</div>'; } } catch (error) { console.error(`Erro ao buscar ${type} ${id}: `, error); contentModalBody.innerHTML = '<div class="error">Erro ao carregar detalhes.</div>'; } }
+        async function loadActressesForModal(actressIds, containerElement, contextActressIds = []) { if (!actressIds || actressIds.length === 0) { containerElement.innerHTML = '<h4>Atrizes</h4><i style="font-size:0.9em; color:#777;">Nenhuma atriz associada.</i>'; return; } const listElement = document.createElement('ul'); listElement.classList.add('modal-actress-list'); containerElement.innerHTML = '<h4>Atrizes</h4>'; containerElement.appendChild(listElement); let foundCount = 0; const fetchPromises = actressIds.map(async (actressId) => { try { let actressData = allActressesData.find(a => a.id === actressId); if (!actressData) { const docSnap = await getDoc(doc(db, "atores", actressId)); if (docSnap.exists()) actressData = { id: actressId, ...docSnap.data() }; } if (actressData) { foundCount++; const li = document.createElement('li'); li.classList.add('modal-actress-item'); li.onclick = () => createActressPopup(actressId, contextActressIds); const img = document.createElement('img'); img.src = actressData.foto || 'placeholder.png'; img.alt = actressData.nome || 'Atriz'; img.onerror = () => { img.src = 'placeholder.png'; img.onerror=null; } const nameSpan = document.createElement('span'); nameSpan.textContent = actressData.nome || 'Nome Ind.'; li.appendChild(img); li.appendChild(nameSpan); listElement.appendChild(li); } } catch (error) { console.error(`Erro ao carregar atriz ${actressId} para modal:`, error); } }); await Promise.all(fetchPromises); if (foundCount === 0) containerElement.innerHTML = '<h4>Atrizes</h4><i class="error">Erro ao carregar atrizes.</i>'; }
+        async function loadScenesForModal(sceneIds, containerElement) { if (!sceneIds || sceneIds.length === 0) { containerElement.innerHTML = '<h4>Cenas do Filme</h4><i style="font-size:0.9em; color:#777;">Nenhuma cena associada.</i>'; return; } const cardsContainer = document.createElement('div'); cardsContainer.classList.add('modal-scene-cards'); containerElement.innerHTML = '<h4>Cenas do Filme</h4>'; containerElement.appendChild(cardsContainer); let foundCount = 0; sceneIds.forEach(sceneId => { const sceneData = allScenesCache.get(sceneId); if (sceneData) { foundCount++; const card = document.createElement('div'); card.classList.add('modal-scene-card'); const img = document.createElement('img'); let finalImageUrl = sceneData.imagem; if (typeof finalImageUrl === 'object' && finalImageUrl !== null && finalImageUrl.width) { const urlKey = Object.keys(finalImageUrl).find(k=>typeof finalImageUrl[k]==='string'&&finalImageUrl[k].startsWith('http')); finalImageUrl = urlKey ? finalImageUrl[urlKey] : 'placeholder.png'; } else if (typeof finalImageUrl !== 'string' || !finalImageUrl) { finalImageUrl = 'placeholder.png'; } img.src = finalImageUrl; img.alt = sceneData.nome || 'Cena'; img.onerror = () => { img.src = 'placeholder.png'; img.onerror=null; } const titleDiv = document.createElement('div'); titleDiv.classList.add('title'); titleDiv.textContent = sceneData.nome || 'Sem Título'; card.appendChild(img); card.appendChild(titleDiv); cardsContainer.appendChild(card); } else { console.warn(`Cena ${sceneId} não encontrada no cache para modal.`); } }); if (foundCount === 0) containerElement.innerHTML = '<h4>Cenas do Filme</h4><i class="error">Erro ao carregar cenas.</i>'; }
+        window.closeModal = function() { if(contentModal) contentModal.style.display = 'none'; if(contentModalBody) contentModalBody.innerHTML = ''; if(modalLinkContainer) modalLinkContainer.innerHTML = ''; }
 
         // --- Movable Actress Popup Functions ---
-        function createActressPopup(actressId, contextActressIds = []) { /* ... includes closing popup on compare click ... */
-             const template = document.getElementById('actress-popup-template'); if (!template) return; const popup = template.cloneNode(true); popup.id = `actress-popup-${actressId}-${popupsOpen++}`; popup.style.display = 'flex'; const vpWidth = window.innerWidth; const vpHeight = window.innerHeight; const popupWidth = 200; const popupHeight = 300; const startTop = 50 + (popupsOpen * 20) % Math.max(100, vpHeight - popupHeight - 20); const startLeft = 50 + (popupsOpen * 25) % Math.max(100, vpWidth - popupWidth - 20); popup.style.top = `${startTop}px`; popup.style.left = `${startLeft}px`; const header = popup.querySelector('.actress-popup-header h5'); const body = popup.querySelector('.actress-popup-body'); const closeBtn = popup.querySelector('.actress-popup-close'); const compareBtn = popup.querySelector('.actress-popup-compare-btn'); if(!header || !body || !closeBtn || !compareBtn) { console.error("Popup structure invalid"); return; } header.textContent = 'Carregando...'; body.innerHTML = '<div class="loading">...</div>'; closeBtn.onclick = () => popup.remove(); compareBtn.onclick = (e) => { e.stopPropagation(); openComparisonModal(contextActressIds); popup.remove(); }; document.body.appendChild(popup); makeDraggable(popup); const actressData = allActressesData.find(a => a.id === actressId); if (actressData) { populateActressPopup(popup, actressData); } else { getDoc(doc(db, "atores", actressId)).then(docSnap => { if (docSnap.exists()) { populateActressPopup(popup, { id: actressId, ...docSnap.data() }); } else { header.textContent = 'Erro'; body.innerHTML = '<div class="error">Não encontrada.</div>'; } }).catch(err => { header.textContent = 'Erro'; body.innerHTML = '<div class="error">Erro.</div>'; }); }
-        }
-        function populateActressPopup(popupElement, data) { /* ... includes counts, no functional changes needed ... */
-             const header = popupElement.querySelector('.actress-popup-header h5'); const body = popupElement.querySelector('.actress-popup-body'); if(!header || !body) return; header.textContent = data.nome || 'Detalhes'; body.innerHTML = ''; if (data.foto) { const img = document.createElement('img'); img.src = data.foto; img.alt = data.nome || 'Foto'; img.onerror = () => { img.style.display = 'none'; }; body.appendChild(img); } let detailsAdded = false; const addDetailRow = (label, value) => { if (value != null && value !== '') { const div = document.createElement('div'); div.innerHTML = `<strong>${label}:</strong> ${value}`; body.appendChild(div); detailsAdded = true; } }; addDetailRow('Nasc', data.dataNascimento); if (data.dataNascimento) { addDetailRow('Idade', calculateAge(data.dataNascimento)); } if (data.altura != null) { addDetailRow('Altura', `${data.altura} cm`); } if (data.peso != null) { addDetailRow('Peso', `${data.peso} kg`); } if (Array.isArray(data.filmes)) { addDetailRow('Filmes', data.filmes.length); } if (Array.isArray(data.videos)) { addDetailRow('Vídeos', data.videos.length); } if (Array.isArray(data.cenas)) { addDetailRow('Cenas', data.cenas.length); } const skipFields = ['foto', 'nome', 'timestamp', 'id', 'filmes', 'videos', 'cenas', 'dataNascimento', 'altura', 'peso']; for (const key in data) { if (data.hasOwnProperty(key) && !skipFields.includes(key)) { addDetailRow(capitalizeFirstLetter(key), data[key]); } } if (!detailsAdded && !data.foto) { body.innerHTML += '<i style="font-size:0.9em; color:#777;">(Sem detalhes)</i>'; }
-        }
-        function makeDraggable(element) { /* ... no changes needed ... */
-             let isDragging = false; let offsetX, offsetY; const header = element.querySelector('.actress-popup-header'); if (!header) return; header.onmousedown = (e) => { if (e.target.tagName === 'BUTTON') return; isDragging = true; element.classList.add('dragging'); offsetX = e.clientX - element.getBoundingClientRect().left; offsetY = e.clientY - element.getBoundingClientRect().top; header.style.cursor = 'grabbing'; e.preventDefault(); }; document.onmousemove = (e) => { if (!isDragging) return; let newX = e.clientX - offsetX; let newY = e.clientY - offsetY; const vpWidth = window.innerWidth; const vpHeight = window.innerHeight; const elWidth = element.offsetWidth; const elHeight = element.offsetHeight; newX = Math.max(0, Math.min(newX, vpWidth - elWidth)); newY = Math.max(0, Math.min(newY, vpHeight - elHeight)); element.style.left = `${newX}px`; element.style.top = `${newY}px`; }; document.onmouseup = () => { if (isDragging) { isDragging = false; element.classList.remove('dragging'); header.style.cursor = 'grab'; } }; header.ondragstart = () => false;
-        }
+        function createActressPopup(actressId, contextActressIds = []) { const template = document.getElementById('actress-popup-template'); if (!template) return; const popup = template.cloneNode(true); popup.id = `actress-popup-${actressId}-${popupsOpen++}`; popup.style.display = 'flex'; const vpWidth = window.innerWidth; const vpHeight = window.innerHeight; const popupWidth = 200; const popupHeight = 300; const startTop = 50 + (popupsOpen * 20) % Math.max(100, vpHeight - popupHeight - 20); const startLeft = 50 + (popupsOpen * 25) % Math.max(100, vpWidth - popupWidth - 20); popup.style.top = `${startTop}px`; popup.style.left = `${startLeft}px`; const header = popup.querySelector('.actress-popup-header h5'); const body = popup.querySelector('.actress-popup-body'); const closeBtn = popup.querySelector('.actress-popup-close'); const compareBtn = popup.querySelector('.actress-popup-compare-btn'); if(!header || !body || !closeBtn || !compareBtn) { console.error("Popup structure invalid"); return; } header.textContent = 'Carregando...'; body.innerHTML = '<div class="loading">...</div>'; closeBtn.onclick = () => popup.remove(); compareBtn.onclick = (e) => { e.stopPropagation(); openComparisonModal(contextActressIds); popup.remove(); }; document.body.appendChild(popup); makeDraggable(popup); const actressData = allActressesData.find(a => a.id === actressId); if (actressData) { populateActressPopup(popup, actressData); } else { getDoc(doc(db, "atores", actressId)).then(docSnap => { if (docSnap.exists()) { populateActressPopup(popup, { id: actressId, ...docSnap.data() }); } else { header.textContent = 'Erro'; body.innerHTML = '<div class="error">Não encontrada.</div>'; } }).catch(err => { header.textContent = 'Erro'; body.innerHTML = '<div class="error">Erro.</div>'; }); } }
+        function populateActressPopup(popupElement, data) { const header = popupElement.querySelector('.actress-popup-header h5'); const body = popupElement.querySelector('.actress-popup-body'); if(!header || !body) return; header.textContent = data.nome || 'Detalhes'; body.innerHTML = ''; if (data.foto) { const img = document.createElement('img'); img.src = data.foto; img.alt = data.nome || 'Foto'; img.onerror = () => { img.style.display = 'none'; }; body.appendChild(img); } let detailsAdded = false; const addDetailRow = (label, value) => { if (value != null && value !== '') { const div = document.createElement('div'); div.innerHTML = `<strong>${label}:</strong> ${value}`; body.appendChild(div); detailsAdded = true; } }; addDetailRow('Nasc', data.dataNascimento); if (data.dataNascimento) { addDetailRow('Idade', calculateAge(data.dataNascimento)); } if (data.altura != null) { addDetailRow('Altura', `${data.altura} cm`); } if (data.peso != null) { addDetailRow('Peso', `${data.peso} kg`); } if (Array.isArray(data.filmes)) { addDetailRow('Filmes', data.filmes.length); } if (Array.isArray(data.videos)) { addDetailRow('Vídeos', data.videos.length); } if (Array.isArray(data.cenas)) { addDetailRow('Cenas', data.cenas.length); } const skipFields = ['foto', 'nome', 'timestamp', 'id', 'filmes', 'videos', 'cenas', 'dataNascimento', 'altura', 'peso']; for (const key in data) { if (data.hasOwnProperty(key) && !skipFields.includes(key)) { addDetailRow(capitalizeFirstLetter(key), data[key]); } } if (!detailsAdded && !data.foto) { body.innerHTML += '<i style="font-size:0.9em; color:#777;">(Sem detalhes)</i>'; } }
+        function makeDraggable(element) { let isDragging = false; let offsetX, offsetY; const header = element.querySelector('.actress-popup-header'); if (!header) return; header.onmousedown = (e) => { if (e.target.tagName === 'BUTTON') return; isDragging = true; element.classList.add('dragging'); offsetX = e.clientX - element.getBoundingClientRect().left; offsetY = e.clientY - element.getBoundingClientRect().top; header.style.cursor = 'grabbing'; e.preventDefault(); }; document.onmousemove = (e) => { if (!isDragging) return; let newX = e.clientX - offsetX; let newY = e.clientY - offsetY; const vpWidth = window.innerWidth; const vpHeight = window.innerHeight; const elWidth = element.offsetWidth; const elHeight = element.offsetHeight; newX = Math.max(0, Math.min(newX, vpWidth - elWidth)); newY = Math.max(0, Math.min(newY, vpHeight - elHeight)); element.style.left = `${newX}px`; element.style.top = `${newY}px`; }; document.onmouseup = () => { if (isDragging) { isDragging = false; element.classList.remove('dragging'); header.style.cursor = 'grab'; } }; header.ondragstart = () => false; }
 
         // --- Comparison Modal Functions ---
-        function openComparisonModal(contextIds = []) { /* ... no changes needed ... */
-            console.log("Abrindo comparação com contexto:", contextIds); comparisonContextActressIds = contextIds; actressesToCompare = []; if(comparisonSearchInput) comparisonSearchInput.value = ''; if(comparisonSuggestionsList) comparisonSuggestionsList.style.display = 'none'; renderComparisonView(); if(comparisonModal) comparisonModal.style.display = 'flex'; if(comparisonSearchInput) comparisonSearchInput.focus();
-        }
-        window.closeComparisonModal = function() { /* ... no changes needed ... */
-             if(comparisonModal) comparisonModal.style.display = 'none'; comparisonContextActressIds = []; actressesToCompare = [];
-        }
-        function displayComparisonSuggestions(searchTerm) { /* ... no changes needed ... */
-            if (!comparisonSuggestionsList || !comparisonSearchInput) return; comparisonSuggestionsList.innerHTML = ''; if (!searchTerm || searchTerm.trim() === '') { comparisonSuggestionsList.style.display = 'none'; return; } const lowerSearchTerm = searchTerm.toLowerCase(); let matchedActresses = allActressesData.filter(actress => (actress.nome || '').toLowerCase().includes(lowerSearchTerm) && !actressesToCompare.some(ca => ca.id === actress.id) ); matchedActresses.sort((a, b) => { const aIsInContext = comparisonContextActressIds.includes(a.id); const bIsInContext = comparisonContextActressIds.includes(b.id); if (aIsInContext && !bIsInContext) return -1; if (!aIsInContext && bIsInContext) return 1; return (a.nome || '').localeCompare(b.nome || ''); }); if (matchedActresses.length > 0) { matchedActresses.slice(0, 10).forEach(actress => { const item = document.createElement('div'); item.classList.add('suggestion-item'); if (comparisonContextActressIds.includes(actress.id)) { item.classList.add('context-actress'); } item.dataset.id = actress.id; item.innerHTML = `<img src="${actress.foto || 'placeholder.png'}" alt=""><span>${actress.nome || 'Nome Ind.'}</span>`; item.addEventListener('click', () => handleSelectActressForComparison(actress.id)); comparisonSuggestionsList.appendChild(item); }); comparisonSuggestionsList.style.display = 'block'; } else { comparisonSuggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma atriz encontrada</div>'; comparisonSuggestionsList.style.display = 'block'; }
-        }
-        function handleSelectActressForComparison(actressId) { /* ... no changes needed ... */
-            if (actressesToCompare.some(a => a.id === actressId)) return; const actressData = allActressesData.find(a => a.id === actressId); if (actressData) { actressesToCompare.push({ id: actressId, nome: actressData.nome, data: actressData }); renderComparisonView(); } else { console.error("Dados da atriz não encontrados para comparação:", actressId); } if(comparisonSearchInput) comparisonSearchInput.value = ''; if(comparisonSuggestionsList) comparisonSuggestionsList.style.display = 'none'; if(comparisonSearchInput) comparisonSearchInput.focus();
-        }
-        function removeActressFromComparison(actressId) { /* ... no changes needed ... */
-            actressesToCompare = actressesToCompare.filter(a => a.id !== actressId); renderComparisonView();
-        }
-        function renderComparisonView() { /* ... uses counts, improved button listener, no other functional changes needed ... */
-             if (!comparisonModalBody || !comparisonPlaceholder) return; comparisonModalBody.innerHTML = ''; if (actressesToCompare.length === 0) { comparisonPlaceholder.style.display = 'block'; comparisonModalBody.appendChild(comparisonPlaceholder); } else { comparisonPlaceholder.style.display = 'none'; actressesToCompare.forEach(actress => { const column = document.createElement('div'); column.classList.add('comparison-column'); column.dataset.id = actress.id; let content = ''; let detailsAdded = false; content += `<button class="remove-compare-btn" title="Remover ${actress.nome || 'Atriz'}">×</button>`; content += `<h4>${actress.nome || 'Nome Indisponível'}</h4>`; if (actress.data.foto) { content += `<img src="${actress.data.foto}" alt="${actress.nome || 'Foto'}" onerror="this.style.display='none';">`; } const addDetailToString = (label, value) => { if (value != null && value !== '') { content += `<div><strong>${label}:</strong> ${value}</div>`; detailsAdded = true; } }; addDetailToString('Nasc', actress.data.dataNascimento); if (actress.data.dataNascimento) { addDetailToString('Idade', calculateAge(actress.data.dataNascimento)); } if (actress.data.altura != null) { addDetailToString('Altura', `${actress.data.altura} cm`); } if (actress.data.peso != null) { addDetailToString('Peso', `${actress.data.peso} kg`); } if (Array.isArray(actress.data.filmes)) { addDetailToString('Filmes', actress.data.filmes.length); } if (Array.isArray(actress.data.videos)) { addDetailToString('Vídeos', actress.data.videos.length); } if (Array.isArray(actress.data.cenas)) { addDetailToString('Cenas', actress.data.cenas.length); } const skipFieldsCompare = ['foto', 'nome', 'timestamp', 'id', 'filmes', 'videos', 'cenas', 'dataNascimento', 'altura', 'peso']; for (const key in actress.data) { if (actress.data.hasOwnProperty(key) && !skipFieldsCompare.includes(key)) { addDetailToString(capitalizeFirstLetter(key), actress.data[key]); } } if (!detailsAdded && !actress.data.foto) { content += '<i style="font-size:0.8em; color:#777; display: block; text-align: center; margin-top: 10px;">(Sem detalhes)</i>'; } column.innerHTML = content; const removeBtn = column.querySelector('.remove-compare-btn'); if (removeBtn) { removeBtn.onclick = (event) => { event.stopPropagation(); removeActressFromComparison(actress.id); }; } else { console.error("Remove button not found in comparison column for", actress.id); } comparisonModalBody.appendChild(column); }); }
-        }
+        function openComparisonModal(contextIds = []) { console.log("Abrindo comparação com contexto:", contextIds); comparisonContextActressIds = contextIds; actressesToCompare = []; if(comparisonSearchInput) comparisonSearchInput.value = ''; if(comparisonSuggestionsList) comparisonSuggestionsList.style.display = 'none'; renderComparisonView(); if(comparisonModal) comparisonModal.style.display = 'flex'; if(comparisonSearchInput) comparisonSearchInput.focus(); }
+        window.closeComparisonModal = function() { if(comparisonModal) comparisonModal.style.display = 'none'; comparisonContextActressIds = []; actressesToCompare = []; }
+        function displayComparisonSuggestions(searchTerm) { if (!comparisonSuggestionsList || !comparisonSearchInput) return; comparisonSuggestionsList.innerHTML = ''; if (!searchTerm || searchTerm.trim() === '') { comparisonSuggestionsList.style.display = 'none'; return; } const lowerSearchTerm = searchTerm.toLowerCase(); let matchedActresses = allActressesData.filter(actress => (actress.nome || '').toLowerCase().includes(lowerSearchTerm) && !actressesToCompare.some(ca => ca.id === actress.id) ); matchedActresses.sort((a, b) => { const aIsInContext = comparisonContextActressIds.includes(a.id); const bIsInContext = comparisonContextActressIds.includes(b.id); if (aIsInContext && !bIsInContext) return -1; if (!aIsInContext && bIsInContext) return 1; return (a.nome || '').localeCompare(b.nome || ''); }); if (matchedActresses.length > 0) { matchedActresses.slice(0, 10).forEach(actress => { const item = document.createElement('div'); item.classList.add('suggestion-item'); if (comparisonContextActressIds.includes(actress.id)) { item.classList.add('context-actress'); } item.dataset.id = actress.id; item.innerHTML = `<img src="${actress.foto || 'placeholder.png'}" alt=""><span>${actress.nome || 'Nome Ind.'}</span>`; item.addEventListener('click', () => handleSelectActressForComparison(actress.id)); comparisonSuggestionsList.appendChild(item); }); comparisonSuggestionsList.style.display = 'block'; } else { comparisonSuggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma atriz encontrada</div>'; comparisonSuggestionsList.style.display = 'block'; } }
+        function handleSelectActressForComparison(actressId) { if (actressesToCompare.some(a => a.id === actressId)) return; const actressData = allActressesData.find(a => a.id === actressId); if (actressData) { actressesToCompare.push({ id: actressId, nome: actressData.nome, data: actressData }); renderComparisonView(); } else { console.error("Dados da atriz não encontrados para comparação:", actressId); } if(comparisonSearchInput) comparisonSearchInput.value = ''; if(comparisonSuggestionsList) comparisonSuggestionsList.style.display = 'none'; if(comparisonSearchInput) comparisonSearchInput.focus(); }
+        function removeActressFromComparison(actressId) { actressesToCompare = actressesToCompare.filter(a => a.id !== actressId); renderComparisonView(); }
+
+        // Render the comparison columns
+        function renderComparisonView() {
+             if (!comparisonModalBody || !comparisonPlaceholder) return;
+             comparisonModalBody.innerHTML = ''; // Clear previous
+             if (actressesToCompare.length === 0) {
+                 comparisonPlaceholder.style.display = 'block';
+                 comparisonModalBody.appendChild(comparisonPlaceholder);
+             } else {
+                 comparisonPlaceholder.style.display = 'none';
+                 actressesToCompare.forEach(actress => {
+                     const column = document.createElement('div');
+                     column.classList.add('comparison-column');
+                     column.dataset.id = actress.id;
+
+                     let content = ''; // Build HTML string
+                     let detailsAdded = false;
+
+                     // --- Build Column Content ---
+                     content += `<button class="remove-compare-btn" title="Remover ${actress.nome || 'Atriz'}">×</button>`; // Button HTML added here
+                     content += `<h4>${actress.nome || 'Nome Indisponível'}</h4>`;
+                     if (actress.data.foto) { content += `<img src="${actress.data.foto}" alt="${actress.nome || 'Foto'}" onerror="this.style.display='none';">`; }
+                     const addDetailToString = (label, value) => { if (value != null && value !== '') { content += `<div><strong>${label}:</strong> ${value}</div>`; detailsAdded = true; } };
+                     addDetailToString('Nasc', actress.data.dataNascimento); if (actress.data.dataNascimento) { addDetailToString('Idade', calculateAge(actress.data.dataNascimento)); } if (actress.data.altura != null) { addDetailToString('Altura', `${actress.data.altura} cm`); } if (actress.data.peso != null) { addDetailToString('Peso', `${actress.data.peso} kg`); } if (Array.isArray(actress.data.filmes)) { addDetailToString('Filmes', actress.data.filmes.length); } if (Array.isArray(actress.data.videos)) { addDetailToString('Vídeos', actress.data.videos.length); } if (Array.isArray(actress.data.cenas)) { addDetailToString('Cenas', actress.data.cenas.length); }
+                     const skipFieldsCompare = ['foto', 'nome', 'timestamp', 'id', 'filmes', 'videos', 'cenas', 'dataNascimento', 'altura', 'peso'];
+                     for (const key in actress.data) { if (actress.data.hasOwnProperty(key) && !skipFieldsCompare.includes(key)) { addDetailToString(capitalizeFirstLetter(key), actress.data[key]); } }
+                     if (!detailsAdded && !actress.data.foto) { content += '<i style="font-size:0.8em; color:#777; display: block; text-align: center; margin-top: 10px;">(Sem detalhes)</i>'; }
+
+                     // --- Set Content and Attach Listener ---
+                     column.innerHTML = content; // Set the generated HTML
+                     const removeBtn = column.querySelector('.remove-compare-btn'); // Find the button *after* setting innerHTML
+                     if (removeBtn) { removeBtn.onclick = (event) => { event.stopPropagation(); removeActressFromComparison(actress.id); }; } // Attach listener
+                     else { console.error("Remove button not found in comparison column for", actress.id); }
+                     comparisonModalBody.appendChild(column);
+                 });
+             }
+        } // <--- CORRECTED BRACE
 
         // --- NEW: FAB and Create Menu/Modal Functions ---
-
-        function toggleCreateMenu() {
-            if (!createMenuPopup) return;
-            const isVisible = createMenuPopup.style.display === 'block';
-            createMenuPopup.style.display = isVisible ? 'none' : 'block';
-        }
-
-        function closeCreateMenu() {
-             if (createMenuPopup) createMenuPopup.style.display = 'none';
-        }
-
-        function openCreateActressModal() {
-            closeCreateMenu(); // Close the small menu first
-            if (!createActressModal || !createActressModalBody) return;
-
-            // Inject the form HTML (only if not already present or needs refresh)
-            // For simplicity here, we always inject, assuming the form is static
-            createActressModalBody.innerHTML = getCreateActressFormHTML();
-
-            createActressModal.style.display = 'flex'; // Show the modal
-
-            // IMPORTANT: Initialize the form's specific JS logic *after* it's in the DOM
-            if (!createFormInitialized) { // Only initialize once
-                 initializeCreateActressForm();
-                 createFormInitialized = true;
-            } else {
-                // If already initialized, maybe just ensure the submit button is enabled
-                const form = createActressModalBody.querySelector('#create-actress-form');
-                const submitButton = form?.nextElementSibling?.querySelector('button[type="submit"]');
-                 if(submitButton) submitButton.disabled = false; // Ensure enabled on reopen
-                 const nameInput = form?.querySelector('#name');
-                 const nameErrorMessage = form?.querySelector('#name-error-message');
-                 if(nameErrorMessage) nameErrorMessage.style.display = 'none'; // Hide previous errors
-                 if(form) form.reset(); // Reset form fields on reopen
-                 console.log("Re-opening create modal, form reset and button enabled.");
-            }
-        }
-
-        // Make close function globally available
-        window.closeCreateActressModal = function() {
-            if (createActressModal) createActressModal.style.display = 'none';
-            // Optionally clear the form body if needed, but resetting on open might be better
-            // if (createActressModalBody) createActressModalBody.innerHTML = '';
-        }
-
-        function openCreateMultimediaModal() {
-            closeCreateMenu();
-            // Placeholder for future implementation
-            alert("Funcionalidade 'Criar Multimídia' ainda não implementada.");
-            console.log("Placeholder: Abrir modal de criação de multimídia.");
-        }
-
-        // Function to return the raw HTML string for the form
-        function getCreateActressFormHTML() {
-             // This HTML is copied directly from your provided code for the form page,
-             // excluding <html>, <head>, <body>, <nav>, <header>, <main>, and outer <div> tags.
-             return `
-                <form id="create-actress-form">
-                    <div class="form-card">
-                        <label for="name">Name:</label>
-                        <input type="text" id="name" name="name" required>
-                        <span id="name-error-message" class="error-message" style="display: none;"></span>
-                    </div>
-                    <div class="form-card">
-                        <label for="foto">Foto (URL):</label>
-                        <input type="url" id="foto" name="foto" placeholder="https://exemplo.com/imagem.jpg" required>
-                    </div>
-                    <div class="form-card full-width">
-                        <label for="texto">Texto (Biografia/Descrição):</label>
-                        <textarea id="texto" name="texto" rows="5" placeholder="Cole ou digite a biografia e informações aqui..." required></textarea>
-                    </div>
-                    <div class="form-card">
-                        <label for="born">Born (Ex: 1990/05/15):</label>
-                        <input type="text" id="born" name="born" placeholder="YYYY/MM/DD">
-                    </div>
-                    <div class="form-card">
-                        <label for="birthplace">Birthplace:</label>
-                        <input type="text" id="birthplace" name="birthplace">
-                    </div>
-                    <div class="form-card">
-                        <label for="ethnicity">Ethnicity:</label>
-                        <input type="text" id="ethnicity" name="ethnicity">
-                    </div>
-                    <div class="form-card">
-                        <label for="hair_color">Hair color:</label>
-                        <input type="text" id="hair_color" name="hair_color">
-                    </div>
-                    <div class="form-card">
-                        <label for="eye_color">Eye color:</label>
-                        <input type="text" id="eye_color" name="eye_color">
-                    </div>
-                    <div class="form-card">
-                        <label for="height">Height (cm):</label>
-                        <input type="text" id="height" name="height" placeholder="Ex: 170">
-                    </div>
-                    <div class="form-card">
-                        <label for="weight">Weight (kg):</label>
-                        <input type="text" id="weight" name="weight" placeholder="Ex: 59">
-                    </div>
-                    <div class="form-card">
-                        <label for="body_type">Body type:</label>
-                        <input type="text" id="body_type" name="body_type">
-                    </div>
-                    <div class="form-card">
-                        <label for="measurements">Measurements (Ex: 34-24-35):</label>
-                        <input type="text" id="measurements" name="measurements">
-                    </div>
-                    <div class="form-card">
-                        <label for="years_active">Years active (Start Year):</label>
-                        <input type="text" id="years_active" name="years_active" placeholder="Ex: 2010">
-                    </div>
-                    <div class="form-card">
-                        <label for="nota">Nota (0 a 10):</label>
-                        <input type="number" id="nota" name="nota" min="0" max="10" step="0.1" placeholder="Ex: 8.5">
-                    </div>
-                </form>
-                <div class="submit-button-container">
-                    <button type="submit" form="create-actress-form">Criar</button>
-                </div>
-            `;
-        }
-
+        function toggleCreateMenu() { if (!createMenuPopup) return; const isVisible = createMenuPopup.style.display === 'block'; createMenuPopup.style.display = isVisible ? 'none' : 'block'; }
+        function closeCreateMenu() { if (createMenuPopup) createMenuPopup.style.display = 'none'; }
+        function openCreateActressModal() { closeCreateMenu(); if (!createActressModal || !createActressModalBody) return; createActressModalBody.innerHTML = getCreateActressFormHTML(); createActressModal.style.display = 'flex'; if (!createFormInitialized) { initializeCreateActressForm(); createFormInitialized = true; } else { const form = createActressModalBody.querySelector('#create-actress-form'); const submitButton = form?.nextElementSibling?.querySelector('button[type="submit"]'); if(submitButton) submitButton.disabled = false; const nameInput = form?.querySelector('#name'); const nameErrorMessage = form?.querySelector('#name-error-message'); if(nameErrorMessage) nameErrorMessage.style.display = 'none'; if(form) form.reset(); console.log("Re-opening create modal, form reset and button enabled."); } }
+        window.closeCreateActressModal = function() { if (createActressModal) createActressModal.style.display = 'none'; }
+        function openCreateMultimediaModal() { closeCreateMenu(); alert("Funcionalidade 'Criar Multimídia' ainda não implementada."); console.log("Placeholder: Abrir modal de criação de multimídia."); }
+        function getCreateActressFormHTML() { return ` <form id="create-actress-form"> <div class="form-card"> <label for="name">Name:</label> <input type="text" id="name" name="name" required> <span id="name-error-message" class="error-message" style="display: none;"></span> </div> <div class="form-card"> <label for="foto">Foto (URL):</label> <input type="url" id="foto" name="foto" placeholder="https://exemplo.com/imagem.jpg" required> </div> <div class="form-card full-width"> <label for="texto">Texto (Biografia/Descrição):</label> <textarea id="texto" name="texto" rows="5" placeholder="Cole ou digite a biografia e informações aqui..." required></textarea> </div> <div class="form-card"> <label for="born">Born (Ex: 1990/05/15):</label> <input type="text" id="born" name="born" placeholder="YYYY/MM/DD"> </div> <div class="form-card"> <label for="birthplace">Birthplace:</label> <input type="text" id="birthplace" name="birthplace"> </div> <div class="form-card"> <label for="ethnicity">Ethnicity:</label> <input type="text" id="ethnicity" name="ethnicity"> </div> <div class="form-card"> <label for="hair_color">Hair color:</label> <input type="text" id="hair_color" name="hair_color"> </div> <div class="form-card"> <label for="eye_color">Eye color:</label> <input type="text" id="eye_color" name="eye_color"> </div> <div class="form-card"> <label for="height">Height (cm):</label> <input type="text" id="height" name="height" placeholder="Ex: 170"> </div> <div class="form-card"> <label for="weight">Weight (kg):</label> <input type="text" id="weight" name="weight" placeholder="Ex: 59"> </div> <div class="form-card"> <label for="body_type">Body type:</label> <input type="text" id="body_type" name="body_type"> </div> <div class="form-card"> <label for="measurements">Measurements (Ex: 34-24-35):</label> <input type="text" id="measurements" name="measurements"> </div> <div class="form-card"> <label for="years_active">Years active (Start Year):</label> <input type="text" id="years_active" name="years_active" placeholder="Ex: 2010"> </div> <div class="form-card"> <label for="nota">Nota (0 a 10):</label> <input type="number" id="nota" name="nota" min="0" max="10" step="0.1" placeholder="Ex: 8.5"> </div> </form> <div class="submit-button-container"> <button type="submit" form="create-actress-form">Criar</button> </div> `; }
 
         // --- NEW: Actress Creation Form Logic (Integrated) ---
-
-        // Function to initialize listeners and logic for the injected form
         function initializeCreateActressForm() {
             console.log("DEBUG: Initializing Create Actress Form Logic...");
-
-            // Get elements *within the modal context*
             const form = createActressModalBody.querySelector('#create-actress-form');
             const submitButton = createActressModalBody.querySelector('button[form="create-actress-form"]');
             const sourceTextArea = createActressModalBody.querySelector('#texto');
             const nameInput = createActressModalBody.querySelector('#name');
             const nameErrorMessage = createActressModalBody.querySelector('#name-error-message');
-
-             // Basic check if form elements are found
-            if (!form || !submitButton || !sourceTextArea || !nameInput || !nameErrorMessage) {
-                console.error("DEBUG: Failed to find all required elements within the create actress form modal body.");
-                if (!nameErrorMessage) console.error("DEBUG: Specifically, #name-error-message was not found!");
-                createActressModalBody.innerHTML = "<div class='error'>Erro ao carregar o formulário. Elementos não encontrados.</div>";
-                return;
-            }
-            console.log("DEBUG: All create form elements found.");
-
-            // --- Mapeamento: ID do Formulário -> Nome do Campo no Firestore ---
-            const firestoreFieldMap = {
-                'name': 'nome', 'texto': 'texto', 'foto': 'foto', 'born': 'dataNascimento',
-                'birthplace': 'pais', 'ethnicity': 'etnia', 'hair_color': 'corCabelo',
-                'eye_color': 'corOlhos', 'height': 'altura', 'weight': 'peso',
-                'body_type': 'tipoCorpo', 'measurements': 'medidas', 'years_active': 'AnosAtiva',
-                'nota': 'nota'
-            };
-
-            // --- FUNÇÕES HELPER PARA FORMATAÇÃO (Specific to this form) ---
-            function formatBornDate(dateString) { /* ... Same as provided ... */ const dateRegex = /(\d{1,2})(?:st|nd|rd|th)?\s+(?:of\s+)?([a-zA-Z]+)\s+(\d{4})/; const match = dateString.match(dateRegex); if (match) { const day = match[1].padStart(2, '0'); const monthName = match[2]; const year = match[3]; const monthMap = {'january': '01', 'february': '02', 'march': '03', 'april': '04', 'may': '05', 'june': '06', 'july': '07', 'august': '08', 'september': '09', 'october': '10', 'november': '11', 'december': '12'}; const monthNumber = monthMap[monthName.toLowerCase()]; if (monthNumber) return `${year}/${monthNumber}/${day}`; else console.warn(`Mês não reconhecido: "${monthName}"`); } else { const simpleDateRegex = /^(\d{4})[/-](\d{1,2})[/-](\d{1,2})$/; const simpleMatch = dateString.match(simpleDateRegex); if (simpleMatch) { return `${simpleMatch[1]}/${simpleMatch[2].padStart(2, '0')}/${simpleMatch[3].padStart(2, '0')}`; } } return dateString; }
-            function extractCmValue(heightString) { /* ... Same as provided ... */ const cmRegex = /(\d+)\s*cm/i; const match = heightString.match(cmRegex); if (match) return match[1]; const parenCmRegex = /\(\s*(\d+)\s*cm\s*\)/i; const parenMatch = heightString.match(parenCmRegex); if (parenMatch) return parenMatch[1]; return ''; }
-            function extractKgValue(weightString) { /* ... Same as provided ... */ const kgRegex = /(\d+)\s*kg/i; const match = weightString.match(kgRegex); if (match) return match[1]; const parenKgRegex = /\(\s*(\d+)\s*kg\s*\)/i; const parenMatch = weightString.match(parenKgRegex); if (parenMatch) return parenMatch[1]; return ''; }
-            function extractStartYear(yearsString) { /* ... Same as provided ... */ const yearRegex = /(\d{4})/; const match = yearsString.match(yearRegex); return match ? match[1] : ''; }
-
-            // --- Function to check if name exists in Firestore ---
-            async function checkNameExists() {
-                console.log("DEBUG: checkNameExists (form) running for name:", nameInput.value);
-                const enteredName = nameInput.value.trim();
-                nameErrorMessage.style.display = 'none'; nameErrorMessage.textContent = '';
-                let shouldBeDisabled = false;
-                if (enteredName === '') { submitButton.disabled = false; return; }
-                console.log(`DEBUG: checkNameExists (form) - Querying Firestore for name: "${enteredName}"`);
-                try {
-                    const checkQuery = query(collection(db, "atores"), where("nome", "==", enteredName), limit(1));
-                    const querySnapshot = await getDocs(checkQuery);
-                    console.log(`DEBUG: checkNameExists (form) - Query result empty: ${querySnapshot.empty}`);
-                    if (!querySnapshot.empty) {
-                        nameErrorMessage.textContent = `O nome "${enteredName}" já existe.`;
-                        nameErrorMessage.style.display = 'block'; shouldBeDisabled = true;
-                    } else { shouldBeDisabled = false; }
-                } catch (error) { console.error("DEBUG: checkNameExists (form) - Firestore query failed:", error); nameErrorMessage.textContent = 'Erro ao verificar nome.'; nameErrorMessage.style.display = 'block'; shouldBeDisabled = true; }
-                finally { submitButton.disabled = shouldBeDisabled; console.log(`DEBUG: checkNameExists (form) - Submit button disabled: ${shouldBeDisabled}`);}
-            }
-
+            if (!form || !submitButton || !sourceTextArea || !nameInput || !nameErrorMessage) { console.error("DEBUG: Failed to find create form elements."); createActressModalBody.innerHTML = "<div class='error'>Erro ao carregar formulário.</div>"; return; } console.log("DEBUG: All create form elements found.");
+            const firestoreFieldMap = { 'name': 'nome', 'texto': 'texto', 'foto': 'foto', 'born': 'dataNascimento', 'birthplace': 'pais', 'ethnicity': 'etnia', 'hair_color': 'corCabelo', 'eye_color': 'corOlhos', 'height': 'altura', 'weight': 'peso', 'body_type': 'tipoCorpo', 'measurements': 'medidas', 'years_active': 'AnosAtiva', 'nota': 'nota' };
+            function formatBornDate(dateString) { const dateRegex = /(\d{1,2})(?:st|nd|rd|th)?\s+(?:of\s+)?([a-zA-Z]+)\s+(\d{4})/; const match = dateString.match(dateRegex); if (match) { const day = match[1].padStart(2, '0'); const monthName = match[2]; const year = match[3]; const monthMap = {'january': '01', 'february': '02', 'march': '03', 'april': '04', 'may': '05', 'june': '06', 'july': '07', 'august': '08', 'september': '09', 'october': '10', 'november': '11', 'december': '12'}; const monthNumber = monthMap[monthName.toLowerCase()]; if (monthNumber) return `${year}/${monthNumber}/${day}`; } else { const simpleDateRegex = /^(\d{4})[/-](\d{1,2})[/-](\d{1,2})$/; const simpleMatch = dateString.match(simpleDateRegex); if (simpleMatch) { return `${simpleMatch[1]}/${simpleMatch[2].padStart(2, '0')}/${simpleMatch[3].padStart(2, '0')}`; } } return dateString; }
+            function extractCmValue(heightString) { const cmRegex = /(\d+)\s*cm/i; const match = heightString.match(cmRegex); if (match) return match[1]; const parenCmRegex = /\(\s*(\d+)\s*cm\s*\)/i; const parenMatch = heightString.match(parenCmRegex); if (parenMatch) return parenMatch[1]; return ''; }
+            function extractKgValue(weightString) { const kgRegex = /(\d+)\s*kg/i; const match = weightString.match(kgRegex); if (match) return match[1]; const parenKgRegex = /\(\s*(\d+)\s*kg\s*\)/i; const parenMatch = weightString.match(parenKgRegex); if (parenMatch) return parenMatch[1]; return ''; }
+            function extractStartYear(yearsString) { const yearRegex = /(\d{4})/; const match = yearsString.match(yearRegex); return match ? match[1] : ''; }
+            async function checkNameExists() { console.log("DEBUG: checkNameExists (form) name:", nameInput.value); const enteredName = nameInput.value.trim(); nameErrorMessage.style.display = 'none'; nameErrorMessage.textContent = ''; let shouldBeDisabled = false; if (enteredName === '') { submitButton.disabled = false; return; } console.log(`DEBUG: checkNameExists (form) - Querying: "${enteredName}"`); try { const checkQuery = query(collection(db, "atores"), where("nome", "==", enteredName), limit(1)); const querySnapshot = await getDocs(checkQuery); console.log(`DEBUG: checkNameExists (form) - Query empty: ${querySnapshot.empty}`); if (!querySnapshot.empty) { nameErrorMessage.textContent = `O nome "${enteredName}" já existe.`; nameErrorMessage.style.display = 'block'; shouldBeDisabled = true; } else { shouldBeDisabled = false; } } catch (error) { console.error("DEBUG: checkNameExists (form) - Error:", error); nameErrorMessage.textContent = 'Erro ao verificar nome.'; nameErrorMessage.style.display = 'block'; shouldBeDisabled = true; } finally { submitButton.disabled = shouldBeDisabled; console.log(`DEBUG: checkNameExists (form) - Submit disabled: ${shouldBeDisabled}`);} }
             let debouncedCheck = debounce(checkNameExists, 500);
-
-            // --- FUNÇÃO PRINCIPAL DE AUTO-PREENCHIMENTO (Form specific) ---
-            function autoFillForm() {
-                 console.log("DEBUG: autoFillForm (form) started.");
-                 const textContent = sourceTextArea.value; const lines = textContent.split('\n'); let nameWasSetByAutofill = false;
-                 // Clear fields only if empty (excluding required/special fields)
-                 Object.keys(firestoreFieldMap).forEach(formId => { if(['texto', 'name', 'foto', 'nota'].includes(formId)) return; const inputElement = form.querySelector(`#${formId}`); if (inputElement && !inputElement.value) { inputElement.value = ''; } });
-                 // Autofill Name if empty
-                 if (lines.length > 0 && nameInput && !nameInput.value) { const potentialName = lines[0].trim(); if (potentialName) { nameInput.value = potentialName; nameWasSetByAutofill = true; console.log("DEBUG: Autofilled Name:", potentialName); } }
-                 // Autofill other fields
-                const fieldMappingsForAutofill = { 'Born': 'dataNascimento', 'Birthplace': 'pais', 'Ethnicity': 'etnia', 'Hair color': 'corCabelo', 'Eye color': 'corOlhos', 'Height': 'altura', 'Weight': 'peso', 'Body type': 'tipoCorpo', 'Measurements': 'medidas', 'Years active': 'AnosAtiva' };
-                 Object.entries(fieldMappingsForAutofill).forEach(([label, firestoreKey]) => { const formId = Object.keys(firestoreFieldMap).find(key => firestoreFieldMap[key] === firestoreKey); if(!formId) return; const regex = new RegExp(`^${label}:\\s*(.*)$`, 'im'); const match = textContent.match(regex); if (match) { let value = match[1].trim(); if (firestoreKey === 'dataNascimento') value = formatBornDate(value); else if (firestoreKey === 'altura') value = extractCmValue(value); else if (firestoreKey === 'peso') value = extractKgValue(value); else if (firestoreKey === 'AnosAtiva') value = extractStartYear(value); const inputElement = form.querySelector(`#${formId}`); if (inputElement && !inputElement.value) { inputElement.value = value; } } });
-                 if (nameWasSetByAutofill) { console.log("DEBUG: Triggering debounced name check after autofill."); debouncedCheck(); } // Trigger check if name was autofilled
-                 console.log("DEBUG: autoFillForm (form) finished.");
-            }
-
-            // --- EVENT LISTENERS (Form specific) ---
-            console.log("DEBUG: Attaching Create Form Listeners...");
-            nameInput.addEventListener('input', debouncedCheck);
-            nameInput.addEventListener('blur', checkNameExists); // Immediate check on blur
-            sourceTextArea.addEventListener('input', autoFillForm);
-
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault(); console.log("DEBUG: Create form submitted.");
-                if (submitButton.disabled) { alert('Corrija o erro indicado (nome duplicado) ou aguarde a verificação.'); return; }
-                const initialButtonText = 'Criar'; submitButton.disabled = true; submitButton.textContent = 'Verificando...';
-                const formData = new FormData(form); const enteredName = formData.get('name')?.trim();
-                if (!enteredName) { alert('O campo "Nome" é obrigatório.'); submitButton.disabled = false; submitButton.textContent = initialButtonText; return; }
-
-                console.log(`DEBUG: Submit (form) - FINAL check for name: "${enteredName}"`);
-                try {
-                    const finalCheckQuery = query(collection(db, "atores"), where("nome", "==", enteredName), limit(1));
-                    const finalSnapshot = await getDocs(finalCheckQuery);
-                    if (!finalSnapshot.empty) { nameErrorMessage.textContent = `O nome "${enteredName}" já existe.`; nameErrorMessage.style.display = 'block'; alert(`Já existe uma atriz com o nome "${enteredName}".`); submitButton.textContent = initialButtonText; return; } // Keep button disabled
-
-                    submitButton.textContent = 'Salvando...';
-                    const firestoreData = {};
-                     for (const [formId, firestoreKey] of Object.entries(firestoreFieldMap)) {
-                        const rawValue = formData.get(formId);
-                         if (rawValue !== null && rawValue !== undefined) {
-                            const trimmedValue = typeof rawValue === 'string' ? rawValue.trim() : rawValue;
-                            if (trimmedValue === '' && firestoreKey !== 'nota') continue; // Skip empty except nota
-                            if (formId === 'nota') { const numValue = parseFloat(trimmedValue); if (!isNaN(numValue)) firestoreData[firestoreKey] = numValue; }
-                            else if (formId === 'measurements') { firestoreData[firestoreKey] = trimmedValue; const parts = trimmedValue.split('-'); if (parts.length === 3) { firestoreData['Boobs'] = parts[0].trim(); firestoreData['Waist'] = parts[1].trim(); firestoreData['Ass'] = parts[2].trim(); } }
-                            else { firestoreData[firestoreKey] = trimmedValue; } // Other fields
-                        }
-                    }
-                    firestoreData.createdAt = serverTimestamp();
-                    console.log('DEBUG: Submit (form) - Data to save:', firestoreData);
-                    const docRef = await addDoc(collection(db, "atores"), firestoreData);
-                    console.log("DEBUG: Submit (form) - Success! ID: ", docRef.id);
-                    alert('Atriz criada com sucesso!'); form.reset(); nameErrorMessage.style.display = 'none'; nameErrorMessage.textContent = '';
-                    submitButton.disabled = false; submitButton.textContent = initialButtonText;
-                    closeCreateActressModal(); // Close modal on success
-                    loadInitialData(); // Refresh the main list
-                } catch (error) {
-                    console.error("DEBUG: Submit (form) - Erro:", error); alert(`Erro ao salvar: ${error.message}`);
-                    submitButton.disabled = false; submitButton.textContent = initialButtonText;
-                }
-            });
+            function autoFillForm() { console.log("DEBUG: autoFillForm (form) started."); const textContent = sourceTextArea.value; const lines = textContent.split('\n'); let nameWasSetByAutofill = false; Object.keys(firestoreFieldMap).forEach(formId => { if(['texto', 'name', 'foto', 'nota'].includes(formId)) return; const inputElement = form.querySelector(`#${formId}`); if (inputElement && !inputElement.value) { inputElement.value = ''; } }); if (lines.length > 0 && nameInput && !nameInput.value) { const potentialName = lines[0].trim(); if (potentialName) { nameInput.value = potentialName; nameWasSetByAutofill = true; console.log("DEBUG: Autofilled Name:", potentialName); } } const fieldMappingsForAutofill = { 'Born': 'dataNascimento', 'Birthplace': 'pais', 'Ethnicity': 'etnia', 'Hair color': 'corCabelo', 'Eye color': 'corOlhos', 'Height': 'altura', 'Weight': 'peso', 'Body type': 'tipoCorpo', 'Measurements': 'medidas', 'Years active': 'AnosAtiva' }; Object.entries(fieldMappingsForAutofill).forEach(([label, firestoreKey]) => { const formId = Object.keys(firestoreFieldMap).find(key => firestoreFieldMap[key] === firestoreKey); if(!formId) return; const regex = new RegExp(`^${label}:\\s*(.*)$`, 'im'); const match = textContent.match(regex); if (match) { let value = match[1].trim(); if (firestoreKey === 'dataNascimento') value = formatBornDate(value); else if (firestoreKey === 'altura') value = extractCmValue(value); else if (firestoreKey === 'peso') value = extractKgValue(value); else if (firestoreKey === 'AnosAtiva') value = extractStartYear(value); const inputElement = form.querySelector(`#${formId}`); if (inputElement && !inputElement.value) { inputElement.value = value; } } }); if (nameWasSetByAutofill) { console.log("DEBUG: Triggering debounced name check after autofill."); debouncedCheck(); } console.log("DEBUG: autoFillForm (form) finished."); }
+            console.log("DEBUG: Attaching Create Form Listeners..."); nameInput.addEventListener('input', debouncedCheck); nameInput.addEventListener('blur', checkNameExists); sourceTextArea.addEventListener('input', autoFillForm);
+            form.addEventListener('submit', async (e) => { e.preventDefault(); console.log("DEBUG: Create form submitted."); if (submitButton.disabled) { alert('Corrija o erro indicado ou aguarde a verificação.'); return; } const initialButtonText = 'Criar'; submitButton.disabled = true; submitButton.textContent = 'Verificando...'; const formData = new FormData(form); const enteredName = formData.get('name')?.trim(); if (!enteredName) { alert('O campo "Nome" é obrigatório.'); submitButton.disabled = false; submitButton.textContent = initialButtonText; return; } console.log(`DEBUG: Submit (form) - FINAL check: "${enteredName}"`); try { const finalCheckQuery = query(collection(db, "atores"), where("nome", "==", enteredName), limit(1)); const finalSnapshot = await getDocs(finalCheckQuery); if (!finalSnapshot.empty) { nameErrorMessage.textContent = `O nome "${enteredName}" já existe.`; nameErrorMessage.style.display = 'block'; alert(`Já existe uma atriz com o nome "${enteredName}".`); submitButton.textContent = initialButtonText; return; } submitButton.textContent = 'Salvando...'; const firestoreData = {}; for (const [formId, firestoreKey] of Object.entries(firestoreFieldMap)) { const rawValue = formData.get(formId); if (rawValue !== null && rawValue !== undefined) { const trimmedValue = typeof rawValue === 'string' ? rawValue.trim() : rawValue; if (trimmedValue === '' && firestoreKey !== 'nota') continue; if (formId === 'nota') { const numValue = parseFloat(trimmedValue); if (!isNaN(numValue)) firestoreData[firestoreKey] = numValue; } else if (formId === 'measurements') { firestoreData[firestoreKey] = trimmedValue; const parts = trimmedValue.split('-'); if (parts.length === 3) { firestoreData['Boobs'] = parts[0].trim(); firestoreData['Waist'] = parts[1].trim(); firestoreData['Ass'] = parts[2].trim(); } } else { firestoreData[firestoreKey] = trimmedValue; } } } firestoreData.createdAt = serverTimestamp(); console.log('DEBUG: Submit (form) - Data:', firestoreData); const docRef = await addDoc(collection(db, "atores"), firestoreData); console.log("DEBUG: Submit (form) - Success! ID: ", docRef.id); alert('Atriz criada com sucesso!'); form.reset(); nameErrorMessage.style.display = 'none'; nameErrorMessage.textContent = ''; submitButton.disabled = false; submitButton.textContent = initialButtonText; closeCreateActressModal(); loadInitialData(); } catch (error) { console.error("DEBUG: Submit (form) - Erro:", error); alert(`Erro ao salvar: ${error.message}`); submitButton.disabled = false; submitButton.textContent = initialButtonText; } });
              console.log("DEBUG: Create Form Listeners Attached.");
-        } // End of initializeCreateActressForm
-
+        }
 
         // --- Event Listeners (Global Page) ---
         document.addEventListener('DOMContentLoaded', () => {
-            loadInitialData(); // Load main page data
-
-            // Content Detail Modal Close
+            loadInitialData();
+            // Modal Closes
              if(contentModal) contentModal.addEventListener('click', (event) => { if (event.target === contentModal) closeModal(); });
-             // Comparison Modal Close
              if (comparisonModal) comparisonModal.addEventListener('click', (event) => { if (event.target === comparisonModal) closeComparisonModal(); });
-             // *** NEW: Create Actress Modal Close ***
              if (createActressModal) createActressModal.addEventListener('click', (event) => { if (event.target === createActressModal) closeCreateActressModal(); });
-
             // Filter Buttons
             relatedFilterButtons.forEach(button => { button.addEventListener('click', () => { relatedFilterButtons.forEach(btn => btn.classList.remove('active')); button.classList.add('active'); activeRelatedFilter = button.dataset.filter; applyRelatedContentFilters(); }); });
-             // Related Search Input
+             // Related Search
              if(relatedSearchInput) { relatedSearchInput.addEventListener('input', () => displayRelatedSuggestions(relatedSearchInput.value)); relatedSearchInput.addEventListener('focus', () => displayRelatedSuggestions(relatedSearchInput.value)); }
              if(relatedSearchInputWrapper) { relatedSearchInputWrapper.addEventListener('click', (e) => { if (!e.target.closest('.related-actress-pill')) relatedSearchInput?.focus(); }); }
-             // Comparison Search Input
+             // Comparison Search
              if (comparisonSearchInput) { comparisonSearchInput.addEventListener('input', () => displayComparisonSuggestions(comparisonSearchInput.value)); comparisonSearchInput.addEventListener('focus', () => displayComparisonSuggestions(comparisonSearchInput.value)); }
-
-             // *** NEW: FAB and Menu Listeners ***
+             // FAB & Menu
              if (fabCreate) { fabCreate.addEventListener('click', toggleCreateMenu); }
              if (menuCreateActressBtn) { menuCreateActressBtn.addEventListener('click', openCreateActressModal); }
              if (menuCreateMultimediaBtn) { menuCreateMultimediaBtn.addEventListener('click', openCreateMultimediaModal); }
-
-
-             // Global Click Listener (Hide Suggestions AND Create Menu)
+             // Global Click Listener (Hide Suggestions & Create Menu)
              document.addEventListener('click', (event) => {
-                 // Hide Related Suggestions list
-                 const isClickInsideRelatedSearch = relatedSearchInputWrapper?.contains(event.target);
-                 const isClickInsideRelatedSuggestions = relatedSuggestionsList?.contains(event.target);
-                 if (relatedSuggestionsList && !isClickInsideRelatedSearch && !isClickInsideRelatedSuggestions) {
-                     relatedSuggestionsList.style.display = 'none';
-                 }
-                 // Hide Comparison Suggestions list
-                 const comparisonSearchArea = comparisonSearchInput?.closest('.comparison-search-area');
-                 const isClickInsideComparisonSearch = comparisonSearchArea?.contains(event.target);
-                 const isClickInsideComparisonSuggestions = comparisonSuggestionsList?.contains(event.target);
-                  if (comparisonSuggestionsList && !isClickInsideComparisonSearch && !isClickInsideComparisonSuggestions) {
-                      comparisonSuggestionsList.style.display = 'none';
-                  }
-                 // *** NEW: Hide Create Menu ***
-                 const isClickInsideFab = fabCreate?.contains(event.target);
-                 const isClickInsideCreateMenu = createMenuPopup?.contains(event.target);
-                 if (createMenuPopup && !isClickInsideFab && !isClickInsideCreateMenu) {
-                     closeCreateMenu();
-                 }
+                 const isClickInsideRelatedSearch = relatedSearchInputWrapper?.contains(event.target); const isClickInsideRelatedSuggestions = relatedSuggestionsList?.contains(event.target);
+                 if (relatedSuggestionsList && !isClickInsideRelatedSearch && !isClickInsideRelatedSuggestions) { relatedSuggestionsList.style.display = 'none'; }
+                 const comparisonSearchArea = comparisonSearchInput?.closest('.comparison-search-area'); const isClickInsideComparisonSearch = comparisonSearchArea?.contains(event.target); const isClickInsideComparisonSuggestions = comparisonSuggestionsList?.contains(event.target);
+                 if (comparisonSuggestionsList && !isClickInsideComparisonSearch && !isClickInsideComparisonSuggestions) { comparisonSuggestionsList.style.display = 'none'; }
+                 const isClickInsideFab = fabCreate?.contains(event.target); const isClickInsideCreateMenu = createMenuPopup?.contains(event.target);
+                 if (createMenuPopup && !isClickInsideFab && !isClickInsideCreateMenu) { closeCreateMenu(); }
              });
         }); // End DOMContentLoaded
 
