@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizador de Atrizes</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex; /* Use flexbox for overall layout */
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .column {
+            background-color: #fff;
+            margin: 0 5px;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow-y: auto; /* Add scroll if content overflows */
+            height: calc(100vh - 30px); /* Adjust height based on body padding */
+            box-sizing: border-box;
+        }
+
+        /* Initial State: Only Left Column Visible */
+        #actress-list-col {
+            flex: 1; /* Take full width initially */
+        }
+
+        #actress-detail-col,
+        #content-col {
+            display: none; /* Hide middle and right columns initially */
+        }
+
+        /* State when an actress is selected */
+        .container.details-visible #actress-list-col {
+            flex: 0 0 25%; /* Fixed width for actress list */
+            max-width: 300px; /* Optional max width */
+        }
+
+        .container.details-visible #actress-detail-col {
+            display: block;
+            flex: 0 0 30%; /* Fixed width for details */
+            max-width: 400px; /* Optional max width */
+        }
+
+        .container.details-visible #content-col {
+            display: block;
+            flex: 1; /* Takes remaining space */
+        }
+
+        /* Actress List Styling */
+        #actress-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .actress-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .actress-item:hover {
+            background-color: #f0f0f0;
+        }
+
+         .actress-item.selected {
+            background-color: #e0e0e0;
+            font-weight: bold;
+        }
+
+        .actress-item img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .actress-info span {
+            display: block;
+            font-size: 0.9em;
+        }
+         .actress-info .name {
+            font-weight: bold;
+            font-size: 1em;
+         }
+         .actress-info .age,
+         .actress-info .rating {
+            color: #555;
+         }
+
+
+        /* Actress Detail Styling */
+        #actress-details h3 {
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+         #actress-details div {
+             margin-bottom: 8px;
+             word-wrap: break-word; /* Prevent long strings from overflowing */
+         }
+         #actress-details strong {
+            display: inline-block;
+            min-width: 100px; /* Align keys */
+            color: #333;
+         }
+         #actress-details img.detail-photo {
+             max-width: 100%;
+             height: auto;
+             border-radius: 4px;
+             margin-top: 10px;
+         }
+
+
+        /* Content Card Styling */
+        #content-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Responsive grid */
+            gap: 15px;
+        }
+
+        .content-card {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            overflow: hidden;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .content-card img {
+            width: 100%;
+            height: 180px; /* Fixed height for consistency */
+            object-fit: cover;
+            display: block;
+        }
+
+        .content-card .title {
+            padding: 8px;
+            font-size: 0.9em;
+            min-height: 40px; /* Ensure space for title */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+         /* Loading/Error indicators */
+         .loading, .error {
+             text-align: center;
+             padding: 20px;
+             color: #888;
+         }
+
+    </style>
+</head>
+<body>
+    <div class="container" id="main-container">
+        <div class="column" id="actress-list-col">
+            <h2>Atrizes</h2>
+            <ul id="actress-list">
+                <li class="loading">Carregando atrizes...</li>
+            </ul>
+        </div>
+        <div class="column" id="actress-detail-col">
+            <div id="actress-details">
+                <!-- Details will be loaded here -->
+            </div>
+        </div>
+        <div class="column" id="content-col">
+            <h2>Conteúdo Relacionado</h2>
+            <div id="content-cards">
+                <!-- Content cards will be loaded here -->
+            </div>
+             <div id="content-message" class="loading" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0", // IMPORTANT: Secure this in production!
+            authDomain: "babes-392fd.firebaseapp.com",
+            projectId: "babes-392fd",
+            storageBucket: "babes-392fd.appspot.com",
+            messagingSenderId: "376795361631",
+            appId: "1:376795361631:web:d662f2b2f2cd23b115c6ea"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // --- DOM Elements ---
+        const mainContainer = document.getElementById('main-container');
+        const actressList = document.getElementById('actress-list');
+        const actressDetailsContainer = document.getElementById('actress-details');
+        const contentCardsContainer = document.getElementById('content-cards');
+        const contentMessage = document.getElementById('content-message');
+
+        let selectedActressElement = null; // Keep track of the selected LI
+
+        // --- Helper Functions ---
+        function calculateAge(birthDateString) {
+            if (!birthDateString) return '?';
+            try {
+                const birthDate = new Date(birthDateString);
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const m = today.getMonth() - birthDate.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                return age;
+            } catch (e) {
+                console.error("Error parsing date:", birthDateString, e);
+                return '?';
+            }
+        }
+
+        function displayMessage(element, message, isError = false) {
+             element.innerHTML = `<div class="${isError ? 'error' : 'loading'}">${message}</div>`;
+             element.style.display = 'block';
+        }
+
+        function clearMessage(element) {
+            element.innerHTML = '';
+            element.style.display = 'none';
+        }
+
+
+        // --- Core Logic ---
+
+        // 1. Load Actresses List
+        async function loadActresses() {
+            actressList.innerHTML = '<li class="loading">Carregando atrizes...</li>'; // Show loading
+            try {
+                const querySnapshot = await getDocs(collection(db, "atores"));
+                actressList.innerHTML = ''; // Clear loading/previous list
+
+                if (querySnapshot.empty) {
+                     actressList.innerHTML = '<li class="error">Nenhuma atriz encontrada.</li>';
+                     return;
+                }
+
+                const actresses = [];
+                querySnapshot.forEach((doc) => {
+                    actresses.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Sort alphabetically by name (optional)
+                 actresses.sort((a, b) => a.nome.localeCompare(b.nome));
+
+
+                actresses.forEach(actress => {
+                    const li = document.createElement('li');
+                    li.classList.add('actress-item');
+                    li.dataset.id = actress.id; // Store ID for lookup
+
+                    const age = calculateAge(actress.dataNascimento);
+                    const imageUrl = actress.foto || 'placeholder.png'; // Use a placeholder if no image
+                    const rating = actress.nota !== undefined ? actress.nota : 'N/A';
+
+                    li.innerHTML = `
+                        <img src="${imageUrl}" alt="${actress.nome}" onerror="this.src='placeholder.png'; this.onerror=null;">
+                        <div class="actress-info">
+                            <span class="name">${actress.nome || 'Nome Indisponível'}</span>
+                            <span class="age">Idade: ${age}</span>
+                            <span class="rating">Nota: ${rating}</span>
+                        </div>
+                    `;
+
+                    li.addEventListener('click', () => handleActressClick(actress.id, li));
+                    actressList.appendChild(li);
+                });
+
+            } catch (error) {
+                console.error("Erro ao buscar atrizes: ", error);
+                actressList.innerHTML = '<li class="error">Erro ao carregar atrizes. Verifique o console.</li>';
+            }
+        }
+
+        // 2. Handle Actress Click
+        async function handleActressClick(actressId, listItemElement) {
+            console.log("Actress clicked:", actressId);
+
+            // Highlight selected item
+            if (selectedActressElement) {
+                selectedActressElement.classList.remove('selected');
+            }
+            listItemElement.classList.add('selected');
+            selectedActressElement = listItemElement;
+
+
+            // Show columns and adjust layout
+            mainContainer.classList.add('details-visible');
+
+            // Clear previous details and content
+            actressDetailsContainer.innerHTML = '<div class="loading">Carregando detalhes...</div>';
+            contentCardsContainer.innerHTML = '';
+            displayMessage(contentMessage, 'Carregando conteúdo...');
+
+
+            try {
+                // Fetch and display actress details
+                const actressDoc = await getDoc(doc(db, "atores", actressId));
+                if (actressDoc.exists()) {
+                    displayActressDetails(actressDoc.data());
+                } else {
+                    actressDetailsContainer.innerHTML = '<div class="error">Detalhes da atriz não encontrados.</div>';
+                }
+
+                // Fetch and display related content (scenes, movies, videos)
+                await loadRelatedContent(actressId);
+
+            } catch (error) {
+                console.error(`Erro ao carregar dados para atriz ${actressId}: `, error);
+                actressDetailsContainer.innerHTML = '<div class="error">Erro ao carregar detalhes.</div>';
+                 displayMessage(contentMessage,'Erro ao carregar conteúdo.', true);
+
+            }
+        }
+
+        // 3. Display Actress Details
+        function displayActressDetails(data) {
+            actressDetailsContainer.innerHTML = ''; // Clear loading/previous
+
+            const detailsTitle = document.createElement('h3');
+            detailsTitle.textContent = data.nome || 'Detalhes';
+            actressDetailsContainer.appendChild(detailsTitle);
+
+            // Display photo prominently if available
+            if (data.foto) {
+                 const img = document.createElement('img');
+                 img.src = data.foto;
+                 img.alt = data.nome;
+                 img.classList.add('detail-photo');
+                 img.onerror = () => { img.style.display = 'none'; }; // Hide if image fails
+                 actressDetailsContainer.appendChild(img);
+            }
+
+
+            // Display other fields
+            for (const key in data) {
+                if (data.hasOwnProperty(key) && key !== 'foto' && key !== 'nome') { // Don't repeat photo/name
+                    const detailDiv = document.createElement('div');
+                    let value = data[key];
+
+                    // Format specific fields if needed
+                    if (key === 'dataNascimento') {
+                       value = `${value} (Idade: ${calculateAge(value)})`;
+                    } else if (key === 'timestamp') {
+                        // Attempt to format timestamp if it's recognizable
+                         try {
+                            if(value && typeof value === 'object' && value.seconds) {
+                                value = new Date(value.seconds * 1000).toLocaleString('pt-BR');
+                            } else if (typeof value === 'string') {
+                                // Keep original string if it's already formatted like in screenshot
+                                value = value;
+                            }
+                         } catch(e) { /* ignore formatting errors */ }
+                    }
+                    // Add more formatting as needed for other fields
+
+
+                    detailDiv.innerHTML = `<strong>${key}:</strong> ${value}`;
+                    actressDetailsContainer.appendChild(detailDiv);
+                }
+            }
+             if (Object.keys(data).length === 0) {
+                 actressDetailsContainer.innerHTML = '<div class="error">Nenhum detalhe disponível.</div>';
+            }
+        }
+
+        // 4. Load Related Content (Scenes, Movies, Videos)
+        async function loadRelatedContent(actressId) {
+            contentCardsContainer.innerHTML = ''; // Clear previous
+            let contentFound = false;
+
+            try {
+                 // --- Fetch Cenas ---
+                const cenasSnapshot = await getDocs(collection(db, "cenas"));
+                cenasSnapshot.forEach(doc => {
+                    const cenaData = doc.data();
+                    // Check if 'atores' field exists and contains the actressId as a key
+                    if (cenaData.atores && cenaData.atores.hasOwnProperty(actressId)) {
+                         createContentCard(cenaData.imagem, cenaData.nome, 'Cena');
+                         contentFound = true;
+                    }
+                });
+
+                 // --- Fetch Videos ---
+                const videosSnapshot = await getDocs(collection(db, "videos"));
+                 videosSnapshot.forEach(doc => {
+                    const videoData = doc.data();
+                     if (videoData.atores && videoData.atores.hasOwnProperty(actressId)) {
+                         createContentCard(videoData.imagem, videoData.nome, 'Vídeo');
+                         contentFound = true;
+                     }
+                 });
+
+
+                // --- Fetch Filmes (needs nested check) ---
+                const filmesSnapshot = await getDocs(collection(db, "filmes"));
+                // Need to fetch related scenes for each movie to check for the actress
+                const moviePromises = [];
+                filmesSnapshot.forEach(filmeDoc => {
+                    const filmeData = filmeDoc.data();
+                    if (filmeData.cenas && Array.isArray(filmeData.cenas) && filmeData.cenas.length > 0) {
+                        // Create a promise to check scenes for this movie
+                        const checkMoviePromise = async () => {
+                            for (const cenaRef of filmeData.cenas) {
+                                // Assuming cenaRef is an ID string like 'LRGBI1VcIONbVoNrTqCi'
+                                if (typeof cenaRef === 'string' && cenaRef.trim() !== '') {
+                                     try {
+                                        const cenaDocSnap = await getDoc(doc(db, "cenas", cenaRef));
+                                        if (cenaDocSnap.exists()) {
+                                            const cenaData = cenaDocSnap.data();
+                                             if (cenaData.atores && cenaData.atores.hasOwnProperty(actressId)) {
+                                                // Actress found in one of the movie's scenes
+                                                 return { found: true, data: filmeData };
+                                             }
+                                        }
+                                     } catch(sceneError) {
+                                         console.warn(`Could not fetch or check scene ${cenaRef} for movie ${filmeDoc.id}:`, sceneError)
+                                     }
+                                }
+                            }
+                            return { found: false }; // Actress not found in any scene of this movie
+                        };
+                        moviePromises.push(checkMoviePromise());
+                    }
+                });
+
+                // Wait for all movie checks to complete
+                const movieResults = await Promise.all(moviePromises);
+                movieResults.forEach(result => {
+                    if (result.found) {
+                        createContentCard(result.data.imagem, result.data.nome, 'Filme');
+                         contentFound = true;
+                    }
+                });
+
+
+                 if (!contentFound) {
+                     displayMessage(contentMessage,'Nenhum conteúdo encontrado para esta atriz.');
+                 } else {
+                     clearMessage(contentMessage); // Hide loading/message if content was found
+                 }
+
+
+            } catch (error) {
+                console.error("Erro ao buscar conteúdo relacionado: ", error);
+                 displayMessage(contentMessage,'Erro ao carregar conteúdo relacionado.', true);
+
+            }
+        }
+
+
+        // 5. Create Content Card HTML
+        function createContentCard(imageUrl, title, type) {
+            const card = document.createElement('div');
+            card.classList.add('content-card');
+
+            const img = document.createElement('img');
+             // Handle potential image URLs within objects (like from cenas screenshot)
+             let finalImageUrl = imageUrl;
+             if (typeof imageUrl === 'object' && imageUrl !== null && imageUrl.hasOwnProperty('width')) {
+                 // Attempt to find a url-like string property if it's an object
+                 const urlKey = Object.keys(imageUrl).find(k => typeof imageUrl[k] === 'string' && imageUrl[k].startsWith('http'));
+                 finalImageUrl = urlKey ? imageUrl[urlKey] : 'placeholder.png';
+             } else if (typeof imageUrl !== 'string' || !imageUrl) {
+                 finalImageUrl = 'placeholder.png'; // Default placeholder
+             }
+
+            img.src = finalImageUrl;
+            img.alt = title || type;
+            img.onerror = () => { img.src = 'placeholder.png'; img.onerror=null; } // Placeholder on error
+
+            const titleDiv = document.createElement('div');
+            titleDiv.classList.add('title');
+            titleDiv.textContent = `${title || 'Sem Título'} (${type})`; // Add type (Scene/Movie/Video)
+
+            card.appendChild(img);
+            card.appendChild(titleDiv);
+            contentCardsContainer.appendChild(card);
+        }
+
+        // --- Initial Load ---
+        loadActresses();
+
+    </script>
+</body>
+</html>
