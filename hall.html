@@ -462,7 +462,9 @@
 
         // --- Event Listeners (Global Page) ---
         document.addEventListener('DOMContentLoaded', () => {
+             console.log("DOM Content Loaded - Minimal Test");
             loadInitialData();
+             });
             // Modal Closes
              if(contentModal) contentModal.addEventListener('click', (event) => { if (event.target === contentModal) closeModal(); });
              if (comparisonModal) comparisonModal.addEventListener('click', (event) => { if (event.target === comparisonModal) closeComparisonModal(); });
@@ -488,7 +490,7 @@
                  if (createMenuPopup && !isClickInsideFab && !isClickInsideCreateMenu) { closeCreateMenu(); }
              });
         }); // End DOMContentLoaded
-
+console.log("--- Minimal Script Parsed ---");
     </script>
 </body>
 </html>
