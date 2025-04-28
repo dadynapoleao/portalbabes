@@ -378,13 +378,64 @@
         } // <--- End of renderComparisonView
 
         // --- NEW: FAB and Create Menu/Modal Functions ---
-        function toggleCreateMenu() { if (!createMenuPopup) return; const isVisible = createMenuPopup.style.display === 'block'; createMenuPopup.style.display = isVisible ? 'none' : 'block'; }; // <-- Added ;
-        function closeCreateMenu() { if (createMenuPopup) createMenuPopup.style.display = 'none'; }; // <-- Added ;
-        function openCreateActressModal() { closeCreateMenu(); if (!createActressModal || !createActressModalBody) return; createActressModalBody.innerHTML = getCreateActressFormHTML(); createActressModal.style.display = 'flex'; if (!createFormInitialized) { initializeCreateActressForm(); createFormInitialized = true; } else { const form = createActressModalBody.querySelector('#create-actress-form'); const submitButton = form?.nextElementSibling?.querySelector('button[type="submit"]'); if(submitButton) submitButton.disabled = false; const nameInput = form?.querySelector('#name'); const nameErrorMessage = form?.querySelector('#name-error-message'); if(nameErrorMessage) nameErrorMessage.style.display = 'none'; if(form) form.reset(); console.log("Re-opening create modal, form reset and button enabled."); } }; // <-- Added ;
-        window.closeCreateActressModal = function() { if (createActressModal) createActressModal.style.display = 'none'; }; // <-- Added ;
-        function openCreateMultimediaModal() { closeCreateMenu(); alert("Funcionalidade 'Criar Multimídia' ainda não implementada."); console.log("Placeholder: Abrir modal de criação de multimídia."); }; // <-- Added ;
-        function getCreateActressFormHTML() { return ` <form id="create-actress-form"> <div class="form-card"> <label for="name">Name:</label> <input type="text" id="name" name="name" required> <span id="name-error-message" class="error-message" style="display: none;"></span> </div> <div class="form-card"> <label for="foto">Foto (URL):</label> <input type="url" id="foto" name="foto" placeholder="https://exemplo.com/imagem.jpg" required> </div> <div class="form-card full-width"> <label for="texto">Texto (Biografia/Descrição):</label> <textarea id="texto" name="texto" rows="5" placeholder="Cole ou digite a biografia e informações aqui..." required></textarea> </div> <div class="form-card"> <label for="born">Born (Ex: 1990/05/15):</label> <input type="text" id="born" name="born" placeholder="YYYY/MM/DD"> </div> <div class="form-card"> <label for="birthplace">Birthplace:</label> <input type="text" id="birthplace" name="birthplace"> </div> <div class="form-card"> <label for="ethnicity">Ethnicity:</label> <input type="text" id="ethnicity" name="ethnicity"> </div> <div class="form-card"> <label for="hair_color">Hair color:</label> <input type="text" id="hair_color" name="hair_color"> </div> <div class="form-card"> <label for="eye_color">Eye color:</label> <input type="text" id="eye_color" name="eye_color"> </div> <div class="form-card"> <label for="height">Height (cm):</label> <input type="text" id="height" name="height" placeholder="Ex: 170"> </div> <div class="form-card"> <label for="weight">Weight (kg):</label> <input type="text" id="weight" name="weight" placeholder="Ex: 59"> </div> <div class="form-card"> <label for="body_type">Body type:</label> <input type="text" id="body_type" name="body_type"> </div> <div class="form-card"> <label for="measurements">Measurements (Ex: 34-24-35):</label> <input type="text" id="measurements" name="measurements"> </div> <div class="form-card"> <label for="years_active">Years active (Start Year):</label> <input type="text" id="years_active" name="years_active" placeholder="Ex: 2010"> </div> <div class="form-card"> <label for="nota">Nota (0 a 10):</label> <input type="number" id="nota" name="nota" min="0" max="10" step="0.1" placeholder="Ex: 8.5"> </div> </form> <div class="submit-button-container"> <button type="submit" form="create-actress-form">Criar</button> </div> `; }; // <-- Added ;
+        function toggleCreateMenu() {
+            if (!createMenuPopup) {
+                return;
+            }
+            const isVisible = createMenuPopup.style.display === 'block';
+            createMenuPopup.style.display = isVisible ? 'none' : 'block';
+        } // Function definition ends implicitly with brace
 
+        function closeCreateMenu() {
+            if (createMenuPopup) {
+                createMenuPopup.style.display = 'none';
+            }
+        } // Function definition ends implicitly with brace
+
+        function openCreateActressModal() {
+            closeCreateMenu();
+            if (!createActressModal || !createActressModalBody) {
+                return;
+            }
+            createActressModalBody.innerHTML = getCreateActressFormHTML();
+            createActressModal.style.display = 'flex';
+            if (!createFormInitialized) {
+                initializeCreateActressForm();
+                createFormInitialized = true;
+            } else {
+                const form = createActressModalBody.querySelector('#create-actress-form');
+                const submitButton = form?.nextElementSibling?.querySelector('button[type="submit"]');
+                if(submitButton) {
+                    submitButton.disabled = false;
+                }
+                const nameInput = form?.querySelector('#name');
+                const nameErrorMessage = form?.querySelector('#name-error-message');
+                if(nameErrorMessage) {
+                    nameErrorMessage.style.display = 'none';
+                }
+                if(form) {
+                    form.reset();
+                }
+                console.log("Re-opening create modal, form reset and button enabled.");
+            }
+        } // Function definition ends implicitly with brace
+
+        window.closeCreateActressModal = function() {
+            if (createActressModal) {
+                createActressModal.style.display = 'none';
+            }
+        }; // Assigning anonymous function, semicolon is good practice here
+
+        function openCreateMultimediaModal() {
+            closeCreateMenu();
+            alert("Funcionalidade 'Criar Multimídia' ainda não implementada.");
+            console.log("Placeholder: Abrir modal de criação de multimídia.");
+        } // Function definition ends implicitly with brace
+
+        function getCreateActressFormHTML() {
+            // NOTE: Keep the long HTML string with backticks here as it was
+            return ` <form id="create-actress-form"> <div class="form-card"> <label for="name">Name:</label> <input type="text" id="name" name="name" required> <span id="name-error-message" class="error-message" style="display: none;"></span> </div> <div class="form-card"> <label for="foto">Foto (URL):</label> <input type="url" id="foto" name="foto" placeholder="https://exemplo.com/imagem.jpg" required> </div> <div class="form-card full-width"> <label for="texto">Texto (Biografia/Descrição):</label> <textarea id="texto" name="texto" rows="5" placeholder="Cole ou digite a biografia e informações aqui..." required></textarea> </div> <div class="form-card"> <label for="born">Born (Ex: 1990/05/15):</label> <input type="text" id="born" name="born" placeholder="YYYY/MM/DD"> </div> <div class="form-card"> <label for="birthplace">Birthplace:</label> <input type="text" id="birthplace" name="birthplace"> </div> <div class="form-card"> <label for="ethnicity">Ethnicity:</label> <input type="text" id="ethnicity" name="ethnicity"> </div> <div class="form-card"> <label for="hair_color">Hair color:</label> <input type="text" id="hair_color" name="hair_color"> </div> <div class="form-card"> <label for="eye_color">Eye color:</label> <input type="text" id="eye_color" name="eye_color"> </div> <div class="form-card"> <label for="height">Height (cm):</label> <input type="text" id="height" name="height" placeholder="Ex: 170"> </div> <div class="form-card"> <label for="weight">Weight (kg):</label> <input type="text" id="weight" name="weight" placeholder="Ex: 59"> </div> <div class="form-card"> <label for="body_type">Body type:</label> <input type="text" id="body_type" name="body_type"> </div> <div class="form-card"> <label for="measurements">Measurements (Ex: 34-24-35):</label> <input type="text" id="measurements" name="measurements"> </div> <div class="form-card"> <label for="years_active">Years active (Start Year):</label> <input type="text" id="years_active" name="years_active" placeholder="Ex: 2010"> </div> <div class="form-card"> <label for="nota">Nota (0 a 10):</label> <input type="number" id="nota" name="nota" min="0" max="10" step="0.1" placeholder="Ex: 8.5"> </div> </form> <div class="submit-button-container"> <button type="submit" form="create-actress-form">Criar</button> </div> `;
+        } // Function definition ends implicitly with brace
         // --- NEW: Actress Creation Form Logic (Integrated) ---
         function initializeCreateActressForm() {
             console.log("DEBUG: Initializing Create Actress Form Logic...");
