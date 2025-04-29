@@ -1,447 +1,25 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visualizador de Atrizes</title>
-    <style>
-        /* === Google Fonts (Optional but used in form) === */
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
-
-        /* --- Base & Layout --- */
-        body { font-family: 'Roboto', sans-serif; /* Changed default font */ margin: 0; padding: 0; background-color: #f4f4f4; display: flex; min-height: 100vh; font-size: 14px; }
-        .container { display: flex; width: 100%; padding: 15px; box-sizing: border-box; gap: 10px; }
-        .column { background-color: #fff; padding: 15px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); overflow: hidden; height: calc(100vh - 30px); box-sizing: border-box; display: flex; flex-direction: column; }
-        #actress-list-col { flex: 1; }
-        #actress-detail-col, #content-col { display: none; }
-        .container.details-visible #actress-list-col { flex: 0 0 25%; max-width: 300px; }
-        .container.details-visible #actress-detail-col { display: flex; flex: 0 0 30%; max-width: 400px; }
-        .container.details-visible #content-col { display: flex; flex: 1; }
-        .column h2 { margin-top: 0; margin-bottom: 15px; font-size: 1.3em; color: #333; border-bottom: 1px solid #eee; padding-bottom: 10px; flex-shrink: 0; }
-        .column h2.related-title { margin-top: 0; }
-
-        /* --- Actress List (Left Column) --- */
-        #actress-list { list-style: none; padding: 0; margin: 0; flex-grow: 1; overflow-y: auto; }
-        .actress-item { display: flex; align-items: center; padding: 8px 10px; border-bottom: 1px solid #eee; cursor: pointer; transition: background-color 0.2s ease; }
-        .actress-item:hover { background-color: #f0f0f0; }
-        .actress-item.selected { background-color: #e0e0e0; font-weight: bold; }
-        .actress-item img { width: 45px; height: 45px; object-fit: cover; border-radius: 50%; margin-right: 10px; flex-shrink: 0; }
-        .actress-info span { display: block; font-size: 0.9em; line-height: 1.3; }
-        .actress-info .name { font-weight: bold; font-size: 1em; }
-        .actress-info .age, .actress-info .rating { color: #555; font-size: 0.85em; }
-
-        /* --- Actress Details (Middle Column) --- */
-        #actress-details { flex-grow: 1; overflow-y: auto; padding-right: 5px; }
-        #actress-details h3 { margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        #actress-details div { margin-bottom: 7px; word-wrap: break-word; font-size: 0.9em; }
-        #actress-details strong { display: inline-block; min-width: 90px; color: #333; font-weight: bold; margin-right: 5px; }
-        #actress-details img.detail-photo { max-width: 180px; max-height: 230px; width: auto; height: auto; border-radius: 4px; margin-top: 8px; display: block; }
-
-        /* --- Related Content (Right Column) --- */
-         #content-col-header { margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px; flex-shrink: 0; }
-        .related-filter-buttons { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
-        .related-filter-btn { padding: 5px 10px; border: 1px solid #ccc; background-color: #eee; color: #333; border-radius: 4px; cursor: pointer; font-size: 0.85em; transition: background-color 0.2s ease, border-color 0.2s ease; }
-        .related-filter-btn:hover { background-color: #ddd; }
-        .related-filter-btn.active { background-color: #007bff; color: white; border-color: #007bff; font-weight: bold; }
-        .related-actress-search-area { position: relative; width: 100%; }
-        .related-search-input-wrapper { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; cursor: text; min-height: 32px; }
-        .related-search-input-wrapper:focus-within { border-color: #80bdff; box-shadow: 0 0 0 0.15rem rgba(0,123,255,.25); }
-        #related-selected-actresses { display: contents; }
-        .related-actress-pill { display: inline-flex; align-items: center; background-color: #007bff; color: white; padding: 2px 5px; border-radius: 3px; font-size: 0.8em; margin: 1px; white-space: nowrap; }
-        .related-actress-pill span { margin-right: 4px; }
-        .related-remove-actress-btn { background: none; border: none; color: white; cursor: pointer; font-weight: bold; font-size: 1em; padding: 0 2px; line-height: 1; opacity: 0.8; }
-        .related-remove-actress-btn:hover { opacity: 1; }
-        .related-search-input { flex-grow: 1; padding: 4px 5px; border: none; background-color: transparent; color: #333; font-size: 0.9em; min-width: 100px; outline: none; }
-        #related-suggestions-list { display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 100; background-color: #fff; border: 1px solid #ccc; border-top: none; border-radius: 0 0 4px 4px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-height: 180px; overflow-y: auto; }
-        #related-suggestions-list .suggestion-item { display: flex; padding: 5px 10px; color: #333; cursor: pointer; align-items: center; gap: 8px; font-size: 0.9em; }
-        #related-suggestions-list .suggestion-item:hover { background-color: #f0f0f0; }
-        #related-suggestions-list .suggestion-item.no-results { cursor: default; color: #888; justify-content: center; padding: 8px; }
-        #related-suggestions-list .suggestion-item img { width: 25px; height: 25px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
-
-        #content-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; flex-grow: 1; overflow-y: auto; padding-top: 5px; align-content: start; }
-        .content-card { background-color: #f9f9f9; border: 1px solid #eee; border-radius: 4px; overflow: hidden; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); cursor: pointer; transition: box-shadow 0.2s ease; position: relative; display: flex; flex-direction: column;}
-        .content-card:hover { box-shadow: 0 3px 6px rgba(0,0,0,0.1); }
-        .content-card .image-container { position: relative; width: 100%; height: 160px; flex-shrink: 0; }
-        .content-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .content-type-badge { position: absolute; top: 4px; left: 4px; background-color: rgba(0, 0, 0, 0.75); color: white; padding: 2px 5px; font-size: 0.7em; font-weight: bold; border-radius: 3px; z-index: 1; }
-        .content-card .title { padding: 6px; font-size: 0.85em; min-height: 35px; display: flex; align-items: center; justify-content: center; line-height: 1.2; flex-grow: 1; }
-        #content-message { grid-column: 1 / -1; font-size: 0.9em; }
-
-        /* --- Modal Styling (Shared) --- */
-        .modal-overlay { position: fixed; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: 1000; display: none; /* Hidden initially */ justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
-        .modal-content { background-color: #fff; padding: 20px 25px; border-radius: 5px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); max-width: 650px; width: 90%; position: relative; max-height: 85vh; display: flex; flex-direction: column; }
-        .modal-close-button { position: absolute; top: 8px; right: 12px; font-size: 24px; font-weight: bold; color: #aaa; cursor: pointer; line-height: 1; background: none; border: none; padding: 0;}
-        .modal-close-button:hover { color: #333; }
-        .modal-content h3 { margin-top: 0; margin-bottom: 15px; font-size: 1.2em; border-bottom: 1px solid #eee; padding-bottom: 8px;}
-        .modal-body-content { /* Renamed from #modal-body to avoid ID conflict */ flex-grow: 1; overflow-y: auto; padding-right: 5px; font-size: 0.9em; }
-
-        /* --- Content Detail Modal Specific --- */
-        #content-modal .modal-body-content div:not(.modal-actress-list-container):not(.modal-scenes-container) { margin-bottom: 7px; word-wrap: break-word; }
-        #content-modal .modal-body-content strong { display: inline-block; min-width: 70px; color: #333; font-weight: bold;}
-        #modal-link-container button { padding: 8px 12px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em; }
-        #modal-link-container button:hover { background-color: #0056b3; }
-        #content-modal .modal-body-content img.modal-detail-image { max-width: 90%; height: auto; max-height: 280px; margin-top: 5px; border-radius: 4px; display: block; margin-left: auto; margin-right: auto; margin-bottom: 12px; }
-        #content-modal .modal-body-content img.modal-detail-image.movie-image { max-width: 220px; max-height: 220px; }
-        #content-modal .modal-body-content .modal-year { font-size: 1em; color: #555; margin-bottom: 12px; }
-        .modal-actress-list-container, .modal-scenes-container { margin-top: 15px; padding-top: 12px; border-top: 1px solid #eee; }
-        .modal-actress-list-container h4, .modal-scenes-container h4 { margin-top: 0; margin-bottom: 10px; color: #333; font-size: 1em; }
-        .modal-actress-list { display: flex; flex-wrap: wrap; gap: 12px; padding: 0; list-style: none; }
-        .modal-actress-item { display: flex; flex-direction: column; align-items: center; text-align: center; cursor: pointer; padding: 4px; border-radius: 4px; transition: background-color 0.2s ease; max-width: 70px; }
-        .modal-actress-item:hover { background-color: #f0f0f0; }
-        .modal-actress-item img { width: 50px; height: 50px; object-fit: cover; border-radius: 50%; margin-bottom: 4px; }
-        .modal-actress-item span { font-size: 0.8em; word-wrap: break-word; line-height: 1.1; max-width: 100%;}
-        .modal-scene-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
-        .modal-scene-card { background-color: #f9f9f9; border: 1px solid #eee; border-radius: 4px; overflow: hidden; text-align: center; font-size: 0.75em; }
-        .modal-scene-card img { width: 100%; height: 70px; object-fit: cover; display: block; }
-        .modal-scene-card .title { padding: 4px; min-height: 20px; display: flex; align-items: center; justify-content: center; line-height: 1.1; }
-
-        /* --- Movable Actress Popup Styling --- */
-        .actress-popup { position: fixed; background-color: white; border: 1px solid #ccc; border-radius: 6px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); z-index: 1050; width: 200px; max-height: 300px; overflow: hidden; display: flex; flex-direction: column; cursor: grab; user-select: none; }
-        .actress-popup.dragging { cursor: grabbing; opacity: 0.9; }
-        .actress-popup-header { background-color: #f0f0f0; padding: 5px 8px; border-bottom: 1px solid #ccc; display: flex; justify-content: space-between; align-items: center; cursor: grab; }
-        .actress-popup-header:active { cursor: grabbing; }
-        .actress-popup-header h5 { margin: 0; font-size: 0.9em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; padding-right: 5px; }
-        .actress-popup-close, .actress-popup-compare-btn { font-weight: bold; color: #888; cursor: pointer; border: none; background: none; padding: 0 4px; line-height: 1; flex-shrink: 0; }
-        .actress-popup-close { font-size: 1.1em; }
-        .actress-popup-compare-btn { font-size: 0.9em; margin-right: 5px; }
-        .actress-popup-close:hover, .actress-popup-compare-btn:hover { color: #333; }
-        .actress-popup-body { padding: 8px; overflow-y: auto; font-size: 0.8em; flex-grow: 1; }
-        .actress-popup-body img { width: 65px; height: 65px; object-fit: cover; border-radius: 50%; display: block; margin: 0 auto 8px auto; }
-        .actress-popup-body div { margin-bottom: 4px; }
-        .actress-popup-body strong { display: inline-block; min-width: 55px; color: #444; font-weight: bold; margin-right: 3px;}
-
-        /* --- Comparison Modal --- */
-        #comparison-modal .modal-content { max-width: 80vw; width: auto; }
-        #comparison-modal-body { display: flex; gap: 10px; align-items: flex-start; overflow-x: auto; padding-bottom: 10px; min-height: 200px; flex-grow: 1; }
-        .comparison-column { flex: 1; min-width: 180px; max-width: 220px; background-color: #f9f9f9; border: 1px solid #eee; border-radius: 4px; padding: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); position: relative; display: flex; flex-direction: column; box-sizing: border-box; height: min-content; }
-        .comparison-column .remove-compare-btn { position: absolute; top: 3px; right: 3px; background: rgba(255, 255, 255, 0.7); border: none; border-radius: 50%; color: #888; cursor: pointer; font-weight: bold; font-size: 14px; line-height: 16px; width: 18px; height: 18px; text-align: center; padding: 0; z-index: 1; }
-        .comparison-column .remove-compare-btn:hover { color: #333; background: rgba(230, 230, 230, 0.9); }
-        .comparison-column img { width: 100%; height: auto; max-height: 180px; object-fit: cover; border-radius: 4px; margin-bottom: 8px; display: block; }
-        .comparison-column h4 { font-size: 1em; margin: 0 0 8px 0; text-align: center; border-bottom: 1px solid #eee; padding-bottom: 5px; padding-right: 20px; word-wrap: break-word; }
-        .comparison-column div { font-size: 0.85em; margin-bottom: 4px; word-wrap: break-word; }
-        .comparison-column strong { display: inline-block; min-width: 50px; color: #333; font-weight: bold; margin-right: 3px; }
-        #comparison-suggestions-list { display: none; position: absolute; width: 100%; background-color: #fff; border: 1px solid #ccc; border-top: none; border-radius: 0 0 4px 4px; max-height: 150px; overflow-y: auto; z-index: 1100; box-sizing: border-box; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        /* Reuse suggestion-item styles */
-        #comparison-suggestions-list .suggestion-item { display: flex; padding: 5px 10px; color: #333; cursor: pointer; align-items: center; gap: 8px; font-size: 0.9em; }
-        #comparison-suggestions-list .suggestion-item:hover { background-color: #f0f0f0; }
-        #comparison-suggestions-list .suggestion-item.no-results { cursor: default; color: #888; justify-content: center; padding: 8px; }
-        #comparison-suggestions-list .suggestion-item img { width: 25px; height: 25px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
-        #comparison-suggestions-list .suggestion-item.context-actress span { font-weight: bold; color: #0056b3; }
-
-        /* --- Floating Action Button (FAB) & Menu --- */
-        #fab-create { position: fixed; bottom: 25px; right: 25px; width: 55px; height: 55px; background-color: #007bff; color: white; border: none; border-radius: 50%; font-size: 28px; line-height: 55px; text-align: center; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); cursor: pointer; z-index: 1060; transition: background-color 0.2s ease, transform 0.1s ease; }
-        #fab-create:hover { background-color: #0056b3; }
-        #fab-create:active { transform: scale(0.95); }
-        #create-menu-popup { position: fixed; bottom: 90px; right: 25px; background-color: #fff; border-radius: 6px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); padding: 8px 0; z-index: 1070; display: none; min-width: 160px; }
-        .create-menu-button { display: block; background: none; border: none; color: #333; padding: 10px 15px; text-align: left; width: 100%; cursor: pointer; font-size: 0.95em; transition: background-color 0.2s ease; }
-        .create-menu-button:hover { background-color: #f0f0f0; }
-
-        /* --- Create Actress Modal Specific Styles --- */
-        #create-actress-modal .modal-content { max-width: 1000px; background-color: #242424; color: #e0e0e0; }
-        #create-actress-modal .modal-content h3 { color: #fff; border-bottom-color: #444; }
-        #create-actress-modal .modal-close-button { color: #aaa; }
-        #create-actress-modal .modal-close-button:hover { color: #fff; }
-        #create-actress-modal .modal-body-content { padding: 5px; }
-        #create-actress-modal #create-actress-form { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 30px; }
-        #create-actress-modal .form-card { background-color: #333; padding: 18px; border-radius: 8px; border: 1px solid #444; flex-basis: calc(50% - 8px); flex-grow: 1; box-sizing: border-box; min-width: 250px; }
-        #create-actress-modal .form-card.full-width { flex-basis: 100%; }
-        #create-actress-modal label { display: block; margin-bottom: 10px; color: #b0b0b0; font-size: 0.9em; font-weight: bold; }
-        #create-actress-modal input[type="text"], #create-actress-modal input[type="url"], #create-actress-modal input[type="number"], #create-actress-modal textarea { width: 100%; padding: 10px 12px; background-color: #404040; border: 1px solid #555; border-radius: 5px; color: #e0e0e0; box-sizing: border-box; font-size: 1em; transition: border-color 0.2s ease, box-shadow 0.2s ease; margin-bottom: 0; }
-        #create-actress-modal textarea { min-height: 120px; resize: vertical; }
-        #create-actress-modal input:focus, #create-actress-modal textarea:focus { outline: none; border-color: #bb86fc; box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.3); }
-        #create-actress-modal .error-message { color: #f44336; font-size: 0.85em; display: block; margin-top: 5px; font-weight: bold; }
-        #create-actress-modal .submit-button-container { text-align: center; }
-        #create-actress-modal button[type="submit"] { min-width: 200px; margin-top: 10px; background-color: #bb86fc; color: #121212; padding: 14px 35px; border: none; border-radius: 6px; font-size: 1.2em; font-weight: bold; cursor: pointer; transition: background-color 0.2s ease, transform 0.1s ease; }
-        #create-actress-modal button[type="submit"]:hover { background-color: #a772e3; }
-        #create-actress-modal button[type="submit"]:active { transform: scale(0.98); }
-        #create-actress-modal button[type="submit"]:disabled { background-color: #555; color: #999; cursor: not-allowed; transform: none; }
-
-        /* --- NEW: Paste Text Modal Styles --- */
-        #paste-text-modal .modal-content { max-width: 700px; }
-        #paste-text-area { width: 100%; min-height: 250px; resize: vertical; font-family: monospace; font-size: 0.9em; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-bottom: 15px; }
-        #paste-analysis-result { font-size: 0.9em; margin-top: 10px; min-height: 1.5em; }
-        #paste-analysis-result.error { color: #a00; font-weight: bold; }
-        #analyze-paste-button { padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1em; }
-        #analyze-paste-button:hover { background-color: #0056b3; }
-        #analyze-paste-button:disabled { background-color: #aaa; cursor: not-allowed; }
-
-        /* --- NEW: Create Scene/Movie Modal Styles --- */
-        #create-scene-modal .modal-content,
-        #create-movie-modal .modal-content { max-width: 850px; /* Wider for forms */ }
-        #create-scene-modal .modal-body-content,
-        #create-movie-modal .modal-body-content { font-size: 1em; } /* Slightly larger base font */
-        .create-form { display: flex; flex-wrap: wrap; gap: 15px 20px; /* Row and column gap */ }
-        .form-group { margin-bottom: 10px; flex: 1 1 calc(50% - 10px); /* Two columns */ box-sizing: border-box; min-width: 200px; }
-        .form-group.full-width { flex-basis: 100%; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; font-size: 0.9em; }
-        .form-group input[type="text"],
-        .form-group input[type="url"],
-        .form-group input[type="number"],
-        .form-group input[type="date"] /* Added date type */
-        { width: 100%; padding: 9px 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 0.95em; }
-        .form-group input:focus { outline: none; border-color: #80bdff; box-shadow: 0 0 0 0.15rem rgba(0,123,255,.25); }
-        .form-group .info-display { font-size: 0.9em; color: #555; margin-top: 5px; min-height: 1.5em; }
-        .form-group .info-display.loading { font-style: italic; color: #888; }
-        .form-group .info-display.not-found { color: #a00; }
-        .form-group .info-display.found { color: #007bff; font-weight: bold; }
-        .submit-button-container { flex-basis: 100%; text-align: right; margin-top: 20px; }
-        .submit-button-container button[type="submit"] { padding: 12px 25px; background-color: #28a745; color: white; border: none; border-radius: 5px; font-size: 1em; font-weight: bold; cursor: pointer; transition: background-color 0.2s ease; }
-        .submit-button-container button[type="submit"]:hover { background-color: #218838; }
-        .submit-button-container button[type="submit"]:disabled { background-color: #aaa; cursor: not-allowed; }
-        .form-group .error-message { color: #dc3545; font-size: 0.8em; margin-top: 4px; }
-
-        /* --- NEW: Actor Selector for Create Scene Modal --- */
-        #scene-actors-selector { position: relative; }
-        #scene-actors-search-input-wrapper { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; cursor: text; min-height: 32px; }
-        #scene-actors-search-input-wrapper:focus-within { border-color: #80bdff; box-shadow: 0 0 0 0.15rem rgba(0,123,255,.25); }
-        #scene-selected-actors { display: contents; }
-        .scene-actor-pill { /* Reuse related-actress-pill style */ display: inline-flex; align-items: center; background-color: #007bff; color: white; padding: 2px 5px; border-radius: 3px; font-size: 0.8em; margin: 1px; white-space: nowrap; }
-        .scene-actor-pill span { margin-right: 4px; }
-        .scene-remove-actor-btn { /* Reuse related style */ background: none; border: none; color: white; cursor: pointer; font-weight: bold; font-size: 1em; padding: 0 2px; line-height: 1; opacity: 0.8; }
-        .scene-remove-actor-btn:hover { opacity: 1; }
-        #scene-actors-search-input { flex-grow: 1; padding: 4px 5px; border: none; background-color: transparent; color: #333; font-size: 0.9em; min-width: 100px; outline: none; }
-        #scene-actors-suggestions-list { /* Reuse related style */ display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 100; background-color: #fff; border: 1px solid #ccc; border-top: none; border-radius: 0 0 4px 4px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-height: 180px; overflow-y: auto; }
-        #scene-actors-suggestions-list .suggestion-item { /* Reuse related style */ display: flex; padding: 5px 10px; color: #333; cursor: pointer; align-items: center; gap: 8px; font-size: 0.9em; }
-        #scene-actors-suggestions-list .suggestion-item:hover { background-color: #f0f0f0; }
-        #scene-actors-suggestions-list .suggestion-item.no-results { cursor: default; color: #888; justify-content: center; padding: 8px; }
-        #scene-actors-suggestions-list .suggestion-item img { width: 25px; height: 25px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
-
-
-        /* General Loading/Error Styles */
-        .loading, .error { padding: 10px; text-align: center; color: #555; font-style: italic; }
-        .error { color: #a00; font-weight: bold; }
-
-    </style>
-</head>
-<body>
-    <div class="container" id="main-container">
-        <!-- Left Column: Actress List -->
-        <div class="column" id="actress-list-col">
-            <h2>Atrizes</h2>
-            <ul id="actress-list">
-                <li class="loading">Carregando...</li>
-            </ul>
-        </div>
-        <!-- Middle Column: Actress Details -->
-        <div class="column" id="actress-detail-col">
-            <h2>Detalhes da Atriz</h2>
-            <div id="actress-details"></div>
-        </div>
-        <!-- Right Column: Related Content -->
-        <div class="column" id="content-col">
-            <div id="content-col-header">
-                <div class="related-filter-buttons">
-                    <button class="related-filter-btn active" data-filter="all">Todos</button>
-                    <button class="related-filter-btn" data-filter="video">Vídeos</button>
-                    <button class="related-filter-btn" data-filter="film">Filmes</button>
-                    <button class="related-filter-btn" data-filter="scene">Cenas</button>
-                </div>
-                <div class="related-actress-search-area">
-                    <div class="related-search-input-wrapper">
-                        <div id="related-selected-actresses"></div>
-                        <input type="text" id="related-search-input" class="related-search-input" placeholder="Filtrar por co-atriz...">
-                    </div>
-                    <div id="related-suggestions-list"></div>
-                </div>
-            </div>
-            <h2 class="related-title">Conteúdo Relacionado</h2>
-            <div id="content-cards"></div>
-            <div id="content-message" style="display: none;"></div>
-        </div>
-    </div>
-
-     <!-- Main Modal Structure (for Content Details) -->
-    <div id="content-modal" class="modal-overlay">
-        <div class="modal-content">
-            <button class="modal-close-button" onclick="closeModal()">×</button>
-            <h3 id="modal-title">Detalhes</h3>
-            <div class="modal-body-content"></div> <!-- Changed ID -->
-            <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 15px;"> <div id="modal-link-container"></div> </div>
-        </div>
-    </div>
-
-    <!-- Comparison Modal Structure -->
-    <div id="comparison-modal" class="modal-overlay">
-        <div class="modal-content">
-            <button class="modal-close-button" onclick="closeComparisonModal()">×</button>
-            <h3 id="comparison-modal-title">Comparar Atrizes</h3>
-            <div class="comparison-search-area" style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 15px; position: relative;">
-                 <input type="text" id="comparison-search-input" placeholder="Buscar atriz para comparar..." style="width: 100%; padding: 8px; font-size: 0.9em; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
-                 <div id="comparison-suggestions-list"></div>
-            </div>
-            <div id="comparison-modal-body"> <div id="comparison-placeholder" style="width: 100%; text-align: center; color: #888; padding-top: 20px;">Selecione atrizes na busca acima para comparar.</div> </div>
-        </div>
-    </div>
-
-    <!-- Create Actress Modal Structure -->
-    <div id="create-actress-modal" class="modal-overlay">
-        <div class="modal-content">
-            <button class="modal-close-button" onclick="closeCreateActressModal()">×</button>
-            <h3>Criar Nova Atriz</h3>
-            <div class="modal-body-content" id="create-actress-modal-body"> <div class="loading">Carregando formulário...</div> </div>
-        </div>
-    </div>
-
-    <!-- *** NEW: Paste Text Modal Structure *** -->
-    <div id="paste-text-modal" class="modal-overlay">
-        <div class="modal-content">
-            <button class="modal-close-button" onclick="closePasteTextModal()">×</button>
-            <h3>Analisar Texto para Criar Multimídia</h3>
-            <div class="modal-body-content">
-                <p style="font-size: 0.9em; color: #555; margin-top: 0;">Cole o texto abaixo. O sistema tentará identificar se é uma Cena ou Filme e extrair os dados iniciais.</p>
-                <textarea id="paste-text-area" placeholder="Cole aqui o texto começando com 'Scene:' ou 'Movie:'..."></textarea>
-                <div id="paste-analysis-result"></div>
-            </div>
-            <div style="text-align: right; margin-top: 15px;">
-                <button id="analyze-paste-button">Analisar e Criar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- *** NEW: Create Scene Modal Structure *** -->
-    <div id="create-scene-modal" class="modal-overlay">
-        <div class="modal-content">
-            <button class="modal-close-button" onclick="closeCreateSceneModal()">×</button>
-            <h3>Criar Nova Cena</h3>
-            <div class="modal-body-content">
-                <form id="create-scene-form" class="create-form" novalidate>
-                    <input type="hidden" id="scene-filme-id" name="scene-filme-id">
-                    <div class="form-group full-width">
-                        <label for="scene-nome">Nome da Cena:</label>
-                        <input type="text" id="scene-nome" name="scene-nome" required>
-                        <span class="error-message" id="scene-nome-error"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="scene-data">Data (YYYY/MM/DD):</label>
-                        <input type="text" id="scene-data" name="scene-data" placeholder="YYYY/MM/DD">
-                         <span class="error-message" id="scene-data-error"></span>
-                    </div>
-                     <div class="form-group">
-                        <label for="scene-numero">Número da Cena:</label>
-                        <input type="number" id="scene-numero" name="scene-numero" min="1">
-                    </div>
-                     <div class="form-group">
-                        <label>Filme Associado:</label>
-                        <div id="scene-movie-display" class="info-display loading">Procurando filme...</div>
-                         <span class="error-message" id="scene-filme-error"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="scene-imagem">Imagem (URL):</label>
-                        <input type="url" id="scene-imagem" name="scene-imagem" placeholder="https://exemplo.com/imagem_cena.jpg">
-                    </div>
-                     <div class="form-group">
-                        <label for="scene-pagina">Página Externa (URL):</label>
-                        <input type="url" id="scene-pagina" name="scene-pagina" placeholder="https://link_externo.com/cena">
-                    </div>
-                    <div class="form-group full-width">
-                        <label>Atores:</label>
-                        <div id="scene-actors-selector">
-                            <div id="scene-actors-search-input-wrapper">
-                                <div id="scene-selected-actors"></div>
-                                <input type="text" id="scene-actors-search-input" placeholder="Buscar atriz para adicionar...">
-                            </div>
-                            <div id="scene-actors-suggestions-list"></div>
-                        </div>
-                        <span class="error-message" id="scene-atores-error"></span>
-                    </div>
-                    <div class="submit-button-container">
-                         <div id="create-scene-form-message" class="error-message" style="text-align: left; margin-bottom: 10px;"></div>
-                         <button type="submit" id="create-scene-submit-button">Salvar Cena</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- *** NEW: Create Movie Modal Structure *** -->
-    <div id="create-movie-modal" class="modal-overlay">
-         <div class="modal-content">
-            <button class="modal-close-button" onclick="closeCreateMovieModal()">×</button>
-            <h3>Criar Novo Filme</h3>
-            <div class="modal-body-content">
-                 <form id="create-movie-form" class="create-form" novalidate>
-                    <div class="form-group full-width">
-                        <label for="movie-nome">Nome do Filme:</label>
-                        <input type="text" id="movie-nome" name="movie-nome" required>
-                        <span class="error-message" id="movie-nome-error"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="movie-ano">Ano de Lançamento:</label>
-                        <input type="number" id="movie-ano" name="movie-ano" placeholder="YYYY">
-                        <span class="error-message" id="movie-ano-error"></span>
-                    </div>
-                     <div class="form-group">
-                        <label for="movie-estudio">Estúdio:</label>
-                        <input type="text" id="movie-estudio" name="movie-estudio">
-                    </div>
-                     <div class="form-group">
-                        <label for="movie-duracao">Duração:</label>
-                        <input type="text" id="movie-duracao" name="movie-duracao" placeholder="HH:MM:SS">
-                    </div>
-                    <div class="form-group">
-                        <label for="movie-imagem">Imagem (URL):</label>
-                        <input type="url" id="movie-imagem" name="movie-imagem" placeholder="https://exemplo.com/imagem_filme.jpg">
-                    </div>
-                     <div class="form-group">
-                        <label for="movie-pagina">Página Externa (URL):</label>
-                        <input type="url" id="movie-pagina" name="movie-pagina" placeholder="https://link_externo.com/filme">
-                    </div>
-                    <div class="form-group full-width">
-                         <label>Cenas:</label>
-                         <div class="info-display">Cenas serão associadas posteriormente ou automaticamente se já existirem.</div>
-                    </div>
-                    <div class="submit-button-container">
-                         <div id="create-movie-form-message" class="error-message" style="text-align: left; margin-bottom: 10px;"></div>
-                        <button type="submit" id="create-movie-submit-button">Salvar Filme</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- Template for Movable Actress Popups -->
-    <div id="actress-popup-template" class="actress-popup" style="display: none;">
-        <div class="actress-popup-header"> <h5>Nome Atriz</h5> <button class="actress-popup-compare-btn" title="Comparar Atrizes">🧪</button> <button class="actress-popup-close">×</button> </div>
-        <div class="actress-popup-body"></div>
-    </div>
-
-    <!-- Floating Action Button -->
-    <button id="fab-create" title="Criar Novo Item">+</button>
-
-    <!-- Create Menu Popup -->
-    <div id="create-menu-popup">
-        <button class="create-menu-button" id="menu-create-actress">Criar Atriz</button>
-        <button class="create-menu-button" id="menu-create-multimedia">Criar Multimídia</button>
-    </div>
-
-
-    <!-- Firebase SDK -->
-  
-
-
-    <script type="module">
+ <script type="module">
         // --- Imports ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 
-// Importa TODAS as funções do Firestore necessárias UMA VEZ
-import {
-    getFirestore,
-    collection,
-    getDocs,
-    doc,
-    getDoc,
-    addDoc,
-    query,
-    where,
-    limit,
-    serverTimestamp,
-    updateDoc,  // <- Incluído aqui
-    arrayUnion  // <- Incluído aqui
-} from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        // Importa TODAS as funções do Firestore necessárias UMA VEZ
+        import {
+            getFirestore,
+            collection,
+            getDocs,
+            doc,
+            getDoc,
+            addDoc,
+            query,
+            where,
+            limit,
+            serverTimestamp,
+            updateDoc,  // <- Incluído aqui
+            arrayUnion  // <- Incluído aqui
+        } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-// --- Firebase Config --- (Vem depois dos imports)
-const firebaseConfig = {
+        // --- Firebase Config --- (Vem depois dos imports)
+        const firebaseConfig = {
             apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0",
             authDomain: "babes-392fd.firebaseapp.com",
             // VERIFIQUE ESTA LINHA ABAIXO:
@@ -518,7 +96,7 @@ const firebaseConfig = {
         let selectedMainActressElement = null;
         let currentMainActressId = null;
         let allActressesData = [];
-        let allRelatedContent = [];
+        let allRelatedContent = []; // <<< ATENÇÃO A ESTA VARIÁVEL
         let filteredRelatedContent = [];
         let selectedRelatedActresses = [];
         let activeRelatedFilter = 'all';
@@ -628,6 +206,28 @@ const firebaseConfig = {
              actressListUl.appendChild(li);
         }
         async function handleMainActressClick(actressId, listItemElement) {
+             // --->>> DEBUG: Adicionado Log Antes de Carregar <<<---
+             try {
+                // Convertendo para string JSON de forma segura (lidando com possíveis estruturas circulares se houver)
+                const getCircularReplacer = () => {
+                    const seen = new WeakSet();
+                    return (key, value) => {
+                        if (typeof value === "object" && value !== null) {
+                            if (seen.has(value)) {
+                                return "[Circular]"; // Ou qualquer marcador que você preferir
+                            }
+                            seen.add(value);
+                        }
+                        return value;
+                    };
+                };
+                 console.log(`DEBUG: BEFORE Load (Actress Click ${actressId}) - Current allRelatedContent:`, JSON.stringify(allRelatedContent, getCircularReplacer()));
+             } catch (e) {
+                 console.error("DEBUG: Error stringifying allRelatedContent before load:", e);
+                 console.log("DEBUG: BEFORE Load - allRelatedContent (raw):", allRelatedContent); // Fallback to raw object
+             }
+             // --->>> FIM DEBUG <<<---
+
              if (selectedMainActressElement === listItemElement || !mainContainer || !actressDetailsContainer || !contentCardsContainer || !contentMessage) return;
              if (selectedMainActressElement) selectedMainActressElement.classList.remove('selected');
              listItemElement.classList.add('selected');
@@ -658,7 +258,8 @@ const firebaseConfig = {
                  } else {
                      actressDetailsContainer.innerHTML = '<div class="error">Detalhes não encontrados.</div>';
                  }
-                 await loadAndDisplayRelatedContent(actressId);
+                 // CHAMADA PRINCIPAL para carregar conteúdo
+                 await loadAndDisplayRelatedContent(actressId); // <<< A limpeza do allRelatedContent acontece DENTRO desta função
              } catch (error) {
                  console.error(`Erro ao carregar dados da atriz ${actressId}: `, error);
                  actressDetailsContainer.innerHTML = '<div class="error">Erro ao carregar detalhes.</div>';
@@ -713,90 +314,168 @@ const firebaseConfig = {
 
         // --- Related Content Logic ---
         async function loadAndDisplayRelatedContent(mainActressId) {
-            if (!contentCardsContainer || !contentMessage) return;
-             allRelatedContent = [];
+            console.log(`>>> Iniciando loadAndDisplayRelatedContent para Atriz ID: ${mainActressId}`);
+            if (!contentCardsContainer || !contentMessage) {
+                console.error("Elementos contentCardsContainer ou contentMessage não encontrados!");
+                return;
+            }
+             // <<<--- LIMPEZA DO ESTADO ACONTECE AQUI ---<<<
+             allRelatedContent = []; // Limpa a lista de conteúdo relacionado anterior
              filteredRelatedContent = [];
-             contentCardsContainer.innerHTML = '';
+             // <<<--------------------------------------->>>
+             contentCardsContainer.innerHTML = ''; // Limpa visualmente a coluna
              displayMessage(contentMessage, 'Buscando conteúdo relacionado...');
+             console.log(`   Cache de Cenas Atual: ${allScenesCache.size} cenas.`);
+
              try {
+                 // Busca inicial de vídeos e filmes
                  const [videosSnapshot, filmesSnapshot] = await Promise.all([
                      getDocs(collection(db, "videos")),
                      getDocs(collection(db, "filmes"))
                  ]);
+                 console.log(`   Encontrados ${videosSnapshot.size} vídeos e ${filmesSnapshot.size} filmes no total.`);
+
+                 // 1. Processar Vídeos
+                 // console.log("   --- Processando Vídeos ---"); // Log opcional menos verboso
                  videosSnapshot.forEach(docSnap => {
+                     const videoId = docSnap.id;
                      const itemData = docSnap.data();
-                     if (itemData.atores?.includes(mainActressId)) {
-                         allRelatedContent.push({ id: docSnap.id, type: 'video', ...itemData });
+                     const videoActors = itemData.atores || []; // Garante que é um array ou vazio
+                     // console.log(`   Verificando Vídeo ID: ${videoId}, Atores: ${JSON.stringify(videoActors)}`); // Log opcional
+                     if (Array.isArray(videoActors) && videoActors.includes(mainActressId)) {
+                         console.log(`      >> VÍDEO ADICIONADO: ${videoId} (Contém a atriz ${mainActressId})`);
+                         allRelatedContent.push({ id: videoId, type: 'video', ...itemData });
                      }
                  });
+
+                 // 2. Processar Filmes e suas Cenas
+                 // console.log("   --- Processando Filmes ---"); // Log opcional menos verboso
                  filmesSnapshot.forEach(docSnap => {
+                     const movieId = docSnap.id;
                      const movieData = docSnap.data();
+                     const movieSceneIds = movieData.cenas || []; // IDs das cenas listadas no filme
+                     // console.log(`   Verificando Filme ID: ${movieId}, Nome: "${movieData.nome}", Cenas no Doc: ${JSON.stringify(movieSceneIds)}`); // Log opcional
                      let movieIsRelated = false;
                      const relatedScenesFromMovie = [];
-                     if (movieData.cenas?.length > 0) {
-                         for (const sceneId of movieData.cenas) {
+
+                     if (movieSceneIds.length > 0) {
+                         // console.log(`      Analisando ${movieSceneIds.length} cenas do filme ${movieId}:`); // Log opcional
+                         for (const sceneId of movieSceneIds) {
                              const sceneData = allScenesCache.get(sceneId);
                              if (sceneData) {
+                                 const sceneActors = sceneData.atores || [];
+                                 // console.log(`      - Cena ID: ${sceneId} (Encontrada no Cache), Atores na Cena: ${JSON.stringify(sceneActors)}`); // Log opcional
                                  const sceneFullData = { id: sceneId, type: 'scene', ...sceneData };
-                                 relatedScenesFromMovie.push(sceneFullData);
-                                 if (sceneData.atores?.includes(mainActressId)) {
+
+                                 if (Array.isArray(sceneActors) && sceneActors.includes(mainActressId)) {
+                                     // console.log(`         * Cena ${sceneId} CONTÉM a atriz ${mainActressId}. Marcando filme como relacionado e guardando cena.`); // Log opcional
                                      movieIsRelated = true;
+                                     relatedScenesFromMovie.push(sceneFullData);
                                  }
+                             } else {
+                                 console.warn(`      - Cena ID: ${sceneId} NÃO encontrada no Cache para o filme ${movieId}.`);
                              }
                          }
+                     } else {
+                         // console.log(`      - Filme ${movieId} não possui cenas listadas no documento.`); // Log opcional
                      }
+
                      if (movieIsRelated) {
-                         allRelatedContent.push({ id: docSnap.id, type: 'film', ...movieData });
+                         console.log(`      >> FILME ADICIONADO: ${movieId} (Nome: "${movieData.nome}")`);
+                         allRelatedContent.push({ id: movieId, type: 'film', ...movieData });
+
                          relatedScenesFromMovie.forEach(scene => {
                              if (!allRelatedContent.some(item => item.id === scene.id && item.type === 'scene')) {
+                                 console.log(`         >> CENA (do filme ${movieId}) ADICIONADA: ${scene.id}`);
                                  allRelatedContent.push(scene);
                              }
                          });
                      } else {
-                         relatedScenesFromMovie.forEach(scene => {
-                             if (scene.atores?.includes(mainActressId)) {
-                                 if (!allRelatedContent.some(item => item.id === scene.id && item.type === 'scene')) {
-                                     allRelatedContent.push(scene);
-                                 }
-                             }
-                         });
+                         // console.log(`      -- Filme ${movieId} NÃO foi marcado como relacionado diretamente.`); // Log opcional
                      }
                  });
-                 // Add scenes not associated with a found related movie but containing the actress
+
+                 // 3. Processar Cenas Diretamente (do Cache)
+                 // console.log("   --- Processando Cenas do Cache Diretamente ---"); // Log opcional menos verboso
                  allScenesCache.forEach((sceneData, sceneId) => {
-                    if (sceneData.atores?.includes(mainActressId)) {
-                        if (!allRelatedContent.some(item => item.id === sceneId && item.type === 'scene')) {
-                            allRelatedContent.push({ id: sceneId, type: 'scene', ...sceneData });
-                        }
-                    }
+                     const sceneActors = sceneData.atores || [];
+                     // console.log(`   Verificando Cena Cache ID: ${sceneId}, Atores: ${JSON.stringify(sceneActors)}`); // Log opcional
+                     if (Array.isArray(sceneActors) && sceneActors.includes(mainActressId)) {
+                         if (!allRelatedContent.some(item => item.id === sceneId && item.type === 'scene')) {
+                             console.log(`      >> CENA (do cache) ADICIONADA: ${sceneId} (Contém a atriz e não estava na lista ainda)`);
+                             allRelatedContent.push({ id: sceneId, type: 'scene', ...sceneData });
+                         }
+                     }
                  });
-                 console.log(`Found ${allRelatedContent.length} related items for actress ${mainActressId}`);
-                 applyRelatedContentFilters();
+
+                 console.log(`   Total de itens (${allRelatedContent.length}) coletados em 'allRelatedContent' ANTES de aplicar filtros:`, allRelatedContent.map(item => `${item.type}:${item.id}`));
+                 applyRelatedContentFilters(); // Aplica filtros de tipo e co-atriz e exibe os cards
+
              } catch (error) {
-                 console.error("Erro ao buscar conteúdo relacionado: ", error);
+                 console.error("Erro detalhado ao buscar conteúdo relacionado: ", error);
                  displayMessage(contentMessage, 'Erro ao carregar conteúdo relacionado.', true);
              }
+             console.log(`<<< Finalizando loadAndDisplayRelatedContent para Atriz ID: ${mainActressId}`);
         }
+
         function applyRelatedContentFilters() {
+            // --->>> DEBUG: Adicionado Log no Início <<<---
+             try {
+                const getCircularReplacer = () => { /* ... (helper function from above) ... */
+                    const seen = new WeakSet();
+                    return (key, value) => {
+                        if (typeof value === "object" && value !== null) {
+                            if (seen.has(value)) { return "[Circular]"; }
+                            seen.add(value);
+                        }
+                        return value;
+                    };
+                };
+                 console.log('DEBUG: APPLYING FILTERS - Input allRelatedContent:', JSON.stringify(allRelatedContent, getCircularReplacer()));
+             } catch (e) {
+                 console.error("DEBUG: Error stringifying allRelatedContent at filter start:", e);
+                 console.log("DEBUG: APPLYING FILTERS - Input allRelatedContent (raw):", allRelatedContent);
+             }
+             // --->>> FIM DEBUG <<<---
+
             if (!contentCardsContainer || !contentMessage) return;
-             contentCardsContainer.innerHTML = '';
+             contentCardsContainer.innerHTML = ''; // Limpa visualmente
              clearMessage(contentMessage);
              const relatedActressIds = selectedRelatedActresses.map(a => a.id);
+
+             // O filtro principal acontece aqui
              filteredRelatedContent = allRelatedContent.filter(item => {
+                 // Filtro por tipo (Vídeo, Filme, Cena)
                  if (activeRelatedFilter !== 'all' && item.type !== activeRelatedFilter) return false;
+                 // Filtro por co-atrizes selecionadas
                  if (relatedActressIds.length > 0) {
-                     if (!item.atores || !Array.isArray(item.atores)) return false;
+                     if (!item.atores || !Array.isArray(item.atores)) return false; // Item precisa ter atores
+                     // Verifica se TODOS os IDs de co-atrizes selecionadas estão presentes nos atores do item
                      if (!relatedActressIds.every(relId => item.atores.includes(relId))) return false;
                  }
+                 // Se passou pelos filtros, mantém o item
                  return true;
              });
-             filteredRelatedContent.sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
+
+            // --->>> DEBUG: Adicionado Log Após Filtrar <<<---
+            try {
+                 console.log('DEBUG: APPLYING FILTERS - Filtered content:', JSON.stringify(filteredRelatedContent.map(item => ({id: item.id, type: item.type, nome: item.nome, atores: item.atores})), null, 2)); // Mostra atores para verificação
+            } catch (e) {
+                console.error("DEBUG: Error stringifying filteredRelatedContent:", e);
+                console.log('DEBUG: APPLYING FILTERS - Filtered content (raw):', filteredRelatedContent);
+            }
+            // --->>> FIM DEBUG <<<---
+
+             filteredRelatedContent.sort((a, b) => (a.nome || '').localeCompare(b.nome || '')); // Ordena alfabeticamente
+
              if (filteredRelatedContent.length > 0) {
+                 // Cria os cartões apenas para o conteúdo que passou pelos filtros
                  filteredRelatedContent.forEach(item => createContentCard(item.imagem, item.nome, item.type, item.id));
              } else {
                  displayMessage(contentMessage, 'Nenhum conteúdo encontrado com os filtros aplicados.');
              }
         }
+
         function createContentCard(imageUrl, title, type, id) {
             if (!contentCardsContainer) return;
              const card = document.createElement('div');
@@ -842,7 +521,8 @@ const firebaseConfig = {
              if (!searchTerm || searchTerm.trim() === '') { relatedSuggestionsList.style.display = 'none'; return; }
              // Find all co-actress IDs from currently displayed related content
              const coActressIds = new Set();
-             filteredRelatedContent.forEach(item => { // Use filtered content for relevance
+             // IMPORTANTE: Usar filteredRelatedContent aqui faz sentido para sugerir co-estrelas do conteúdo JÁ FILTRADO
+             filteredRelatedContent.forEach(item => {
                  item.atores?.forEach(id => { if (id !== currentMainActressId) coActressIds.add(id); });
              });
              if (coActressIds.size === 0) { relatedSuggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma co-atriz no conteúdo filtrado</div>'; relatedSuggestionsList.style.display = 'block'; return; }
@@ -2742,6 +2422,3 @@ const firebaseConfig = {
         }); // End DOMContentLoaded
 
     </script>
-
-  </body>
-  </html>
