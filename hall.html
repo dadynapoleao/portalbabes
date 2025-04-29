@@ -121,6 +121,7 @@
         .comparison-column div { font-size: 0.85em; margin-bottom: 4px; word-wrap: break-word; }
         .comparison-column strong { display: inline-block; min-width: 50px; color: #333; font-weight: bold; margin-right: 3px; }
         #comparison-suggestions-list { display: none; position: absolute; width: 100%; background-color: #fff; border: 1px solid #ccc; border-top: none; border-radius: 0 0 4px 4px; max-height: 150px; overflow-y: auto; z-index: 1100; box-sizing: border-box; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        /* Reuse suggestion-item styles */
         #comparison-suggestions-list .suggestion-item { display: flex; padding: 5px 10px; color: #333; cursor: pointer; align-items: center; gap: 8px; font-size: 0.9em; }
         #comparison-suggestions-list .suggestion-item:hover { background-color: #f0f0f0; }
         #comparison-suggestions-list .suggestion-item.no-results { cursor: default; color: #888; justify-content: center; padding: 8px; }
@@ -154,6 +155,57 @@
         #create-actress-modal button[type="submit"]:hover { background-color: #a772e3; }
         #create-actress-modal button[type="submit"]:active { transform: scale(0.98); }
         #create-actress-modal button[type="submit"]:disabled { background-color: #555; color: #999; cursor: not-allowed; transform: none; }
+
+        /* --- NEW: Paste Text Modal Styles --- */
+        #paste-text-modal .modal-content { max-width: 700px; }
+        #paste-text-area { width: 100%; min-height: 250px; resize: vertical; font-family: monospace; font-size: 0.9em; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-bottom: 15px; }
+        #paste-analysis-result { font-size: 0.9em; margin-top: 10px; min-height: 1.5em; }
+        #paste-analysis-result.error { color: #a00; font-weight: bold; }
+        #analyze-paste-button { padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1em; }
+        #analyze-paste-button:hover { background-color: #0056b3; }
+        #analyze-paste-button:disabled { background-color: #aaa; cursor: not-allowed; }
+
+        /* --- NEW: Create Scene/Movie Modal Styles --- */
+        #create-scene-modal .modal-content,
+        #create-movie-modal .modal-content { max-width: 850px; /* Wider for forms */ }
+        #create-scene-modal .modal-body-content,
+        #create-movie-modal .modal-body-content { font-size: 1em; } /* Slightly larger base font */
+        .create-form { display: flex; flex-wrap: wrap; gap: 15px 20px; /* Row and column gap */ }
+        .form-group { margin-bottom: 10px; flex: 1 1 calc(50% - 10px); /* Two columns */ box-sizing: border-box; min-width: 200px; }
+        .form-group.full-width { flex-basis: 100%; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; font-size: 0.9em; }
+        .form-group input[type="text"],
+        .form-group input[type="url"],
+        .form-group input[type="number"],
+        .form-group input[type="date"] /* Added date type */
+        { width: 100%; padding: 9px 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 0.95em; }
+        .form-group input:focus { outline: none; border-color: #80bdff; box-shadow: 0 0 0 0.15rem rgba(0,123,255,.25); }
+        .form-group .info-display { font-size: 0.9em; color: #555; margin-top: 5px; min-height: 1.5em; }
+        .form-group .info-display.loading { font-style: italic; color: #888; }
+        .form-group .info-display.not-found { color: #a00; }
+        .form-group .info-display.found { color: #007bff; font-weight: bold; }
+        .submit-button-container { flex-basis: 100%; text-align: right; margin-top: 20px; }
+        .submit-button-container button[type="submit"] { padding: 12px 25px; background-color: #28a745; color: white; border: none; border-radius: 5px; font-size: 1em; font-weight: bold; cursor: pointer; transition: background-color 0.2s ease; }
+        .submit-button-container button[type="submit"]:hover { background-color: #218838; }
+        .submit-button-container button[type="submit"]:disabled { background-color: #aaa; cursor: not-allowed; }
+        .form-group .error-message { color: #dc3545; font-size: 0.8em; margin-top: 4px; }
+
+        /* --- NEW: Actor Selector for Create Scene Modal --- */
+        #scene-actors-selector { position: relative; }
+        #scene-actors-search-input-wrapper { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; cursor: text; min-height: 32px; }
+        #scene-actors-search-input-wrapper:focus-within { border-color: #80bdff; box-shadow: 0 0 0 0.15rem rgba(0,123,255,.25); }
+        #scene-selected-actors { display: contents; }
+        .scene-actor-pill { /* Reuse related-actress-pill style */ display: inline-flex; align-items: center; background-color: #007bff; color: white; padding: 2px 5px; border-radius: 3px; font-size: 0.8em; margin: 1px; white-space: nowrap; }
+        .scene-actor-pill span { margin-right: 4px; }
+        .scene-remove-actor-btn { /* Reuse related style */ background: none; border: none; color: white; cursor: pointer; font-weight: bold; font-size: 1em; padding: 0 2px; line-height: 1; opacity: 0.8; }
+        .scene-remove-actor-btn:hover { opacity: 1; }
+        #scene-actors-search-input { flex-grow: 1; padding: 4px 5px; border: none; background-color: transparent; color: #333; font-size: 0.9em; min-width: 100px; outline: none; }
+        #scene-actors-suggestions-list { /* Reuse related style */ display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 100; background-color: #fff; border: 1px solid #ccc; border-top: none; border-radius: 0 0 4px 4px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-height: 180px; overflow-y: auto; }
+        #scene-actors-suggestions-list .suggestion-item { /* Reuse related style */ display: flex; padding: 5px 10px; color: #333; cursor: pointer; align-items: center; gap: 8px; font-size: 0.9em; }
+        #scene-actors-suggestions-list .suggestion-item:hover { background-color: #f0f0f0; }
+        #scene-actors-suggestions-list .suggestion-item.no-results { cursor: default; color: #888; justify-content: center; padding: 8px; }
+        #scene-actors-suggestions-list .suggestion-item img { width: 25px; height: 25px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+
 
         /* General Loading/Error Styles */
         .loading, .error { padding: 10px; text-align: center; color: #555; font-style: italic; }
@@ -230,6 +282,124 @@
         </div>
     </div>
 
+    <!-- *** NEW: Paste Text Modal Structure *** -->
+    <div id="paste-text-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-button" onclick="closePasteTextModal()">×</button>
+            <h3>Analisar Texto para Criar Multimídia</h3>
+            <div class="modal-body-content">
+                <p style="font-size: 0.9em; color: #555; margin-top: 0;">Cole o texto abaixo. O sistema tentará identificar se é uma Cena ou Filme e extrair os dados iniciais.</p>
+                <textarea id="paste-text-area" placeholder="Cole aqui o texto começando com 'Scene:' ou 'Movie:'..."></textarea>
+                <div id="paste-analysis-result"></div>
+            </div>
+            <div style="text-align: right; margin-top: 15px;">
+                <button id="analyze-paste-button">Analisar e Criar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- *** NEW: Create Scene Modal Structure *** -->
+    <div id="create-scene-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-button" onclick="closeCreateSceneModal()">×</button>
+            <h3>Criar Nova Cena</h3>
+            <div class="modal-body-content">
+                <form id="create-scene-form" class="create-form" novalidate>
+                    <input type="hidden" id="scene-filme-id" name="scene-filme-id">
+                    <div class="form-group full-width">
+                        <label for="scene-nome">Nome da Cena:</label>
+                        <input type="text" id="scene-nome" name="scene-nome" required>
+                        <span class="error-message" id="scene-nome-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="scene-data">Data (YYYY/MM/DD):</label>
+                        <input type="text" id="scene-data" name="scene-data" placeholder="YYYY/MM/DD">
+                         <span class="error-message" id="scene-data-error"></span>
+                    </div>
+                     <div class="form-group">
+                        <label for="scene-numero">Número da Cena:</label>
+                        <input type="number" id="scene-numero" name="scene-numero" min="1">
+                    </div>
+                     <div class="form-group">
+                        <label>Filme Associado:</label>
+                        <div id="scene-movie-display" class="info-display loading">Procurando filme...</div>
+                         <span class="error-message" id="scene-filme-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="scene-imagem">Imagem (URL):</label>
+                        <input type="url" id="scene-imagem" name="scene-imagem" placeholder="https://exemplo.com/imagem_cena.jpg">
+                    </div>
+                     <div class="form-group">
+                        <label for="scene-pagina">Página Externa (URL):</label>
+                        <input type="url" id="scene-pagina" name="scene-pagina" placeholder="https://link_externo.com/cena">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Atores:</label>
+                        <div id="scene-actors-selector">
+                            <div id="scene-actors-search-input-wrapper">
+                                <div id="scene-selected-actors"></div>
+                                <input type="text" id="scene-actors-search-input" placeholder="Buscar atriz para adicionar...">
+                            </div>
+                            <div id="scene-actors-suggestions-list"></div>
+                        </div>
+                        <span class="error-message" id="scene-atores-error"></span>
+                    </div>
+                    <div class="submit-button-container">
+                         <div id="create-scene-form-message" class="error-message" style="text-align: left; margin-bottom: 10px;"></div>
+                         <button type="submit" id="create-scene-submit-button">Salvar Cena</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- *** NEW: Create Movie Modal Structure *** -->
+    <div id="create-movie-modal" class="modal-overlay">
+         <div class="modal-content">
+            <button class="modal-close-button" onclick="closeCreateMovieModal()">×</button>
+            <h3>Criar Novo Filme</h3>
+            <div class="modal-body-content">
+                 <form id="create-movie-form" class="create-form" novalidate>
+                    <div class="form-group full-width">
+                        <label for="movie-nome">Nome do Filme:</label>
+                        <input type="text" id="movie-nome" name="movie-nome" required>
+                        <span class="error-message" id="movie-nome-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="movie-ano">Ano de Lançamento:</label>
+                        <input type="number" id="movie-ano" name="movie-ano" placeholder="YYYY">
+                        <span class="error-message" id="movie-ano-error"></span>
+                    </div>
+                     <div class="form-group">
+                        <label for="movie-estudio">Estúdio:</label>
+                        <input type="text" id="movie-estudio" name="movie-estudio">
+                    </div>
+                     <div class="form-group">
+                        <label for="movie-duracao">Duração:</label>
+                        <input type="text" id="movie-duracao" name="movie-duracao" placeholder="HH:MM:SS">
+                    </div>
+                    <div class="form-group">
+                        <label for="movie-imagem">Imagem (URL):</label>
+                        <input type="url" id="movie-imagem" name="movie-imagem" placeholder="https://exemplo.com/imagem_filme.jpg">
+                    </div>
+                     <div class="form-group">
+                        <label for="movie-pagina">Página Externa (URL):</label>
+                        <input type="url" id="movie-pagina" name="movie-pagina" placeholder="https://link_externo.com/filme">
+                    </div>
+                    <div class="form-group full-width">
+                         <label>Cenas:</label>
+                         <div class="info-display">Cenas serão associadas posteriormente ou automaticamente se já existirem.</div>
+                    </div>
+                    <div class="submit-button-container">
+                         <div id="create-movie-form-message" class="error-message" style="text-align: left; margin-bottom: 10px;"></div>
+                        <button type="submit" id="create-movie-submit-button">Salvar Filme</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
     <!-- Template for Movable Actress Popups -->
     <div id="actress-popup-template" class="actress-popup" style="display: none;">
         <div class="actress-popup-header"> <h5>Nome Atriz</h5> <button class="actress-popup-compare-btn" title="Comparar Atrizes">🧪</button> <button class="actress-popup-close">×</button> </div>
@@ -247,13 +417,41 @@
 
 
     <!-- Firebase SDK -->
+  
+
+
     <script type="module">
         // --- Imports ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, getDoc, addDoc, query, where, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // --- Firebase Config ---
-        const firebaseConfig = { apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0", authDomain: "babes-392fd.firebaseapp.com", projectId: "babes-392fd", storageBucket: "babes-392fd.appspot.com", messagingSenderId: "376795361631", appId: "1:376795361631:web:d662f2b2f2cd23b115c6ea" };
+// Importa TODAS as funções do Firestore necessárias UMA VEZ
+import {
+    getFirestore,
+    collection,
+    getDocs,
+    doc,
+    getDoc,
+    addDoc,
+    query,
+    where,
+    limit,
+    serverTimestamp,
+    updateDoc,  // <- Incluído aqui
+    arrayUnion  // <- Incluído aqui
+} from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+// --- Firebase Config --- (Vem depois dos imports)
+const firebaseConfig = {
+            apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0",
+            authDomain: "babes-392fd.firebaseapp.com",
+            // VERIFIQUE ESTA LINHA ABAIXO:
+            projectId: "babes-392fd", // <--- TEM CERTEZA QUE ESTA LINHA EXISTE E ESTÁ CORRETA NO SEU ARQUIVO?
+            storageBucket: "babes-392fd.appspot.com",
+            messagingSenderId: "376795361631",
+            appId: "1:376795361631:web:d662f2b2f2cd23b115c6ea"
+        };
+
+        // A inicialização ocorre aqui:
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
@@ -264,7 +462,7 @@
         const contentCardsContainer = document.getElementById('content-cards');
         const contentMessage = document.getElementById('content-message');
         const contentModal = document.getElementById('content-modal');
-        const contentModalBody = contentModal.querySelector('.modal-body-content');
+        const contentModalBody = contentModal?.querySelector('.modal-body-content'); // Add null check
         const contentModalTitle = document.getElementById('modal-title');
         const modalLinkContainer = document.getElementById('modal-link-container');
         const comparisonModal = document.getElementById('comparison-modal');
@@ -284,6 +482,38 @@
         const menuCreateActressBtn = document.getElementById('menu-create-actress');
         const menuCreateMultimediaBtn = document.getElementById('menu-create-multimedia');
 
+        // DOM Elements for New Modals
+        const pasteTextModal = document.getElementById('paste-text-modal');
+        const pasteTextArea = document.getElementById('paste-text-area');
+        const pasteAnalysisResult = document.getElementById('paste-analysis-result');
+        const analyzePasteButton = document.getElementById('analyze-paste-button');
+        const createSceneModal = document.getElementById('create-scene-modal');
+        const createSceneForm = document.getElementById('create-scene-form');
+        const sceneNomeInput = document.getElementById('scene-nome');
+        const sceneDataInput = document.getElementById('scene-data');
+        const sceneNumeroInput = document.getElementById('scene-numero');
+        const sceneMovieDisplay = document.getElementById('scene-movie-display');
+        const sceneFilmeIdInput = document.getElementById('scene-filme-id');
+        const sceneImagemInput = document.getElementById('scene-imagem');
+        const scenePaginaInput = document.getElementById('scene-pagina');
+        const sceneActorsSelector = document.getElementById('scene-actors-selector');
+        const sceneSelectedActorsContainer = document.getElementById('scene-selected-actors');
+        const sceneActorsSearchInput = document.getElementById('scene-actors-search-input');
+        const sceneActorsSuggestionsList = document.getElementById('scene-actors-suggestions-list');
+        const createSceneSubmitButton = document.getElementById('create-scene-submit-button');
+        const createSceneFormMessage = document.getElementById('create-scene-form-message');
+        const createMovieModal = document.getElementById('create-movie-modal');
+        const createMovieForm = document.getElementById('create-movie-form');
+        const movieNomeInput = document.getElementById('movie-nome');
+        const movieAnoInput = document.getElementById('movie-ano');
+        const movieEstudioInput = document.getElementById('movie-estudio');
+        const movieDuracaoInput = document.getElementById('movie-duracao');
+        const movieImagemInput = document.getElementById('movie-imagem');
+        const moviePaginaInput = document.getElementById('movie-pagina');
+        const createMovieSubmitButton = document.getElementById('create-movie-submit-button');
+        const createMovieFormMessage = document.getElementById('create-movie-form-message');
+
+
         // --- State Variables ---
         let selectedMainActressElement = null;
         let currentMainActressId = null;
@@ -297,55 +527,779 @@
         let actressesToCompare = [];
         let comparisonContextActressIds = [];
         let createFormInitialized = false;
+        let selectedSceneActors = []; // State for actors in scene creation modal
 
         // --- Helper Functions ---
         function calculateAge(birthDateString) { if (!birthDateString) return '?'; try { const birthDate = new Date(birthDateString); const today = new Date(); let age = today.getFullYear() - birthDate.getFullYear(); const m = today.getMonth() - birthDate.getMonth(); if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) { age--; } return age > 0 ? age : '?'; } catch (e) { return '?'; } }
-        function displayMessage(element, message, isError = false) { element.innerHTML = `<div class="${isError ? 'error' : 'loading'}">${message}</div>`; element.style.display = 'block'; }
-        function clearMessage(element) { element.innerHTML = ''; element.style.display = 'none'; }
+        function displayMessage(element, message, isError = false) { if (!element) return; element.innerHTML = `<div class="${isError ? 'error' : 'loading'}">${message}</div>`; element.style.display = 'block'; }
+        function clearMessage(element) { if (!element) return; element.innerHTML = ''; element.style.display = 'none'; }
         function capitalizeFirstLetter(string) { return string ? string.charAt(0).toUpperCase() + string.slice(1) : ''; }
         function debounce(func, delay) { let timeoutId; return function(...args) { clearTimeout(timeoutId); timeoutId = setTimeout(() => { func.apply(this, args); }, delay); }; }
 
+        // Helper function to format Date (e.g., "April 07, 2025" -> "2025/04/07")
+        function formatDateString(dateString) {
+            if (!dateString) return '';
+            try {
+                // Handle "Month Day, Year" and "Month, Year"
+                 const dateParts = dateString.replace(',', '').split(' ').filter(part => part.length > 0); // Remove empty parts too
+                 const monthNames = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+                 const monthIndex = monthNames.indexOf(dateParts[0]?.toLowerCase());
+                 if (monthIndex === -1) throw new Error(`Invalid month name: ${dateParts[0]}`);
+
+                 const month = (monthIndex + 1).toString().padStart(2, '0');
+                 let day = '01'; // Default day if not present
+                 let year = '';
+
+                 if (dateParts.length === 3) { // Month Day Year
+                     year = dateParts[2];
+                     day = parseInt(dateParts[1]).toString().padStart(2, '0');
+                 } else if (dateParts.length === 2) { // Month Year
+                     year = dateParts[1];
+                 } else {
+                     throw new Error(`Unexpected date format parts count: ${dateParts.length} (${dateString})`);
+                 }
+
+                 if (!/^\d{4}$/.test(year) || !/^\d{2}$/.test(day)) {
+                    throw new Error(`Invalid day or year format: Day=${day}, Year=${year}`);
+                 }
+
+                 // Optional validation by creating a Date object
+                 const testDate = new Date(`${year}-${month}-${day}T00:00:00`); // Add time to avoid timezone issues
+                 if (isNaN(testDate.getTime()) || testDate.getFullYear() !== parseInt(year) || testDate.getMonth() !== monthIndex || testDate.getDate() !== parseInt(day)) {
+                     console.warn("Constructed date is invalid or differs from parts:", `${year}-${month}-${day}`);
+                     // Decide if you want to throw an error or return original/default here
+                 }
+
+                 return `${year}/${month}/${day}`;
+
+            } catch (e) {
+                console.error("Erro ao formatar data:", dateString, e);
+                return dateString; // Return original on error
+            }
+        }
+
+        // Helper to clear form error messages
+        function clearFormMessages(messageElements) {
+            if (!Array.isArray(messageElements)) return;
+            messageElements.forEach(el => {
+                if (el && typeof el.textContent !== 'undefined') { // Check if element exists and has textContent
+                     el.textContent = '';
+                }
+            });
+        }
+
         // --- Core Logic: Main Page Display ---
-        async function loadInitialData() { displayMessage(actressListUl, 'Carregando atrizes...'); allScenesCache.clear(); try { const [actoresSnapshot, cenasSnapshot] = await Promise.all([ getDocs(collection(db, "atores")), getDocs(collection(db, "cenas")) ]); actressListUl.innerHTML = ''; if (actoresSnapshot.empty) { displayMessage(actressListUl, 'Nenhuma atriz encontrada.', true); } else { allActressesData = []; actoresSnapshot.forEach((doc) => allActressesData.push({ id: doc.id, ...doc.data() })); allActressesData.sort((a, b) => (a.nome || '').localeCompare(b.nome || '')); allActressesData.forEach(renderActressListItem); console.log(`Loaded ${allActressesData.length} actresses.`); } cenasSnapshot.forEach(docSnap => allScenesCache.set(docSnap.id, docSnap.data())); console.log(`Cached ${allScenesCache.size} scenes.`); } catch (error) { console.error("Erro ao carregar dados iniciais: ", error); displayMessage(actressListUl, 'Erro ao carregar dados.', true); } }
-        function renderActressListItem(actress) { const li = document.createElement('li'); li.classList.add('actress-item'); li.dataset.id = actress.id; const age = calculateAge(actress.dataNascimento); const imageUrl = actress.foto || 'placeholder.png'; const rating = actress.nota !== undefined && actress.nota !== null ? actress.nota : 'N/A'; li.innerHTML = `<img src="${imageUrl}" alt="${actress.nome || ''}" onerror="this.src='placeholder.png'; this.onerror=null;"><div class="actress-info"><span class="name">${actress.nome || 'Nome Indisponível'}</span><span class="age">Idade: ${age}</span><span class="rating">Nota: ${rating}</span></div>`; li.addEventListener('click', () => handleMainActressClick(actress.id, li)); actressListUl.appendChild(li); }
-        async function handleMainActressClick(actressId, listItemElement) { if (selectedMainActressElement === listItemElement) return; if (selectedMainActressElement) selectedMainActressElement.classList.remove('selected'); listItemElement.classList.add('selected'); selectedMainActressElement = listItemElement; currentMainActressId = actressId; mainContainer.classList.add('details-visible'); actressDetailsContainer.innerHTML = '<div class="loading">Carregando detalhes...</div>'; contentCardsContainer.innerHTML = ''; displayMessage(contentMessage, 'Carregando conteúdo...'); selectedRelatedActresses = []; activeRelatedFilter = 'all'; if(relatedSearchInput) relatedSearchInput.value = ''; renderRelatedActressPills(); relatedFilterButtons.forEach(btn => btn.classList.remove('active')); document.querySelector('.related-filter-btn[data-filter="all"]')?.classList.add('active'); try { let actressData = allActressesData.find(a => a.id === actressId); if (!actressData) { const actressDoc = await getDoc(doc(db, "atores", actressId)); if (actressDoc.exists()) { actressData = { id: actressId, ...actressDoc.data() }; } } if (actressData) { displayMainActressDetails(actressData); } else { actressDetailsContainer.innerHTML = '<div class="error">Detalhes não encontrados.</div>'; } await loadAndDisplayRelatedContent(actressId); } catch (error) { console.error(`Erro ao carregar dados da atriz ${actressId}: `, error); actressDetailsContainer.innerHTML = '<div class="error">Erro ao carregar detalhes.</div>'; displayMessage(contentMessage,'Erro ao carregar conteúdo.', true); } }
-        function displayMainActressDetails(data) { actressDetailsContainer.innerHTML = ''; const detailsTitle = document.createElement('h3'); detailsTitle.textContent = data.nome || 'Detalhes'; actressDetailsContainer.appendChild(detailsTitle); if (data.foto) { const img = document.createElement('img'); img.src = data.foto; img.alt = data.nome || 'Foto'; img.classList.add('detail-photo'); img.onerror = () => { img.style.display = 'none'; }; actressDetailsContainer.appendChild(img); } let detailsAdded = false; const detailFieldsContainer = document.createElement('div'); const addDetailRow = (label, value) => { if (value != null && value !== '') { const div = document.createElement('div'); div.innerHTML = `<strong>${label}:</strong> ${value}`; detailFieldsContainer.appendChild(div); detailsAdded = true; } }; addDetailRow('Nascimento', data.dataNascimento); if (data.dataNascimento) { addDetailRow('Idade', calculateAge(data.dataNascimento)); } if (data.altura != null) { addDetailRow('Altura', `${data.altura} cm`); } if (data.peso != null) { addDetailRow('Peso', `${data.peso} kg`); } if (Array.isArray(data.filmes)) { addDetailRow('Filmes Participados', data.filmes.length); } if (Array.isArray(data.videos)) { addDetailRow('Vídeos Participados', data.videos.length); } if (Array.isArray(data.cenas)) { addDetailRow('Cenas Participadas', data.cenas.length); } const skipFields = ['foto', 'nome', 'timestamp', 'id', 'filmes', 'videos', 'cenas', 'dataNascimento', 'altura', 'peso']; for (const key in data) { if (data.hasOwnProperty(key) && !skipFields.includes(key)) { addDetailRow(capitalizeFirstLetter(key), data[key]); } } actressDetailsContainer.appendChild(detailFieldsContainer); if (!detailsAdded && !data.foto) { const noDetailsDiv = document.createElement('div'); noDetailsDiv.classList.add('error'); noDetailsDiv.textContent = 'Sem detalhes adicionais disponíveis.'; actressDetailsContainer.appendChild(noDetailsDiv); } }
+        async function loadInitialData() {
+            if (!actressListUl) { console.error("Actress list UL not found."); return; }
+            displayMessage(actressListUl, 'Carregando atrizes...');
+            allScenesCache.clear();
+            try {
+                 const [actoresSnapshot, cenasSnapshot] = await Promise.all([
+                     getDocs(collection(db, "atores")),
+                     getDocs(collection(db, "cenas"))
+                 ]);
+                 actressListUl.innerHTML = '';
+                 if (actoresSnapshot.empty) {
+                     displayMessage(actressListUl, 'Nenhuma atriz encontrada.', true);
+                 } else {
+                     allActressesData = [];
+                     actoresSnapshot.forEach((doc) => allActressesData.push({ id: doc.id, ...doc.data() }));
+                     allActressesData.sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
+                     allActressesData.forEach(renderActressListItem);
+                     console.log(`Loaded ${allActressesData.length} actresses.`);
+                 }
+                 cenasSnapshot.forEach(docSnap => allScenesCache.set(docSnap.id, docSnap.data()));
+                 console.log(`Cached ${allScenesCache.size} scenes.`);
+            } catch (error) {
+                 console.error("Erro ao carregar dados iniciais: ", error);
+                 displayMessage(actressListUl, 'Erro ao carregar dados.', true);
+            }
+        }
+        function renderActressListItem(actress) {
+             if (!actressListUl) return;
+             const li = document.createElement('li');
+             li.classList.add('actress-item');
+             li.dataset.id = actress.id;
+             const age = calculateAge(actress.dataNascimento);
+             const imageUrl = actress.foto || 'placeholder.png';
+             const rating = actress.nota !== undefined && actress.nota !== null ? actress.nota : 'N/A';
+             li.innerHTML = `<img src="${imageUrl}" alt="${actress.nome || ''}" onerror="this.src='placeholder.png'; this.onerror=null;"><div class="actress-info"><span class="name">${actress.nome || 'Nome Indisponível'}</span><span class="age">Idade: ${age}</span><span class="rating">Nota: ${rating}</span></div>`;
+             li.addEventListener('click', () => handleMainActressClick(actress.id, li));
+             actressListUl.appendChild(li);
+        }
+        async function handleMainActressClick(actressId, listItemElement) {
+             if (selectedMainActressElement === listItemElement || !mainContainer || !actressDetailsContainer || !contentCardsContainer || !contentMessage) return;
+             if (selectedMainActressElement) selectedMainActressElement.classList.remove('selected');
+             listItemElement.classList.add('selected');
+             selectedMainActressElement = listItemElement;
+             currentMainActressId = actressId;
+             mainContainer.classList.add('details-visible');
+             actressDetailsContainer.innerHTML = '<div class="loading">Carregando detalhes...</div>';
+             contentCardsContainer.innerHTML = '';
+             displayMessage(contentMessage, 'Carregando conteúdo...');
+             selectedRelatedActresses = [];
+             activeRelatedFilter = 'all';
+             if(relatedSearchInput) relatedSearchInput.value = '';
+             renderRelatedActressPills(); // Assume this handles null container if needed
+             relatedFilterButtons.forEach(btn => btn.classList.remove('active'));
+             document.querySelector('.related-filter-btn[data-filter="all"]')?.classList.add('active');
+             try {
+                 let actressData = allActressesData.find(a => a.id === actressId);
+                 if (!actressData) {
+                     const actressDoc = await getDoc(doc(db, "atores", actressId));
+                     if (actressDoc.exists()) {
+                         actressData = { id: actressId, ...actressDoc.data() };
+                         allActressesData.push(actressData);
+                         allActressesData.sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
+                     }
+                 }
+                 if (actressData) {
+                     displayMainActressDetails(actressData);
+                 } else {
+                     actressDetailsContainer.innerHTML = '<div class="error">Detalhes não encontrados.</div>';
+                 }
+                 await loadAndDisplayRelatedContent(actressId);
+             } catch (error) {
+                 console.error(`Erro ao carregar dados da atriz ${actressId}: `, error);
+                 actressDetailsContainer.innerHTML = '<div class="error">Erro ao carregar detalhes.</div>';
+                 displayMessage(contentMessage,'Erro ao carregar conteúdo.', true);
+             }
+        }
+        function displayMainActressDetails(data) {
+            if (!actressDetailsContainer) return;
+             actressDetailsContainer.innerHTML = '';
+             const detailsTitle = document.createElement('h3');
+             detailsTitle.textContent = data.nome || 'Detalhes';
+             actressDetailsContainer.appendChild(detailsTitle);
+             if (data.foto) {
+                 const img = document.createElement('img');
+                 img.src = data.foto;
+                 img.alt = data.nome || 'Foto';
+                 img.classList.add('detail-photo');
+                 img.onerror = () => { img.style.display = 'none'; };
+                 actressDetailsContainer.appendChild(img);
+             }
+             let detailsAdded = false;
+             const detailFieldsContainer = document.createElement('div');
+             const addDetailRow = (label, value) => {
+                 if (value != null && value !== '') {
+                     const div = document.createElement('div');
+                     div.innerHTML = `<strong>${label}:</strong> ${value}`;
+                     detailFieldsContainer.appendChild(div);
+                     detailsAdded = true;
+                 }
+             };
+             addDetailRow('Nascimento', data.dataNascimento);
+             if (data.dataNascimento) { addDetailRow('Idade', calculateAge(data.dataNascimento)); }
+             if (data.altura != null) { addDetailRow('Altura', `${data.altura} cm`); }
+             if (data.peso != null) { addDetailRow('Peso', `${data.peso} kg`); }
+             if (Array.isArray(data.filmes)) { addDetailRow('Filmes Participados', data.filmes.length); }
+             if (Array.isArray(data.videos)) { addDetailRow('Vídeos Participados', data.videos.length); }
+             if (Array.isArray(data.cenas)) { addDetailRow('Cenas Participadas', data.cenas.length); }
+             const skipFields = ['foto', 'nome', 'timestamp', 'id', 'filmes', 'videos', 'cenas', 'dataNascimento', 'altura', 'peso', 'createdAt'];
+             for (const key in data) {
+                 if (data.hasOwnProperty(key) && !skipFields.includes(key)) {
+                     addDetailRow(capitalizeFirstLetter(key), data[key]);
+                 }
+             }
+             actressDetailsContainer.appendChild(detailFieldsContainer);
+             if (!detailsAdded && !data.foto) {
+                 const noDetailsDiv = document.createElement('div');
+                 noDetailsDiv.classList.add('error');
+                 noDetailsDiv.textContent = 'Sem detalhes adicionais disponíveis.';
+                 actressDetailsContainer.appendChild(noDetailsDiv);
+             }
+        }
 
         // --- Related Content Logic ---
-        async function loadAndDisplayRelatedContent(mainActressId) { allRelatedContent = []; filteredRelatedContent = []; contentCardsContainer.innerHTML = ''; displayMessage(contentMessage, 'Buscando conteúdo relacionado...'); try { const [videosSnapshot, filmesSnapshot] = await Promise.all([ getDocs(collection(db, "videos")), getDocs(collection(db, "filmes")) ]); videosSnapshot.forEach(docSnap => { const itemData = docSnap.data(); if (itemData.atores?.includes(mainActressId)) { allRelatedContent.push({ id: docSnap.id, type: 'video', ...itemData }); } }); filmesSnapshot.forEach(docSnap => { const movieData = docSnap.data(); let movieIsRelated = false; const relatedScenesFromMovie = []; if (movieData.cenas?.length > 0) { for (const sceneId of movieData.cenas) { const sceneData = allScenesCache.get(sceneId); if (sceneData) { const sceneFullData = { id: sceneId, type: 'scene', ...sceneData }; relatedScenesFromMovie.push(sceneFullData); if (sceneData.atores?.includes(mainActressId)) { movieIsRelated = true; } } } } if (movieIsRelated) { allRelatedContent.push({ id: docSnap.id, type: 'film', ...movieData }); relatedScenesFromMovie.forEach(scene => { if (!allRelatedContent.some(item => item.id === scene.id && item.type === 'scene')) { allRelatedContent.push(scene); } }); } else { relatedScenesFromMovie.forEach(scene => { if (scene.atores?.includes(mainActressId)) { if (!allRelatedContent.some(item => item.id === scene.id && item.type === 'scene')) { allRelatedContent.push(scene); } } }); } }); allScenesCache.forEach((sceneData, sceneId) => { if (sceneData.atores?.includes(mainActressId)) { if (!allRelatedContent.some(item => item.id === sceneId && item.type === 'scene')) { allRelatedContent.push({ id: sceneId, type: 'scene', ...sceneData }); } } }); console.log(`Found ${allRelatedContent.length} related items for actress ${mainActressId}`); applyRelatedContentFilters(); } catch (error) { console.error("Erro ao buscar conteúdo relacionado: ", error); displayMessage(contentMessage, 'Erro ao carregar conteúdo relacionado.', true); } }
-        function applyRelatedContentFilters() { contentCardsContainer.innerHTML = ''; clearMessage(contentMessage); const relatedActressIds = selectedRelatedActresses.map(a => a.id); filteredRelatedContent = allRelatedContent.filter(item => { if (activeRelatedFilter !== 'all' && item.type !== activeRelatedFilter) return false; if (relatedActressIds.length > 0) { if (!item.atores || !Array.isArray(item.atores)) return false; if (!relatedActressIds.every(relId => item.atores.includes(relId))) return false; } return true; }); filteredRelatedContent.sort((a, b) => (a.nome || '').localeCompare(b.nome || '')); if (filteredRelatedContent.length > 0) { filteredRelatedContent.forEach(item => createContentCard(item.imagem, item.nome, item.type, item.id)); } else { displayMessage(contentMessage, 'Nenhum conteúdo encontrado com os filtros aplicados.'); } }
-        function createContentCard(imageUrl, title, type, id) { const card = document.createElement('div'); card.classList.add('content-card'); card.dataset.type = type; card.dataset.id = id; const imageContainer = document.createElement('div'); imageContainer.classList.add('image-container'); const img = document.createElement('img'); let finalImageUrl = imageUrl; if (typeof imageUrl === 'object' && imageUrl !== null && imageUrl.width) { const urlKey = Object.keys(imageUrl).find(k=>typeof imageUrl[k]==='string'&&imageUrl[k].startsWith('http')); finalImageUrl = urlKey ? imageUrl[urlKey] : 'placeholder.png';} else if (typeof imageUrl !== 'string' || !imageUrl) { finalImageUrl = 'placeholder.png'; } img.src = finalImageUrl; img.alt = title || type; img.onerror = () => { img.src = 'placeholder.png'; img.onerror=null; }; const badge = document.createElement('div'); badge.classList.add('content-type-badge'); let badgeText = capitalizeFirstLetter(type); if(type === 'film') badgeText = 'Filme'; else if(type === 'scene') badgeText = 'Cena'; else if(type === 'video') badgeText = 'Vídeo'; badge.textContent = badgeText; imageContainer.appendChild(badge); imageContainer.appendChild(img); const titleDiv = document.createElement('div'); titleDiv.classList.add('title'); titleDiv.textContent = `${title || 'Sem Título'}`; card.appendChild(imageContainer); card.appendChild(titleDiv); card.addEventListener('click', () => showContentDetails(type, id)); contentCardsContainer.appendChild(card); }
+        async function loadAndDisplayRelatedContent(mainActressId) {
+            if (!contentCardsContainer || !contentMessage) return;
+             allRelatedContent = [];
+             filteredRelatedContent = [];
+             contentCardsContainer.innerHTML = '';
+             displayMessage(contentMessage, 'Buscando conteúdo relacionado...');
+             try {
+                 const [videosSnapshot, filmesSnapshot] = await Promise.all([
+                     getDocs(collection(db, "videos")),
+                     getDocs(collection(db, "filmes"))
+                 ]);
+                 videosSnapshot.forEach(docSnap => {
+                     const itemData = docSnap.data();
+                     if (itemData.atores?.includes(mainActressId)) {
+                         allRelatedContent.push({ id: docSnap.id, type: 'video', ...itemData });
+                     }
+                 });
+                 filmesSnapshot.forEach(docSnap => {
+                     const movieData = docSnap.data();
+                     let movieIsRelated = false;
+                     const relatedScenesFromMovie = [];
+                     if (movieData.cenas?.length > 0) {
+                         for (const sceneId of movieData.cenas) {
+                             const sceneData = allScenesCache.get(sceneId);
+                             if (sceneData) {
+                                 const sceneFullData = { id: sceneId, type: 'scene', ...sceneData };
+                                 relatedScenesFromMovie.push(sceneFullData);
+                                 if (sceneData.atores?.includes(mainActressId)) {
+                                     movieIsRelated = true;
+                                 }
+                             }
+                         }
+                     }
+                     if (movieIsRelated) {
+                         allRelatedContent.push({ id: docSnap.id, type: 'film', ...movieData });
+                         relatedScenesFromMovie.forEach(scene => {
+                             if (!allRelatedContent.some(item => item.id === scene.id && item.type === 'scene')) {
+                                 allRelatedContent.push(scene);
+                             }
+                         });
+                     } else {
+                         relatedScenesFromMovie.forEach(scene => {
+                             if (scene.atores?.includes(mainActressId)) {
+                                 if (!allRelatedContent.some(item => item.id === scene.id && item.type === 'scene')) {
+                                     allRelatedContent.push(scene);
+                                 }
+                             }
+                         });
+                     }
+                 });
+                 // Add scenes not associated with a found related movie but containing the actress
+                 allScenesCache.forEach((sceneData, sceneId) => {
+                    if (sceneData.atores?.includes(mainActressId)) {
+                        if (!allRelatedContent.some(item => item.id === sceneId && item.type === 'scene')) {
+                            allRelatedContent.push({ id: sceneId, type: 'scene', ...sceneData });
+                        }
+                    }
+                 });
+                 console.log(`Found ${allRelatedContent.length} related items for actress ${mainActressId}`);
+                 applyRelatedContentFilters();
+             } catch (error) {
+                 console.error("Erro ao buscar conteúdo relacionado: ", error);
+                 displayMessage(contentMessage, 'Erro ao carregar conteúdo relacionado.', true);
+             }
+        }
+        function applyRelatedContentFilters() {
+            if (!contentCardsContainer || !contentMessage) return;
+             contentCardsContainer.innerHTML = '';
+             clearMessage(contentMessage);
+             const relatedActressIds = selectedRelatedActresses.map(a => a.id);
+             filteredRelatedContent = allRelatedContent.filter(item => {
+                 if (activeRelatedFilter !== 'all' && item.type !== activeRelatedFilter) return false;
+                 if (relatedActressIds.length > 0) {
+                     if (!item.atores || !Array.isArray(item.atores)) return false;
+                     if (!relatedActressIds.every(relId => item.atores.includes(relId))) return false;
+                 }
+                 return true;
+             });
+             filteredRelatedContent.sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
+             if (filteredRelatedContent.length > 0) {
+                 filteredRelatedContent.forEach(item => createContentCard(item.imagem, item.nome, item.type, item.id));
+             } else {
+                 displayMessage(contentMessage, 'Nenhum conteúdo encontrado com os filtros aplicados.');
+             }
+        }
+        function createContentCard(imageUrl, title, type, id) {
+            if (!contentCardsContainer) return;
+             const card = document.createElement('div');
+             card.classList.add('content-card');
+             card.dataset.type = type;
+             card.dataset.id = id;
+             const imageContainer = document.createElement('div');
+             imageContainer.classList.add('image-container');
+             const img = document.createElement('img');
+             let finalImageUrl = imageUrl;
+             // Handle image objects (like from Firestore with width/height?)
+             if (typeof imageUrl === 'object' && imageUrl !== null && imageUrl.width) {
+                 const urlKey = Object.keys(imageUrl).find(k=>typeof imageUrl[k]==='string'&&imageUrl[k].startsWith('http'));
+                 finalImageUrl = urlKey ? imageUrl[urlKey] : 'placeholder.png';
+             } else if (typeof imageUrl !== 'string' || !imageUrl) {
+                 finalImageUrl = 'placeholder.png';
+             }
+             img.src = finalImageUrl;
+             img.alt = title || type;
+             img.onerror = () => { img.src = 'placeholder.png'; img.onerror=null; };
+             const badge = document.createElement('div');
+             badge.classList.add('content-type-badge');
+             let badgeText = capitalizeFirstLetter(type);
+             if(type === 'film') badgeText = 'Filme';
+             else if(type === 'scene') badgeText = 'Cena';
+             else if(type === 'video') badgeText = 'Vídeo';
+             badge.textContent = badgeText;
+             imageContainer.appendChild(badge);
+             imageContainer.appendChild(img);
+             const titleDiv = document.createElement('div');
+             titleDiv.classList.add('title');
+             titleDiv.textContent = `${title || 'Sem Título'}`;
+             card.appendChild(imageContainer);
+             card.appendChild(titleDiv);
+             card.addEventListener('click', () => showContentDetails(type, id));
+             contentCardsContainer.appendChild(card);
+        }
 
         // --- Right Column Search Functions ---
-        function displayRelatedSuggestions(searchTerm) { if (!relatedSuggestionsList || !currentMainActressId) return; relatedSuggestionsList.innerHTML = ''; if (!searchTerm || searchTerm.trim() === '') { relatedSuggestionsList.style.display = 'none'; return; } const coActressIds = new Set(); allRelatedContent.forEach(item => { item.atores?.forEach(id => { if (id !== currentMainActressId) coActressIds.add(id); }); }); if (coActressIds.size === 0) { relatedSuggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma co-atriz no conteúdo</div>'; relatedSuggestionsList.style.display = 'block'; return; } const lowerSearchTerm = searchTerm.toLowerCase(); const matchedActresses = allActressesData.filter(actress => { const isCoStar = coActressIds.has(actress.id); const matchesSearch = (actress.nome || '').toLowerCase().includes(lowerSearchTerm); const isNotSelected = !selectedRelatedActresses.some(sa => sa.id === actress.id); return isCoStar && matchesSearch && isNotSelected; }); if (matchedActresses.length > 0) { matchedActresses.sort((a, b) => (a.nome || '').localeCompare(b.nome || '')).slice(0, 7).forEach(actress => { const item = document.createElement('div'); item.classList.add('suggestion-item'); item.dataset.id = actress.id; item.dataset.nome = actress.nome || ''; item.innerHTML = `<img src="${actress.foto || 'placeholder.png'}" alt=""><span>${actress.nome || 'Nome Ind.'}</span>`; item.addEventListener('click', handleSelectRelatedActress); relatedSuggestionsList.appendChild(item); }); relatedSuggestionsList.style.display = 'block'; } else { relatedSuggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma co-atriz encontrada</div>'; relatedSuggestionsList.style.display = 'block'; } }
-        function handleSelectRelatedActress(event) { const target = event.currentTarget; const actressId = target.dataset.id; const actressName = target.dataset.nome; if (!actressId || !actressName) return; if (!selectedRelatedActresses.some(a => a.id === actressId)) { selectedRelatedActresses.push({ id: actressId, nome: actressName }); renderRelatedActressPills(); applyRelatedContentFilters(); } if (relatedSearchInput) relatedSearchInput.value = ''; if (relatedSuggestionsList) relatedSuggestionsList.style.display = 'none'; if (relatedSearchInput) relatedSearchInput.focus(); }
-        function renderRelatedActressPills() { if (!relatedSelectedActressesContainer) return; relatedSelectedActressesContainer.innerHTML = ''; selectedRelatedActresses.forEach(actress => { const pill = document.createElement('div'); pill.classList.add('related-actress-pill'); pill.dataset.id = actress.id; pill.innerHTML = `<span>${actress.nome}</span><button class="related-remove-actress-btn" title="Remover">×</button>`; pill.querySelector('.related-remove-actress-btn').addEventListener('click', handleRemoveRelatedActress); relatedSelectedActressesContainer.appendChild(pill); }); }
-        function handleRemoveRelatedActress(event) { event.stopPropagation(); const pill = event.target.closest('.related-actress-pill'); if (!pill) return; const actressIdToRemove = pill.dataset.id; selectedRelatedActresses = selectedRelatedActresses.filter(a => a.id !== actressIdToRemove); renderRelatedActressPills(); applyRelatedContentFilters(); if (relatedSuggestionsList?.style.display === 'block' && relatedSearchInput?.value) { displayRelatedSuggestions(relatedSearchInput.value); } }
+        function displayRelatedSuggestions(searchTerm) {
+             if (!relatedSuggestionsList || !currentMainActressId) return;
+             relatedSuggestionsList.innerHTML = '';
+             if (!searchTerm || searchTerm.trim() === '') { relatedSuggestionsList.style.display = 'none'; return; }
+             // Find all co-actress IDs from currently displayed related content
+             const coActressIds = new Set();
+             filteredRelatedContent.forEach(item => { // Use filtered content for relevance
+                 item.atores?.forEach(id => { if (id !== currentMainActressId) coActressIds.add(id); });
+             });
+             if (coActressIds.size === 0) { relatedSuggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma co-atriz no conteúdo filtrado</div>'; relatedSuggestionsList.style.display = 'block'; return; }
+
+             const lowerSearchTerm = searchTerm.toLowerCase();
+             const matchedActresses = allActressesData.filter(actress => {
+                 const isCoStar = coActressIds.has(actress.id);
+                 const matchesSearch = (actress.nome || '').toLowerCase().includes(lowerSearchTerm);
+                 const isNotSelected = !selectedRelatedActresses.some(sa => sa.id === actress.id);
+                 return isCoStar && matchesSearch && isNotSelected;
+             });
+             if (matchedActresses.length > 0) {
+                 matchedActresses.sort((a, b) => (a.nome || '').localeCompare(b.nome || '')).slice(0, 7).forEach(actress => {
+                     const item = document.createElement('div');
+                     item.classList.add('suggestion-item');
+                     item.dataset.id = actress.id;
+                     item.dataset.nome = actress.nome || '';
+                     item.innerHTML = `<img src="${actress.foto || 'placeholder.png'}" alt="" onerror="this.src='placeholder.png'; this.onerror=null;"><span>${actress.nome || 'Nome Ind.'}</span>`;
+                     item.addEventListener('click', handleSelectRelatedActress);
+                     relatedSuggestionsList.appendChild(item);
+                 });
+                 relatedSuggestionsList.style.display = 'block';
+             } else {
+                 relatedSuggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma co-atriz encontrada</div>';
+                 relatedSuggestionsList.style.display = 'block';
+             }
+        }
+        function handleSelectRelatedActress(event) {
+             const target = event.currentTarget;
+             const actressId = target.dataset.id;
+             const actressName = target.dataset.nome;
+             if (!actressId || !actressName) return;
+             if (!selectedRelatedActresses.some(a => a.id === actressId)) {
+                 selectedRelatedActresses.push({ id: actressId, nome: actressName });
+                 renderRelatedActressPills();
+                 applyRelatedContentFilters(); // Re-apply filters after selecting co-actress
+             }
+             if (relatedSearchInput) relatedSearchInput.value = '';
+             if (relatedSuggestionsList) relatedSuggestionsList.style.display = 'none';
+             if (relatedSearchInput) relatedSearchInput.focus();
+        }
+        function renderRelatedActressPills() {
+             if (!relatedSelectedActressesContainer) return;
+             relatedSelectedActressesContainer.innerHTML = '';
+             selectedRelatedActresses.forEach(actress => {
+                 const pill = document.createElement('div');
+                 pill.classList.add('related-actress-pill');
+                 pill.dataset.id = actress.id;
+                 pill.innerHTML = `<span>${actress.nome}</span><button class="related-remove-actress-btn" title="Remover">×</button>`;
+                 pill.querySelector('.related-remove-actress-btn')?.addEventListener('click', handleRemoveRelatedActress);
+                 relatedSelectedActressesContainer.appendChild(pill);
+             });
+        }
+        function handleRemoveRelatedActress(event) {
+             event.stopPropagation();
+             const pill = event.target.closest('.related-actress-pill');
+             if (!pill) return;
+             const actressIdToRemove = pill.dataset.id;
+             selectedRelatedActresses = selectedRelatedActresses.filter(a => a.id !== actressIdToRemove);
+             renderRelatedActressPills();
+             applyRelatedContentFilters(); // Re-apply filters after removing co-actress
+             if (relatedSuggestionsList?.style.display === 'block' && relatedSearchInput?.value) {
+                 displayRelatedSuggestions(relatedSearchInput.value);
+             }
+        }
 
         // --- Content Detail Modal Functions ---
-        async function showContentDetails(type, id) { contentModalBody.innerHTML = '<div class="loading">Carregando...</div>'; modalLinkContainer.innerHTML = ''; contentModal.style.display = 'flex'; let collectionName = ''; switch (type) { case 'scene': collectionName = 'cenas'; break; case 'video': collectionName = 'videos'; break; case 'film': collectionName = 'filmes'; break; default: contentModalBody.innerHTML = '<div class="error">Tipo inválido.</div>'; return; } try { const docSnap = await getDoc(doc(db, collectionName, id)); if (docSnap.exists()) { const data = docSnap.data(); contentModalTitle.textContent = data.nome || `Detalhes`; contentModalBody.innerHTML = ''; if (data.imagem) { let finalImageUrl = data.imagem; if (typeof finalImageUrl === 'object' && finalImageUrl !== null && finalImageUrl.width) { const urlKey = Object.keys(finalImageUrl).find(k=>typeof finalImageUrl[k]==='string'&&finalImageUrl[k].startsWith('http')); finalImageUrl = urlKey ? finalImageUrl[urlKey] : null;} else if (typeof finalImageUrl !== 'string') { finalImageUrl = null; } if(finalImageUrl){ const img = document.createElement('img'); img.src = finalImageUrl; img.alt = data.nome || type; img.classList.add('modal-detail-image'); if (type === 'film') img.classList.add('movie-image'); img.onerror = () => { img.style.display = 'none'; }; contentModalBody.appendChild(img); } } if (data.ano) { const yearDiv = document.createElement('div'); yearDiv.classList.add('modal-year'); yearDiv.textContent = `Ano: ${data.ano}`; contentModalBody.appendChild(yearDiv); } const actressesContainer = document.createElement('div'); actressesContainer.classList.add('modal-actress-list-container'); actressesContainer.innerHTML = `<h4>Atrizes</h4><div class="loading" style="font-size:0.9em;">Carregando...</div>`; contentModalBody.appendChild(actressesContainer); let scenesContainer = null; if (type === 'film') { scenesContainer = document.createElement('div'); scenesContainer.classList.add('modal-scenes-container'); scenesContainer.innerHTML = `<h4>Cenas do Filme</h4><div class="loading" style="font-size:0.9em;">Carregando...</div>`; contentModalBody.appendChild(scenesContainer); } if (data.pagina?.trim()) { const linkButton = document.createElement('button'); linkButton.textContent = 'Abrir Página Externa'; linkButton.onclick = () => window.open(data.pagina, '_blank'); modalLinkContainer.appendChild(linkButton); } else { modalLinkContainer.innerHTML = '<i style="font-size:0.9em; color:#777;">(Nenhuma página externa)</i>'; } const contentActressIds = data.atores || []; loadActressesForModal(contentActressIds, actressesContainer, contentActressIds); if (type === 'film' && scenesContainer) { loadScenesForModal(data.cenas || [], scenesContainer); } } else { contentModalBody.innerHTML = '<div class="error">Conteúdo não encontrado.</div>'; } } catch (error) { console.error(`Erro ao buscar ${type} ${id}: `, error); contentModalBody.innerHTML = '<div class="error">Erro ao carregar detalhes.</div>'; } }
-        async function loadActressesForModal(actressIds, containerElement, contextActressIds = []) { if (!actressIds || actressIds.length === 0) { containerElement.innerHTML = '<h4>Atrizes</h4><i style="font-size:0.9em; color:#777;">Nenhuma atriz associada.</i>'; return; } const listElement = document.createElement('ul'); listElement.classList.add('modal-actress-list'); containerElement.innerHTML = '<h4>Atrizes</h4>'; containerElement.appendChild(listElement); let foundCount = 0; const fetchPromises = actressIds.map(async (actressId) => { try { let actressData = allActressesData.find(a => a.id === actressId); if (!actressData) { const docSnap = await getDoc(doc(db, "atores", actressId)); if (docSnap.exists()) actressData = { id: actressId, ...docSnap.data() }; } if (actressData) { foundCount++; const li = document.createElement('li'); li.classList.add('modal-actress-item'); li.onclick = () => createActressPopup(actressId, contextActressIds); const img = document.createElement('img'); img.src = actressData.foto || 'placeholder.png'; img.alt = actressData.nome || 'Atriz'; img.onerror = () => { img.src = 'placeholder.png'; img.onerror=null; } ;
-        const nameSpan = document.createElement('span'); nameSpan.textContent = actressData.nome || 'Nome Ind.'; li.appendChild(img); li.appendChild(nameSpan); listElement.appendChild(li); } } catch (error) { console.error(`Erro ao carregar atriz ${actressId} para modal:`, error); } }); await Promise.all(fetchPromises); if (foundCount === 0) containerElement.innerHTML = '<h4>Atrizes</h4><i class="error">Erro ao carregar atrizes.</i>'; }
-        async function loadScenesForModal(sceneIds, containerElement) { if (!sceneIds || sceneIds.length === 0) { containerElement.innerHTML = '<h4>Cenas do Filme</h4><i style="font-size:0.9em; color:#777;">Nenhuma cena associada.</i>'; return; } const cardsContainer = document.createElement('div'); cardsContainer.classList.add('modal-scene-cards'); containerElement.innerHTML = '<h4>Cenas do Filme</h4>'; containerElement.appendChild(cardsContainer); let foundCount = 0; sceneIds.forEach(sceneId => { const sceneData = allScenesCache.get(sceneId); if (sceneData) { foundCount++; const card = document.createElement('div'); card.classList.add('modal-scene-card'); const img = document.createElement('img'); let finalImageUrl = sceneData.imagem; if (typeof finalImageUrl === 'object' && finalImageUrl !== null && finalImageUrl.width) { const urlKey = Object.keys(finalImageUrl).find(k=>typeof finalImageUrl[k]==='string'&&finalImageUrl[k].startsWith('http')); finalImageUrl = urlKey ? finalImageUrl[urlKey] : 'placeholder.png'; } else if (typeof finalImageUrl !== 'string' || !finalImageUrl) { finalImageUrl = 'placeholder.png'; } img.src = finalImageUrl; img.alt = sceneData.nome || 'Cena'; img.onerror = () => { img.src = 'placeholder.png'; img.onerror=null; } 
-        const titleDiv = document.createElement('div'); titleDiv.classList.add('title'); titleDiv.textContent = sceneData.nome || 'Sem Título'; card.appendChild(img); card.appendChild(titleDiv); cardsContainer.appendChild(card); } else { console.warn(`Cena ${sceneId} não encontrada no cache para modal.`); } }); if (foundCount === 0) containerElement.innerHTML = '<h4>Cenas do Filme</h4><i class="error">Erro ao carregar cenas.</i>'; }
-        window.closeModal = function() { if(contentModal) contentModal.style.display = 'none'; if(contentModalBody) contentModalBody.innerHTML = ''; if(modalLinkContainer) modalLinkContainer.innerHTML = ''; };
+        async function showContentDetails(type, id) {
+            if (!contentModal || !contentModalBody || !contentModalTitle || !modalLinkContainer) {
+                 console.error("Content modal elements missing!");
+                 return;
+            }
+            contentModalBody.innerHTML = '<div class="loading">Carregando...</div>';
+            modalLinkContainer.innerHTML = '';
+            contentModal.style.display = 'flex';
+            let collectionName = '';
+            switch (type) {
+                case 'scene': collectionName = 'cenas'; break;
+                case 'video': collectionName = 'videos'; break;
+                case 'film': collectionName = 'filmes'; break;
+                default:
+                    contentModalBody.innerHTML = '<div class="error">Tipo inválido.</div>';
+                    return;
+            }
+            try {
+                const docSnap = await getDoc(doc(db, collectionName, id));
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    contentModalTitle.textContent = data.nome || `Detalhes`;
+                    contentModalBody.innerHTML = ''; // Clear loading
+
+                    // Image
+                    if (data.imagem) {
+                        let finalImageUrl = data.imagem;
+                        if (typeof finalImageUrl === 'object' && finalImageUrl !== null && finalImageUrl.width) {
+                            const urlKey = Object.keys(finalImageUrl).find(k=>typeof finalImageUrl[k]==='string'&&finalImageUrl[k].startsWith('http'));
+                            finalImageUrl = urlKey ? finalImageUrl[urlKey] : null;
+                        } else if (typeof finalImageUrl !== 'string') {
+                            finalImageUrl = null;
+                        }
+                        if(finalImageUrl){
+                            const img = document.createElement('img');
+                            img.src = finalImageUrl;
+                            img.alt = data.nome || type;
+                            img.classList.add('modal-detail-image');
+                            if (type === 'film') img.classList.add('movie-image');
+                            img.onerror = () => { img.style.display = 'none'; };
+                            contentModalBody.appendChild(img);
+                        }
+                    }
+
+                    // Year / Date
+                    if (data.ano) {
+                        const yearDiv = document.createElement('div');
+                        yearDiv.classList.add('modal-year');
+                        yearDiv.textContent = `Ano: ${data.ano}`;
+                        contentModalBody.appendChild(yearDiv);
+                    } else if (data.data) {
+                        const dateDiv = document.createElement('div');
+                        dateDiv.classList.add('modal-year');
+                        dateDiv.textContent = `Data: ${data.data}`;
+                        contentModalBody.appendChild(dateDiv);
+                    }
+
+                    // Link Button
+                    if (data.pagina?.trim()) {
+                        const linkButton = document.createElement('button');
+                        linkButton.textContent = 'Abrir Página Externa';
+                        linkButton.onclick = () => window.open(data.pagina, '_blank');
+                        modalLinkContainer.appendChild(linkButton);
+                    } else {
+                        modalLinkContainer.innerHTML = '<i style="font-size:0.9em; color:#777;">(Nenhuma página externa)</i>';
+                    }
+
+                    // Actress List Container (prepare structure)
+                    const actressesContainer = document.createElement('div');
+                    actressesContainer.classList.add('modal-actress-list-container');
+                    actressesContainer.innerHTML = `<h4>Atrizes</h4><div class="loading" style="font-size:0.9em;">Carregando...</div>`;
+                    contentModalBody.appendChild(actressesContainer);
+
+                    // Scenes Container (prepare structure if film)
+                    let scenesContainer = null;
+                    if (type === 'film') {
+                        scenesContainer = document.createElement('div');
+                        scenesContainer.classList.add('modal-scenes-container');
+                        scenesContainer.innerHTML = `<h4>Cenas do Filme</h4><div class="loading" style="font-size:0.9em;">Carregando...</div>`;
+                        contentModalBody.appendChild(scenesContainer);
+                    }
+
+                    // Load Actresses (pass container)
+                    const contentActressIds = data.atores || [];
+                    loadActressesForModal(contentActressIds, actressesContainer, contentActressIds);
+
+                    // Load Scenes if film (pass container)
+                    if (type === 'film' && scenesContainer) {
+                        loadScenesForModal(data.cenas || [], scenesContainer);
+                    }
+
+                } else {
+                    contentModalBody.innerHTML = '<div class="error">Conteúdo não encontrado.</div>';
+                }
+            } catch (error) {
+                console.error(`Erro ao buscar ${type} ${id}: `, error);
+                contentModalBody.innerHTML = '<div class="error">Erro ao carregar detalhes.</div>';
+            }
+        }
+        async function loadActressesForModal(actressIds, containerElement, contextActressIds = []) {
+            if (!containerElement) return; // Don't proceed if container doesn't exist
+            if (!actressIds || actressIds.length === 0) {
+                 containerElement.innerHTML = '<h4>Atrizes</h4><i style="font-size:0.9em; color:#777;">Nenhuma atriz associada.</i>';
+                 return;
+            }
+            const listElement = document.createElement('ul');
+            listElement.classList.add('modal-actress-list');
+            containerElement.innerHTML = '<h4>Atrizes</h4>'; // Clear loading message
+            containerElement.appendChild(listElement);
+            let foundCount = 0;
+            const fetchPromises = actressIds.map(async (actressId) => {
+                 try {
+                     let actressData = allActressesData.find(a => a.id === actressId);
+                     if (!actressData) {
+                         const docSnap = await getDoc(doc(db, "atores", actressId));
+                         if (docSnap.exists()) {
+                             actressData = { id: actressId, ...docSnap.data() };
+                             // Optionally add to allActressesData cache here
+                         }
+                     }
+                     if (actressData) {
+                         foundCount++;
+                         const li = document.createElement('li');
+                         li.classList.add('modal-actress-item');
+                         li.onclick = () => createActressPopup(actressId, contextActressIds);
+                         const img = document.createElement('img');
+                         img.src = actressData.foto || 'placeholder.png';
+                         img.alt = actressData.nome || 'Atriz';
+                         img.onerror = () => { img.src = 'placeholder.png'; img.onerror=null; } ;
+                         const nameSpan = document.createElement('span');
+                         nameSpan.textContent = actressData.nome || 'Nome Ind.';
+                         li.appendChild(img);
+                         li.appendChild(nameSpan);
+                         listElement.appendChild(li);
+                     } else {
+                          console.warn(`Actress data not found for ID: ${actressId}`);
+                     }
+                 } catch (error) {
+                     console.error(`Erro ao carregar atriz ${actressId} para modal:`, error);
+                 }
+            });
+            await Promise.all(fetchPromises);
+            if (foundCount === 0 && listElement.children.length === 0) { // Check if list is still empty
+                // Don't overwrite the title, just add the error message
+                const errorMsg = document.createElement('i');
+                errorMsg.className = 'error';
+                errorMsg.style.fontSize = '0.9em';
+                errorMsg.textContent = 'Nenhuma atriz pôde ser carregada.';
+                containerElement.appendChild(errorMsg);
+            }
+        }
+        async function loadScenesForModal(sceneIds, containerElement) {
+            if (!containerElement) return;
+            if (!sceneIds || sceneIds.length === 0) {
+                 containerElement.innerHTML = '<h4>Cenas do Filme</h4><i style="font-size:0.9em; color:#777;">Nenhuma cena associada.</i>';
+                 return;
+            }
+            const cardsContainer = document.createElement('div');
+            cardsContainer.classList.add('modal-scene-cards');
+            containerElement.innerHTML = '<h4>Cenas do Filme</h4>'; // Clear loading
+            containerElement.appendChild(cardsContainer);
+            let foundCount = 0;
+            const fetchPromises = sceneIds.map(async (sceneId) => {
+                 try {
+                     let sceneData = allScenesCache.get(sceneId);
+                     if (!sceneData) {
+                         const sceneDoc = await getDoc(doc(db, "cenas", sceneId));
+                         if (sceneDoc.exists()) {
+                             sceneData = sceneDoc.data();
+                             allScenesCache.set(sceneId, sceneData); // Add to cache
+                         }
+                     }
+                     if (sceneData) {
+                         foundCount++;
+                         const card = document.createElement('div');
+                         card.classList.add('modal-scene-card');
+                         const img = document.createElement('img');
+                         let finalImageUrl = sceneData.imagem;
+                         if (typeof finalImageUrl === 'object' && finalImageUrl !== null && finalImageUrl.width) {
+                             const urlKey = Object.keys(finalImageUrl).find(k=>typeof finalImageUrl[k]==='string'&&finalImageUrl[k].startsWith('http'));
+                             finalImageUrl = urlKey ? finalImageUrl[urlKey] : 'placeholder.png';
+                         } else if (typeof finalImageUrl !== 'string' || !finalImageUrl) {
+                             finalImageUrl = 'placeholder.png';
+                         }
+                         img.src = finalImageUrl;
+                         img.alt = sceneData.nome || 'Cena';
+                         img.onerror = () => { img.src = 'placeholder.png'; img.onerror=null; }
+                         const titleDiv = document.createElement('div');
+                         titleDiv.classList.add('title');
+                         titleDiv.textContent = sceneData.nome || 'Sem Título';
+                         card.appendChild(img);
+                         card.appendChild(titleDiv);
+                         cardsContainer.appendChild(card); // Append to cards container
+                     } else {
+                         console.warn(`Cena ${sceneId} não encontrada no cache ou Firestore para modal.`);
+                     }
+                 } catch (error) {
+                     console.error(`Error loading scene ${sceneId} for modal:`, error);
+                 }
+            });
+            await Promise.all(fetchPromises);
+            if (foundCount === 0 && cardsContainer.children.length === 0) {
+                const errorMsg = document.createElement('i');
+                errorMsg.className = 'error';
+                errorMsg.style.fontSize = '0.9em';
+                errorMsg.textContent = 'Nenhuma cena pôde ser carregada.';
+                containerElement.appendChild(errorMsg);
+            }
+        }
+        window.closeModal = function() {
+            if(contentModal) contentModal.style.display = 'none';
+            if(contentModalBody) contentModalBody.innerHTML = '';
+            if(modalLinkContainer) modalLinkContainer.innerHTML = '';
+        };
 
         // --- Movable Actress Popup Functions ---
-        function createActressPopup(actressId, contextActressIds = []) { const template = document.getElementById('actress-popup-template'); if (!template) return; const popup = template.cloneNode(true); popup.id = `actress-popup-${actressId}-${popupsOpen++}`; popup.style.display = 'flex'; const vpWidth = window.innerWidth; const vpHeight = window.innerHeight; const popupWidth = 200; const popupHeight = 300; const startTop = 50 + (popupsOpen * 20) % Math.max(100, vpHeight - popupHeight - 20); const startLeft = 50 + (popupsOpen * 25) % Math.max(100, vpWidth - popupWidth - 20); popup.style.top = `${startTop}px`; popup.style.left = `${startLeft}px`; const header = popup.querySelector('.actress-popup-header h5'); const body = popup.querySelector('.actress-popup-body'); const closeBtn = popup.querySelector('.actress-popup-close'); const compareBtn = popup.querySelector('.actress-popup-compare-btn'); if(!header || !body || !closeBtn || !compareBtn) { console.error("Popup structure invalid"); return; } header.textContent = 'Carregando...'; body.innerHTML = '<div class="loading">...</div>'; closeBtn.onclick = () => popup.remove(); compareBtn.onclick = (e) => { e.stopPropagation(); openComparisonModal(contextActressIds); popup.remove(); }; document.body.appendChild(popup); makeDraggable(popup); const actressData = allActressesData.find(a => a.id === actressId); if (actressData) { populateActressPopup(popup, actressData); } else { getDoc(doc(db, "atores", actressId)).then(docSnap => { if (docSnap.exists()) { populateActressPopup(popup, { id: actressId, ...docSnap.data() }); } else { header.textContent = 'Erro'; body.innerHTML = '<div class="error">Não encontrada.</div>'; } }).catch(err => { header.textContent = 'Erro'; body.innerHTML = '<div class="error">Erro.</div>'; }); } }
-        function populateActressPopup(popupElement, data) { const header = popupElement.querySelector('.actress-popup-header h5'); const body = popupElement.querySelector('.actress-popup-body'); if(!header || !body) return; header.textContent = data.nome || 'Detalhes'; body.innerHTML = ''; if (data.foto) { const img = document.createElement('img'); img.src = data.foto; img.alt = data.nome || 'Foto'; img.onerror = () => { img.style.display = 'none'; }; body.appendChild(img); } let detailsAdded = false; const addDetailRow = (label, value) => { if (value != null && value !== '') { const div = document.createElement('div'); div.innerHTML = `<strong>${label}:</strong> ${value}`; body.appendChild(div); detailsAdded = true; } }; addDetailRow('Nasc', data.dataNascimento); if (data.dataNascimento) { addDetailRow('Idade', calculateAge(data.dataNascimento)); } if (data.altura != null) { addDetailRow('Altura', `${data.altura} cm`); } if (data.peso != null) { addDetailRow('Peso', `${data.peso} kg`); } if (Array.isArray(data.filmes)) { addDetailRow('Filmes', data.filmes.length); } if (Array.isArray(data.videos)) { addDetailRow('Vídeos', data.videos.length); } if (Array.isArray(data.cenas)) { addDetailRow('Cenas', data.cenas.length); } const skipFields = ['foto', 'nome', 'timestamp', 'id', 'filmes', 'videos', 'cenas', 'dataNascimento', 'altura', 'peso']; for (const key in data) { if (data.hasOwnProperty(key) && !skipFields.includes(key)) { addDetailRow(capitalizeFirstLetter(key), data[key]); } } if (!detailsAdded && !data.foto) { body.innerHTML += '<i style="font-size:0.9em; color:#777;">(Sem detalhes)</i>'; } }
-        function makeDraggable(element) { let isDragging = false; let offsetX, offsetY; const header = element.querySelector('.actress-popup-header'); if (!header) return; header.onmousedown = (e) => { if (e.target.tagName === 'BUTTON') return; isDragging = true; element.classList.add('dragging'); offsetX = e.clientX - element.getBoundingClientRect().left; offsetY = e.clientY - element.getBoundingClientRect().top; header.style.cursor = 'grabbing'; e.preventDefault(); }; document.onmousemove = (e) => { if (!isDragging) return; let newX = e.clientX - offsetX; let newY = e.clientY - offsetY; const vpWidth = window.innerWidth; const vpHeight = window.innerHeight; const elWidth = element.offsetWidth; const elHeight = element.offsetHeight; newX = Math.max(0, Math.min(newX, vpWidth - elWidth)); newY = Math.max(0, Math.min(newY, vpHeight - elHeight)); element.style.left = `${newX}px`; element.style.top = `${newY}px`; }; document.onmouseup = () => { if (isDragging) { isDragging = false; element.classList.remove('dragging'); header.style.cursor = 'grab'; } }; header.ondragstart = () => false; }
+        function createActressPopup(actressId, contextActressIds = []) {
+            const template = document.getElementById('actress-popup-template');
+            if (!template) return;
+            const popup = template.cloneNode(true);
+            popup.id = `actress-popup-${actressId}-${popupsOpen++}`;
+            popup.style.display = 'flex';
+            const vpWidth = window.innerWidth;
+            const vpHeight = window.innerHeight;
+            const popupWidth = 200;
+            const popupHeight = 300;
+            const startTop = 50 + (popupsOpen * 20) % Math.max(100, vpHeight - popupHeight - 20);
+            const startLeft = 50 + (popupsOpen * 25) % Math.max(100, vpWidth - popupWidth - 20);
+            popup.style.top = `${startTop}px`;
+            popup.style.left = `${startLeft}px`;
+            const header = popup.querySelector('.actress-popup-header h5');
+            const body = popup.querySelector('.actress-popup-body');
+            const closeBtn = popup.querySelector('.actress-popup-close');
+            const compareBtn = popup.querySelector('.actress-popup-compare-btn');
+            if(!header || !body || !closeBtn || !compareBtn) { console.error("Popup structure invalid"); return; }
+            header.textContent = 'Carregando...';
+            body.innerHTML = '<div class="loading">...</div>';
+            closeBtn.onclick = () => popup.remove();
+            compareBtn.onclick = (e) => { e.stopPropagation(); openComparisonModal(contextActressIds); popup.remove(); };
+            document.body.appendChild(popup);
+            makeDraggable(popup);
+            const actressData = allActressesData.find(a => a.id === actressId);
+            if (actressData) {
+                populateActressPopup(popup, actressData);
+            } else {
+                getDoc(doc(db, "atores", actressId)).then(docSnap => {
+                    if (docSnap.exists()) { populateActressPopup(popup, { id: actressId, ...docSnap.data() }); }
+                    else { header.textContent = 'Erro'; body.innerHTML = '<div class="error">Não encontrada.</div>'; }
+                }).catch(err => { header.textContent = 'Erro'; body.innerHTML = '<div class="error">Erro.</div>'; });
+            }
+        }
+        function populateActressPopup(popupElement, data) {
+            const header = popupElement.querySelector('.actress-popup-header h5');
+            const body = popupElement.querySelector('.actress-popup-body');
+            if(!header || !body) return;
+            header.textContent = data.nome || 'Detalhes';
+            body.innerHTML = '';
+            if (data.foto) {
+                const img = document.createElement('img');
+                img.src = data.foto;
+                img.alt = data.nome || 'Foto';
+                img.onerror = () => { img.style.display = 'none'; };
+                body.appendChild(img);
+            }
+            let detailsAdded = false;
+            const addDetailRow = (label, value) => {
+                if (value != null && value !== '') {
+                    const div = document.createElement('div');
+                    div.innerHTML = `<strong>${label}:</strong> ${value}`;
+                    body.appendChild(div);
+                    detailsAdded = true;
+                }
+            };
+            addDetailRow('Nasc', data.dataNascimento);
+            if (data.dataNascimento) { addDetailRow('Idade', calculateAge(data.dataNascimento)); }
+            if (data.altura != null) { addDetailRow('Altura', `${data.altura} cm`); }
+            if (data.peso != null) { addDetailRow('Peso', `${data.peso} kg`); }
+            if (Array.isArray(data.filmes)) { addDetailRow('Filmes', data.filmes.length); }
+            if (Array.isArray(data.videos)) { addDetailRow('Vídeos', data.videos.length); }
+            if (Array.isArray(data.cenas)) { addDetailRow('Cenas', data.cenas.length); }
+            const skipFields = ['foto', 'nome', 'timestamp', 'id', 'filmes', 'videos', 'cenas', 'dataNascimento', 'altura', 'peso', 'createdAt'];
+            for (const key in data) {
+                if (data.hasOwnProperty(key) && !skipFields.includes(key)) { addDetailRow(capitalizeFirstLetter(key), data[key]); }
+            }
+            if (!detailsAdded && !data.foto) { body.innerHTML += '<i style="font-size:0.9em; color:#777;">(Sem detalhes)</i>'; }
+        }
+        function makeDraggable(element) {
+            let isDragging = false; let offsetX, offsetY;
+            const header = element.querySelector('.actress-popup-header');
+            if (!header) return;
+            header.onmousedown = (e) => {
+                if (e.target.tagName === 'BUTTON') return; // Don't drag if clicking buttons in header
+                isDragging = true;
+                element.classList.add('dragging');
+                offsetX = e.clientX - element.getBoundingClientRect().left;
+                offsetY = e.clientY - element.getBoundingClientRect().top;
+                header.style.cursor = 'grabbing';
+                document.body.style.userSelect = 'none'; // Prevent text selection during drag
+                e.preventDefault();
+            };
+            document.onmousemove = (e) => {
+                if (!isDragging) return;
+                let newX = e.clientX - offsetX;
+                let newY = e.clientY - offsetY;
+                const vpWidth = window.innerWidth; const vpHeight = window.innerHeight;
+                const elWidth = element.offsetWidth; const elHeight = element.offsetHeight;
+                newX = Math.max(0, Math.min(newX, vpWidth - elWidth));
+                newY = Math.max(0, Math.min(newY, vpHeight - elHeight));
+                element.style.left = `${newX}px`; element.style.top = `${newY}px`;
+            };
+            document.onmouseup = () => {
+                if (isDragging) {
+                    isDragging = false;
+                    element.classList.remove('dragging');
+                    header.style.cursor = 'grab';
+                    document.body.style.userSelect = ''; // Re-enable text selection
+                }
+            };
+            header.ondragstart = () => false;
+        }
 
         // --- Comparison Modal Functions ---
-        function openComparisonModal(contextIds = []) { console.log("Abrindo comparação com contexto:", contextIds); comparisonContextActressIds = contextIds; actressesToCompare = []; if(comparisonSearchInput) comparisonSearchInput.value = ''; if(comparisonSuggestionsList) comparisonSuggestionsList.style.display = 'none'; renderComparisonView(); if(comparisonModal) comparisonModal.style.display = 'flex'; if(comparisonSearchInput) comparisonSearchInput.focus(); }
-        window.closeComparisonModal = function() { if(comparisonModal) comparisonModal.style.display = 'none'; comparisonContextActressIds = []; actressesToCompare = []; };
-        function displayComparisonSuggestions(searchTerm) { if (!comparisonSuggestionsList || !comparisonSearchInput) return; comparisonSuggestionsList.innerHTML = ''; if (!searchTerm || searchTerm.trim() === '') { comparisonSuggestionsList.style.display = 'none'; return; } const lowerSearchTerm = searchTerm.toLowerCase(); let matchedActresses = allActressesData.filter(actress => (actress.nome || '').toLowerCase().includes(lowerSearchTerm) && !actressesToCompare.some(ca => ca.id === actress.id) ); matchedActresses.sort((a, b) => { const aIsInContext = comparisonContextActressIds.includes(a.id); const bIsInContext = comparisonContextActressIds.includes(b.id); if (aIsInContext && !bIsInContext) return -1; if (!aIsInContext && bIsInContext) return 1; return (a.nome || '').localeCompare(b.nome || ''); }); if (matchedActresses.length > 0) { matchedActresses.slice(0, 10).forEach(actress => { const item = document.createElement('div'); item.classList.add('suggestion-item'); if (comparisonContextActressIds.includes(actress.id)) { item.classList.add('context-actress'); } item.dataset.id = actress.id; item.innerHTML = `<img src="${actress.foto || 'placeholder.png'}" alt=""><span>${actress.nome || 'Nome Ind.'}</span>`; item.addEventListener('click', () => handleSelectActressForComparison(actress.id)); comparisonSuggestionsList.appendChild(item); }); comparisonSuggestionsList.style.display = 'block'; } else { comparisonSuggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma atriz encontrada</div>'; comparisonSuggestionsList.style.display = 'block'; } }
-        function handleSelectActressForComparison(actressId) { if (actressesToCompare.some(a => a.id === actressId)) return; const actressData = allActressesData.find(a => a.id === actressId); if (actressData) { actressesToCompare.push({ id: actressId, nome: actressData.nome, data: actressData }); renderComparisonView(); } else { console.error("Dados da atriz não encontrados para comparação:", actressId); } if(comparisonSearchInput) comparisonSearchInput.value = ''; if(comparisonSuggestionsList) comparisonSuggestionsList.style.display = 'none'; if(comparisonSearchInput) comparisonSearchInput.focus(); }
-        function removeActressFromComparison(actressId) { actressesToCompare = actressesToCompare.filter(a => a.id !== actressId); renderComparisonView(); }
-
-        // Render the comparison columns
+        function openComparisonModal(contextIds = []) {
+             console.log("Abrindo comparação com contexto:", contextIds);
+             if (!comparisonModal) { console.error("Comparison modal not found."); return; }
+             comparisonContextActressIds = contextIds;
+             actressesToCompare = [];
+             if(comparisonSearchInput) comparisonSearchInput.value = '';
+             if(comparisonSuggestionsList) comparisonSuggestionsList.style.display = 'none';
+             renderComparisonView(); // Render before showing
+             comparisonModal.style.display = 'flex';
+             if(comparisonSearchInput) comparisonSearchInput.focus();
+        }
+        window.closeComparisonModal = function() {
+            if(comparisonModal) comparisonModal.style.display = 'none';
+            comparisonContextActressIds = [];
+            actressesToCompare = [];
+        };
+        function displayComparisonSuggestions(searchTerm) {
+             if (!comparisonSuggestionsList || !comparisonSearchInput) return;
+             comparisonSuggestionsList.innerHTML = '';
+             if (!searchTerm || searchTerm.trim() === '') { comparisonSuggestionsList.style.display = 'none'; return; }
+             const lowerSearchTerm = searchTerm.toLowerCase();
+             let matchedActresses = allActressesData.filter(actress =>
+                 (actress.nome || '').toLowerCase().includes(lowerSearchTerm) &&
+                 !actressesToCompare.some(ca => ca.id === actress.id)
+             );
+             matchedActresses.sort((a, b) => {
+                 const aIsInContext = comparisonContextActressIds.includes(a.id);
+                 const bIsInContext = comparisonContextActressIds.includes(b.id);
+                 if (aIsInContext && !bIsInContext) return -1;
+                 if (!aIsInContext && bIsInContext) return 1;
+                 return (a.nome || '').localeCompare(b.nome || '');
+             });
+             if (matchedActresses.length > 0) {
+                 matchedActresses.slice(0, 10).forEach(actress => {
+                     const item = document.createElement('div');
+                     item.classList.add('suggestion-item');
+                     if (comparisonContextActressIds.includes(actress.id)) { item.classList.add('context-actress'); }
+                     item.dataset.id = actress.id;
+                     item.innerHTML = `<img src="${actress.foto || 'placeholder.png'}" alt="" onerror="this.src='placeholder.png'; this.onerror=null;"><span>${actress.nome || 'Nome Ind.'}</span>`;
+                     item.addEventListener('click', () => handleSelectActressForComparison(actress.id));
+                     comparisonSuggestionsList.appendChild(item);
+                 });
+                 comparisonSuggestionsList.style.display = 'block';
+             } else {
+                 comparisonSuggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma atriz encontrada</div>';
+                 comparisonSuggestionsList.style.display = 'block';
+             }
+        }
+        function handleSelectActressForComparison(actressId) {
+             if (actressesToCompare.some(a => a.id === actressId)) return;
+             const actressData = allActressesData.find(a => a.id === actressId);
+             if (actressData) {
+                 actressesToCompare.push({ id: actressId, nome: actressData.nome, data: actressData });
+                 renderComparisonView();
+             } else {
+                 console.error("Dados da atriz não encontrados para comparação:", actressId);
+             }
+             if(comparisonSearchInput) comparisonSearchInput.value = '';
+             if(comparisonSuggestionsList) comparisonSuggestionsList.style.display = 'none';
+             if(comparisonSearchInput) comparisonSearchInput.focus();
+        }
+        function removeActressFromComparison(actressId) {
+             actressesToCompare = actressesToCompare.filter(a => a.id !== actressId);
+             renderComparisonView();
+        }
         function renderComparisonView() {
              if (!comparisonModalBody || !comparisonPlaceholder) return;
-             comparisonModalBody.innerHTML = ''; // Clear previous
+             comparisonModalBody.innerHTML = ''; // Clear previous content
              if (actressesToCompare.length === 0) {
                  comparisonPlaceholder.style.display = 'block';
                  comparisonModalBody.appendChild(comparisonPlaceholder);
@@ -355,144 +1309,1439 @@
                      const column = document.createElement('div');
                      column.classList.add('comparison-column');
                      column.dataset.id = actress.id;
-
-                     let content = ''; // Build HTML string
-                     let detailsAdded = false;
-
-                     // --- Build Column Content ---
-                     content += `<button class="remove-compare-btn" title="Remover ${actress.nome || 'Atriz'}">×</button>`; // Button HTML added here
+                     let content = ''; let detailsAdded = false;
+                     content += `<button class="remove-compare-btn" title="Remover ${actress.nome || 'Atriz'}">×</button>`;
                      content += `<h4>${actress.nome || 'Nome Indisponível'}</h4>`;
                      if (actress.data.foto) { content += `<img src="${actress.data.foto}" alt="${actress.nome || 'Foto'}" onerror="this.style.display='none';">`; }
                      const addDetailToString = (label, value) => { if (value != null && value !== '') { content += `<div><strong>${label}:</strong> ${value}</div>`; detailsAdded = true; } };
-                     addDetailToString('Nasc', actress.data.dataNascimento); if (actress.data.dataNascimento) { addDetailToString('Idade', calculateAge(actress.data.dataNascimento)); } if (actress.data.altura != null) { addDetailToString('Altura', `${actress.data.altura} cm`); } if (actress.data.peso != null) { addDetailToString('Peso', `${actress.data.peso} kg`); } if (Array.isArray(actress.data.filmes)) { addDetailToString('Filmes', actress.data.filmes.length); } if (Array.isArray(actress.data.videos)) { addDetailToString('Vídeos', actress.data.videos.length); } if (Array.isArray(actress.data.cenas)) { addDetailToString('Cenas', actress.data.cenas.length); }
-                     const skipFieldsCompare = ['foto', 'nome', 'timestamp', 'id', 'filmes', 'videos', 'cenas', 'dataNascimento', 'altura', 'peso'];
+                     addDetailToString('Nasc', actress.data.dataNascimento);
+                     if (actress.data.dataNascimento) { addDetailToString('Idade', calculateAge(actress.data.dataNascimento)); }
+                     if (actress.data.altura != null) { addDetailToString('Altura', `${actress.data.altura} cm`); }
+                     if (actress.data.peso != null) { addDetailToString('Peso', `${actress.data.peso} kg`); }
+                     if (Array.isArray(actress.data.filmes)) { addDetailToString('Filmes', actress.data.filmes.length); }
+                     if (Array.isArray(actress.data.videos)) { addDetailToString('Vídeos', actress.data.videos.length); }
+                     if (Array.isArray(actress.data.cenas)) { addDetailToString('Cenas', actress.data.cenas.length); }
+                     const skipFieldsCompare = ['foto', 'nome', 'timestamp', 'id', 'filmes', 'videos', 'cenas', 'dataNascimento', 'altura', 'peso', 'createdAt'];
                      for (const key in actress.data) { if (actress.data.hasOwnProperty(key) && !skipFieldsCompare.includes(key)) { addDetailToString(capitalizeFirstLetter(key), actress.data[key]); } }
                      if (!detailsAdded && !actress.data.foto) { content += '<i style="font-size:0.8em; color:#777; display: block; text-align: center; margin-top: 10px;">(Sem detalhes)</i>'; }
-
-                     // --- Set Content and Attach Listener ---
-                     column.innerHTML = content; // Set the generated HTML
-                     const removeBtn = column.querySelector('.remove-compare-btn'); // Find the button *after* setting innerHTML
-                     if (removeBtn) { removeBtn.onclick = (event) => { event.stopPropagation(); removeActressFromComparison(actress.id); }; } // Attach listener
+                     column.innerHTML = content;
+                     const removeBtn = column.querySelector('.remove-compare-btn');
+                     if (removeBtn) { removeBtn.onclick = (event) => { event.stopPropagation(); removeActressFromComparison(actress.id); }; }
                      else { console.error("Remove button not found in comparison column for", actress.id); }
                      comparisonModalBody.appendChild(column);
                  });
              }
-        } // <--- End of renderComparisonView
+        }
 
-        // --- NEW: FAB and Create Menu/Modal Functions (Multi-line format) ---
-
+        // --- FAB and Create Menu/Modal Functions ---
         function toggleCreateMenu() {
-            if (!createMenuPopup) {
-                return;
-            }
+            if (!createMenuPopup) return;
             const isVisible = createMenuPopup.style.display === 'block';
             createMenuPopup.style.display = isVisible ? 'none' : 'block';
         }
-
-        function closeCreateMenu() {
-            if (createMenuPopup) {
-                createMenuPopup.style.display = 'none';
-            }
-        }
-
+        function closeCreateMenu() { if (createMenuPopup) createMenuPopup.style.display = 'none'; }
         function openCreateActressModal() {
-            closeCreateMenu();
-            if (!createActressModal || !createActressModalBody) {
-                return;
-            }
-            createActressModalBody.innerHTML = getCreateActressFormHTML();
-            createActressModal.style.display = 'flex';
-            if (!createFormInitialized) {
-                initializeCreateActressForm();
-                createFormInitialized = true;
-            } else {
-                const form = createActressModalBody.querySelector('#create-actress-form');
-                const submitButton = form?.nextElementSibling?.querySelector('button[type="submit"]');
-                if(submitButton) {
-                    submitButton.disabled = false;
-                }
-                const nameInput = form?.querySelector('#name');
-                const nameErrorMessage = form?.querySelector('#name-error-message');
-                if(nameErrorMessage) {
-                    nameErrorMessage.style.display = 'none';
-                }
-                if(form) {
-                    form.reset();
-                }
-                console.log("Re-opening create modal, form reset and button enabled.");
-            }
+             closeCreateMenu();
+             if (!createActressModal || !createActressModalBody) return;
+             createActressModalBody.innerHTML = getCreateActressFormHTML(); // Regenerate form HTML
+             createActressModal.style.display = 'flex';
+             // Always re-initialize form logic when opening
+             initializeCreateActressForm();
+             createFormInitialized = true; // Or use a flag specific to initialization logic if needed
+             const nameInput = createActressModalBody.querySelector('#name'); // Get name input after HTML is set
+             if (nameInput) nameInput.focus(); // Focus after initializing
         }
-
-        window.closeCreateActressModal = function() {
-            if (createActressModal) {
-                createActressModal.style.display = 'none';
-            }
-        }; // Semicolon is good practice for function assignments
-
-        function openCreateMultimediaModal() {
-            closeCreateMenu();
-            alert("Funcionalidade 'Criar Multimídia' ainda não implementada.");
-            console.log("Placeholder: Abrir modal de criação de multimídia.");
-        }
-
+        window.closeCreateActressModal = function() { if (createActressModal) createActressModal.style.display = 'none'; };
         function getCreateActressFormHTML() {
-            // Kept the original template literal for the form HTML
-            return ` <form id="create-actress-form"> <div class="form-card"> <label for="name">Name:</label> <input type="text" id="name" name="name" required> <span id="name-error-message" class="error-message" style="display: none;"></span> </div> <div class="form-card"> <label for="foto">Foto (URL):</label> <input type="url" id="foto" name="foto" placeholder="https://exemplo.com/imagem.jpg" required> </div> <div class="form-card full-width"> <label for="texto">Texto (Biografia/Descrição):</label> <textarea id="texto" name="texto" rows="5" placeholder="Cole ou digite a biografia e informações aqui..." required></textarea> </div> <div class="form-card"> <label for="born">Born (Ex: 1990/05/15):</label> <input type="text" id="born" name="born" placeholder="YYYY/MM/DD"> </div> <div class="form-card"> <label for="birthplace">Birthplace:</label> <input type="text" id="birthplace" name="birthplace"> </div> <div class="form-card"> <label for="ethnicity">Ethnicity:</label> <input type="text" id="ethnicity" name="ethnicity"> </div> <div class="form-card"> <label for="hair_color">Hair color:</label> <input type="text" id="hair_color" name="hair_color"> </div> <div class="form-card"> <label for="eye_color">Eye color:</label> <input type="text" id="eye_color" name="eye_color"> </div> <div class="form-card"> <label for="height">Height (cm):</label> <input type="text" id="height" name="height" placeholder="Ex: 170"> </div> <div class="form-card"> <label for="weight">Weight (kg):</label> <input type="text" id="weight" name="weight" placeholder="Ex: 59"> </div> <div class="form-card"> <label for="body_type">Body type:</label> <input type="text" id="body_type" name="body_type"> </div> <div class="form-card"> <label for="measurements">Measurements (Ex: 34-24-35):</label> <input type="text" id="measurements" name="measurements"> </div> <div class="form-card"> <label for="years_active">Years active (Start Year):</label> <input type="text" id="years_active" name="years_active" placeholder="Ex: 2010"> </div> <div class="form-card"> <label for="nota">Nota (0 a 10):</label> <input type="number" id="nota" name="nota" min="0" max="10" step="0.1" placeholder="Ex: 8.5"> </div> </form> <div class="submit-button-container"> <button type="submit" form="create-actress-form">Criar</button> </div> `;
+             // This HTML structure should match the IDs used in initializeCreateActressForm
+             return `
+                 <form id="create-actress-form">
+                     <div class="form-card">
+                         <label for="name">Name:</label>
+                         <input type="text" id="name" name="name" required>
+                         <span id="name-error-message" class="error-message" style="display: none;"></span>
+                     </div>
+                     <div class="form-card">
+                         <label for="foto">Foto (URL):</label>
+                         <input type="url" id="foto" name="foto" placeholder="https://exemplo.com/imagem.jpg" required>
+                     </div>
+                     <div class="form-card full-width">
+                         <label for="texto">Texto (Biografia/Descrição):</label>
+                         <textarea id="texto" name="texto" rows="5" placeholder="Cole ou digite a biografia e informações aqui..." required></textarea>
+                     </div>
+                     <div class="form-card">
+                         <label for="born">Born (Ex: 1990/05/15):</label>
+                         <input type="text" id="born" name="born" placeholder="YYYY/MM/DD">
+                     </div>
+                     <div class="form-card">
+                         <label for="birthplace">Birthplace:</label>
+                         <input type="text" id="birthplace" name="birthplace">
+                     </div>
+                     <div class="form-card">
+                         <label for="ethnicity">Ethnicity:</label>
+                         <input type="text" id="ethnicity" name="ethnicity">
+                     </div>
+                     <div class="form-card">
+                         <label for="hair_color">Hair color:</label>
+                         <input type="text" id="hair_color" name="hair_color">
+                     </div>
+                     <div class="form-card">
+                         <label for="eye_color">Eye color:</label>
+                         <input type="text" id="eye_color" name="eye_color">
+                     </div>
+                     <div class="form-card">
+                         <label for="height">Height (cm):</label>
+                         <input type="text" id="height" name="height" placeholder="Ex: 170">
+                     </div>
+                     <div class="form-card">
+                         <label for="weight">Weight (kg):</label>
+                         <input type="text" id="weight" name="weight" placeholder="Ex: 59">
+                     </div>
+                     <div class="form-card">
+                         <label for="body_type">Body type:</label>
+                         <input type="text" id="body_type" name="body_type">
+                     </div>
+                     <div class="form-card">
+                         <label for="measurements">Measurements (Ex: 34-24-35):</label>
+                         <input type="text" id="measurements" name="measurements">
+                     </div>
+                     <div class="form-card">
+                         <label for="years_active">Years active (Start Year):</label>
+                         <input type="text" id="years_active" name="years_active" placeholder="Ex: 2010">
+                     </div>
+                     <div class="form-card">
+                         <label for="nota">Nota (0 a 10):</label>
+                         <input type="number" id="nota" name="nota" min="0" max="10" step="0.1" placeholder="Ex: 8.5">
+                     </div>
+                 </form>
+                 <div class="submit-button-container">
+                     <button type="submit" form="create-actress-form">Criar</button>
+                 </div>
+             `;
         }
-
-        // --- NEW: Actress Creation Form Logic (Integrated) ---
         function initializeCreateActressForm() {
             console.log("DEBUG: Initializing Create Actress Form Logic...");
-            const form = createActressModalBody.querySelector('#create-actress-form');
-            const submitButton = createActressModalBody.querySelector('button[form="create-actress-form"]');
-            const sourceTextArea = createActressModalBody.querySelector('#texto');
-            const nameInput = createActressModalBody.querySelector('#name');
-            const nameErrorMessage = createActressModalBody.querySelector('#name-error-message');
-            // Semicolon added after the if statement's closing brace
-            if (!form || !submitButton || !sourceTextArea || !nameInput || !nameErrorMessage) { console.error("DEBUG: Failed to find create form elements."); createActressModalBody.innerHTML = "<div class='error'>Erro ao carregar formulário.</div>"; return; }; console.log("DEBUG: All create form elements found.");
+            // Ensure we get elements *after* HTML is set by getCreateActressFormHTML
+            const form = document.getElementById('create-actress-form'); // Use document.getElementById
+            const submitButton = createActressModalBody?.querySelector('button[form="create-actress-form"]'); // Scope to modal body
+            const sourceTextArea = document.getElementById('texto');
+            const nameInput = document.getElementById('name');
+            const nameErrorMessage = document.getElementById('name-error-message');
+
+            if (!form || !submitButton || !sourceTextArea || !nameInput || !nameErrorMessage) {
+                console.error("DEBUG: Failed to find create form elements. Form:", !!form, "Submit:", !!submitButton, "TextArea:", !!sourceTextArea, "NameInput:", !!nameInput, "NameError:", !!nameErrorMessage);
+                if (createActressModalBody) createActressModalBody.innerHTML = "<div class='error'>Erro ao carregar formulário. Elementos não encontrados.</div>";
+                return;
+            }
+            console.log("DEBUG: All create form elements found.");
+
             const firestoreFieldMap = { 'name': 'nome', 'texto': 'texto', 'foto': 'foto', 'born': 'dataNascimento', 'birthplace': 'pais', 'ethnicity': 'etnia', 'hair_color': 'corCabelo', 'eye_color': 'corOlhos', 'height': 'altura', 'weight': 'peso', 'body_type': 'tipoCorpo', 'measurements': 'medidas', 'years_active': 'AnosAtiva', 'nota': 'nota' };
-            function formatBornDate(dateString) { const dateRegex = /(\d{1,2})(?:st|nd|rd|th)?\s+(?:of\s+)?([a-zA-Z]+)\s+(\d{4})/; const match = dateString.match(dateRegex); if (match) { const day = match[1].padStart(2, '0'); const monthName = match[2]; const year = match[3]; const monthMap = {'january': '01', 'february': '02', 'march': '03', 'april': '04', 'may': '05', 'june': '06', 'july': '07', 'august': '08', 'september': '09', 'october': '10', 'november': '11', 'december': '12'}; const monthNumber = monthMap[monthName.toLowerCase()]; if (monthNumber) return `${year}/${monthNumber}/${day}`; } else { const simpleDateRegex = /^(\d{4})[/-](\d{1,2})[/-](\d{1,2})$/; const simpleMatch = dateString.match(simpleDateRegex); if (simpleMatch) { return `${simpleMatch[1]}/${simpleMatch[2].padStart(2, '0')}/${simpleMatch[3].padStart(2, '0')}`; } } return dateString; }
-            function extractCmValue(heightString) { const cmRegex = /(\d+)\s*cm/i; const match = heightString.match(cmRegex); if (match) return match[1]; const parenCmRegex = /\(\s*(\d+)\s*cm\s*\)/i; const parenMatch = heightString.match(parenCmRegex); if (parenMatch) return parenMatch[1]; return ''; }
-            function extractKgValue(weightString) { const kgRegex = /(\d+)\s*kg/i; const match = weightString.match(kgRegex); if (match) return match[1]; const parenKgRegex = /\(\s*(\d+)\s*kg\s*\)/i; const parenMatch = weightString.match(parenKgRegex); if (parenMatch) return parenMatch[1]; return ''; }
-            function extractStartYear(yearsString) { const yearRegex = /(\d{4})/; const match = yearsString.match(yearRegex); return match ? match[1] : ''; }
-            async function checkNameExists() { console.log("DEBUG: checkNameExists (form) name:", nameInput.value); const enteredName = nameInput.value.trim(); nameErrorMessage.style.display = 'none'; nameErrorMessage.textContent = ''; let shouldBeDisabled = false; if (enteredName === '') { submitButton.disabled = false; return; } console.log(`DEBUG: checkNameExists (form) - Querying: "${enteredName}"`); try { const checkQuery = query(collection(db, "atores"), where("nome", "==", enteredName), limit(1)); const querySnapshot = await getDocs(checkQuery); console.log(`DEBUG: checkNameExists (form) - Query empty: ${querySnapshot.empty}`); if (!querySnapshot.empty) { nameErrorMessage.textContent = `O nome "${enteredName}" já existe.`; nameErrorMessage.style.display = 'block'; shouldBeDisabled = true; } else { shouldBeDisabled = false; } } catch (error) { console.error("DEBUG: checkNameExists (form) - Error:", error); nameErrorMessage.textContent = 'Erro ao verificar nome.'; nameErrorMessage.style.display = 'block'; shouldBeDisabled = true; } finally { submitButton.disabled = shouldBeDisabled; console.log(`DEBUG: checkNameExists (form) - Submit disabled: ${shouldBeDisabled}`);} }
-            let debouncedCheck = debounce(checkNameExists, 500);
-            function autoFillForm() { console.log("DEBUG: autoFillForm (form) started."); const textContent = sourceTextArea.value; const lines = textContent.split('\n'); let nameWasSetByAutofill = false; Object.keys(firestoreFieldMap).forEach(formId => { if(['texto', 'name', 'foto', 'nota'].includes(formId)) return; const inputElement = form.querySelector(`#${formId}`); if (inputElement && !inputElement.value) { inputElement.value = ''; } }); if (lines.length > 0 && nameInput && !nameInput.value) { const potentialName = lines[0].trim(); if (potentialName) { nameInput.value = potentialName; nameWasSetByAutofill = true; console.log("DEBUG: Autofilled Name:", potentialName); } } const fieldMappingsForAutofill = { 'Born': 'dataNascimento', 'Birthplace': 'pais', 'Ethnicity': 'etnia', 'Hair color': 'corCabelo', 'Eye color': 'corOlhos', 'Height': 'altura', 'Weight': 'peso', 'Body type': 'tipoCorpo', 'Measurements': 'medidas', 'Years active': 'AnosAtiva' }; Object.entries(fieldMappingsForAutofill).forEach(([label, firestoreKey]) => { const formId = Object.keys(firestoreFieldMap).find(key => firestoreFieldMap[key] === firestoreKey); if(!formId) return; const regex = new RegExp(`^${label}:\\s*(.*)$`, 'im'); const match = textContent.match(regex); if (match) { let value = match[1].trim(); if (firestoreKey === 'dataNascimento') value = formatBornDate(value); else if (firestoreKey === 'altura') value = extractCmValue(value); else if (firestoreKey === 'peso') value = extractKgValue(value); else if (firestoreKey === 'AnosAtiva') value = extractStartYear(value); const inputElement = form.querySelector(`#${formId}`); if (inputElement && !inputElement.value) { inputElement.value = value; } } }); if (nameWasSetByAutofill) { console.log("DEBUG: Triggering debounced name check after autofill."); debouncedCheck(); } console.log("DEBUG: autoFillForm (form) finished."); }
-            console.log("DEBUG: Attaching Create Form Listeners..."); nameInput.addEventListener('input', debouncedCheck); nameInput.addEventListener('blur', checkNameExists); sourceTextArea.addEventListener('input', autoFillForm);
-            form.addEventListener('submit', async (e) => { e.preventDefault(); console.log("DEBUG: Create form submitted."); if (submitButton.disabled) { alert('Corrija o erro indicado ou aguarde a verificação.'); return; } const initialButtonText = 'Criar'; submitButton.disabled = true; submitButton.textContent = 'Verificando...'; const formData = new FormData(form); const enteredName = formData.get('name')?.trim(); if (!enteredName) { alert('O campo "Nome" é obrigatório.'); submitButton.disabled = false; submitButton.textContent = initialButtonText; return; } console.log(`DEBUG: Submit (form) - FINAL check: "${enteredName}"`); try { const finalCheckQuery = query(collection(db, "atores"), where("nome", "==", enteredName), limit(1)); const finalSnapshot = await getDocs(finalCheckQuery); if (!finalSnapshot.empty) { nameErrorMessage.textContent = `O nome "${enteredName}" já existe.`; nameErrorMessage.style.display = 'block'; alert(`Já existe uma atriz com o nome "${enteredName}".`); submitButton.textContent = initialButtonText; return; } submitButton.textContent = 'Salvando...'; const firestoreData = {}; for (const [formId, firestoreKey] of Object.entries(firestoreFieldMap)) { const rawValue = formData.get(formId); if (rawValue !== null && rawValue !== undefined) { const trimmedValue = typeof rawValue === 'string' ? rawValue.trim() : rawValue; if (trimmedValue === '' && firestoreKey !== 'nota') continue; if (formId === 'nota') { const numValue = parseFloat(trimmedValue); if (!isNaN(numValue)) firestoreData[firestoreKey] = numValue; } else if (formId === 'measurements') { firestoreData[firestoreKey] = trimmedValue; const parts = trimmedValue.split('-'); if (parts.length === 3) { firestoreData['Boobs'] = parts[0].trim(); firestoreData['Waist'] = parts[1].trim(); firestoreData['Ass'] = parts[2].trim(); } } else { firestoreData[firestoreKey] = trimmedValue; } } } firestoreData.createdAt = serverTimestamp(); console.log('DEBUG: Submit (form) - Data:', firestoreData); const docRef = await addDoc(collection(db, "atores"), firestoreData); console.log("DEBUG: Submit (form) - Success! ID: ", docRef.id); alert('Atriz criada com sucesso!'); form.reset(); nameErrorMessage.style.display = 'none'; nameErrorMessage.textContent = ''; submitButton.disabled = false; submitButton.textContent = initialButtonText; closeCreateActressModal(); loadInitialData(); } catch (error) { console.error("DEBUG: Submit (form) - Erro:", error); alert(`Erro ao salvar: ${error.message}`); submitButton.disabled = false; submitButton.textContent = initialButtonText; } });
-             console.log("DEBUG: Create Form Listeners Attached.");
+
+            function formatBornDateForForm(dateString) {
+                 if (!dateString) return '';
+                 // Regex for dd Mon yyyy, d Mon yyyy, dd Mmm yyyy, d Mmm yyyy formats
+                 const dateRegex = /(\d{1,2})(?:st|nd|rd|th)?\s+(?:of\s+)?([a-zA-Z]+)\s+(\d{4})/;
+                 const match = dateString.match(dateRegex);
+                 if (match) {
+                     const day = match[1].padStart(2, '0');
+                     const monthName = match[2];
+                     const year = match[3];
+                     const monthMap = {'january': '01', 'february': '02', 'march': '03', 'april': '04', 'may': '05', 'june': '06', 'july': '07', 'august': '08', 'september': '09', 'october': '10', 'november': '11', 'december': '12'};
+                     const monthNumber = monthMap[monthName.toLowerCase()];
+                     if (monthNumber) return `${year}/${monthNumber}/${day}`;
+                     else console.warn("Unknown month name in born date:", monthName);
+                 } else {
+                     // Regex for YYYY/MM/DD or YYYY-MM-DD
+                     const simpleDateRegex = /^(\d{4})[/-](\d{1,2})[/-](\d{1,2})$/;
+                     const simpleMatch = dateString.match(simpleDateRegex);
+                     if (simpleMatch) {
+                         // Check if already in correct format
+                         if (simpleMatch[0] === `${simpleMatch[1]}/${simpleMatch[2].padStart(2, '0')}/${simpleMatch[3].padStart(2, '0')}`) {
+                              return simpleMatch[0];
+                         }
+                         return `${simpleMatch[1]}/${simpleMatch[2].padStart(2, '0')}/${simpleMatch[3].padStart(2, '0')}`;
+                     } else {
+                          console.warn("Born date format not recognized:", dateString);
+                     }
+                 }
+                 return dateString; // Return original if no format matched
+            }
+            function extractCmValue(heightString) { if (!heightString) return ''; const cmRegex = /(\d+)\s*cm/i; const match = heightString.match(cmRegex); if (match) return match[1]; const parenCmRegex = /\(\s*(\d+)\s*cm\s*\)/i; const parenMatch = heightString.match(parenCmRegex); if (parenMatch) return parenMatch[1]; const justNumber = heightString.match(/^(\d+)$/); if (justNumber) return justNumber[1]; return ''; }
+            function extractKgValue(weightString) { if (!weightString) return ''; const kgRegex = /(\d+)\s*kg/i; const match = weightString.match(kgRegex); if (match) return match[1]; const parenKgRegex = /\(\s*(\d+)\s*kg\s*\)/i; const parenMatch = weightString.match(parenKgRegex); if (parenMatch) return parenMatch[1]; const justNumber = weightString.match(/^(\d+)$/); if (justNumber) return justNumber[1]; return ''; }
+            function extractStartYear(yearsString) { if (!yearsString) return ''; const yearRegex = /(\d{4})/; const match = yearsString.match(yearRegex); return match ? match[1] : ''; }
+
+            async function checkNameExists() {
+                console.log("DEBUG: checkNameExists (form) name:", nameInput.value);
+                const enteredName = nameInput.value.trim();
+                nameErrorMessage.style.display = 'none';
+                nameErrorMessage.textContent = '';
+                let shouldBeDisabled = false;
+                if (enteredName === '') {
+                    // Don't disable if empty, allow user to type
+                    submitButton.disabled = false;
+                    return;
+                }
+                // Disable button while checking
+                submitButton.disabled = true;
+                submitButton.title = "Verificando nome..."; // Add tooltip
+                console.log(`DEBUG: checkNameExists (form) - Querying: "${enteredName}"`);
+                try {
+                    const checkQuery = query(collection(db, "atores"), where("nome", "==", enteredName), limit(1));
+                    const querySnapshot = await getDocs(checkQuery);
+                    console.log(`DEBUG: checkNameExists (form) - Query empty: ${querySnapshot.empty}`);
+                    if (!querySnapshot.empty) {
+                        nameErrorMessage.textContent = `O nome "${enteredName}" já existe.`;
+                        nameErrorMessage.style.display = 'block';
+                        shouldBeDisabled = true; // Keep disabled if name exists
+                    } else {
+                        shouldBeDisabled = false; // Enable if name doesn't exist
+                    }
+                } catch (error) {
+                    console.error("DEBUG: checkNameExists (form) - Error:", error);
+                    nameErrorMessage.textContent = 'Erro ao verificar nome.';
+                    nameErrorMessage.style.display = 'block';
+                    shouldBeDisabled = true; // Keep disabled on error
+                } finally {
+                    submitButton.disabled = shouldBeDisabled;
+                    submitButton.title = ""; // Clear tooltip
+                    console.log(`DEBUG: checkNameExists (form) - Submit disabled: ${shouldBeDisabled}`);
+                }
+            }
+
+            let debouncedCheck = debounce(checkNameExists, 600); // Slightly longer debounce
+
+            function autoFillForm() {
+                console.log("DEBUG: autoFillForm (form) started.");
+                const textContent = sourceTextArea.value;
+                const lines = textContent.split('\n');
+                let nameWasSetByAutofill = false;
+
+                // Clear fields that might be autofilled (except name, foto, texto, nota)
+                Object.keys(firestoreFieldMap).forEach(formId => {
+                    if(['texto', 'name', 'foto', 'nota'].includes(formId)) return;
+                    const inputElement = document.getElementById(formId);
+                    if (inputElement && inputElement.value) { // Only clear if it has a value
+                        // console.log("DEBUG: Clearing potentially autofilled field:", formId);
+                        // inputElement.value = ''; // Decide if you want to clear or just avoid overwriting
+                    }
+                });
+
+                // Autofill Name only if the name field is empty
+                if (lines.length > 0 && nameInput && !nameInput.value.trim()) {
+                    const potentialName = lines[0].trim();
+                    if (potentialName && potentialName.length > 2) { // Basic check for valid name
+                        nameInput.value = potentialName;
+                        nameWasSetByAutofill = true;
+                        console.log("DEBUG: Autofilled Name:", potentialName);
+                    }
+                }
+
+                // Map labels in text to Firestore keys
+                const fieldMappingsForAutofill = {
+                    'Born': 'dataNascimento',
+                    'Birthplace': 'pais',
+                    'Ethnicity': 'etnia',
+                    'Hair color': 'corCabelo',
+                    'Eye color': 'corOlhos',
+                    'Height': 'altura',
+                    'Weight': 'peso',
+                    'Body type': 'tipoCorpo',
+                    'Measurements': 'medidas',
+                    'Years active': 'AnosAtiva'
+                 };
+
+                Object.entries(fieldMappingsForAutofill).forEach(([label, firestoreKey]) => {
+                    const formId = Object.keys(firestoreFieldMap).find(key => firestoreFieldMap[key] === firestoreKey);
+                    if(!formId) return; // Skip if no corresponding form field ID
+
+                    // Regex to find "Label: Value" pattern
+                    const regex = new RegExp(`^${label}\\s*:\\s*(.*)$`, 'im');
+                    const match = textContent.match(regex);
+
+                    if (match && match[1]) { // Check if label and value were found
+                        let value = match[1].trim();
+                        // Apply specific formatting/extraction based on the field
+                        if (firestoreKey === 'dataNascimento') value = formatBornDateForForm(value);
+                        else if (firestoreKey === 'altura') value = extractCmValue(value);
+                        else if (firestoreKey === 'peso') value = extractKgValue(value);
+                        else if (firestoreKey === 'AnosAtiva') value = extractStartYear(value);
+
+                        const inputElement = document.getElementById(formId);
+                        // Fill only if the input element exists and is currently empty
+                        if (inputElement && !inputElement.value.trim()) {
+                             console.log(`DEBUG: Autofilling ${formId} with value: ${value}`);
+                             inputElement.value = value;
+                        } else if (inputElement && inputElement.value.trim()) {
+                             console.log(`DEBUG: Skipping autofill for ${formId}, already has value: ${inputElement.value}`);
+                        }
+                    }
+                });
+
+                // Trigger name check if it was autofilled
+                if (nameWasSetByAutofill) {
+                    console.log("DEBUG: Triggering debounced name check after autofill.");
+                    debouncedCheck();
+                }
+                console.log("DEBUG: autoFillForm (form) finished.");
+            }
+
+            console.log("DEBUG: Attaching Create Form Listeners...");
+            nameInput.addEventListener('input', debouncedCheck);
+            // nameInput.addEventListener('blur', checkNameExists); // Check on blur might be redundant with debounce
+            sourceTextArea.addEventListener('input', debounce(autoFillForm, 300)); // Debounce autofill slightly
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                console.log("DEBUG: Create form submitted.");
+
+                // Final validation before submitting
+                const enteredName = nameInput.value.trim();
+                if (!enteredName) {
+                    nameErrorMessage.textContent = 'O campo "Nome" é obrigatório.';
+                    nameErrorMessage.style.display = 'block';
+                    alert('O campo "Nome" é obrigatório.');
+                    nameInput.focus();
+                    return;
+                }
+                 // Ensure button isn't disabled from a previous check if user corrected the name
+                 if (submitButton.disabled && nameErrorMessage.style.display === 'block') {
+                     // Re-run check immediately before submitting if there was an error shown
+                      await checkNameExists();
+                      if (submitButton.disabled) { // Check again if still disabled after immediate check
+                           alert('O nome inserido já existe. Por favor, corrija.');
+                           nameInput.focus();
+                           return;
+                      }
+                 } else if (submitButton.disabled) {
+                     // If button is disabled for other reasons (like mid-check)
+                      alert('Aguarde a verificação do nome terminar.');
+                      return;
+                 }
+
+
+                const initialButtonText = 'Criar';
+                submitButton.disabled = true;
+                submitButton.textContent = 'Salvando...';
+
+                const formData = new FormData(form);
+                const firestoreData = {};
+                let hasError = false;
+
+                for (const [formId, firestoreKey] of Object.entries(firestoreFieldMap)) {
+                    const inputElement = document.getElementById(formId); // Get element by ID
+                    const rawValue = formData.get(formId); // Get value from FormData
+
+                    if (rawValue !== null && rawValue !== undefined) {
+                        const trimmedValue = typeof rawValue === 'string' ? rawValue.trim() : rawValue;
+
+                        // Skip empty values unless it's a field that allows empty or it's 'nota'
+                        if (trimmedValue === '' && !['nota'].includes(formId)) continue;
+
+                        // --- Specific Field Processing ---
+                        if (formId === 'nota') {
+                            const numValue = parseFloat(trimmedValue);
+                            if (!isNaN(numValue)) {
+                                 firestoreData[firestoreKey] = numValue >= 0 && numValue <= 10 ? numValue : null; // Validate range
+                                 if (firestoreData[firestoreKey] === null && trimmedValue !== '') console.warn("Nota inválida, ignorando:", trimmedValue);
+                            } else if (trimmedValue !== '') {
+                                console.warn("Nota inválida, ignorando:", trimmedValue);
+                            }
+                        } else if (formId === 'height' || formId === 'weight' || formId === 'years_active') {
+                             // Convert numeric fields to numbers, store null if not a valid number
+                             const numValue = parseInt(trimmedValue, 10);
+                             firestoreData[firestoreKey] = !isNaN(numValue) ? numValue : null;
+                             if (firestoreData[firestoreKey] === null && trimmedValue !== '') console.warn(`${formId} inválido, ignorando:`, trimmedValue);
+                        } else if (formId === 'measurements') {
+                            firestoreData[firestoreKey] = trimmedValue; // Store the full string
+                             // Try to extract parts if it matches the pattern
+                             const parts = trimmedValue.match(/^(\d{2,3}[A-G]?)\s*-\s*(\d{2,3})\s*-\s*(\d{2,3})$/i);
+                             if (parts) {
+                                 firestoreData['Boobs'] = parts[1].trim().toUpperCase();
+                                 firestoreData['Waist'] = parts[2].trim();
+                                 firestoreData['Ass'] = parts[3].trim();
+                             }
+                        } else {
+                            // For other text fields like name, foto, text, etc.
+                            firestoreData[firestoreKey] = trimmedValue;
+                        }
+                    }
+                }
+
+                // Add timestamp
+                firestoreData.createdAt = serverTimestamp();
+
+                // Ensure essential fields are present (adjust as needed)
+                if (!firestoreData.nome || !firestoreData.foto || !firestoreData.texto) {
+                     console.error("Dados essenciais faltando:", firestoreData);
+                     alert('Campos Nome, Foto e Texto são obrigatórios.');
+                     submitButton.disabled = false;
+                     submitButton.textContent = initialButtonText;
+                     return; // Stop submission
+                }
+
+
+                console.log('DEBUG: Submit (form) - Data to save:', firestoreData);
+
+                try {
+                    // Final check for name existence just before saving
+                    const finalCheckQuery = query(collection(db, "atores"), where("nome", "==", firestoreData.nome), limit(1));
+                    const finalSnapshot = await getDocs(finalCheckQuery);
+
+                    if (!finalSnapshot.empty) {
+                         nameErrorMessage.textContent = `O nome "${firestoreData.nome}" já existe.`;
+                         nameErrorMessage.style.display = 'block';
+                         alert(`Já existe uma atriz com o nome "${firestoreData.nome}". Não foi possível salvar.`);
+                         submitButton.disabled = false; // Allow correction
+                         submitButton.textContent = initialButtonText;
+                         nameInput.focus();
+                         return;
+                    }
+
+                    // Save to Firestore
+                    const docRef = await addDoc(collection(db, "atores"), firestoreData);
+                    console.log("DEBUG: Submit (form) - Success! ID: ", docRef.id);
+                    alert('Atriz criada com sucesso!');
+                    form.reset(); // Reset form fields
+                    nameErrorMessage.style.display = 'none'; // Hide error message
+                    nameErrorMessage.textContent = '';
+                    submitButton.disabled = false; // Re-enable button
+                    submitButton.textContent = initialButtonText;
+                    closeCreateActressModal(); // Close modal
+                    await loadInitialData(); // Refresh list in the background
+
+                } catch (error) {
+                    console.error("DEBUG: Submit (form) - Erro ao salvar:", error);
+                    alert(`Erro ao salvar no banco de dados: ${error.message}`);
+                    submitButton.disabled = false; // Re-enable on error
+                    submitButton.textContent = initialButtonText;
+                }
+            });
+            console.log("DEBUG: Create Form Listeners Attached.");
+        }
+
+        // --- Multimedia Creation Functions ---
+
+        // --- Paste Text Modal ---
+        function openPasteTextModal() {
+            closeCreateMenu();
+            if (!pasteTextModal || !pasteTextArea || !pasteAnalysisResult || !analyzePasteButton) return;
+            pasteTextArea.value = '';
+            pasteAnalysisResult.textContent = '';
+            pasteAnalysisResult.className = '';
+            analyzePasteButton.disabled = false;
+            pasteTextModal.style.display = 'flex';
+            pasteTextArea.focus();
+        }
+        window.closePasteTextModal = function() { if (pasteTextModal) pasteTextModal.style.display = 'none'; }
+
+        // --- UPDATED analyzePastedText with debug logs ---
+        async function analyzePastedText() {
+            if (!pasteTextArea || !pasteAnalysisResult || !analyzePasteButton) return;
+            const text = pasteTextArea.value.trim();
+            pasteAnalysisResult.textContent = '';
+            pasteAnalysisResult.className = '';
+            analyzePasteButton.disabled = true;
+
+            if (!text) {
+                pasteAnalysisResult.textContent = 'Por favor, cole algum texto.';
+                pasteAnalysisResult.className = 'error';
+                analyzePasteButton.disabled = false;
+                return;
+            }
+
+            const firstWord = text.split(/\s+/)[0].toLowerCase().replace(':', '');
+
+            if (firstWord === 'scene') {
+                pasteAnalysisResult.textContent = 'Detectado: Cena. Extraindo dados...';
+                const sceneData = extractSceneDataFromText(text); // Assume this function exists and is correct
+                if (sceneData) {
+                    console.log("Extracted Scene Data:", sceneData);
+                    closePasteTextModal(); // Close current modal FIRST
+                    console.log("--- BEFORE calling openCreateSceneModal ---");
+                    try {
+                        await openCreateSceneModal(sceneData); // Then open the next one
+                        console.log("--- AFTER calling openCreateSceneModal ---");
+                    } catch (error) {
+                        console.error("Error occurred DURING or AFTER openCreateSceneModal call:", error);
+                        // Optional: alert user if the next modal fails to open/process
+                        // alert("Erro ao tentar abrir o formulário de criação de cena.");
+                    }
+                } else {
+                    pasteAnalysisResult.textContent = 'Erro ao extrair dados da Cena. Verifique o formato do texto.';
+                    pasteAnalysisResult.className = 'error';
+                    analyzePasteButton.disabled = false; // Re-enable button on extraction error
+                }
+            } else if (firstWord === 'movie') {
+                pasteAnalysisResult.textContent = 'Detectado: Filme. Extraindo dados...';
+                const movieData = extractMovieDataFromText(text); // Assume this function exists and is correct
+                if (movieData) {
+                    console.log("Extracted Movie Data:", movieData);
+                    closePasteTextModal(); // Close current modal FIRST
+                    console.log("--- BEFORE calling openCreateMovieModal ---");
+                     try {
+                        openCreateMovieModal(movieData); // Then open the next one
+                        console.log("--- AFTER calling openCreateMovieModal ---");
+                     } catch (error) {
+                        console.error("Error occurred DURING or AFTER openCreateMovieModal call:", error);
+                         // Optional: alert user if the next modal fails to open/process
+                        // alert("Erro ao tentar abrir o formulário de criação de filme.");
+                    }
+                } else {
+                    pasteAnalysisResult.textContent = 'Erro ao extrair dados do Filme. Verifique o formato do texto.';
+                    pasteAnalysisResult.className = 'error';
+                    analyzePasteButton.disabled = false; // Re-enable button on extraction error
+                }
+            } else {
+                pasteAnalysisResult.textContent = "Formato não reconhecido. O texto deve começar com 'Scene:' ou 'Movie:'.";
+                pasteAnalysisResult.className = 'error';
+                analyzePasteButton.disabled = false; // Re-enable button on format error
+            }
+            // Note: Button remains disabled if opening the next modal was initiated successfully.
+        }
+
+
+        // --- Data Extraction Functions ---
+
+        // --- UPDATED extractSceneDataFromText ---
+        function extractSceneDataFromText(text) {
+            const sceneData = { nome: null, dataRaw: null, filmeNome: null, numeroCena: null, potentialActorNames: [] };
+            console.log("Attempting to extract Scene data...");
+
+            try {
+                // Nome da Cena
+                const nomeMatch = text.match(/^Scene:\s*(.*?)\s*$/im);
+                if (nomeMatch && nomeMatch[1]) {
+                    sceneData.nome = nomeMatch[1].trim();
+                     console.log("Extracted Scene Nome:", sceneData.nome);
+                } else {
+                    console.warn("Scene name pattern ('^Scene:\\s*(.*?)\\s*$') did not match.");
+                    // Considerar retornar null ou lançar erro se nome é obrigatório
+                    // return null;
+                }
+                // Data
+                const dataMatch = text.match(/Release date:\s*([a-zA-Z]+(?:\s+\d{1,2})?,\s*\d{4})/i);
+                if (dataMatch && dataMatch[1]) {
+                    sceneData.dataRaw = dataMatch[1].trim();
+                     console.log("Extracted Scene Data Raw:", sceneData.dataRaw);
+                } else {
+                     console.warn("Scene release date pattern did not match.");
+                }
+                // Filme
+                const filmeMatch = text.match(/Movie:\s*(.*?)\s*-/im);
+                if (filmeMatch && filmeMatch[1]) {
+                    sceneData.filmeNome = filmeMatch[1].trim();
+                     console.log("Extracted Scene Filme Nome:", sceneData.filmeNome);
+                } else {
+                     // Tenta um padrão alternativo se o primeiro falhar (Ex: fim da linha)
+                     const filmeMatchAlt = text.match(/Movie:\s*(.*?)\s*$/im);
+                      if (filmeMatchAlt && filmeMatchAlt[1]) {
+                          sceneData.filmeNome = filmeMatchAlt[1].trim();
+                          console.log("Extracted Scene Filme Nome (Alt Pattern):", sceneData.filmeNome);
+                      } else {
+                          console.warn("Scene movie name pattern (and Alt) did not match.");
+                      }
+                }
+                // Número da Cena
+                const numeroMatch = text.match(/Scene\s*#(\d+)/i);
+                if (numeroMatch && numeroMatch[1]) {
+                    sceneData.numeroCena = parseInt(numeroMatch[1], 10);
+                     console.log("Extracted Scene Numero:", sceneData.numeroCena);
+                } else {
+                     console.warn("Scene number pattern ('Scene\\s*#(\\d+)') did not match.");
+                }
+
+                // Extração de Nomes de Atores (CORRIGIDO)
+                const castSectionMatch = text.match(/Pornstars \/ Cast([\s\S]*)/i);
+                if (castSectionMatch && castSectionMatch[1]) {
+                    const castSection = castSectionMatch[1];
+                    const potentialNames = new Set();
+                    // Regex melhorada para lidar com múltiplas linhas/espaços entre nome e "All Scenes"
+                    const actorBlockRegex = /^([A-Z][a-z']+(?:\s+[A-Z][a-z']+)*)\s*(?:\n\1)?\s*\n\s*All Scenes/gm;
+                    let actorMatch;
+                    while ((actorMatch = actorBlockRegex.exec(castSection)) !== null) {
+                       // --- CORREÇÃO APLICADA AQUI ---
+                       // Garante que pegamos apenas a primeira linha capturada pelo grupo 1
+                       // e remove espaços em branco no início/fim.
+                       const name = actorMatch[1].split('\n')[0].trim();
+
+                       if (name && !potentialNames.has(name)) {
+                           potentialNames.add(name); // Adiciona o nome limpo ao Set
+                           console.log("Found potential actor name (cleaned):", JSON.stringify(name)); // Log com JSON.stringify para verificação
+                       }
+                    }
+                    sceneData.potentialActorNames = Array.from(potentialNames);
+                    console.log("Potential Actor Names Array (cleaned):", sceneData.potentialActorNames);
+                } else {
+                    console.warn("Could not find 'Pornstars / Cast' section.");
+                }
+
+                // Retorna null se o nome da cena não foi encontrado (ou outra lógica de erro)
+                if (!sceneData.nome) {
+                    console.error("Nome da cena não extraído, retornando null.");
+                    return null;
+                }
+
+                return sceneData;
+
+            } catch (error) {
+                console.error("Error extracting scene data:", error);
+                return null;
+            }
+        }
+
+        // --- ADDED extractMovieDataFromText ---
+        function extractMovieDataFromText(text) {
+            const movieData = { nome: null, ano: null, studio: null, duracao: null };
+             console.log("Attempting to extract Movie data...");
+             try {
+                 // Nome
+                 const nomeMatch = text.match(/^Movie:\s*(.*?)\s*$/im);
+                 if (nomeMatch && nomeMatch[1]) {
+                     movieData.nome = nomeMatch[1].trim();
+                     console.log("Extracted Nome:", movieData.nome);
+                 } else {
+                     console.warn("Movie name pattern ('^Movie:\\s*(.*?)\\s*$') did not match.");
+                     return null; // Nome é essencial
+                 }
+                 // Ano
+                 const anoMatch = text.match(/Release date:.*?(\d{4})/i);
+                 if (anoMatch && anoMatch[1]) {
+                     const year = parseInt(anoMatch[1], 10);
+                      movieData.ano = isNaN(year) ? null : year;
+                      console.log("Extracted Ano:", movieData.ano);
+                 } else {
+                     console.warn("Release year pattern ('Release date:.*?(\\d{4})') did not match.");
+                 }
+
+                 // --- MODIFICADO: Studio / Network ---
+                 // Tenta extrair de "Studio:", depois de "Network:"
+                 let studioFound = false;
+
+                 // Tentativa 1: Studio com hífen
+                 const studioMatchHyphen = text.match(/Studio:\s*(.*?)\s*-/i);
+                 if (studioMatchHyphen && studioMatchHyphen[1]) {
+                     movieData.studio = studioMatchHyphen[1].trim();
+                     console.log("Extracted Studio (from Studio Hyphen Pattern):", movieData.studio);
+                     studioFound = true;
+                 }
+
+                 // Tentativa 2: Studio no fim da linha (se Tentativa 1 falhou)
+                 if (!studioFound) {
+                     const studioMatchEnd = text.match(/Studio:\s*(.*?)\s*$/im);
+                     if (studioMatchEnd && studioMatchEnd[1]) {
+                         movieData.studio = studioMatchEnd[1].trim();
+                         console.log("Extracted Studio (from Studio End Pattern):", movieData.studio);
+                         studioFound = true;
+                     }
+                 }
+
+                 // Tentativa 3: Network com hífen (se Tentativas 1 e 2 falharam)
+                 if (!studioFound) {
+                     const networkMatchHyphen = text.match(/Network:\s*(.*?)\s*-/i);
+                     if (networkMatchHyphen && networkMatchHyphen[1]) {
+                         // Armazena no campo studio mesmo vindo de Network
+                         movieData.studio = networkMatchHyphen[1].trim();
+                         console.log("Extracted Studio (from Network Hyphen Pattern):", movieData.studio);
+                         studioFound = true;
+                     }
+                 }
+
+                 // Tentativa 4: Network no fim da linha (se Tentativas 1, 2 e 3 falharam)
+                 if (!studioFound) {
+                     const networkMatchEnd = text.match(/Network:\s*(.*?)\s*$/im);
+                     if (networkMatchEnd && networkMatchEnd[1]) {
+                          // Armazena no campo studio mesmo vindo de Network
+                         movieData.studio = networkMatchEnd[1].trim();
+                         console.log("Extracted Studio (from Network End Pattern):", movieData.studio);
+                         studioFound = true;
+                     }
+                 }
+
+                 // Aviso final se nenhuma das tentativas funcionou
+                 if (!studioFound) {
+                      console.warn("Studio/Network pattern ('Studio/Network: ... -' or '$') did not match.");
+                 }
+                 // --- FIM DA MODIFICAÇÃO ---
+
+
+                 // Duracao - Tenta [HH:MM:SS], depois "XX min, YY sec"
+                 let durationFound = false;
+                 const duracaoMatchBrackets = text.match(/\[(\d{2}:\d{2}:\d{2})\]/);
+                 if (duracaoMatchBrackets && duracaoMatchBrackets[1]) {
+                     movieData.duracao = duracaoMatchBrackets[1].trim();
+                     console.log("Extracted Duracao (Bracket Pattern):", movieData.duracao);
+                     durationFound = true;
+                 } else {
+                      // Updated regex to better handle "Duration: XX min" or "Duration: XX min, YY sec"
+                      const duracaoMatchText = text.match(/Duration:\s*((\d{1,3})\s*min(?:,\s*(\d{1,2})\s*sec)?)/i);
+                      if (duracaoMatchText && duracaoMatchText[1]) {
+                          // Format to HH:MM:SS if possible
+                          const minutes = parseInt(duracaoMatchText[2], 10);
+                          const seconds = parseInt(duracaoMatchText[3] || '0', 10); // Default seconds to 0 if not present
+                          if (!isNaN(minutes) && !isNaN(seconds)) {
+                               const totalSeconds = minutes * 60 + seconds;
+                               const hours = Math.floor(totalSeconds / 3600);
+                               const remainingMinutes = Math.floor((totalSeconds % 3600) / 60);
+                               const remainingSeconds = totalSeconds % 60;
+                               movieData.duracao = `${hours.toString().padStart(2, '0')}:${remainingMinutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+                               console.log("Extracted & Formatted Duracao (Text Pattern):", movieData.duracao);
+                           } else {
+                               movieData.duracao = duracaoMatchText[1].trim(); // Keep original text if parsing fails
+                               console.log("Extracted Duracao (Text Pattern, kept original):", movieData.duracao);
+                           }
+                           durationFound = true;
+                      }
+                 }
+                 if (!durationFound) {
+                      console.warn("Duration pattern ('\\[(\\d{2}:\\d{2}:\\d{2})\\]' or 'Duration: ... min') did not match.");
+                 }
+
+                // Garante que pelo menos o nome foi encontrado
+                if (!movieData.nome) {
+                    console.error("Critical error: Movie name could not be extracted.");
+                    return null;
+                }
+                return movieData;
+             } catch (error) {
+                  console.error("Error during movie data extraction:", error);
+                  return null;
+             }
+        }
+
+
+        // --- Firestore Helper Functions ---
+
+        // --- ADDED generateMovieNameVariations ---
+        function generateMovieNameVariations(name) {
+            if (!name) return [];
+            const variations = new Set();
+            const originalName = name.trim();
+            variations.add(originalName); // Add the original cleaned name first
+
+            // Normalize variations (e.g., remove extra spaces)
+            const normalize = (str) => str.replace(/\s+/g, ' ').trim();
+
+            // Padrão: Nome Base + #Número (no final)
+            const numberMatchHash = originalName.match(/^(.*?)\s*#(\d+)$/);
+            if (numberMatchHash) {
+                const baseName = normalize(numberMatchHash[1]);
+                const number = numberMatchHash[2];
+                variations.add(normalize(`${baseName} vol. ${number}`));
+                variations.add(normalize(`${baseName} Volume ${number}`)); // Case might matter in exact match
+                variations.add(normalize(`${baseName} volume ${number}`));
+                variations.add(normalize(`${baseName} v${number}`));
+                variations.add(normalize(`${baseName} v ${number}`)); // Add space variant
+                variations.add(normalize(`${baseName} ${number}`)); // Just number
+            }
+
+            // Padrão: Nome Base + vol./Volume/v + Número (no final)
+            const numberMatchVol = originalName.match(/^(.*?)\s*(?:vol\.?|volume|v)\s*(\d+)$/i); // Case-insensitive, flexible space
+            if (numberMatchVol) {
+                const baseName = normalize(numberMatchVol[1]);
+                const number = numberMatchVol[2];
+                variations.add(normalize(`${baseName} #${number}`));
+                variations.add(normalize(`${baseName} vol. ${number}`));
+                variations.add(normalize(`${baseName} Volume ${number}`));
+                variations.add(normalize(`${baseName} volume ${number}`));
+                variations.add(normalize(`${baseName} v${number}`));
+                variations.add(normalize(`${baseName} v ${number}`));
+                variations.add(normalize(`${baseName} ${number}`)); // Just number
+            }
+
+            // Add Roman numeral conversion if applicable (simple cases)
+             const romanMatch = originalName.match(/^(.*?)\s+([IVXLCDM]+)$/i);
+             if (romanMatch) {
+                 const baseName = normalize(romanMatch[1]);
+                 const roman = romanMatch[2].toUpperCase();
+                 // Basic conversion (you might need a more robust library for complex numerals)
+                 const romanMap = { I: 1, V: 5, X: 10 }; // Add more if needed
+                 let arabicNum = 0;
+                 // Very basic logic - add more sophisticated conversion if required
+                 if (roman === 'I') arabicNum = 1;
+                 else if (roman === 'II') arabicNum = 2;
+                 else if (roman === 'III') arabicNum = 3;
+                 else if (roman === 'IV') arabicNum = 4;
+                 else if (roman === 'V') arabicNum = 5;
+                 // ... add more common cases ...
+                 if (arabicNum > 0) {
+                      variations.add(normalize(`${baseName} #${arabicNum}`));
+                      variations.add(normalize(`${baseName} vol. ${arabicNum}`));
+                      variations.add(normalize(`${baseName} ${arabicNum}`));
+                 }
+             }
+             const arabicNumMatch = originalName.match(/^(.*?)(\d+)$/);
+             if (arabicNumMatch) {
+                  const baseName = normalize(arabicNumMatch[1]);
+                  const arabic = parseInt(arabicNumMatch[2], 10);
+                   // Basic arabic to roman
+                  const toRomanMap = { 1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V' }; // Add more
+                  if (toRomanMap[arabic]) {
+                       variations.add(normalize(`${baseName} ${toRomanMap[arabic]}`));
+                  }
+             }
+
+
+            // Limit variations for Firestore 'in' query (max 30, safer to use less)
+            const finalVariations = Array.from(variations).slice(0, 15); // Limit to 15
+            console.log(`Generated variations for "${name}":`, finalVariations);
+            return finalVariations;
+        }
+
+        // --- UPDATED findMovieIdByName ---
+        async function findMovieIdByName(movieName) {
+             if (!movieName) return null;
+
+             // Gera variações do nome
+             const variations = generateMovieNameVariations(movieName);
+             if (variations.length === 0) {
+                  console.log(`Could not generate variations for "${movieName}"`);
+                  return null; // Se não foi possível gerar variações válidas
+             }
+
+             console.log(`Searching for movie using variations:`, variations); // Log para depuração
+
+             try {
+                 // Usa a consulta 'in' com as variações geradas
+                 // Limitamos a 1 resultado, pois esperamos encontrar apenas um filme correspondente
+                 const q = query(collection(db, "filmes"), where("nome", "in", variations), limit(1));
+                 const querySnapshot = await getDocs(q);
+
+                 if (!querySnapshot.empty) {
+                     // Encontrou um filme que corresponde a uma das variações
+                     const movieDoc = querySnapshot.docs[0];
+                     console.log(`Found movie match: ID=${movieDoc.id}, Matched Name=${movieDoc.data().nome} (from search variations of "${movieName}")`);
+                     return movieDoc.id; // Retorna o ID do filme encontrado
+                 } else {
+                     console.log(`No movie found matching variations of "${movieName}"`);
+                     return null; // Nenhuma variação correspondeu a um filme no DB
+                 }
+             } catch (error) {
+                 console.error(`Error finding movie ID by name variations for "${movieName}":`, error);
+                 return null; // Erro durante a consulta
+             }
+        }
+
+        // --- ADDED findActorByName (essential helper) ---
+        async function findActorByName(actorName) {
+             if (!actorName) return null;
+             const trimmedName = actorName.trim(); // Ensure no leading/trailing spaces
+             if (!trimmedName) return null;
+
+             console.log(`Searching for actor with exact name: "${trimmedName}"`); // Log search term
+
+             try {
+                 const q = query(collection(db, "atores"), where("nome", "==", trimmedName), limit(1));
+                 const querySnapshot = await getDocs(q);
+                 if (!querySnapshot.empty) {
+                     const actorDoc = querySnapshot.docs[0];
+                     console.log(`Actor "${trimmedName}" found: ID=${actorDoc.id}`);
+                     return { id: actorDoc.id, nome: actorDoc.data().nome, foto: actorDoc.data().foto }; // Include photo
+                 } else {
+                     console.log(`Actor "${trimmedName}" not found via exact match.`);
+                     return null;
+                 }
+             } catch (error) {
+                 console.error(`Error finding actor by name "${trimmedName}":`, error);
+                 return null;
+             }
+        }
+
+
+        // --- Create Scene Modal ---
+        window.closeCreateSceneModal = function() {
+             if(createSceneModal) createSceneModal.style.display = 'none';
+             if(createSceneForm) createSceneForm.reset();
+             if (sceneFilmeIdInput) sceneFilmeIdInput.value = '';
+             if (sceneMovieDisplay) {
+                  sceneMovieDisplay.textContent = '';
+                  sceneMovieDisplay.className = 'info-display';
+             }
+             selectedSceneActors = [];
+             renderSceneActorPills(); // Assume handles null container
+             // Clear general form message and specific field errors
+             clearFormMessages([
+                 createSceneFormMessage,
+                 document.getElementById('scene-nome-error'),
+                 document.getElementById('scene-data-error'),
+                 document.getElementById('scene-filme-error'),
+                 document.getElementById('scene-atores-error')
+             ].filter(el => el)); // Filter out null elements before passing
+        }
+
+        // --- UPDATED openCreateSceneModal with debug logs and checks ---
+         async function openCreateSceneModal(sceneData) {
+             console.log(">>> START openCreateSceneModal"); // Log Adicional
+             if (!createSceneModal) { // Verifica se o elemento do modal existe
+                 console.error("Create Scene Modal element not found!");
+                 return; // Impede a execução se o modal não for encontrado
+             }
+             if (!sceneData) { // Verifica se os dados da cena foram passados
+                  console.error("Scene Data is missing in openCreateSceneModal!");
+                  // Poderia reabrir o modal anterior ou mostrar erro
+                  return;
+             }
+
+             // 1. Reset
+             if (createSceneForm) createSceneForm.reset(); // Verifica se o formulário existe antes de resetar
+             if (sceneFilmeIdInput) sceneFilmeIdInput.value = '';
+             if (sceneMovieDisplay) {
+                 sceneMovieDisplay.textContent = '';
+                 sceneMovieDisplay.className = 'info-display';
+             }
+             selectedSceneActors = [];
+             renderSceneActorPills(); // Assume que esta função lida com container nulo se necessário
+             // Limpa mensagens de erro específicas do formulário de cena
+             clearFormMessages([
+                createSceneFormMessage,
+                document.getElementById('scene-nome-error'),
+                document.getElementById('scene-data-error'),
+                document.getElementById('scene-filme-error'),
+                document.getElementById('scene-atores-error')
+             ].filter(el => el)); // Filtra elementos nulos antes de passar
+
+             // 2. Populate (Verifica se os inputs existem antes de atribuir)
+             if (sceneNomeInput) sceneNomeInput.value = sceneData.nome || '';
+             if (sceneDataInput) sceneDataInput.value = formatDateString(sceneData.dataRaw || '');
+             if (sceneNumeroInput) sceneNumeroInput.value = sceneData.numeroCena || '';
+
+             // 3. Lookups
+             const lookupPromises = [];
+             if (sceneData.filmeNome && sceneMovieDisplay && sceneFilmeIdInput) { // Verifica elementos relacionados
+                 sceneMovieDisplay.className = 'info-display loading';
+                 sceneMovieDisplay.textContent = `Procurando por filme "${sceneData.filmeNome}"...`;
+                 lookupPromises.push(
+                     findMovieIdByName(sceneData.filmeNome).then(movieId => {
+                         if (sceneMovieDisplay && sceneFilmeIdInput) { // Re-verifica dentro do then
+                             if (movieId) {
+                                 sceneMovieDisplay.textContent = `Filme encontrado: ${sceneData.filmeNome} (ID: ${movieId})`; // Mostra ID para debug
+                                 sceneMovieDisplay.className = 'info-display found';
+                                 sceneFilmeIdInput.value = movieId;
+                             } else {
+                                 sceneMovieDisplay.textContent = `Filme "${sceneData.filmeNome}" não encontrado.`;
+                                 sceneMovieDisplay.className = 'info-display not-found';
+                             }
+                         }
+                     }).catch(err => {
+                         console.error("Error during movie lookup:", err);
+                         if (sceneMovieDisplay) { // Verifica dentro do catch
+                             sceneMovieDisplay.textContent = 'Erro ao buscar filme.';
+                             sceneMovieDisplay.className = 'info-display error';
+                         }
+                     })
+                 );
+             } else if (sceneMovieDisplay) { // Apenas se o display existe
+                  sceneMovieDisplay.textContent = 'Nenhum nome de filme extraído ou campo não encontrado.';
+                  sceneMovieDisplay.className = 'info-display';
+             }
+
+             if (sceneData.potentialActorNames && sceneData.potentialActorNames.length > 0) {
+                 console.log("Looking up potential actors:", sceneData.potentialActorNames);
+                 sceneData.potentialActorNames.forEach(actorName => {
+                      // Ensure actorName is a non-empty string before searching
+                     if (typeof actorName === 'string' && actorName.trim()) {
+                          lookupPromises.push(
+                              findActorByName(actorName).then(actorInfo => { // findActorByName now handles logging
+                                  if (actorInfo) {
+                                      if (!selectedSceneActors.some(a => a.id === actorInfo.id)) {
+                                          selectedSceneActors.push(actorInfo);
+                                          console.log(`Pre-selected actor: ${actorInfo.nome} (ID: ${actorInfo.id})`);
+                                      }
+                                  } else {
+                                      // console.warn already happens in findActorByName if not found
+                                      // Optionally add specific log here if needed
+                                       console.log(`Actor "${actorName}" not found in Firestore for pre-selection (checked in openCreateSceneModal).`);
+                                  }
+                              }).catch(err => console.error(`Error looking up actor ${actorName}:`, err))
+                          );
+                      } else {
+                          console.warn("Skipping empty or invalid actor name:", actorName);
+                      }
+                 });
+             } else {
+                  console.log("No potential actor names extracted from text.");
+             }
+
+             // 4. Display
+             createSceneModal.style.display = 'flex'; // Mostra o modal
+
+             // 5. Wait & Update UI
+             try {
+                 await Promise.all(lookupPromises); // Espera todas as buscas (filme, atores)
+                 console.log("Finished all lookups.");
+                 renderSceneActorPills(); // Renderiza pills APÓS lookups completos
+             } catch (error) {
+                 console.error("Error waiting for lookups:", error);
+                 renderSceneActorPills(); // Tenta renderizar mesmo com erro
+             }
+
+             // 6. Focus (Verifica se o input existe)
+             if (sceneActorsSearchInput) {
+                  sceneActorsSearchInput.focus();
+             } else {
+                  console.warn("Scene actors search input not found for focus.");
+             }
+
+             console.log("<<< END openCreateSceneModal"); // Log Adicional
+        }
+
+        async function handleCreateSceneSubmit(event) {
+            event.preventDefault();
+            if (!createSceneForm || !createSceneSubmitButton) return;
+            let isValid = true;
+            // Clear previous messages
+             clearFormMessages([
+                 createSceneFormMessage,
+                 document.getElementById('scene-nome-error'),
+                 document.getElementById('scene-data-error'),
+                 document.getElementById('scene-filme-error'),
+                 document.getElementById('scene-atores-error')
+             ].filter(el => el));
+
+            const nome = sceneNomeInput?.value.trim();
+            const data = sceneDataInput?.value.trim();
+            const filmeId = sceneFilmeIdInput?.value || null; // Get movie ID
+            const nomeError = document.getElementById('scene-nome-error');
+            const dataError = document.getElementById('scene-data-error');
+            const atoresError = document.getElementById('scene-atores-error');
+
+            if (!nome && nomeError) { nomeError.textContent = 'Nome da cena é obrigatório.'; isValid = false; }
+            if (data && !/^\d{4}\/\d{2}\/\d{2}$/.test(data) && dataError) { dataError.textContent = 'Formato da data inválido (use YYYY/MM/DD).'; isValid = false; }
+            if (selectedSceneActors.length === 0 && atoresError) { atoresError.textContent = 'Selecione pelo menos um ator.'; isValid = false; }
+
+            if (!isValid && createSceneFormMessage) {
+                 createSceneFormMessage.textContent = 'Por favor, corrija os erros indicados.';
+                 if (createSceneSubmitButton) createSceneSubmitButton.disabled = false;
+                 return;
+            }
+
+            createSceneSubmitButton.disabled = true;
+            createSceneSubmitButton.textContent = 'Verificando...';
+
+            const firestoreData = { // Prepare data early for check
+                nome: nome,
+                data: data || null,
+                numeroCena: sceneNumeroInput ? (parseInt(sceneNumeroInput.value) || null) : null,
+                filmeId: filmeId,
+                imagem: sceneImagemInput?.value.trim() || null,
+                pagina: scenePaginaInput?.value.trim() || null,
+                atores: selectedSceneActors.map(a => a.id),
+                // timestamp: serverTimestamp() // Add timestamp later during actual save
+            };
+
+            // --- DUPLICATE CHECK ---
+            console.log(`Checking for duplicate scene: Name="${firestoreData.nome}", MovieID="${firestoreData.filmeId}"`);
+            try {
+                const duplicateQuery = query(
+                    collection(db, "cenas"),
+                    where("nome", "==", firestoreData.nome),
+                    where("filmeId", "==", firestoreData.filmeId),
+                    limit(1)
+                );
+                const duplicateSnapshot = await getDocs(duplicateQuery);
+
+                if (!duplicateSnapshot.empty) {
+                    const existingDocId = duplicateSnapshot.docs[0].id;
+                    console.warn(`Duplicate scene found: ID=${existingDocId}`);
+                    const errorMsg = `Já existe uma cena com o nome "${firestoreData.nome}"${firestoreData.filmeId ? ' associada a este filme' : ' sem filme associado'}.`;
+                    alert(errorMsg);
+                    if (createSceneFormMessage) createSceneFormMessage.textContent = errorMsg;
+                    createSceneSubmitButton.disabled = false;
+                    createSceneSubmitButton.textContent = 'Salvar Cena';
+                    return;
+                } else {
+                    console.log("No duplicate scene found. Proceeding with save.");
+                }
+
+            } catch (error) {
+                console.error("Error checking for duplicate scene:", error);
+                alert(`Erro ao verificar duplicados: ${error.message}`);
+                if (createSceneFormMessage) createSceneFormMessage.textContent = `Erro ao verificar duplicados: ${error.message}`;
+                createSceneSubmitButton.disabled = false;
+                createSceneSubmitButton.textContent = 'Salvar Cena';
+                return;
+            }
+            // --- END DUPLICATE CHECK ---
+
+            createSceneSubmitButton.textContent = 'Salvando Cena...'; // Update status
+
+            // Add timestamp just before saving scene
+            firestoreData.timestamp = serverTimestamp();
+
+            console.log("Saving Scene Data:", firestoreData);
+            try {
+                // 1. ADD SCENE DOCUMENT
+                const docRef = await addDoc(collection(db, "cenas"), firestoreData);
+                const newSceneId = docRef.id; // Get the ID of the newly created scene
+                console.log("Scene created successfully with ID:", newSceneId);
+                alert('Cena criada com sucesso!'); // Notify scene creation success first
+                allScenesCache.set(newSceneId, { ...firestoreData, timestamp: new Date() }); // Update cache
+
+                // 2. UPDATE MOVIE DOCUMENT (if filmeId exists)
+                if (firestoreData.filmeId) {
+                    createSceneSubmitButton.textContent = 'Atualizando Filme...'; // Update status
+                    console.log(`Attempting to update movie ${firestoreData.filmeId} with new scene ID ${newSceneId}`);
+                    const movieRef = doc(db, "filmes", firestoreData.filmeId); // Get reference to the movie doc
+                    try {
+                        // Use updateDoc and arrayUnion to add the new scene ID
+                        await updateDoc(movieRef, {
+                            cenas: arrayUnion(newSceneId)
+                        });
+                        console.log(`Successfully updated movie ${firestoreData.filmeId} with scene ${newSceneId}`);
+                        // Optional: maybe a second, more subtle notification? Or none.
+                        // alert('Filme associado atualizado com sucesso.');
+                    } catch (updateError) {
+                        // Log the specific error for failing to update the movie
+                        console.error(`Failed to update movie ${firestoreData.filmeId} with scene ${newSceneId}:`, updateError);
+                        // Inform user that the scene was created but linking failed
+                        alert(`A cena foi criada (ID: ${newSceneId}), mas houve um erro ao associá-la ao filme. Verifique o filme manualmente.`);
+                        // Don't stop the rest of the flow (like closing modal) just because linking failed
+                    }
+                } else {
+                    console.log("No associated movie ID found, skipping movie update.");
+                }
+
+                // 3. Close Modal & Refresh (after scene creation and movie update attempt)
+                closeCreateSceneModal();
+
+                if (currentMainActressId && firestoreData.atores.includes(currentMainActressId)) {
+                    console.log("New scene includes current main actress, refreshing content...");
+                    await loadAndDisplayRelatedContent(currentMainActressId);
+                }
+
+            } catch (error) { // Catch errors from the initial scene addDoc
+                console.error("Error creating scene:", error);
+                if(createSceneFormMessage) createSceneFormMessage.textContent = `Erro ao salvar cena: ${error.message}`;
+                alert(`Erro ao criar cena: ${error.message}`);
+                // Button re-enabled in finally block
+            } finally {
+                // Ensure button is always re-enabled
+                if (createSceneSubmitButton) {
+                      createSceneSubmitButton.disabled = false;
+                      createSceneSubmitButton.textContent = 'Salvar Cena';
+                }
+            }
+        }
+
+         // --- Scene Actor Selection Logic ---
+         function displaySceneActorSuggestions(searchTerm) {
+            if (!sceneActorsSuggestionsList || !sceneActorsSearchInput) return;
+            sceneActorsSuggestionsList.innerHTML = '';
+             if (!searchTerm || searchTerm.trim() === '') { sceneActorsSuggestionsList.style.display = 'none'; return; }
+             const lowerSearchTerm = searchTerm.toLowerCase();
+             // Search only within the main cached actress data
+             const matchedActresses = allActressesData.filter(actress =>
+                 (actress.nome || '').toLowerCase().includes(lowerSearchTerm) &&
+                 !selectedSceneActors.some(sa => sa.id === actress.id) // Exclude already selected
+             );
+
+             if (matchedActresses.length > 0) {
+                 matchedActresses.sort((a, b) => (a.nome || '').localeCompare(b.nome || '')).slice(0, 7).forEach(actress => {
+                     const item = document.createElement('div');
+                     item.classList.add('suggestion-item');
+                     item.dataset.id = actress.id;
+                     item.dataset.nome = actress.nome || '';
+                     const photoUrl = actress.foto || 'placeholder.png';
+                     item.innerHTML = `<img src="${photoUrl}" alt="" onerror="this.src='placeholder.png'; this.onerror=null;"><span>${actress.nome || 'Nome Ind.'}</span>`;
+                     item.addEventListener('click', () => handleSelectSceneActor(actress)); // Pass full object
+                     sceneActorsSuggestionsList.appendChild(item);
+                 });
+                 sceneActorsSuggestionsList.style.display = 'block';
+             } else {
+                 sceneActorsSuggestionsList.innerHTML = '<div class="suggestion-item no-results">Nenhuma atriz encontrada</div>';
+                 sceneActorsSuggestionsList.style.display = 'block';
+             }
+         }
+        function handleSelectSceneActor(actress) { // Accepts the full actress object
+            if (!actress || !actress.id || !actress.nome) return;
+            if (!selectedSceneActors.some(a => a.id === actress.id)) {
+                selectedSceneActors.push(actress); // Add the full object
+                renderSceneActorPills();
+                const errorEl = document.getElementById('scene-atores-error');
+                if (errorEl) errorEl.textContent = ''; // Clear error on selection
+            }
+            if (sceneActorsSearchInput) sceneActorsSearchInput.value = '';
+            if (sceneActorsSuggestionsList) sceneActorsSuggestionsList.style.display = 'none';
+            if (sceneActorsSearchInput) sceneActorsSearchInput.focus();
+        }
+        function renderSceneActorPills() {
+             if (!sceneSelectedActorsContainer) return;
+             sceneSelectedActorsContainer.innerHTML = '';
+             selectedSceneActors.forEach(actress => {
+                 const pill = document.createElement('div');
+                 pill.classList.add('scene-actor-pill');
+                 pill.dataset.id = actress.id;
+                 pill.innerHTML = `<span>${actress.nome}</span><button type="button" class="scene-remove-actor-btn" title="Remover">×</button>`;
+                 pill.querySelector('.scene-remove-actor-btn')?.addEventListener('click', handleRemoveSceneActor); // Optional chaining
+                 sceneSelectedActorsContainer.appendChild(pill);
+             });
+        }
+        function handleRemoveSceneActor(event) {
+             event.stopPropagation();
+             const pill = event.target.closest('.scene-actor-pill');
+             if (!pill) return;
+             const actressIdToRemove = pill.dataset.id;
+             selectedSceneActors = selectedSceneActors.filter(a => a.id !== actressIdToRemove);
+             renderSceneActorPills();
+             // Optionally refresh suggestions if input has text
+             if (sceneActorsSuggestionsList?.style.display === 'block' && sceneActorsSearchInput?.value) {
+                 displaySceneActorSuggestions(sceneActorsSearchInput.value);
+             }
+        }
+
+        // --- Create Movie Modal ---
+        window.closeCreateMovieModal = function() {
+             if(createMovieModal) createMovieModal.style.display = 'none';
+             if(createMovieForm) createMovieForm.reset();
+             // Clear general form message and specific field errors
+              clearFormMessages([
+                 createMovieFormMessage,
+                 document.getElementById('movie-nome-error'),
+                 document.getElementById('movie-ano-error')
+             ].filter(el => el)); // Filter out null elements
+        }
+
+        // --- UPDATED openCreateMovieModal with debug logs and checks ---
+        function openCreateMovieModal(movieData) {
+             console.log(">>> START openCreateMovieModal"); // Log Adicional
+             if (!createMovieModal) { // Verifica se o elemento do modal existe
+                 console.error("Create Movie Modal element not found!");
+                 return; // Impede a execução
+             }
+              if (!movieData) { // Verifica se os dados do filme foram passados
+                  console.error("Movie Data is missing in openCreateMovieModal!");
+                  return;
+             }
+
+             // Reset e Limpeza (Verifica elementos antes de usar)
+             if (createMovieForm) createMovieForm.reset();
+             clearFormMessages([
+                 createMovieFormMessage,
+                 document.getElementById('movie-nome-error'),
+                 document.getElementById('movie-ano-error')
+             ].filter(el => el)); // Filtra elementos nulos
+
+             // Populate (Verifica inputs antes de atribuir)
+             if (movieNomeInput) movieNomeInput.value = movieData.nome || '';
+             if (movieAnoInput) movieAnoInput.value = movieData.ano || '';
+             if (movieEstudioInput) movieEstudioInput.value = movieData.studio || '';
+             if (movieDuracaoInput) movieDuracaoInput.value = movieData.duracao || '';
+             // Limpa campos não preenchidos automaticamente
+             if (movieImagemInput) movieImagemInput.value = '';
+             if (moviePaginaInput) moviePaginaInput.value = '';
+
+             // Display
+             createMovieModal.style.display = 'flex';
+
+             // Focus (Verifica input antes de focar)
+             if (movieNomeInput) {
+                 movieNomeInput.focus();
+             } else {
+                 console.warn("Movie name input not found for focus.");
+             }
+
+             console.log("<<< END openCreateMovieModal"); // Log Adicional
+        }
+
+        async function handleCreateMovieSubmit(event) {
+             event.preventDefault();
+             if (!createMovieForm || !createMovieSubmitButton) return;
+             let isValid = true;
+             // Clear previous messages
+              clearFormMessages([
+                 createMovieFormMessage,
+                 document.getElementById('movie-nome-error'),
+                 document.getElementById('movie-ano-error')
+             ].filter(el => el));
+
+             const nome = movieNomeInput?.value.trim(); // Use optional chaining
+             const anoString = movieAnoInput?.value.trim();
+             const nomeError = document.getElementById('movie-nome-error');
+             const anoError = document.getElementById('movie-ano-error');
+             let ano = null;
+
+             if (!nome && nomeError) { nomeError.textContent = 'Nome do filme é obrigatório.'; isValid = false; }
+             if (anoString) { // Only validate if something was entered
+                  if (!/^\d{4}$/.test(anoString) && anoError) {
+                       anoError.textContent = 'Ano inválido (use YYYY).';
+                       isValid = false;
+                   } else if (/^\d{4}$/.test(anoString)) {
+                       ano = parseInt(anoString, 10);
+                       // Optional: Add range validation if needed (e.g., not before 1900)
+                       // if (ano < 1900 || ano > new Date().getFullYear() + 1) { ... }
+                   }
+             }
+             if (!isValid && createMovieFormMessage) { createMovieFormMessage.textContent = 'Por favor, corrija os erros indicados.'; return; }
+
+             createMovieSubmitButton.disabled = true; createMovieSubmitButton.textContent = 'Salvando...';
+
+             const firestoreData = {
+                 nome: nome,
+                 ano: ano, // Will be null if not entered or invalid
+                 estudio: movieEstudioInput?.value.trim() || null,
+                 duracao: movieDuracaoInput?.value.trim() || null,
+                 imagem: movieImagemInput?.value.trim() || null,
+                 pagina: moviePaginaInput?.value.trim() || null,
+                 cenas: [], // Initially empty, scenes are linked via the scene document
+                 timestamp: serverTimestamp()
+             };
+             console.log("Saving Movie Data:", firestoreData);
+             try {
+                 // Optional: Check if movie name already exists before saving
+                 const checkQuery = query(collection(db, "filmes"), where("nome", "==", firestoreData.nome), limit(1));
+                 const nameSnapshot = await getDocs(checkQuery);
+                 if (!nameSnapshot.empty) {
+                     if (nomeError) nomeError.textContent = `Filme "${firestoreData.nome}" já existe.`;
+                     alert(`Filme "${firestoreData.nome}" já existe.`);
+                     isValid = false;
+                 }
+
+                 if (!isValid) {
+                     createMovieSubmitButton.disabled = false;
+                     createMovieSubmitButton.textContent = 'Salvar Filme';
+                     return;
+                 }
+
+                 // Add the document if name doesn't exist
+                 const docRef = await addDoc(collection(db, "filmes"), firestoreData);
+                 console.log("Movie created successfully with ID:", docRef.id);
+                 alert('Filme criado com sucesso!');
+                 closeCreateMovieModal();
+                 // No direct list refresh needed here, maybe update a movie cache if implemented
+             } catch (error) {
+                 console.error("Error creating movie:", error);
+                 if(createMovieFormMessage) createMovieFormMessage.textContent = `Erro ao salvar: ${error.message}`;
+                 alert(`Erro ao criar filme: ${error.message}`);
+             } finally {
+                 if(createMovieSubmitButton) { // Check again
+                      createMovieSubmitButton.disabled = false;
+                      createMovieSubmitButton.textContent = 'Salvar Filme';
+                 }
+             }
         }
 
         // --- Event Listeners (Global Page) ---
         document.addEventListener('DOMContentLoaded', () => {
             loadInitialData();
-            // Modal Closes
-             if(contentModal) contentModal.addEventListener('click', (event) => { if (event.target === contentModal) closeModal(); });
-             if (comparisonModal) comparisonModal.addEventListener('click', (event) => { if (event.target === comparisonModal) closeComparisonModal(); });
-             if (createActressModal) createActressModal.addEventListener('click', (event) => { if (event.target === createActressModal) closeCreateActressModal(); });
+
+            // Modal Closes on Overlay Click
+            [contentModal, comparisonModal, createActressModal, pasteTextModal, createSceneModal, createMovieModal].forEach(modal => {
+                if (modal) {
+                     modal.addEventListener('click', (event) => {
+                         if (event.target === modal) {
+                             // Find the corresponding close function based on ID
+                             switch(modal.id) {
+                                 case 'content-modal': closeModal(); break;
+                                 case 'comparison-modal': closeComparisonModal(); break;
+                                 case 'create-actress-modal': closeCreateActressModal(); break;
+                                 case 'paste-text-modal': closePasteTextModal(); break;
+                                 case 'create-scene-modal': closeCreateSceneModal(); break;
+                                 case 'create-movie-modal': closeCreateMovieModal(); break;
+                             }
+                         }
+                     });
+                }
+            });
+
             // Filter Buttons
-            relatedFilterButtons.forEach(button => { button.addEventListener('click', () => { relatedFilterButtons.forEach(btn => btn.classList.remove('active')); button.classList.add('active'); activeRelatedFilter = button.dataset.filter; applyRelatedContentFilters(); }); });
-             // Related Search
-             if(relatedSearchInput) { relatedSearchInput.addEventListener('input', () => displayRelatedSuggestions(relatedSearchInput.value)); relatedSearchInput.addEventListener('focus', () => displayRelatedSuggestions(relatedSearchInput.value)); }
-             if(relatedSearchInputWrapper) { relatedSearchInputWrapper.addEventListener('click', (e) => { if (!e.target.closest('.related-actress-pill')) relatedSearchInput?.focus(); }); }
+            relatedFilterButtons.forEach(button => {
+                 button.addEventListener('click', () => {
+                     relatedFilterButtons.forEach(btn => btn.classList.remove('active'));
+                     button.classList.add('active');
+                     activeRelatedFilter = button.dataset.filter || 'all';
+                     applyRelatedContentFilters();
+                 });
+            });
+
+             // Related Search (Co-actress filter)
+             if(relatedSearchInput) {
+                  const debouncedRelatedSearch = debounce(() => displayRelatedSuggestions(relatedSearchInput.value), 300);
+                  relatedSearchInput.addEventListener('input', debouncedRelatedSearch);
+                  relatedSearchInput.addEventListener('focus', () => displayRelatedSuggestions(relatedSearchInput.value)); // Show on focus too
+             }
+             if(relatedSearchInputWrapper) {
+                  relatedSearchInputWrapper.addEventListener('click', (e) => {
+                       // Focus input if click is not on a pill's remove button
+                       if (!e.target.closest('.related-remove-actress-btn')) {
+                           relatedSearchInput?.focus();
+                       }
+                  });
+             }
+
              // Comparison Search
-             if (comparisonSearchInput) { comparisonSearchInput.addEventListener('input', () => displayComparisonSuggestions(comparisonSearchInput.value)); comparisonSearchInput.addEventListener('focus', () => displayComparisonSuggestions(comparisonSearchInput.value)); }
+             if (comparisonSearchInput) {
+                  const debouncedComparisonSearch = debounce(() => displayComparisonSuggestions(comparisonSearchInput.value), 300);
+                  comparisonSearchInput.addEventListener('input', debouncedComparisonSearch);
+                  comparisonSearchInput.addEventListener('focus', () => displayComparisonSuggestions(comparisonSearchInput.value));
+             }
+
              // FAB & Menu
              if (fabCreate) { fabCreate.addEventListener('click', toggleCreateMenu); }
              if (menuCreateActressBtn) { menuCreateActressBtn.addEventListener('click', openCreateActressModal); }
-             if (menuCreateMultimediaBtn) { menuCreateMultimediaBtn.addEventListener('click', openCreateMultimediaModal); }
+             if (menuCreateMultimediaBtn) { menuCreateMultimediaBtn.addEventListener('click', openPasteTextModal); }
+
+            // Paste Text Modal Analyze Button Listener
+            if (analyzePasteButton) {
+                analyzePasteButton.addEventListener('click', analyzePastedText);
+            }
+
+             // Create Scene Modal Listeners
+             if (createSceneForm) {
+                 createSceneForm.addEventListener('submit', handleCreateSceneSubmit);
+             }
+              if (sceneActorsSearchInput) {
+                  const debouncedSceneActorSearch = debounce(() => displaySceneActorSuggestions(sceneActorsSearchInput.value), 300);
+                  sceneActorsSearchInput.addEventListener('input', debouncedSceneActorSearch);
+                  sceneActorsSearchInput.addEventListener('focus', () => displaySceneActorSuggestions(sceneActorsSearchInput.value)); // Show on focus
+             }
+             if (sceneActorsSelector) {
+                  sceneActorsSelector.addEventListener('click', (e) => {
+                       // Focus input if click is not on pill's remove button or suggestions list
+                       if (!e.target.closest('.scene-remove-actor-btn') &&
+                           !e.target.closest('#scene-actors-suggestions-list')) {
+                           sceneActorsSearchInput?.focus();
+                       }
+                  });
+             }
+
+             // Create Movie Modal Listener
+             if (createMovieForm) {
+                 createMovieForm.addEventListener('submit', handleCreateMovieSubmit);
+             }
+
              // Global Click Listener (Hide Suggestions & Create Menu)
              document.addEventListener('click', (event) => {
-                 const isClickInsideRelatedSearch = relatedSearchInputWrapper?.contains(event.target); const isClickInsideRelatedSuggestions = relatedSuggestionsList?.contains(event.target);
-                 if (relatedSuggestionsList && !isClickInsideRelatedSearch && !isClickInsideRelatedSuggestions) { relatedSuggestionsList.style.display = 'none'; }
-                 const comparisonSearchArea = comparisonSearchInput?.closest('.comparison-search-area'); const isClickInsideComparisonSearch = comparisonSearchArea?.contains(event.target); const isClickInsideComparisonSuggestions = comparisonSuggestionsList?.contains(event.target);
-                 if (comparisonSuggestionsList && !isClickInsideComparisonSearch && !isClickInsideComparisonSuggestions) { comparisonSuggestionsList.style.display = 'none'; }
-                 const isClickInsideFab = fabCreate?.contains(event.target); const isClickInsideCreateMenu = createMenuPopup?.contains(event.target);
-                 if (createMenuPopup && !isClickInsideFab && !isClickInsideCreateMenu) { closeCreateMenu(); }
-             });
+                     // Hide Related Suggestions
+                     const isClickInsideRelatedSearchArea = relatedSearchInputWrapper?.contains(event.target);
+                     const isClickInsideRelatedSuggestions = relatedSuggestionsList?.contains(event.target);
+                     if (relatedSuggestionsList && !isClickInsideRelatedSearchArea && !isClickInsideRelatedSuggestions) {
+                          relatedSuggestionsList.style.display = 'none';
+                     }
+
+                     // Hide Comparison Suggestions
+                     const comparisonSearchArea = comparisonSearchInput?.closest('.comparison-search-area');
+                     const isClickInsideComparisonSearchArea = comparisonSearchArea?.contains(event.target);
+                     const isClickInsideComparisonSuggestions = comparisonSuggestionsList?.contains(event.target);
+                     if (comparisonSuggestionsList && !isClickInsideComparisonSearchArea && !isClickInsideComparisonSuggestions) {
+                          comparisonSuggestionsList.style.display = 'none';
+                     }
+
+                     // Hide Create Menu
+                     const isClickInsideFab = fabCreate?.contains(event.target);
+                     const isClickInsideCreateMenu = createMenuPopup?.contains(event.target);
+                     if (createMenuPopup && createMenuPopup.style.display === 'block' && !isClickInsideFab && !isClickInsideCreateMenu) {
+                          closeCreateMenu();
+                     }
+
+                     // Hide Scene Actor Suggestions
+                     const isClickInsideSceneActorSearchArea = sceneActorsSelector?.contains(event.target);
+                     const isClickInsideSceneActorSuggestions = sceneActorsSuggestionsList?.contains(event.target);
+                      if (sceneActorsSuggestionsList && !isClickInsideSceneActorSearchArea && !isClickInsideSceneActorSuggestions) {
+                         sceneActorsSuggestionsList.style.display = 'none';
+                      }
+                 });
         }); // End DOMContentLoaded
 
     </script>
 
-</body>
-</html>
+  </body>
+  </html>
