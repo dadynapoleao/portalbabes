@@ -76,6 +76,75 @@
         #content-message { grid-column: 1 / -1; font-size: 0.9em; padding: 10px; text-align: center; color: #555; font-style: italic; }
          #content-message.error { color: #a00; font-weight: bold; }
 
+        /* --- Similar Actresses Table Styles (NEW) --- */
+        #similar-actresses-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px; /* Ensure it doesn't stick to the elements above */
+            table-layout: fixed; /* Helps control column widths */
+        }
+
+        #similar-actresses-table th,
+        #similar-actresses-table td {
+            border-bottom: 1px solid #eee;
+            padding: 8px 5px;
+            text-align: left;
+            vertical-align: middle;
+            font-size: 0.9em;
+        }
+
+        #similar-actresses-table th {
+            background-color: #f8f8f8;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        #similar-actresses-table th.rank-col { width: 50px; text-align: center; }
+        #similar-actresses-table th.score-col { width: 65px; text-align: center;}
+        #similar-actresses-table th.actress-col { /* Takes remaining space */ }
+
+        #similar-actresses-table td.rank-col { text-align: center; font-weight: bold; font-size: 1.1em; color: #555; }
+        #similar-actresses-table td.score-col { text-align: center; font-weight: bold; color: #007bff; }
+
+        /* Style for the compact card inside the table cell */
+        .similar-actress-table-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            min-height: 45px; /* Ensure consistent row height */
+        }
+
+        .similar-actress-table-card:hover {
+            background-color: #f0f0f0;
+        }
+
+        .similar-actress-table-card img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 50%;
+            flex-shrink: 0;
+            border: 1px solid #ddd;
+        }
+
+        .similar-actress-table-card .name {
+            font-weight: bold;
+            font-size: 0.95em;
+            line-height: 1.2;
+             /* Allow text to wrap if needed */
+             word-break: break-word;
+             /* Optional: Limit lines if names get too long */
+             /* display: -webkit-box;
+             -webkit-line-clamp: 2;
+             -webkit-box-orient: vertical;
+             overflow: hidden; */
+        }
+        /* --- END: Similar Actresses Table Styles --- */
+
 
         /* --- Modal Styling (Shared) --- */
         .modal-overlay { position: fixed; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: 1000; display: none; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
@@ -414,6 +483,7 @@
                     <button class="related-filter-btn" data-filter="video">Vídeos</button>
                     <button class="related-filter-btn" data-filter="film">Filmes</button>
                     <button class="related-filter-btn" data-filter="scene">Cenas</button>
+                    <button class="related-filter-btn" data-filter="similar">Semelhantes</button> <!-- Added Button -->
                 </div>
                 <div class="related-actress-search-area">
                     <div class="related-search-input-wrapper">
@@ -424,8 +494,9 @@
                 </div>
             </div>
             <h2 class="related-title">Conteúdo Relacionado</h2>
-            <div id="content-cards"></div>
-            <div id="content-message" style="display: none;"></div>
+             <!-- Container for Cards OR Table -->
+            <div id="content-cards" style="overflow-y: auto; flex-grow: 1;"></div>
+            <div id="content-message" style="display: none; grid-column: 1 / -1;"></div>
         </div>
     </div>
 
@@ -754,18 +825,18 @@
         // --- Imports ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import {
-            getFirestore, collection, getDocs, doc, getDoc, addDoc,
+            getFirestore, collection, getDocs, doc, getDoc, addDoc, documentId,
             query, where, limit, serverTimestamp, updateDoc, arrayUnion
         } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         // --- Firebase Config ---
         const firebaseConfig = {
-            apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0",
-            authDomain: "babes-392fd.firebaseapp.com",
-            projectId: "babes-392fd",
-            storageBucket: "babes-392fd.appspot.com",
-            messagingSenderId: "376795361631",
-            appId: "1:376795361631:web:d662f2b2f2cd23b115c6ea"
+           apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0",
+           authDomain: "babes-392fd.firebaseapp.com",
+           projectId: "babes-392fd",
+           storageBucket: "babes-392fd.appspot.com",
+           messagingSenderId: "376795361631",
+           appId: "1:376795361631:web:d662f2b2f2cd23b115c6ea"
         };
 
         // --- Initialize Firebase ---
@@ -789,7 +860,7 @@
         const comparisonPlaceholder = document.getElementById('comparison-placeholder');
         const createActressModal = document.getElementById('create-actress-modal');
         const createActressModalBody = document.getElementById('create-actress-modal-body');
-        const relatedFilterButtons = document.querySelectorAll('.related-filter-btn');
+        const relatedFilterButtonsContainer = document.querySelector('.related-filter-buttons'); // Get the container
         const relatedSearchInput = document.getElementById('related-search-input');
         const relatedSuggestionsList = document.getElementById('related-suggestions-list');
         const relatedSelectedActressesContainer = document.getElementById('related-selected-actresses');
@@ -865,7 +936,6 @@
         let popupsOpen = 0;
         let actressesToCompare = [];
         let comparisonContextActressIds = [];
-        // let createFormInitialized = false; // No longer needed if form is always regenerated
         let selectedSceneActors = [];
         let selectedVideoActors = [];
         let activeActressFilters = {};
@@ -1272,12 +1342,19 @@
              mainContainer.classList.add('details-visible');
              actressDetailsContainer.innerHTML = '<div class="loading">Carregando detalhes...</div>'; contentCardsContainer.innerHTML = ''; displayMessage(contentMessage, 'Carregando conteúdo...');
              selectedRelatedActresses = []; activeRelatedFilter = 'all'; if(relatedSearchInput) relatedSearchInput.value = ''; renderRelatedActressPills();
-             relatedFilterButtons.forEach(btn => btn.classList.remove('active')); document.querySelector('.related-filter-btn[data-filter="all"]')?.classList.add('active');
+
+             // Reset filter buttons and activate "Todos"
+             const allFilterButtons = relatedFilterButtonsContainer?.querySelectorAll('.related-filter-btn');
+             if(allFilterButtons) {
+                allFilterButtons.forEach(btn => btn.classList.remove('active'));
+                relatedFilterButtonsContainer.querySelector('.related-filter-btn[data-filter="all"]')?.classList.add('active');
+             }
+
              try {
                  let actressData = allActressesData.find(a => a.id === actressId);
                  if (!actressData) { const actressDoc = await getDoc(doc(db, "atores", actressId)); if (actressDoc.exists()) { actressData = { id: actressId, ...actressDoc.data() }; allActressesData.push(actressData); allActressesData.sort((a, b) => (a.nome || '').localeCompare(b.nome || '')); filterAndRenderActressList(); } }
                  if (actressData) { displayMainActressDetails(actressData); } else { actressDetailsContainer.innerHTML = '<div class="error">Detalhes não encontrados.</div>'; }
-                 await loadAndDisplayRelatedContent(actressId);
+                 await loadAndDisplayRelatedContent(actressId); // Load default related content ("Todos")
              } catch (error) { console.error(`Erro ao carregar dados da atriz ${actressId}: `, error); actressDetailsContainer.innerHTML = '<div class="error">Erro ao carregar detalhes.</div>'; displayMessage(contentMessage,'Erro ao carregar conteúdo.', true); }
         }
         function displayMainActressDetails(data) {
@@ -1363,18 +1440,40 @@
                  });
                  allScenesCache.forEach((sceneData, sceneId) => { const sceneActors = sceneData.atores || []; if (Array.isArray(sceneActors) && sceneActors.includes(mainActressId)) { if (!allRelatedContent.some(item => item.id === sceneId && item.type === 'scene')) { /* console.log(`      >> CENA (do cache) ADICIONADA: ${sceneId}`); */ allRelatedContent.push({ id: sceneId, type: 'scene', ...sceneData }); } } });
                  // console.log(`   Total de itens (${allRelatedContent.length}) coletados ANTES de aplicar filtros:`, allRelatedContent.map(item => `${item.type}:${item.id}`));
-                 applyRelatedContentFilters();
+                 applyRelatedContentFilters(); // Apply the currently active filter (which should be 'all' initially after selecting an actress)
              } catch (error) { console.error("Erro detalhado ao buscar conteúdo relacionado: ", error); displayMessage(contentMessage, 'Erro ao carregar conteúdo relacionado.', true); }
              // console.log(`<<< Finalizando loadAndDisplayRelatedContent para Atriz ID: ${mainActressId}`);
         }
         function applyRelatedContentFilters() {
+            // This function now ONLY handles the 'all', 'video', 'film', 'scene' filters
+            if (activeRelatedFilter === 'similar') {
+                // Do nothing here, as displaySimilarActresses handles this case separately
+                return;
+            }
+
             if (!contentCardsContainer || !contentMessage) return;
              contentCardsContainer.innerHTML = ''; clearMessage(contentMessage);
+             // Ensure grid display is active for content cards
+             contentCardsContainer.style.display = 'grid';
+
              const relatedActressIds = selectedRelatedActresses.map(a => a.id);
-             filteredRelatedContent = allRelatedContent.filter(item => { if (activeRelatedFilter !== 'all' && item.type !== activeRelatedFilter) return false; if (relatedActressIds.length > 0) { if (!item.atores || !Array.isArray(item.atores)) return false; if (!relatedActressIds.every(relId => item.atores.includes(relId))) return false; } return true; });
+             filteredRelatedContent = allRelatedContent.filter(item => {
+                 if (activeRelatedFilter !== 'all' && item.type !== activeRelatedFilter) return false;
+                 if (relatedActressIds.length > 0) {
+                     if (!item.atores || !Array.isArray(item.atores)) return false;
+                     if (!relatedActressIds.every(relId => item.atores.includes(relId))) return false;
+                 }
+                 return true;
+             });
+
              filteredRelatedContent.sort((a, b) => { const timestampA = getItemTimestampForSort(a); const timestampB = getItemTimestampForSort(b); if (timestampA === null && timestampB === null) { return (a.nome || '').localeCompare(b.nome || ''); } else if (timestampA === null) { return 1; } else if (timestampB === null) { return -1; } const dateDifference = timestampB - timestampA; if (dateDifference !== 0) { return dateDifference; } return (a.nome || '').localeCompare(b.nome || ''); });
-             if (filteredRelatedContent.length > 0) { filteredRelatedContent.forEach(item => createContentCard(item.imagem, item.nome, item.type, item.id)); }
-             else { displayMessage(contentMessage, 'Nenhum conteúdo encontrado com os filtros aplicados.'); }
+
+             if (filteredRelatedContent.length > 0) {
+                 filteredRelatedContent.forEach(item => createContentCard(item.imagem, item.nome, item.type, item.id));
+             }
+             else {
+                 displayMessage(contentMessage, 'Nenhum conteúdo encontrado com os filtros aplicados.');
+             }
         }
         function createContentCard(imageUrl, title, type, id) {
             if (!contentCardsContainer) return;
@@ -1432,12 +1531,82 @@
             }
              relatedSuggestionsList.style.display = 'block';
         }
+        // --- NEW FUNCTION for click ---
+        function displayInitialRelatedSuggestionsOnClick() {
+            if (!relatedSuggestionsList || !relatedSearchInput || !currentMainActressId) {
+                if (relatedSuggestionsList) relatedSuggestionsList.style.display = 'none';
+                return;
+            }
+
+            // --- Gather unique co-actress IDs from currently filtered content ---
+            const allCoActressIds = new Set();
+            // Use filteredRelatedContent which respects the main filter (Todos, Video, etc.)
+            // BUT if 'similar' is active, there's no relevant co-actress context.
+            if (activeRelatedFilter === 'similar') {
+                 const noResults = document.createElement('div');
+                 noResults.classList.add('suggestion-item', 'no-results');
+                 noResults.textContent = 'Filtro por co-atriz não aplicável';
+                 relatedSuggestionsList.innerHTML = '';
+                 relatedSuggestionsList.appendChild(noResults);
+                 relatedSuggestionsList.style.display = 'block';
+                 return;
+            }
+
+            filteredRelatedContent.forEach(item => {
+                if (item.atores && Array.isArray(item.atores)) {
+                    item.atores.forEach(actorId => {
+                        if (actorId !== currentMainActressId) { // Exclude the main actress
+                            allCoActressIds.add(actorId);
+                        }
+                    });
+                }
+            });
+
+            const alreadySelectedIds = selectedRelatedActresses.map(a => a.id);
+            const coActressesToShow = [];
+
+            allCoActressIds.forEach(actressId => {
+                // Exclude already selected co-actresses
+                if (!alreadySelectedIds.includes(actressId)) {
+                    const actressData = allActressesData.find(a => a.id === actressId);
+                    if (actressData) {
+                        coActressesToShow.push(actressData);
+                    }
+                }
+            });
+
+            // Sort alphabetically
+            coActressesToShow.sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
+
+            // --- Populate the suggestions list ---
+            relatedSuggestionsList.innerHTML = ''; // Clear previous suggestions
+
+            if (coActressesToShow.length > 0) {
+                coActressesToShow.forEach(actress => {
+                    const item = document.createElement('div');
+                    item.classList.add('suggestion-item');
+                    item.innerHTML = `
+                        <img src="${actress.foto || 'placeholder.png'}" alt="${actress.nome}" onerror="this.src='placeholder.png';">
+                        <span>${actress.nome}</span>
+                    `;
+                    item.addEventListener('click', () => handleSelectRelatedActress(actress)); // Reuse existing handler
+                    relatedSuggestionsList.appendChild(item);
+                });
+            } else {
+                const noResults = document.createElement('div');
+                noResults.classList.add('suggestion-item', 'no-results');
+                noResults.textContent = 'Nenhuma co-atriz encontrada neste conteúdo';
+                relatedSuggestionsList.appendChild(noResults);
+            }
+
+            relatedSuggestionsList.style.display = 'block'; // Show the list
+        }
         function handleSelectRelatedActress(actress) {
-             if (!actress || !actress.id) return;
+             if (!actress || !actress.id || activeRelatedFilter === 'similar') return; // Don't add if in similar mode
              if (!selectedRelatedActresses.some(a => a.id === actress.id)) {
                  selectedRelatedActresses.push(actress);
                  renderRelatedActressPills();
-                 applyRelatedContentFilters(); // Re-filter content
+                 applyRelatedContentFilters(); // Re-filter content (will ignore if 'similar')
                  if (relatedSearchInput) relatedSearchInput.value = '';
                  if (relatedSuggestionsList) relatedSuggestionsList.style.display = 'none';
                  if (relatedSearchInput) relatedSearchInput.focus();
@@ -1457,6 +1626,11 @@
                 pill.querySelector('.related-remove-actress-btn').addEventListener('click', handleRemoveRelatedActress);
                 relatedSelectedActressesContainer.appendChild(pill);
             });
+            // Disable input if in 'similar' mode
+            if (relatedSearchInput) {
+                relatedSearchInput.disabled = (activeRelatedFilter === 'similar');
+                relatedSearchInput.placeholder = (activeRelatedFilter === 'similar') ? 'Não aplicável' : 'Filtrar por co-atriz...';
+            }
         }
         function handleRemoveRelatedActress(event) {
             const button = event.target;
@@ -1465,9 +1639,242 @@
                 const actressIdToRemove = pill.dataset.id;
                 selectedRelatedActresses = selectedRelatedActresses.filter(a => a.id !== actressIdToRemove);
                 renderRelatedActressPills();
-                applyRelatedContentFilters(); // Re-filter content
+                applyRelatedContentFilters(); // Re-filter content (will ignore if 'similar')
             }
         }
+
+        // --- Similarity Calculation ---
+        const SIMILARITY_WEIGHTS = {
+            altura: 15,      // Height
+            peso: 15,        // Weight
+            age: 10,         // Age difference
+            corCabelo: 10,   // Hair Color (Exact match)
+            corOlhos: 10,    // Eye Color (Exact match)
+            etnia: 15,       // Ethnicity (Exact match)
+            pais: 5,         // Country (Exact match)
+            tipoCorpo: 10,   // Body Type (Exact match)
+            measurements: 10,// Combined score for B/W/H difference
+            // Add nota if desired: nota: 5,
+        };
+        const MAX_SIMILARITY_SCORE = Object.values(SIMILARITY_WEIGHTS).reduce((sum, w) => sum + w, 0);
+
+        function safeParseInt(value) {
+            if (value === null || value === undefined || value === '') return null;
+            const parsed = parseInt(String(value).trim(), 10);
+            return isNaN(parsed) ? null : parsed;
+        }
+
+        function safeStringCompare(strA, strB) {
+            if (strA === null || strA === undefined || strB === null || strB === undefined) return false;
+            return String(strA).trim().toLowerCase() === String(strB).trim().toLowerCase();
+        }
+
+        function calculateSimilarity(actressA, actressB) {
+            if (!actressA || !actressB || actressA.id === actressB.id) {
+                return 0;
+            }
+
+            let currentScore = 0;
+
+            // --- Numerical Comparisons (Height, Weight, Age) ---
+            const calculateNumericSimilarity = (key, weight, maxDifferencePenalty) => {
+                const valA = key === 'age' ? calculateAge(actressA.dataNascimento) : safeParseInt(actressA[key]);
+                const valB = key === 'age' ? calculateAge(actressB.dataNascimento) : safeParseInt(actressB[key]);
+
+                if (valA === null || valB === null || valA === '?' || valB === '?') return 0; // Cannot compare if data missing or invalid age
+
+                const diff = Math.abs(valA - valB);
+                let score = weight - (diff / maxDifferencePenalty) * weight;
+                return Math.max(0, score); // Clamp score at 0
+            };
+
+            currentScore += calculateNumericSimilarity('altura', SIMILARITY_WEIGHTS.altura, 20); // Max penalty over 20cm diff
+            currentScore += calculateNumericSimilarity('peso', SIMILARITY_WEIGHTS.peso, 15); // Max penalty over 15kg diff
+            currentScore += calculateNumericSimilarity('age', SIMILARITY_WEIGHTS.age, 10); // Max penalty over 10 years diff
+
+            // --- Categorical Comparisons (Hair, Eyes, Ethnicity, Country, Body Type) ---
+            const calculateCategoricalSimilarity = (key, weight) => {
+                 // Handle potential variations in ethnicity, hair, eyes - simple exact match for now
+                 if (safeStringCompare(actressA[key], actressB[key])) {
+                     return weight;
+                 }
+                 return 0;
+            };
+
+            currentScore += calculateCategoricalSimilarity('corCabelo', SIMILARITY_WEIGHTS.corCabelo);
+            currentScore += calculateCategoricalSimilarity('corOlhos', SIMILARITY_WEIGHTS.corOlhos);
+            currentScore += calculateCategoricalSimilarity('etnia', SIMILARITY_WEIGHTS.etnia);
+            currentScore += calculateCategoricalSimilarity('pais', SIMILARITY_WEIGHTS.pais);
+            currentScore += calculateCategoricalSimilarity('tipoCorpo', SIMILARITY_WEIGHTS.tipoCorpo);
+
+
+            // --- Measurements Comparison (B/W/H using individual fields) ---
+            const calculateMeasurementSimilarity = (weight) => {
+                const parseMeasure = (act) => ({
+                    b: safeParseInt(act.Boobs),
+                    w: safeParseInt(act.Waist),
+                    a: safeParseInt(act.Ass)
+                });
+                const mA = parseMeasure(actressA);
+                const mB = parseMeasure(actressB);
+
+                let measureScore = 0;
+                let comparableParts = 0;
+                const maxDiffPerPart = 5; // Max penalty difference (e.g., inches/cm)
+
+                if (mA.b !== null && mB.b !== null) {
+                    comparableParts++;
+                    measureScore += Math.max(0, (weight/3) - (Math.abs(mA.b - mB.b) / maxDiffPerPart) * (weight/3));
+                }
+                if (mA.w !== null && mB.w !== null) {
+                     comparableParts++;
+                     measureScore += Math.max(0, (weight/3) - (Math.abs(mA.w - mB.w) / maxDiffPerPart) * (weight/3));
+                }
+                 if (mA.a !== null && mB.a !== null) {
+                     comparableParts++;
+                     measureScore += Math.max(0, (weight/3) - (Math.abs(mA.a - mB.a) / maxDiffPerPart) * (weight/3));
+                 }
+
+                 // Optional: Give bonus if the 'medidas' string matches exactly?
+                 if (comparableParts > 0 && safeStringCompare(actressA.medidas, actressB.medidas)) {
+                    measureScore = weight; // Max score if string matches and parts were comparable
+                 } else if (comparableParts < 3 && comparableParts > 0) {
+                     // Scale score slightly if only some parts were comparable but string didn't match
+                     measureScore = measureScore * (3 / comparableParts); // Normalize back roughly
+                 } else if (comparableParts === 0) {
+                    return 0; // No measurements comparable
+                 }
+
+                 return Math.max(0, Math.min(weight, measureScore)); // Clamp final score
+            };
+
+            currentScore += calculateMeasurementSimilarity(SIMILARITY_WEIGHTS.measurements);
+
+            // --- Normalization (Optional but good practice) ---
+            // Since weights sum to 100, the score is already roughly normalized.
+            // If weights change, use: return (currentScore / MAX_SIMILARITY_SCORE) * 100;
+            return Math.max(0, Math.min(100, currentScore)); // Ensure score is strictly 0-100
+        }
+
+        // --- Function to display similar actresses (MODIFIED) ---
+        async function displaySimilarActresses() {
+            if (!currentMainActressId || !contentCardsContainer || !contentMessage) {
+                console.error("Cannot display similar actresses: Missing required elements or selected actress.");
+                return;
+            }
+
+            const mainActress = allActressesData.find(a => a.id === currentMainActressId);
+            if (!mainActress) {
+                contentCardsContainer.innerHTML = ''; // Clear container
+                displayMessage(contentMessage, 'Atriz principal não encontrada para comparação.', true);
+                return;
+            }
+
+            // Clear previous content and show loading message
+            contentCardsContainer.innerHTML = '';
+            contentCardsContainer.style.display = 'block'; // Ensure container is block for table
+            displayMessage(contentMessage, 'Calculando similaridade...');
+
+            // Introduce a small delay to allow the "Loading..." message to render
+            await new Promise(resolve => setTimeout(resolve, 50));
+
+            const similarActresses = [];
+            allActressesData.forEach(otherActress => {
+                if (otherActress.id !== currentMainActressId) {
+                    const score = calculateSimilarity(mainActress, otherActress);
+                    if (score > 0) { // Only consider actresses with some similarity
+                        similarActresses.push({ actress: otherActress, score: score });
+                    }
+                }
+            });
+
+            // Sort by score descending
+            similarActresses.sort((a, b) => b.score - a.score);
+
+            // Get top 10
+            const topSimilar = similarActresses.slice(0, 10);
+
+            // Clear loading message
+            clearMessage(contentMessage);
+
+            // --- Build the Table ---
+            if (topSimilar.length > 0) {
+                const table = document.createElement('table');
+                table.id = 'similar-actresses-table';
+
+                // Table Header
+                const thead = table.createTHead();
+                const headerRow = thead.insertRow();
+                headerRow.innerHTML = `
+                    <th class="rank-col">#</th>
+                    <th class="actress-col">Atriz</th>
+                    <th class="score-col">Score</th>
+                `;
+
+                // Table Body
+                const tbody = table.createTBody();
+                topSimilar.forEach((item, index) => {
+                    const rank = index + 1;
+                    const tableRow = createSimilarActressTableRow(item.actress, item.score, rank); // Use new function
+                    tbody.appendChild(tableRow);
+                });
+
+                contentCardsContainer.appendChild(table); // Add table to the container
+            } else {
+                displayMessage(contentMessage, 'Nenhuma atriz semelhante encontrada.');
+            }
+        }
+
+        // --- NEW Function to create a table row for a similar actress ---
+        function createSimilarActressTableRow(actress, score, rank) {
+            const row = document.createElement('tr');
+
+            // Rank Cell
+            const rankCell = row.insertCell();
+            rankCell.classList.add('rank-col');
+            rankCell.textContent = rank;
+
+            // Actress Cell (with embedded card)
+            const actressCell = row.insertCell();
+            actressCell.classList.add('actress-col');
+
+            const cardDiv = document.createElement('div');
+            cardDiv.classList.add('similar-actress-table-card');
+            cardDiv.dataset.id = actress.id; // Store ID for click handler
+
+            const img = document.createElement('img');
+            img.src = actress.foto || 'placeholder.png';
+            img.alt = actress.nome || 'Atriz';
+            img.onerror = () => { img.src = 'placeholder.png'; img.onerror = null; };
+
+            const nameSpan = document.createElement('span');
+            nameSpan.classList.add('name');
+            nameSpan.textContent = actress.nome || 'Nome Indisponível';
+
+            cardDiv.appendChild(img);
+            cardDiv.appendChild(nameSpan);
+
+            // Add click listener to the cardDiv inside the cell
+            cardDiv.addEventListener('click', () => {
+                const mainListItem = actressListUl.querySelector(`.actress-item[data-id="${actress.id}"]`);
+                if (mainListItem) {
+                    mainListItem.click(); // Simulate click on the main list item
+                    mainListItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else {
+                    console.warn(`List item for similar actress ${actress.id} not found.`);
+                }
+            });
+
+            actressCell.appendChild(cardDiv); // Add the card to the cell
+
+            // Score Cell
+            const scoreCell = row.insertCell();
+            scoreCell.classList.add('score-col');
+            scoreCell.textContent = `${score.toFixed(0)}%`; // Show score as percentage
+
+            return row;
+        }
+
 
         // --- Content Detail Modal Functions ---
         async function showContentDetails(type, id) {
@@ -1570,7 +1977,8 @@
                      const MAX_IN_QUERY_SIZE = 30;
                      for (let i = 0; i < idsToFetch.length; i += MAX_IN_QUERY_SIZE) {
                          const chunkIds = idsToFetch.slice(i, i + MAX_IN_QUERY_SIZE);
-                         const q = query(collection(db, "atores"), where(document.Id(), 'in', chunkIds)); // Note: document.Id() might vary per SDK version, check docs if needed
+                         // Use documentId() for 'in' queries on document IDs
+                         const q = query(collection(db, "atores"), where(documentId(), 'in', chunkIds));
                          const querySnapshot = await getDocs(q);
                          querySnapshot.forEach(docSnap => {
                              fetchedActresses.push({ id: docSnap.id, ...docSnap.data() });
@@ -1629,7 +2037,7 @@
                      const MAX_IN_QUERY_SIZE = 30;
                      for (let i = 0; i < idsToFetch.length; i += MAX_IN_QUERY_SIZE) {
                          const chunkIds = idsToFetch.slice(i, i + MAX_IN_QUERY_SIZE);
-                         const q = query(collection(db, "cenas"), where(document.Id(), 'in', chunkIds));
+                         const q = query(collection(db, "cenas"), where(documentId(), 'in', chunkIds));
                          const querySnapshot = await getDocs(q);
                          querySnapshot.forEach(docSnap => {
                              allScenesCache.set(docSnap.id, docSnap.data());
@@ -1674,17 +2082,17 @@
         window.closeModal = function() { if (contentModal) contentModal.style.display = 'none'; };
 
         // --- Movable Actress Popup Functions ---
-        function createActressPopup(actressId, contextActressIds = []) { /* ... (implementation remains the same) ... */ }
-        function populateActressPopup(popupElement, data) { /* ... (implementation remains the same) ... */ }
-        function makeDraggable(element) { /* ... (implementation remains the same) ... */ }
+        function createActressPopup(actressId, contextActressIds = []) { /* ... (implementation remains the same - omitted for brevity) ... */ }
+        function populateActressPopup(popupElement, data) { /* ... (implementation remains the same - omitted for brevity) ... */ }
+        function makeDraggable(element) { /* ... (implementation remains the same - omitted for brevity) ... */ }
 
         // --- Comparison Modal Functions ---
-        function openComparisonModal(contextIds = []) { /* ... (implementation remains the same) ... */ }
-        window.closeComparisonModal = function() { /* ... (implementation remains the same) ... */ };
-        function displayComparisonSuggestions(searchTerm) { /* ... (implementation remains the same) ... */ }
-        function handleSelectActressForComparison(actressId) { /* ... (implementation remains the same) ... */ }
-        function removeActressFromComparison(actressId) { /* ... (implementation remains the same) ... */ }
-        function renderComparisonView() { /* ... (implementation remains the same) ... */ }
+        function openComparisonModal(contextIds = []) { /* ... (implementation remains the same - omitted for brevity) ... */ }
+        window.closeComparisonModal = function() { /* ... (implementation remains the same - omitted for brevity) ... */ };
+        function displayComparisonSuggestions(searchTerm) { /* ... (implementation remains the same - omitted for brevity) ... */ }
+        function handleSelectActressForComparison(actressId) { /* ... (implementation remains the same - omitted for brevity) ... */ }
+        function removeActressFromComparison(actressId) { /* ... (implementation remains the same - omitted for brevity) ... */ }
+        function renderComparisonView() { /* ... (implementation remains the same - omitted for brevity) ... */ }
 
         // --- FAB and Create Menu/Modal Functions ---
         function toggleCreateMenu() { if (createMenuPopup) { const isVisible = createMenuPopup.style.display === 'block'; createMenuPopup.style.display = isVisible ? 'none' : 'block'; } }
@@ -1742,7 +2150,7 @@
                         <input type="text" id="body_type" name="body_type">
                     </div>
                     <div class="form-card">
-                        <label for="measurements">Measurements (Ex: 34-24-35):</label>
+                        <label for="measurements">Measurements (Ex: 34-26-38):</label>
                         <input type="text" id="measurements" name="measurements">
                     </div>
                     <div class="form-card">
@@ -1862,7 +2270,8 @@
                         else { firestoreData[firestoreKey] = trimmedValue; }
                     }
                 }
-                firestoreData.timestamp = serverTimestamp();
+                firestoreData.timestamp = serverTimestamp(); // Use serverTimestamp for consistency
+                firestoreData.createdAt = serverTimestamp(); // Add createdAt field
                 // console.log("Saving actress data:", firestoreData);
 
                 // Save to Firestore
@@ -1872,6 +2281,7 @@
                 // Update local cache & UI
                 const newActressForCache = formDataToObject(formData); // Use helper for cache consistency
                 newActressForCache.id = docRef.id; // Add the new ID
+                newActressForCache.createdAt = new Date(); // Approximate timestamp for immediate display
                 allActressesData.push(newActressForCache);
                 allActressesData.sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
                 filterAndRenderActressList();
@@ -2061,27 +2471,451 @@
         }
 
         // --- Create Scene Modal ---
-        window.closeCreateSceneModal = function() { /* ... (implementation remains the same) ... */ }
-        async function openCreateSceneModal(sceneData) { /* ... (implementation remains the same) ... */ }
-        async function handleCreateSceneSubmit(event) { /* ... (implementation remains the same) ... */ }
-        function displaySceneActorSuggestions(searchTerm) { /* ... (implementation remains the same) ... */ }
-        function handleSelectSceneActor(actress) { /* ... (implementation remains the same) ... */ }
-        function renderSceneActorPills() { /* ... (implementation remains the same) ... */ }
-        function handleRemoveSceneActor(event) { /* ... (implementation remains the same) ... */ }
+        window.closeCreateSceneModal = function() { if(createSceneModal) createSceneModal.style.display = 'none'; }
+        async function openCreateSceneModal(sceneData = {}) {
+            closeCreateMenu();
+            if (!createSceneModal || !createSceneForm) return;
+
+            createSceneForm.reset();
+            selectedSceneActors = [];
+            renderSceneActorPills();
+            clearFormMessages([
+                createSceneFormMessage,
+                createSceneForm.querySelector('#scene-nome-error'),
+                createSceneForm.querySelector('#scene-data-error'),
+                createSceneForm.querySelector('#scene-filme-error'),
+                createSceneForm.querySelector('#scene-imagem-error'),
+                createSceneForm.querySelector('#scene-pagina-error'),
+                createSceneForm.querySelector('#scene-atores-error')
+            ]);
+            if(createSceneSubmitButton) createSceneSubmitButton.disabled = false;
+
+            // Pre-fill from extracted data
+            if (sceneData.nome && sceneNomeInput) sceneNomeInput.value = sceneData.nome;
+            if (sceneData.dataRaw && sceneDataInput) sceneDataInput.value = formatDateString(sceneData.dataRaw) || sceneData.dataRaw; // Format if possible
+
+            if (sceneMovieDisplay) sceneMovieDisplay.textContent = 'Procurando filme...'; sceneMovieDisplay.className = 'info-display loading';
+            if (sceneFilmeIdInput) sceneFilmeIdInput.value = '';
+
+            if (sceneData.movieName) {
+                const movieResult = await findMovieIdByName(sceneData.movieName);
+                if (movieResult) {
+                    if (sceneMovieDisplay) { sceneMovieDisplay.textContent = `Filme: ${movieResult.nome}`; sceneMovieDisplay.className = 'info-display found';}
+                    if (sceneFilmeIdInput) sceneFilmeIdInput.value = movieResult.id;
+                } else {
+                    if (sceneMovieDisplay) { sceneMovieDisplay.textContent = `Filme "${sceneData.movieName}" não encontrado. Será criado se a cena for salva.`; sceneMovieDisplay.className = 'info-display not-found'; }
+                }
+            } else {
+                 if (sceneMovieDisplay) { sceneMovieDisplay.textContent = 'Nenhum filme associado no texto.'; sceneMovieDisplay.className = 'info-display'; }
+            }
+
+            if (sceneData.potentialActorNames && sceneData.potentialActorNames.length > 0) {
+                for (const name of sceneData.potentialActorNames) {
+                    const actor = await findActorByName(name);
+                    if (actor && !selectedSceneActors.some(a => a.id === actor.id)) {
+                        selectedSceneActors.push(actor);
+                    } else if (!actor) {
+                        console.warn(`Ator pré-selecionado "${name}" não encontrado.`);
+                        // Optionally add to an error message or ignore
+                    }
+                }
+                renderSceneActorPills();
+            }
+
+
+            createSceneModal.style.display = 'flex';
+            sceneNomeInput?.focus();
+        }
+        async function handleCreateSceneSubmit(event) {
+            event.preventDefault();
+             if (!createSceneForm || !createSceneSubmitButton) return;
+
+             createSceneSubmitButton.disabled = true;
+             createSceneSubmitButton.textContent = 'Salvando...';
+             if(createSceneFormMessage) createSceneFormMessage.textContent = '';
+
+             const formData = new FormData(createSceneForm);
+             const sceneName = formData.get('scene-nome')?.trim();
+             const sceneDate = formData.get('scene-data')?.trim();
+             const sceneNumber = formData.get('scene-numero')?.trim();
+             const sceneImage = formData.get('scene-imagem')?.trim();
+             const scenePage = formData.get('scene-pagina')?.trim();
+             let sceneMovieId = formData.get('scene-filme-id')?.trim(); // ID if found
+             const sceneActors = selectedSceneActors.map(a => a.id);
+
+             // --- Validation ---
+             let isValid = true;
+             const nomeError = createSceneForm.querySelector('#scene-nome-error');
+             const dateError = createSceneForm.querySelector('#scene-data-error');
+             const actorsError = createSceneForm.querySelector('#scene-atores-error');
+             const movieError = createSceneForm.querySelector('#scene-filme-error'); // Use this for movie creation errors
+             clearFormMessages([nomeError, dateError, actorsError, movieError, createSceneFormMessage]);
+
+             if (!sceneName) { isValid = false; if(nomeError) nomeError.textContent = 'Nome da cena é obrigatório.'; }
+             if (sceneDate && !/^\d{4}[/-]\d{1,2}[/-]\d{1,2}$/.test(sceneDate)) { isValid = false; if(dateError) dateError.textContent = 'Formato de data inválido (use YYYY/MM/DD).'; }
+             if (sceneActors.length === 0) { isValid = false; if(actorsError) actorsError.textContent = 'Selecione pelo menos um ator.'; }
+
+             if (!isValid) { createSceneSubmitButton.disabled = false; createSceneSubmitButton.textContent = 'Salvar Cena'; return; }
+
+             // --- Create Movie if not found ---
+             const movieNotFoundDisplay = sceneMovieDisplay?.classList.contains('not-found');
+             const movieNameToCreate = movieNotFoundDisplay ? sceneMovieDisplay.textContent.match(/Filme "(.*?)" não encontrado/)?.[1] : null;
+
+             if (movieNotFoundDisplay && movieNameToCreate && !sceneMovieId) {
+                 console.log(`Tentando criar filme automaticamente: "${movieNameToCreate}"`);
+                 try {
+                      const movieData = { nome: movieNameToCreate, cenas: [] }; // Initial movie data
+                      const movieDocRef = await addDoc(collection(db, "filmes"), movieData);
+                      sceneMovieId = movieDocRef.id;
+                      console.log(`Filme "${movieNameToCreate}" criado com ID: ${sceneMovieId}`);
+                       if (sceneMovieDisplay) { sceneMovieDisplay.textContent = `Filme: ${movieNameToCreate}`; sceneMovieDisplay.className = 'info-display found';} // Update display
+                      if (sceneFilmeIdInput) sceneFilmeIdInput.value = sceneMovieId;
+                 } catch (movieError) {
+                     console.error("Erro ao criar filme automaticamente:", movieError);
+                     if(movieError) movieError.textContent = `Erro ao criar filme "${movieNameToCreate}": ${movieError.message}`;
+                     createSceneSubmitButton.disabled = false; createSceneSubmitButton.textContent = 'Salvar Cena';
+                     return;
+                 }
+             } else if (!sceneMovieId && !movieNotFoundDisplay) {
+                 // This case shouldn't happen if logic is correct, but as a safeguard:
+                 // isValid = false; if(movieError) movieError.textContent = 'Filme associado não encontrado ou definido.';
+                 // console.warn("Scene submitted without a movie ID and not in movie-creation state.");
+                 // For now, allow scene without movie ID
+             }
+
+             // --- Prepare Scene Data ---
+             const sceneFirestoreData = {
+                 nome: sceneName,
+                 atores: sceneActors,
+                 timestamp: serverTimestamp()
+             };
+             if (sceneDate) sceneFirestoreData.data = sceneDate;
+             if (sceneNumber) sceneFirestoreData.numero = parseInt(sceneNumber, 10);
+             if (sceneImage) sceneFirestoreData.imagem = sceneImage;
+             if (scenePage) sceneFirestoreData.pagina = scenePage;
+             if (sceneMovieId) sceneFirestoreData.filmeId = sceneMovieId;
+
+             // --- Save Scene ---
+             try {
+                 const sceneDocRef = await addDoc(collection(db, "cenas"), sceneFirestoreData);
+                 const newSceneId = sceneDocRef.id;
+                 console.log("Cena salva com ID:", newSceneId);
+                 allScenesCache.set(newSceneId, sceneFirestoreData); // Update cache
+
+                 // --- Update Movie's Scene List (if movie exists) ---
+                 if (sceneMovieId) {
+                     try {
+                         const movieRef = doc(db, "filmes", sceneMovieId);
+                         await updateDoc(movieRef, {
+                             cenas: arrayUnion(newSceneId)
+                         });
+                         console.log(`Cena ${newSceneId} adicionada ao filme ${sceneMovieId}`);
+                     } catch (updateError) {
+                         console.error(`Erro ao atualizar filme ${sceneMovieId} com nova cena:`, updateError);
+                         // Continue even if update fails, scene is still saved
+                     }
+                 }
+
+                 alert('Cena salva com sucesso!');
+                 closeCreateSceneModal();
+                 // Optionally refresh related content if the current actress is in this scene
+                 if (currentMainActressId && sceneActors.includes(currentMainActressId)) {
+                     handleMainActressClick(currentMainActressId, selectedMainActressElement); // Reload content for current actress
+                 }
+
+
+             } catch (sceneError) {
+                 console.error("Erro ao salvar cena:", sceneError);
+                 if(createSceneFormMessage) createSceneFormMessage.textContent = `Erro ao salvar cena: ${sceneError.message}`;
+                 createSceneSubmitButton.disabled = false; createSceneSubmitButton.textContent = 'Salvar Cena';
+             }
+        }
+        function displaySceneActorSuggestions(searchTerm) {
+            if (!sceneActorsSuggestionsList || !sceneActorsSearchInput) return;
+            const term = searchTerm.trim().toLowerCase();
+            sceneActorsSuggestionsList.innerHTML = '';
+
+            if (!term) { sceneActorsSuggestionsList.style.display = 'none'; return; }
+
+            const alreadySelectedIds = selectedSceneActors.map(a => a.id);
+            const filteredActresses = allActressesData.filter(actress =>
+                !alreadySelectedIds.includes(actress.id) &&
+                (actress.nome || '').toLowerCase().includes(term)
+            ).slice(0, 10);
+
+            if (filteredActresses.length > 0) {
+                filteredActresses.forEach(actress => {
+                    const item = document.createElement('div'); item.classList.add('suggestion-item');
+                    item.innerHTML = `<img src="${actress.foto || 'placeholder.png'}" alt="${actress.nome}" onerror="this.src='placeholder.png';"> <span>${actress.nome}</span>`;
+                    item.addEventListener('click', () => handleSelectSceneActor(actress));
+                    sceneActorsSuggestionsList.appendChild(item);
+                });
+            } else {
+                 const noResults = document.createElement('div'); noResults.classList.add('suggestion-item', 'no-results'); noResults.textContent = 'Nenhuma atriz encontrada'; sceneActorsSuggestionsList.appendChild(noResults);
+            }
+             sceneActorsSuggestionsList.style.display = 'block';
+        }
+        function handleSelectSceneActor(actress) {
+             if (!actress || !actress.id) return;
+             if (!selectedSceneActors.some(a => a.id === actress.id)) {
+                 selectedSceneActors.push(actress);
+                 renderSceneActorPills();
+                 if (sceneActorsSearchInput) sceneActorsSearchInput.value = '';
+                 if (sceneActorsSuggestionsList) sceneActorsSuggestionsList.style.display = 'none';
+                 sceneActorsSearchInput?.focus();
+             }
+        }
+        function renderSceneActorPills() {
+            if (!sceneSelectedActorsContainer) return;
+            sceneSelectedActorsContainer.innerHTML = '';
+            selectedSceneActors.forEach(actress => {
+                const pill = document.createElement('div'); pill.classList.add('scene-actor-pill'); pill.dataset.id = actress.id;
+                pill.innerHTML = `<span>${actress.nome}</span> <button type="button" class="scene-remove-actor-btn" title="Remover ${actress.nome}">×</button>`;
+                pill.querySelector('.scene-remove-actor-btn').addEventListener('click', handleRemoveSceneActor);
+                sceneSelectedActorsContainer.appendChild(pill);
+            });
+        }
+        function handleRemoveSceneActor(event) {
+            const button = event.target;
+            const pill = button.closest('.scene-actor-pill');
+            if (pill && pill.dataset.id) {
+                const actressIdToRemove = pill.dataset.id;
+                selectedSceneActors = selectedSceneActors.filter(a => a.id !== actressIdToRemove);
+                renderSceneActorPills();
+            }
+        }
 
         // --- Create Movie Modal ---
-        window.closeCreateMovieModal = function() { /* ... (implementation remains the same) ... */ }
-        function openCreateMovieModal(movieData) { /* ... (implementation remains the same) ... */ }
-        async function handleCreateMovieSubmit(event) { /* ... (implementation remains the same) ... */ }
+        window.closeCreateMovieModal = function() { if(createMovieModal) createMovieModal.style.display = 'none'; }
+        function openCreateMovieModal(movieData = {}) {
+            closeCreateMenu();
+             if (!createMovieModal || !createMovieForm) return;
+             createMovieForm.reset();
+             clearFormMessages([
+                 createMovieFormMessage,
+                 createMovieForm.querySelector('#movie-nome-error'),
+                 createMovieForm.querySelector('#movie-ano-error'),
+                 createMovieForm.querySelector('#movie-imagem-error'),
+                 createMovieForm.querySelector('#movie-pagina-error')
+             ]);
+             if(createMovieSubmitButton) createMovieSubmitButton.disabled = false;
+
+             // Pre-fill
+             if (movieData.nome && movieNomeInput) movieNomeInput.value = movieData.nome;
+             if (movieData.ano && movieAnoInput) movieAnoInput.value = movieData.ano;
+             if (movieData.estudio && movieEstudioInput) movieEstudioInput.value = movieData.estudio;
+             if (movieData.duracao && movieDuracaoInput) movieDuracaoInput.value = movieData.duracao;
+
+             createMovieModal.style.display = 'flex';
+             movieNomeInput?.focus();
+        }
+        async function handleCreateMovieSubmit(event) {
+             event.preventDefault();
+             if (!createMovieForm || !createMovieSubmitButton) return;
+
+             createMovieSubmitButton.disabled = true;
+             createMovieSubmitButton.textContent = 'Salvando...';
+             if(createMovieFormMessage) createMovieFormMessage.textContent = '';
+
+             const formData = new FormData(createMovieForm);
+             const movieName = formData.get('movie-nome')?.trim();
+             const movieYear = formData.get('movie-ano')?.trim();
+             const movieStudio = formData.get('movie-estudio')?.trim();
+             const movieDuration = formData.get('movie-duracao')?.trim();
+             const movieImage = formData.get('movie-imagem')?.trim();
+             const moviePage = formData.get('movie-pagina')?.trim();
+
+             // --- Validation ---
+             let isValid = true;
+             const nomeError = createMovieForm.querySelector('#movie-nome-error');
+             const yearError = createMovieForm.querySelector('#movie-ano-error');
+             clearFormMessages([nomeError, yearError, createMovieFormMessage]);
+
+             if (!movieName) { isValid = false; if(nomeError) nomeError.textContent = 'Nome do filme é obrigatório.'; }
+             if (movieYear && (!/^\d{4}$/.test(movieYear) || parseInt(movieYear) < 1900 || parseInt(movieYear) > new Date().getFullYear() + 5 )) {
+                 isValid = false; if(yearError) yearError.textContent = 'Ano inválido.';
+             }
+
+             if (!isValid) { createMovieSubmitButton.disabled = false; createMovieSubmitButton.textContent = 'Salvar Filme'; return; }
+
+             // --- Prepare Movie Data ---
+             const movieFirestoreData = {
+                 nome: movieName,
+                 cenas: [], // Initialize with empty scenes array
+                 timestamp: serverTimestamp()
+             };
+             if (movieYear) movieFirestoreData.ano = parseInt(movieYear, 10);
+             if (movieStudio) movieFirestoreData.estudio = movieStudio;
+             if (movieDuration) movieFirestoreData.duracao = movieDuration;
+             if (movieImage) movieFirestoreData.imagem = movieImage;
+             if (moviePage) movieFirestoreData.pagina = moviePage;
+
+              // --- Save Movie ---
+             try {
+                 const movieDocRef = await addDoc(collection(db, "filmes"), movieFirestoreData);
+                 console.log("Filme salvo com ID:", movieDocRef.id);
+
+                 alert('Filme salvo com sucesso!');
+                 closeCreateMovieModal();
+                 // No need to refresh content here unless linking scenes immediately
+
+             } catch (movieError) {
+                 console.error("Erro ao salvar filme:", movieError);
+                 if(createMovieFormMessage) createMovieFormMessage.textContent = `Erro ao salvar filme: ${movieError.message}`;
+                 createMovieSubmitButton.disabled = false; createMovieSubmitButton.textContent = 'Salvar Filme';
+             }
+        }
 
         // --- Create Video Modal ---
-        window.closeCreateVideoModal = function() { /* ... (implementation remains the same) ... */ }
-        async function openCreateVideoModal(videoData) { /* ... (implementation remains the same) ... */ }
-        async function handleCreateVideoSubmit(event) { /* ... (implementation remains the same) ... */ }
-        function displayVideoActorSuggestions(searchTerm) { /* ... (implementation remains the same) ... */ }
-        function handleSelectVideoActor(actress) { /* ... (implementation remains the same) ... */ }
-        function renderVideoActorPills() { /* ... (implementation remains the same) ... */ }
-        function handleRemoveVideoActor(event) { /* ... (implementation remains the same) ... */ }
+        window.closeCreateVideoModal = function() { if(createVideoModal) createVideoModal.style.display = 'none'; }
+        async function openCreateVideoModal(videoData = {}) {
+             closeCreateMenu();
+             if (!createVideoModal || !createVideoForm) return;
+             createVideoForm.reset();
+             selectedVideoActors = [];
+             renderVideoActorPills();
+             clearFormMessages([
+                 createVideoFormMessage,
+                 createVideoForm.querySelector('#video-nome-error'),
+                 createVideoForm.querySelector('#video-data-error'),
+                 createVideoForm.querySelector('#video-imagem-error'),
+                 createVideoForm.querySelector('#video-pagina-error'),
+                 createVideoForm.querySelector('#video-atores-error')
+             ]);
+              if(createVideoSubmitButton) createVideoSubmitButton.disabled = false;
+
+             // Pre-fill
+             if (videoData.nome && videoNomeInput) videoNomeInput.value = videoData.nome;
+             if (videoData.estudio && videoEstudioInput) videoEstudioInput.value = videoData.estudio;
+             if (videoData.dataRaw && videoDataInput) videoDataInput.value = formatDateString(videoData.dataRaw) || videoData.dataRaw; // Format if possible
+
+             if (videoData.potentialActorNames && videoData.potentialActorNames.length > 0) {
+                for (const name of videoData.potentialActorNames) {
+                    const actor = await findActorByName(name);
+                    if (actor && !selectedVideoActors.some(a => a.id === actor.id)) {
+                        selectedVideoActors.push(actor);
+                    } else if (!actor) {
+                        console.warn(`Ator pré-selecionado "${name}" não encontrado.`);
+                    }
+                }
+                renderVideoActorPills();
+             }
+
+             createVideoModal.style.display = 'flex';
+             videoNomeInput?.focus();
+        }
+        async function handleCreateVideoSubmit(event) {
+             event.preventDefault();
+             if (!createVideoForm || !createVideoSubmitButton) return;
+
+             createVideoSubmitButton.disabled = true;
+             createVideoSubmitButton.textContent = 'Salvando...';
+             if(createVideoFormMessage) createVideoFormMessage.textContent = '';
+
+             const formData = new FormData(createVideoForm);
+             const videoName = formData.get('video-nome')?.trim();
+             const videoStudio = formData.get('video-estudio')?.trim();
+             const videoDate = formData.get('video-data')?.trim();
+             const videoImage = formData.get('video-imagem')?.trim();
+             const videoPage = formData.get('video-pagina')?.trim();
+             const videoActors = selectedVideoActors.map(a => a.id);
+
+              // --- Validation ---
+             let isValid = true;
+             const nomeError = createVideoForm.querySelector('#video-nome-error');
+             const dateError = createVideoForm.querySelector('#video-data-error');
+             const actorsError = createVideoForm.querySelector('#video-atores-error');
+             clearFormMessages([nomeError, dateError, actorsError, createVideoFormMessage]);
+
+             if (!videoName) { isValid = false; if(nomeError) nomeError.textContent = 'Nome do vídeo é obrigatório.'; }
+             if (videoDate && !/^\d{4}[/-]\d{1,2}[/-]\d{1,2}$/.test(videoDate)) { isValid = false; if(dateError) dateError.textContent = 'Formato de data inválido (use YYYY/MM/DD).'; }
+             if (videoActors.length === 0) { isValid = false; if(actorsError) actorsError.textContent = 'Selecione pelo menos um ator.'; }
+
+             if (!isValid) { createVideoSubmitButton.disabled = false; createVideoSubmitButton.textContent = 'Salvar Vídeo'; return; }
+
+             // --- Prepare Video Data ---
+             const videoFirestoreData = {
+                 nome: videoName,
+                 atores: videoActors,
+                 timestamp: serverTimestamp()
+             };
+             if (videoStudio) videoFirestoreData.estudio = videoStudio;
+             if (videoDate) videoFirestoreData.data = videoDate;
+             if (videoImage) videoFirestoreData.imagem = videoImage;
+             if (videoPage) videoFirestoreData.pagina = videoPage;
+
+             // --- Save Video ---
+             try {
+                 const videoDocRef = await addDoc(collection(db, "videos"), videoFirestoreData);
+                 console.log("Vídeo salvo com ID:", videoDocRef.id);
+
+                 alert('Vídeo salvo com sucesso!');
+                 closeCreateVideoModal();
+                  // Optionally refresh related content if the current actress is in this video
+                 if (currentMainActressId && videoActors.includes(currentMainActressId)) {
+                     handleMainActressClick(currentMainActressId, selectedMainActressElement); // Reload content
+                 }
+
+             } catch (videoError) {
+                 console.error("Erro ao salvar vídeo:", videoError);
+                 if(createVideoFormMessage) createVideoFormMessage.textContent = `Erro ao salvar vídeo: ${videoError.message}`;
+                 createVideoSubmitButton.disabled = false; createVideoSubmitButton.textContent = 'Salvar Vídeo';
+             }
+        }
+        function displayVideoActorSuggestions(searchTerm) {
+             if (!videoActorsSuggestionsList || !videoActorsSearchInput) return;
+            const term = searchTerm.trim().toLowerCase();
+            videoActorsSuggestionsList.innerHTML = '';
+
+            if (!term) { videoActorsSuggestionsList.style.display = 'none'; return; }
+
+            const alreadySelectedIds = selectedVideoActors.map(a => a.id);
+            const filteredActresses = allActressesData.filter(actress =>
+                !alreadySelectedIds.includes(actress.id) &&
+                (actress.nome || '').toLowerCase().includes(term)
+            ).slice(0, 10);
+
+            if (filteredActresses.length > 0) {
+                filteredActresses.forEach(actress => {
+                    const item = document.createElement('div'); item.classList.add('suggestion-item');
+                    item.innerHTML = `<img src="${actress.foto || 'placeholder.png'}" alt="${actress.nome}" onerror="this.src='placeholder.png';"> <span>${actress.nome}</span>`;
+                    item.addEventListener('click', () => handleSelectVideoActor(actress));
+                    videoActorsSuggestionsList.appendChild(item);
+                });
+            } else {
+                 const noResults = document.createElement('div'); noResults.classList.add('suggestion-item', 'no-results'); noResults.textContent = 'Nenhuma atriz encontrada'; videoActorsSuggestionsList.appendChild(noResults);
+            }
+             videoActorsSuggestionsList.style.display = 'block';
+        }
+        function handleSelectVideoActor(actress) {
+             if (!actress || !actress.id) return;
+             if (!selectedVideoActors.some(a => a.id === actress.id)) {
+                 selectedVideoActors.push(actress);
+                 renderVideoActorPills();
+                 if (videoActorsSearchInput) videoActorsSearchInput.value = '';
+                 if (videoActorsSuggestionsList) videoActorsSuggestionsList.style.display = 'none';
+                 videoActorsSearchInput?.focus();
+             }
+        }
+        function renderVideoActorPills() {
+            if (!videoSelectedActorsContainer) return;
+            videoSelectedActorsContainer.innerHTML = '';
+            selectedVideoActors.forEach(actress => {
+                const pill = document.createElement('div'); pill.classList.add('video-actor-pill'); pill.dataset.id = actress.id;
+                pill.innerHTML = `<span>${actress.nome}</span> <button type="button" class="video-remove-actor-btn" title="Remover ${actress.nome}">×</button>`;
+                pill.querySelector('.video-remove-actor-btn').addEventListener('click', handleRemoveVideoActor);
+                videoSelectedActorsContainer.appendChild(pill);
+            });
+        }
+        function handleRemoveVideoActor(event) {
+            const button = event.target;
+            const pill = button.closest('.video-actor-pill');
+            if (pill && pill.dataset.id) {
+                const actressIdToRemove = pill.dataset.id;
+                selectedVideoActors = selectedVideoActors.filter(a => a.id !== actressIdToRemove);
+                renderVideoActorPills();
+            }
+        }
 
         // --- Statistics Modal Functions ---
         function openStatsModal() {
@@ -2093,12 +2927,195 @@
              statsModal.style.display = 'flex';
         }
         window.closeStatsModal = function() { if (statsModal) statsModal.style.display = 'none'; };
-        async function displayStatistic(statType) { /* ... (implementation remains the same - ensure it uses allActressesData) ... */ }
-        function generateStatsTable(statType) { /* ... (implementation remains the same - ensure it uses allActressesData) ... */ }
-        function generateUniqueCountList(fieldKey, title) { /* ... (implementation remains the same - ensure it uses allActressesData) ... */ }
-        function calculateAverageStat(fieldKey, title) { /* ... (implementation remains the same - ensure it uses allActressesData) ... */ }
-        function calculateGroupAverage(groupKey, valueKey, title) { /* ... (implementation remains the same - ensure it uses allActressesData) ... */ }
-        function addTableSorting(table) { /* ... (implementation remains the same) ... */ }
+        async function displayStatistic(statType) {
+            if (!statsResultsContainer) return;
+            statsResultsContainer.innerHTML = '<div class="loading-stats">Calculando...</div>';
+             // Ensure data is loaded
+             if (allActressesData.length === 0) { await loadInitialData(); } // Load if empty, might need adjustment
+             if (allActressesData.length === 0) { statsResultsContainer.innerHTML = '<div class="error">Nenhuma atriz carregada para calcular estatísticas.</div>'; return; }
+
+             let content = '';
+             switch (statType) {
+                 case 'full-list': content = generateStatsTable(statType); break;
+                 case 'shortest': content = generateStatsTable(statType); break;
+                 case 'youngest': content = generateStatsTable(statType); break;
+                 case 'rating': content = generateStatsTable(statType); break;
+                 case 'hair-color': content = generateUniqueCountList('corCabelo', 'Cores de Cabelo'); break;
+                 case 'eye-color': content = generateUniqueCountList('corOlhos', 'Cores de Olhos'); break;
+                 case 'height-avg': content = calculateAverageStat('altura', 'Altura Média'); break;
+                 case 'age-avg': content = calculateAverageStat('age', 'Idade Média'); break; // Use 'age' pseudo-key
+                 case 'countries': content = generateUniqueCountList('pais', 'Contagem por País'); break;
+                 case 'country-rating-avg': content = calculateGroupAverage('pais', 'nota', 'Nota Média por País'); break;
+                 default: content = '<p>Tipo de estatística não reconhecido.</p>';
+             }
+             statsResultsContainer.innerHTML = content;
+             const table = statsResultsContainer.querySelector('table');
+             if (table) { addTableSorting(table); }
+        }
+        function generateStatsTable(statType) {
+             let dataToSort = [...allActressesData];
+             let columns = [
+                 { key: 'foto', label: 'Foto', type: 'image' },
+                 { key: 'nome', label: 'Nome', type: 'string' },
+                 { key: 'age', label: 'Idade', type: 'number', sortable: true },
+                 { key: 'altura', label: 'Altura (cm)', type: 'number', sortable: true },
+                 { key: 'peso', label: 'Peso (kg)', type: 'number', sortable: true },
+                 { key: 'nota', label: 'Nota', type: 'number', sortable: true },
+                 { key: 'pais', label: 'País', type: 'string', sortable: true },
+                 { key: 'etnia', label: 'Etnia', type: 'string', sortable: true },
+             ];
+             let defaultSortKey = 'nome'; let defaultSortDir = 'asc'; let limit = null;
+
+             switch (statType) {
+                 case 'full-list': defaultSortKey = 'nome'; defaultSortDir = 'asc'; break;
+                 case 'shortest': defaultSortKey = 'altura'; defaultSortDir = 'asc'; limit = 10; dataToSort = dataToSort.filter(a => a.altura != null); break;
+                 case 'youngest': defaultSortKey = 'age'; defaultSortDir = 'asc'; limit = 10; dataToSort = dataToSort.filter(a => a.dataNascimento); break; // Requires age calculation
+                 case 'rating': defaultSortKey = 'nota'; defaultSortDir = 'desc'; limit = 20; dataToSort = dataToSort.filter(a => a.nota != null); break;
+                 default: defaultSortKey = 'nome'; defaultSortDir = 'asc'; // Fallback
+             }
+
+              // Pre-calculate age for sorting if needed
+              dataToSort.forEach(a => { if (a.dataNascimento) a.calculated_age = calculateAge(a.dataNascimento); else a.calculated_age = null; });
+
+             // Initial Sort before rendering
+             const sortKeyForInitial = (statType === 'youngest') ? 'calculated_age' : defaultSortKey;
+             dataToSort.sort((a, b) => {
+                 let valA = a[sortKeyForInitial]; let valB = b[sortKeyForInitial];
+                 if (sortKeyForInitial === 'nota') { valA = (valA == null) ? -Infinity : valA; valB = (valB == null) ? -Infinity : valB; }
+                 else if (sortKeyForInitial === 'altura' || sortKeyForInitial === 'peso') { valA = (valA == null) ? Infinity : valA; valB = (valB == null) ? Infinity : valB; }
+                 else if (sortKeyForInitial === 'calculated_age') { valA = (valA === '?' || valA === null) ? Infinity : valA; valB = (valB === '?' || valB === null) ? Infinity : valB; }
+
+                 let comparison = 0;
+                 if (typeof valA === 'string') { comparison = (valA || '').localeCompare(valB || ''); }
+                 else { comparison = (valA ?? 0) - (valB ?? 0); } // Basic number/null compare
+                 return defaultSortDir === 'asc' ? comparison : -comparison;
+             });
+
+
+             if (limit) { dataToSort = dataToSort.slice(0, limit); }
+
+             // Build Table HTML
+             let tableHTML = `<table><thead><tr>`;
+             columns.forEach(col => {
+                  tableHTML += `<th data-key="${col.key}" data-type="${col.type}" class="${col.sortable ? 'sortable' : ''}">${col.label}</th>`;
+             });
+             tableHTML += `</tr></thead><tbody>`;
+
+             dataToSort.forEach(actress => {
+                 tableHTML += `<tr>`;
+                 columns.forEach(col => {
+                     let value = '';
+                     if (col.key === 'age') { value = actress.calculated_age !== null && actress.calculated_age !== '?' ? actress.calculated_age : '-'; }
+                     else if (col.key === 'foto') { value = `<img src="${actress.foto || 'placeholder.png'}" alt="${actress.nome || ''}" onerror="this.src='placeholder.png';">`; }
+                     else if (col.key === 'nota') { value = (actress.nota != null) ? Number(actress.nota).toFixed(1) : '-'; }
+                      else if (col.key === 'altura' || col.key === 'peso') { value = (actress[col.key] != null) ? actress[col.key] : '-'; }
+                     else { value = actress[col.key] || '-'; }
+                     tableHTML += `<td>${value}</td>`;
+                 });
+                 tableHTML += `</tr>`;
+             });
+
+             tableHTML += `</tbody></table>`;
+             if(dataToSort.length === 0) return `<p>Nenhuma atriz encontrada para esta estatística.</p>`
+             return tableHTML;
+        }
+        function generateUniqueCountList(fieldKey, title) {
+            const counts = {}; let totalCount = 0;
+            allActressesData.forEach(actress => {
+                 const value = String(actress[fieldKey] || 'N/A').trim();
+                 if (value) { counts[value] = (counts[value] || 0) + 1; totalCount++; }
+            });
+            if (totalCount === 0) return `<h4>${title}</h4><p>Nenhum dado encontrado para ${title}.</p>`;
+            const sortedCounts = Object.entries(counts).sort(([, countA], [, countB]) => countB - countA);
+             let listHTML = `<h4>${title} (${totalCount} total)</h4><ul>`;
+             sortedCounts.forEach(([value, count]) => { const percentage = ((count / totalCount) * 100).toFixed(1); listHTML += `<li>${value}: ${count} (${percentage}%)</li>`; });
+             listHTML += `</ul>`;
+             return listHTML;
+        }
+        function calculateAverageStat(fieldKey, title) {
+             let sum = 0; let count = 0;
+             allActressesData.forEach(actress => {
+                 let value;
+                 if (fieldKey === 'age') { value = calculateAge(actress.dataNascimento); if (value === '?') value = null; }
+                 else { value = safeParseInt(actress[fieldKey]); }
+                 if (value !== null) { sum += value; count++; }
+             });
+             if (count === 0) return `<h4>${title}</h4><p>Nenhum dado válido encontrado para calcular a média.</p>`;
+             const average = (sum / count);
+             return `<h4>${title}</h4><p>A média é: <strong>${average.toFixed(fieldKey === 'age' ? 1 : 0)}</strong> (baseado em ${count} atrizes)</p>`;
+        }
+        function calculateGroupAverage(groupKey, valueKey, title) {
+             const groups = {}; // { groupValue: { sum: 0, count: 0 }, ... }
+             allActressesData.forEach(actress => {
+                 const groupValue = String(actress[groupKey] || 'N/A').trim();
+                 const numericValue = (valueKey === 'age') ? calculateAge(actress.dataNascimento) : safeParseInt(actress[valueKey]);
+
+                 if (groupValue !== 'N/A' && numericValue !== null && numericValue !== '?') {
+                     if (!groups[groupValue]) groups[groupValue] = { sum: 0, count: 0 };
+                     groups[groupValue].sum += numericValue;
+                     groups[groupValue].count++;
+                 }
+             });
+
+             const groupAverages = Object.entries(groups) .map(([group, data]) => ({ group: group, average: data.sum / data.count, count: data.count })) .filter(item => item.count > 0) // Ensure group has data .sort((a, b) => b.average - a.average); // Sort by average desc
+
+             if (groupAverages.length === 0) return `<h4>${title}</h4><p>Nenhum dado válido encontrado para calcular médias por grupo.</p>`;
+
+             let tableHTML = `<h4>${title}</h4><table><thead><tr><th>${capitalizeFirstLetter(groupKey)}</th><th>Média ${capitalizeFirstLetter(valueKey)}</th><th>Contagem</th></tr></thead><tbody>`;
+             groupAverages.forEach(item => { tableHTML += `<tr><td>${item.group}</td><td>${item.average.toFixed(1)}</td><td>${item.count}</td></tr>`; });
+             tableHTML += `</tbody></table>`;
+             return tableHTML;
+        }
+        function addTableSorting(table) {
+             const headers = table.querySelectorAll('th.sortable');
+             headers.forEach(header => {
+                 header.addEventListener('click', () => {
+                     const tbody = table.querySelector('tbody');
+                     if (!tbody) return;
+                     const rows = Array.from(tbody.querySelectorAll('tr'));
+                     const key = header.dataset.key;
+                     const type = header.dataset.type;
+                     const currentDir = header.classList.contains('sort-asc') ? 'asc' : (header.classList.contains('sort-desc') ? 'desc' : 'none');
+                     const newDir = (currentDir === 'asc') ? 'desc' : 'asc';
+
+                     // Remove sorting classes from other headers
+                     headers.forEach(h => h.classList.remove('sort-asc', 'sort-desc'));
+                     // Set new direction on clicked header
+                     header.classList.add(newDir === 'asc' ? 'sort-asc' : 'sort-desc');
+
+                     // Sort rows
+                     rows.sort((rowA, rowB) => {
+                         const cellA = rowA.querySelector(`td:nth-child(${header.cellIndex + 1})`);
+                         const cellB = rowB.querySelector(`td:nth-child(${header.cellIndex + 1})`);
+                         let valA = cellA?.textContent.trim() || '';
+                         let valB = cellB?.textContent.trim() || '';
+
+                         let comparison = 0;
+                         if (type === 'number' || key === 'age') { // Include age here
+                             // Handle cases like '-', image tags, etc. better
+                             const numA = parseFloat(valA.replace('%', '')); // Handle percentages if any
+                             const numB = parseFloat(valB.replace('%', ''));
+                              const finalA = isNaN(numA) ? (newDir === 'asc' ? Infinity : -Infinity) : numA;
+                              const finalB = isNaN(numB) ? (newDir === 'asc' ? Infinity : -Infinity) : numB;
+                             comparison = finalA - finalB;
+                         } else if (type === 'string') {
+                             comparison = valA.localeCompare(valB);
+                         }
+                          else if (type === 'date') { // Example if you add date columns
+                             const dateA = parseDateStringForSort(valA)?.getTime() ?? (newDir === 'asc' ? Infinity : -Infinity);
+                             const dateB = parseDateStringForSort(valB)?.getTime() ?? (newDir === 'asc' ? Infinity : -Infinity);
+                              comparison = dateA - dateB;
+                         }
+
+                         return newDir === 'asc' ? comparison : -comparison;
+                     });
+
+                     // Re-append sorted rows
+                     rows.forEach(row => tbody.appendChild(row));
+                 });
+             });
+        }
+
 
         // --- Filter Modal Functions ---
         function openFilterModal() {
@@ -2170,27 +3187,34 @@
             if (!filterForm) return;
             const formData = new FormData(filterForm);
             formData.forEach((value, key) => {
-                 if (value !== '') {
+                 const trimmedValue = String(value).trim(); // Trim all values
+                 if (trimmedValue !== '') {
                      // Map form names to filter keys if needed
                      const filterKey = key; // Assume direct mapping for now unless specified otherwise
+
+                     // Handle select mappings explicitly
+                     if (key === 'nationality') {
+                          activeActressFilters.nationality = trimmedValue;
+                          return; // Don't process further as 'nationality'
+                     }
+                     if (key === 'ethnicity') {
+                          activeActressFilters.ethnicity = trimmedValue;
+                          return; // Don't process further as 'ethnicity'
+                     }
+
                      // Convert numeric fields
                      if (['height_min', 'height_max', 'weight_min', 'weight_max', 'age_min', 'age_max', 'rating_min', 'rating_max'].includes(filterKey)) {
-                         const numValue = filterKey.includes('rating') ? parseFloat(value) : parseInt(value, 10);
+                         const numValue = filterKey.includes('rating') ? parseFloat(trimmedValue) : parseInt(trimmedValue, 10);
                          if (!isNaN(numValue)) {
                              activeActressFilters[filterKey] = numValue;
                          }
                      } else {
-                          // Handle select mappings
-                          if (key === 'nationality') activeActressFilters.nationality = value;
-                          else if (key === 'ethnicity') activeActressFilters.ethnicity = value;
-                          else activeActressFilters[filterKey] = value; // Store others directly
+                           // Store others directly (might include pais, etnia if not handled above)
+                           activeActressFilters[filterKey] = trimmedValue;
                      }
                  }
             });
-             // Clean up potential empty mappings if selects were reset
-             if(activeActressFilters.nationality === "") delete activeActressFilters.nationality;
-             if(activeActressFilters.ethnicity === "") delete activeActressFilters.ethnicity;
-
+             // Clean up potential empty mappings if selects were reset (handled by initial check)
             console.log("Active Filters Updated:", activeActressFilters);
         }
         function handleApplyFilters() {
@@ -2235,10 +3259,50 @@
             });
 
             // Related Content Filter Buttons
-            relatedFilterButtons.forEach(button => { button.addEventListener('click', () => { relatedFilterButtons.forEach(btn => btn.classList.remove('active')); button.classList.add('active'); activeRelatedFilter = button.dataset.filter || 'all'; applyRelatedContentFilters(); }); });
+            if (relatedFilterButtonsContainer) {
+                const allFilterButtons = relatedFilterButtonsContainer.querySelectorAll('.related-filter-btn');
+                allFilterButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const filterType = button.dataset.filter || 'all';
+
+                        // Deactivate all buttons
+                        allFilterButtons.forEach(btn => btn.classList.remove('active'));
+                        // Activate the clicked one
+                        button.classList.add('active');
+                        // Update state
+                        activeRelatedFilter = filterType;
+
+                        // Clear related actress search when changing main filters
+                        selectedRelatedActresses = [];
+                        renderRelatedActressPills(); // Also handles enabling/disabling input
+                        if(relatedSuggestionsList) relatedSuggestionsList.style.display = 'none';
+
+
+                        if (filterType === 'similar') {
+                            displaySimilarActresses(); // Call the similarity function
+                        } else {
+                            applyRelatedContentFilters(); // Call the standard content filtering function
+                        }
+                    });
+                });
+            }
+
             // Related Search
-            if(relatedSearchInput) { const debouncedRelatedSearch = debounce(() => displayRelatedSuggestions(relatedSearchInput.value), 300); relatedSearchInput.addEventListener('input', debouncedRelatedSearch); relatedSearchInput.addEventListener('focus', () => displayRelatedSuggestions(relatedSearchInput.value)); }
-            if(relatedSearchInputWrapper) { relatedSearchInputWrapper.addEventListener('click', (e) => { if (!e.target.closest('.related-remove-actress-btn')) { relatedSearchInput?.focus(); } }); }
+            if (relatedSearchInput) {
+                const debouncedRelatedSearch = debounce(() => displayRelatedSuggestions(relatedSearchInput.value), 300);
+                relatedSearchInput.addEventListener('input', debouncedRelatedSearch);
+                // Use focus to trigger the initial list (might show co-actresses or 'not applicable')
+                 relatedSearchInput.addEventListener('focus', displayInitialRelatedSuggestionsOnClick);
+            }
+            if (relatedSearchInputWrapper) {
+                relatedSearchInputWrapper.addEventListener('click', (e) => {
+                    // If the click is not on a remove button, show suggestions and focus input
+                    if (!e.target.closest('.related-remove-actress-btn') && !relatedSearchInput.disabled) {
+                         displayInitialRelatedSuggestionsOnClick();
+                         relatedSearchInput?.focus();
+                    }
+                });
+            }
             // Comparison Search
             if (comparisonSearchInput) { const debouncedComparisonSearch = debounce(() => displayComparisonSuggestions(comparisonSearchInput.value), 300); comparisonSearchInput.addEventListener('input', debouncedComparisonSearch); comparisonSearchInput.addEventListener('focus', () => displayComparisonSuggestions(comparisonSearchInput.value)); }
 
@@ -2263,15 +3327,15 @@
             // Actress List Search Listener
             if (actressSearchInput && actressListUl) { const debouncedActressFilterRender = debounce(() => { filterAndRenderActressList(); }, 250); actressSearchInput.addEventListener('input', debouncedActressFilterRender); }
 
-            // Actress List Filter/Stats Buttons --- Check these listeners ---
+            // Actress List Filter/Stats Buttons
             if (actressFilterBtn) {
-                console.log("DEBUG: Attaching click listener to Filter Button");
+                // console.log("DEBUG: Attaching click listener to Filter Button");
                 actressFilterBtn.addEventListener('click', openFilterModal);
             } else {
                  console.error("DEBUG: Actress Filter Button (#actress-filter-btn) not found!");
             }
             if (actressStatsBtn) {
-                 console.log("DEBUG: Attaching click listener to Stats Button");
+                 // console.log("DEBUG: Attaching click listener to Stats Button");
                  actressStatsBtn.addEventListener('click', openStatsModal);
             } else {
                  console.error("DEBUG: Actress Stats Button (#actress-stats-btn) not found!");
