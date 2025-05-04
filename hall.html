@@ -445,6 +445,44 @@
         .error { padding: 10px; text-align: center; color: #a00; font-weight: bold; }
 
 
+                /* --- Measurement Cards Styling (Middle Column) --- */
+                .measurement-cards-container {
+            display: flex;
+            justify-content: space-around; /* Distribute space */
+            gap: 8px; /* Space between cards */
+            margin: 15px 0; /* Space above and below the card row */
+            width: 100%; /* Take full width */
+        }
+
+        .measurement-card {
+            background-color: #f0f8ff; /* Light blue background */
+            border: 1px solid #cce0ff; /* Lighter blue border */
+            border-radius: 6px;
+            padding: 10px 8px;
+            text-align: center;
+            flex: 1; /* Allow cards to grow and shrink */
+            min-width: 60px; /* Prevent cards from becoming too narrow */
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .measurement-card .label {
+            display: block;
+            font-size: 0.8em;
+            color: #555;
+            margin-bottom: 4px;
+            font-weight: bold;
+            text-transform: uppercase; /* Optional: Make labels uppercase */
+        }
+
+        .measurement-card .value {
+            display: block;
+            font-size: 1.2em; /* Larger font for the value */
+            font-weight: bold;
+            color: #0056b3; /* Darker blue for value */
+            line-height: 1.1;
+        }
+        /* --- END: Measurement Cards Styling --- */
+
     </style>
 </head>
 <body>
@@ -821,6 +859,7 @@
 
 
     <!-- Firebase SDK -->
+  
     <script type="module">
         // --- Imports ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
@@ -831,7 +870,7 @@
 
         // --- Firebase Config ---
         const firebaseConfig = {
-           apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0",
+           apiKey: "AIzaSyBZEffPMXgbSHYUUrNdIS5duAVGlKlmSq0", // Replace with your actual API key if needed, but this seems to be public example data
            authDomain: "babes-392fd.firebaseapp.com",
            projectId: "babes-392fd",
            storageBucket: "babes-392fd.appspot.com",
@@ -1062,6 +1101,18 @@
             const anoTimestamp = parseDateStringForSort(item.ano); if (anoTimestamp !== null) { return anoTimestamp; }
             return null;
         }
+
+        function safeParseInt(value) {
+            if (value === null || value === undefined || value === '') return null;
+            const parsed = parseInt(String(value).trim(), 10);
+            return isNaN(parsed) ? null : parsed;
+        }
+
+        function safeStringCompare(strA, strB) {
+            if (strA === null || strA === undefined || strB === null || strB === undefined) return false;
+            return String(strA).trim().toLowerCase() === String(strB).trim().toLowerCase();
+        }
+
 
         // --- Create Actress Specific Helper Functions (from criar.html logic) ---
         function formatBornDate(dateString) {
@@ -1357,40 +1408,143 @@
                  await loadAndDisplayRelatedContent(actressId); // Load default related content ("Todos")
              } catch (error) { console.error(`Erro ao carregar dados da atriz ${actressId}: `, error); actressDetailsContainer.innerHTML = '<div class="error">Erro ao carregar detalhes.</div>'; displayMessage(contentMessage,'Erro ao carregar conteúdo.', true); }
         }
+
         function displayMainActressDetails(data) {
             if (!actressDetailsContainer) return;
-             actressDetailsContainer.innerHTML = '';
-             const detailsTitle = document.createElement('h3'); detailsTitle.textContent = data.nome || 'Detalhes'; actressDetailsContainer.appendChild(detailsTitle);
-             if (data.foto) { const img = document.createElement('img'); img.src = data.foto; img.alt = data.nome || 'Foto'; img.classList.add('detail-photo'); img.onerror = () => { img.style.display = 'none'; }; actressDetailsContainer.appendChild(img); }
-             let detailsAdded = false;
-             const detailFieldsContainer = document.createElement('div');
-             const addDetailRow = (label, value) => { if (value != null && value !== '') { const div = document.createElement('div'); div.innerHTML = `<strong>${label}:</strong> ${value}`; detailFieldsContainer.appendChild(div); detailsAdded = true; } };
+             actressDetailsContainer.innerHTML = ''; // Clear previous details
 
-             addDetailRow('Nome', data.nome); // Display name here as well
+             // --- Header with Compare Icon ---
+             const detailsHeaderContainer = document.createElement('div');
+             // (Header styles and icon logic remain the same as previous step)
+             detailsHeaderContainer.style.display = 'flex';
+             detailsHeaderContainer.style.justifyContent = 'space-between';
+             detailsHeaderContainer.style.alignItems = 'center';
+             detailsHeaderContainer.style.borderBottom = '1px solid #eee';
+             detailsHeaderContainer.style.marginBottom = '15px';
+
+             const detailsTitle = document.createElement('h2'); // Use h2 to match column title style
+             detailsTitle.textContent = data.nome || 'Detalhes';
+             detailsTitle.style.margin = '0'; // Reset margin
+             detailsTitle.style.borderBottom = 'none'; // Remove duplicate border
+             detailsTitle.style.paddingBottom = '0'; // Reset padding
+
+             const compareIconButton = document.createElement('button');
+             compareIconButton.id = 'details-compare-icon';
+             compareIconButton.title = 'Comparar esta atriz';
+             compareIconButton.style.background = 'none';
+             compareIconButton.style.border = 'none';
+             compareIconButton.style.fontSize = '1.5em'; // Adjust size as needed
+             compareIconButton.style.cursor = 'pointer';
+             compareIconButton.style.padding = '0 5px';
+             compareIconButton.textContent = '⚖️'; // Balance scale emoji for comparison
+             compareIconButton.addEventListener('click', () => {
+                if (currentMainActressId) {
+                    openComparisonModal([currentMainActressId]); // Pass current actress ID
+                } else {
+                    console.warn("Cannot compare: currentMainActressId is not set.");
+                }
+             });
+
+             detailsHeaderContainer.appendChild(detailsTitle);
+             detailsHeaderContainer.appendChild(compareIconButton);
+             actressDetailsContainer.appendChild(detailsHeaderContainer); // Add header first
+             // --- End Header ---
+
+             // --- Actress Photo ---
+             if (data.foto) {
+                 const img = document.createElement('img');
+                 img.src = data.foto;
+                 img.alt = data.nome || 'Foto';
+                 img.classList.add('detail-photo');
+                 img.onerror = () => { img.style.display = 'none'; };
+                 actressDetailsContainer.appendChild(img);
+             }
+
+             // --- NEW: Measurement Cards ---
+             const measurementContainer = document.createElement('div');
+             measurementContainer.classList.add('measurement-cards-container');
+             let cardsAdded = 0;
+
+             const createMeasurementCard = (label, value) => {
+                 if (value != null && String(value).trim() !== '') {
+                     const card = document.createElement('div');
+                     card.classList.add('measurement-card');
+                     card.innerHTML = `
+                         <span class="label">${label}</span>
+                         <span class="value">${value}</span>
+                     `;
+                     measurementContainer.appendChild(card);
+                     cardsAdded++;
+                 }
+             };
+
+             createMeasurementCard('Boobs', data.Boobs);
+             createMeasurementCard('Waist', data.Waist);
+             createMeasurementCard('Ass', data.Ass);
+
+             if (cardsAdded > 0) {
+                 actressDetailsContainer.appendChild(measurementContainer); // Add the container if it has cards
+             }
+             // --- END NEW: Measurement Cards ---
+
+
+             // --- Other Details (using addDetailRow) ---
+             let detailsAdded = false; // Keep track if *any* other details are added
+             const detailFieldsContainer = document.createElement('div'); // Container for the rest
+             const addDetailRow = (label, value) => {
+                 // Check if value is not null/undefined AND not an empty string after trimming
+                 if (value != null && String(value).trim() !== '') {
+                     const div = document.createElement('div');
+                     div.innerHTML = `<strong>${label}:</strong> ${value}`;
+                     detailFieldsContainer.appendChild(div);
+                     detailsAdded = true; // Mark that at least one detail row was added
+                 }
+             };
+
+             addDetailRow('Nome', data.nome); // Display name here as well (can be redundant but often useful)
              addDetailRow('Nascimento', data.dataNascimento);
              if (data.dataNascimento) { addDetailRow('Idade', calculateAge(data.dataNascimento)); }
              if (data.altura != null) { addDetailRow('Altura', `${data.altura} cm`); }
              if (data.peso != null) { addDetailRow('Peso', `${data.peso} kg`); }
-             addDetailRow('Nacionalidade', data.pais); // Map 'pais' to Nationality
+             // Boobs, Waist, Ass are now handled by cards above
+             addDetailRow('Nacionalidade', data.pais);
              addDetailRow('Etnia', data.etnia);
              addDetailRow('Cor Cabelo', data.corCabelo);
              addDetailRow('Cor Olhos', data.corOlhos);
-             addDetailRow('Medidas', data.medidas);
+             addDetailRow('Medidas', data.medidas); // Still display the combined string if present
              addDetailRow('Tipo Corpo', data.tipoCorpo);
-             addDetailRow('Anos Ativa', data.AnosAtiva); // Display start year
+             addDetailRow('Anos Ativa', data.AnosAtiva);
              if (data.nota != null) { addDetailRow('Nota', Number(data.nota).toFixed(1)); }
 
              // Add other fields dynamically, skipping those already handled or internal
              const skipFields = ['foto', 'nome', 'timestamp', 'id', 'filmes', 'videos', 'cenas', 'dataNascimento', 'altura', 'peso', 'createdAt', 'texto', 'pais', 'etnia', 'corCabelo', 'corOlhos', 'medidas', 'tipoCorpo', 'AnosAtiva', 'nota', 'Boobs', 'Waist', 'Ass'];
-             for (const key in data) { if (data.hasOwnProperty(key) && !skipFields.includes(key)) { addDetailRow(capitalizeFirstLetter(key), data[key]); } }
+             for (const key in data) {
+                 if (data.hasOwnProperty(key) && !skipFields.includes(key)) {
+                     addDetailRow(capitalizeFirstLetter(key), data[key]);
+                 }
+             }
 
-             // Display 'texto' if it exists
-             if(data.texto) { addDetailRow('Biografia', data.texto); }
+             // Display 'texto' (Biography) last, potentially longer field
+             if(data.texto) {
+                 addDetailRow('Biografia', data.texto);
+             }
 
+             // Only append the container for other details if it actually contains something
+             if(detailsAdded || (data.texto && String(data.texto).trim() !== '')) {
+                actressDetailsContainer.appendChild(detailFieldsContainer);
+             }
 
-             actressDetailsContainer.appendChild(detailFieldsContainer);
-             if (!detailsAdded && !data.foto && !data.texto) { const noDetailsDiv = document.createElement('div'); noDetailsDiv.classList.add('error'); noDetailsDiv.textContent = 'Sem detalhes adicionais disponíveis.'; actressDetailsContainer.appendChild(noDetailsDiv); }
+             // Display message if NO details at all were found (photo, cards, rows, text)
+             if (!data.foto && cardsAdded === 0 && !detailsAdded && (!data.texto || String(data.texto).trim() === '')) {
+                 const noDetailsDiv = document.createElement('div');
+                 noDetailsDiv.classList.add('error'); // Or a less alarming class
+                 noDetailsDiv.style.textAlign = 'center';
+                 noDetailsDiv.style.marginTop = '20px';
+                 noDetailsDiv.textContent = 'Sem detalhes disponíveis para esta atriz.';
+                 actressDetailsContainer.appendChild(noDetailsDiv);
+             }
         }
+
         function filterAndRenderActressList() {
             if (!actressListUl) return;
             const searchTerm = actressSearchInput?.value.toLowerCase().trim() || '';
@@ -1658,17 +1812,6 @@
         };
         const MAX_SIMILARITY_SCORE = Object.values(SIMILARITY_WEIGHTS).reduce((sum, w) => sum + w, 0);
 
-        function safeParseInt(value) {
-            if (value === null || value === undefined || value === '') return null;
-            const parsed = parseInt(String(value).trim(), 10);
-            return isNaN(parsed) ? null : parsed;
-        }
-
-        function safeStringCompare(strA, strB) {
-            if (strA === null || strA === undefined || strB === null || strB === undefined) return false;
-            return String(strA).trim().toLowerCase() === String(strB).trim().toLowerCase();
-        }
-
         function calculateSimilarity(actressA, actressB) {
             if (!actressA || !actressB || actressA.id === actressB.id) {
                 return 0;
@@ -1878,7 +2021,7 @@
 
         // --- Content Detail Modal Functions ---
         async function showContentDetails(type, id) {
-            console.log(`DEBUG: showContentDetails called for Type: ${type}, ID: ${id}`);
+            // console.log(`DEBUG: showContentDetails called for Type: ${type}, ID: ${id}`);
              if (!contentModal || !contentModalBody || !contentModalTitle) {
                 console.error("Content modal elements not found!");
                 return;
@@ -2082,17 +2225,270 @@
         window.closeModal = function() { if (contentModal) contentModal.style.display = 'none'; };
 
         // --- Movable Actress Popup Functions ---
-        function createActressPopup(actressId, contextActressIds = []) { /* ... (implementation remains the same - omitted for brevity) ... */ }
-        function populateActressPopup(popupElement, data) { /* ... (implementation remains the same - omitted for brevity) ... */ }
-        function makeDraggable(element) { /* ... (implementation remains the same - omitted for brevity) ... */ }
+        // Placeholder - Assuming implementation exists elsewhere or is not needed for this specific request
+        function createActressPopup(actressId, contextActressIds = []) { console.log("Placeholder: createActressPopup called for", actressId); }
+        function populateActressPopup(popupElement, data) { console.log("Placeholder: populateActressPopup"); }
+        function makeDraggable(element) { console.log("Placeholder: makeDraggable"); }
 
         // --- Comparison Modal Functions ---
-        function openComparisonModal(contextIds = []) { /* ... (implementation remains the same - omitted for brevity) ... */ }
-        window.closeComparisonModal = function() { /* ... (implementation remains the same - omitted for brevity) ... */ };
-        function displayComparisonSuggestions(searchTerm) { /* ... (implementation remains the same - omitted for brevity) ... */ }
-        function handleSelectActressForComparison(actressId) { /* ... (implementation remains the same - omitted for brevity) ... */ }
-        function removeActressFromComparison(actressId) { /* ... (implementation remains the same - omitted for brevity) ... */ }
-        function renderComparisonView() { /* ... (implementation remains the same - omitted for brevity) ... */ }
+        function openComparisonModal(initialActressIds = []) {
+            if (!comparisonModal) return;
+            console.log("Opening comparison modal with initial IDs:", initialActressIds);
+
+            // Add initial actresses, ensuring no duplicates and they exist
+            const validInitialIds = new Set(actressesToCompare.map(a => a.id)); // Start with existing ones
+            initialActressIds.forEach(id => {
+                if (allActressesData.some(a => a.id === id)) { // Check if ID is valid
+                    validInitialIds.add(id);
+                } else {
+                    console.warn(`Initial comparison actress ID ${id} not found in allActressesData.`);
+                }
+            });
+
+            // Update the state - filter allActressesData to get full objects for valid IDs
+            actressesToCompare = allActressesData.filter(a => validInitialIds.has(a.id));
+
+            comparisonContextActressIds = [...validInitialIds]; // Keep track if needed
+            if(comparisonSearchInput) comparisonSearchInput.value = '';
+            if(comparisonSuggestionsList) comparisonSuggestionsList.style.display = 'none';
+
+            renderComparisonView(); // Render with potentially pre-filled actresses
+            comparisonModal.style.display = 'flex';
+            comparisonSearchInput?.focus();
+        }
+        window.closeComparisonModal = function() { if (comparisonModal) comparisonModal.style.display = 'none'; };
+
+        function displayComparisonSuggestions(searchTerm) {
+             if (!comparisonSuggestionsList || !comparisonSearchInput) return;
+             const term = searchTerm.trim().toLowerCase();
+             comparisonSuggestionsList.innerHTML = '';
+
+             if (!term) { comparisonSuggestionsList.style.display = 'none'; return; }
+
+             const alreadyComparingIds = actressesToCompare.map(a => a.id);
+
+             const filteredActresses = allActressesData.filter(actress =>
+                 !alreadyComparingIds.includes(actress.id) && // Exclude those already being compared
+                 (actress.nome || '').toLowerCase().includes(term)
+             ).slice(0, 10); // Limit suggestions
+
+             if (filteredActresses.length > 0) {
+                 filteredActresses.forEach(actress => {
+                     const item = document.createElement('div');
+                     item.classList.add('suggestion-item');
+                     item.innerHTML = `
+                         <img src="${actress.foto || 'placeholder.png'}" alt="${actress.nome}" onerror="this.src='placeholder.png';">
+                         <span>${actress.nome}</span>
+                     `;
+                     item.addEventListener('click', () => handleSelectActressForComparison(actress.id));
+                     comparisonSuggestionsList.appendChild(item);
+                 });
+             } else {
+                 const noResults = document.createElement('div');
+                 noResults.classList.add('suggestion-item', 'no-results');
+                 noResults.textContent = 'Nenhuma atriz encontrada';
+                 comparisonSuggestionsList.appendChild(noResults);
+             }
+             comparisonSuggestionsList.style.display = 'block';
+        }
+
+        function handleSelectActressForComparison(actressId) {
+             if (!actressId) return;
+             const actressData = allActressesData.find(a => a.id === actressId);
+             if (actressData && !actressesToCompare.some(a => a.id === actressId)) {
+                 actressesToCompare.push(actressData);
+                 renderComparisonView(); // Re-render with the new actress
+                 if (comparisonSearchInput) comparisonSearchInput.value = '';
+                 if (comparisonSuggestionsList) comparisonSuggestionsList.style.display = 'none';
+                 comparisonSearchInput?.focus();
+             } else if (!actressData) {
+                 console.warn(`Actress data for ID ${actressId} not found.`);
+             }
+        }
+
+        function removeActressFromComparison(actressIdToRemove) {
+             actressesToCompare = actressesToCompare.filter(a => a.id !== actressIdToRemove);
+             renderComparisonView(); // Re-render after removal
+             comparisonSearchInput?.focus(); // Keep focus in search
+        }
+
+        function renderComparisonView() {
+            if (!comparisonModalBody || !comparisonPlaceholder) return;
+            comparisonModalBody.innerHTML = ''; // Clear previous content
+
+            if (actressesToCompare.length === 0) {
+                comparisonPlaceholder.style.display = 'block'; // Show placeholder
+                comparisonModalBody.appendChild(comparisonPlaceholder);
+                return;
+            }
+
+            comparisonPlaceholder.style.display = 'none'; // Hide placeholder
+
+            // --- Data Preparation & Comparison Logic ---
+            const comparedData = actressesToCompare.map(actress => ({
+                 id: actress.id,
+                 data: actress, // Keep full data object
+                 scores: { overall: 0 } // Store calculated scores here
+             }));
+
+             const fieldsToCompare = [
+                 { key: 'foto', label: 'Foto', type: 'image' },
+                 { key: 'nome', label: 'Nome', type: 'string' },
+                 { key: 'age', label: 'Idade', type: 'number', highlight: true, scoreWeight: 0 }, // Highlight, but don't score by default
+                 { key: 'altura', label: 'Altura (cm)', type: 'number', highlight: true, scoreWeight: 0 },
+                 { key: 'peso', label: 'Peso (kg)', type: 'number', highlight: true, scoreWeight: 0 },
+                 { key: 'Boobs', label: 'Boobs', type: 'number', highlight: true, scoreWeight: 1 }, // Score field
+                 { key: 'Waist', label: 'Waist', type: 'number', highlight: true, scoreWeight: 1 }, // Score field
+                 { key: 'Ass', label: 'Ass', type: 'number', highlight: true, scoreWeight: 1 }, // Score field
+                 { key: 'nota', label: 'Nota', type: 'number', highlight: true, scoreWeight: 2 }, // Score field (higher weight)
+                 { key: 'pais', label: 'País', type: 'string' },
+                 { key: 'etnia', label: 'Etnia', type: 'string' },
+                 // Add more fields as needed
+             ];
+
+             // Find min/max and calculate scores for relevant fields
+             let totalScoreWeight = 0;
+             fieldsToCompare.forEach(field => {
+                 if (field.highlight || field.scoreWeight > 0) {
+                    let values = [];
+                    comparedData.forEach(item => {
+                         let value = null;
+                         if (field.key === 'age') {
+                             const age = calculateAge(item.data.dataNascimento);
+                             value = (age !== '?') ? age : null;
+                         } else if (field.type === 'number') {
+                              value = safeParseInt(item.data[field.key]);
+                         }
+                         if (value !== null) {
+                             values.push(value);
+                         }
+                    });
+
+                    field.min = values.length > 0 ? Math.min(...values) : null;
+                    field.max = values.length > 0 ? Math.max(...values) : null;
+                    field.range = (field.max !== null && field.min !== null) ? field.max - field.min : 0;
+
+                    // Calculate individual field score contribution
+                    if (field.scoreWeight > 0 && field.range !== null) {
+                         totalScoreWeight += field.scoreWeight;
+                         comparedData.forEach(item => {
+                             let value = null;
+                             // Use consistent way to get numeric value for scoring
+                              if (field.key === 'age') {
+                                  const age = calculateAge(item.data.dataNascimento);
+                                  value = (age !== '?') ? age : null;
+                              } else if (field.type === 'number') {
+                                  value = safeParseInt(item.data[field.key]);
+                              }
+
+                             if (value !== null) {
+                                 // Normalize (0 to 1, higher is better)
+                                 const normalized = (field.range > 0) ? (value - field.min) / field.range : (values.length === 1 ? 0.5 : 0); // Handle single value case or all same
+                                 item.scores[field.key] = normalized * field.scoreWeight; // Weighted score part
+                                 item.scores.overall += item.scores[field.key];
+                             } else {
+                                  item.scores[field.key] = 0; // No score if value missing
+                             }
+                         });
+                    }
+                 }
+             });
+
+             // Find winner based on overall score
+             let winnerId = null;
+             let maxOverallScore = -Infinity;
+              if (totalScoreWeight > 0 && comparedData.length > 1) { // Only determine winner if scoring fields exist AND more than one actress
+                  comparedData.forEach(item => {
+                      // Check overall score (might be float, use tolerance or check >)
+                      if (item.scores.overall > maxOverallScore) {
+                           maxOverallScore = item.scores.overall;
+                           winnerId = item.id;
+                      }
+                  });
+                   // Optional: Handle ties - currently picks the last one found with max score
+                   const winners = comparedData.filter(item => Math.abs(item.scores.overall - maxOverallScore) < 0.001); // Tolerance for float comparison
+                   if (winners.length > 1) winnerId = null; // No single winner if tie
+              }
+
+            // --- Generate HTML ---
+            comparedData.forEach(item => {
+                const actress = item.data;
+                const column = document.createElement('div');
+                column.classList.add('comparison-column');
+                if (item.id === winnerId) { // Highlight only if single winner
+                     column.classList.add('comparison-winner'); // Add winner class
+                }
+
+                // Remove Button
+                const removeBtn = document.createElement('button');
+                removeBtn.classList.add('remove-compare-btn');
+                removeBtn.title = `Remover ${actress.nome}`;
+                removeBtn.textContent = '×';
+                removeBtn.onclick = () => removeActressFromComparison(actress.id);
+                column.appendChild(removeBtn);
+
+                // Header (Name)
+                const nameHeader = document.createElement('h4');
+                nameHeader.textContent = actress.nome || 'Nome Indisponível';
+                 if (item.id === winnerId) { // Add trophy only if single winner
+                     nameHeader.textContent += ' 🏆'; // Add trophy to winner
+                 }
+                column.appendChild(nameHeader);
+
+                // Fields
+                fieldsToCompare.forEach(field => {
+                    const div = document.createElement('div');
+                    let valueDisplay = '';
+                    let value = null; // The actual value for comparison logic
+
+                    if (field.type === 'image') {
+                        valueDisplay = `<img src="${actress[field.key] || 'placeholder.png'}" alt="${actress.nome}" onerror="this.src='placeholder.png';">`;
+                        // Don't add label for image
+                        div.innerHTML = valueDisplay;
+                    } else {
+                         // Get value consistently
+                         if (field.key === 'age') {
+                             const age = calculateAge(actress.dataNascimento);
+                             value = (age !== '?') ? age : null;
+                             valueDisplay = age; // Display '?' if needed
+                         } else {
+                             value = actress[field.key]; // Raw value
+                             valueDisplay = value != null ? String(value) : '-';
+                         }
+
+                         div.innerHTML = `<strong>${field.label}:</strong> `;
+                         const valueSpan = document.createElement('span');
+                         valueSpan.textContent = valueDisplay;
+
+                         // Apply highlighting classes (only if more than 1 actress is compared)
+                         if (comparedData.length > 1 && field.highlight && field.type === 'number' && value !== null && field.min !== null) {
+                            const numericValue = (field.key === 'age') ? value : safeParseInt(value); // Use pre-calculated age or parse
+                            if (numericValue === field.max && field.min !== field.max) { // Don't highlight if all are same
+                                 valueSpan.classList.add('value-highest');
+                            }
+                             if (numericValue === field.min && field.min !== field.max) { // Don't highlight if all are same
+                                 valueSpan.classList.add('value-lowest');
+                            }
+                         }
+                         div.appendChild(valueSpan);
+                    }
+                     column.appendChild(div);
+                });
+
+                 // Display Overall Score (Optional)
+                 if (totalScoreWeight > 0) {
+                     const scoreDiv = document.createElement('div');
+                     scoreDiv.innerHTML = `<strong>Score Geral:</strong> <span style="font-weight: bold; color: #0056b3;">${item.scores.overall.toFixed(2)}</span>`;
+                     scoreDiv.style.marginTop = '10px';
+                     scoreDiv.style.paddingTop = '8px';
+                     scoreDiv.style.borderTop = '1px dashed #ccc';
+                     column.appendChild(scoreDiv);
+                 }
+
+
+                comparisonModalBody.appendChild(column);
+            });
+        }
 
         // --- FAB and Create Menu/Modal Functions ---
         function toggleCreateMenu() { if (createMenuPopup) { const isVisible = createMenuPopup.style.display === 'block'; createMenuPopup.style.display = isVisible ? 'none' : 'block'; } }
@@ -2919,7 +3315,7 @@
 
         // --- Statistics Modal Functions ---
         function openStatsModal() {
-             console.log("DEBUG: openStatsModal called");
+             // console.log("DEBUG: openStatsModal called");
              if (!statsModal) { console.error("Stats modal element not found"); return; }
              // Reset view
              if (statsResultsContainer) { statsResultsContainer.innerHTML = '<p>Selecione uma opção acima para ver as estatísticas.</p>'; }
@@ -3119,7 +3515,7 @@
 
         // --- Filter Modal Functions ---
         function openFilterModal() {
-            console.log("DEBUG: openFilterModal called");
+            // console.log("DEBUG: openFilterModal called");
              if (!filterModal) { console.error("Filter modal element not found"); return; }
              populateFilterOptions(); // Populate dropdowns based on current data
              setFilterFormValues(); // Set form values based on activeActressFilters
@@ -3215,7 +3611,7 @@
                  }
             });
              // Clean up potential empty mappings if selects were reset (handled by initial check)
-            console.log("Active Filters Updated:", activeActressFilters);
+            // console.log("Active Filters Updated:", activeActressFilters);
         }
         function handleApplyFilters() {
             updateActiveFiltersFromForm();
@@ -3359,6 +3755,7 @@
         }); // End DOMContentLoaded
 
     </script>
+
 
   </body>
   </html>
