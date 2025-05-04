@@ -99,84 +99,120 @@ def extract_start_year(active_text):
 # --- Função para Parsear o HTML (ADAPTE OS SELETORES!) ---
 def parse_html_data(soup):
     data = {}
-    app.logger.info("Starting HTML parsing...")
+    app.logger.info("Starting HTML parsing using 'biolist' structure...")
 
     try:
-        # Tenta encontrar a div principal que parece conter as stats (pode mudar!)
-        # Inspecione a página e ajuste 'div', '#bio' conforme necessário
-        stats_container = soup.find('div', id='bio') # Ou outra div/section relevante
+        # 1. Encontra a lista UL com id 'biolist'
+        biolist = soup.find('ul', id='biolist')
 
-        if not stats_container:
-            app.logger.warning("Could not find primary stats container (e.g., div#bio). Searching page globally.")
-            # Usa 'soup' (página inteira) como fallback se o container não for encontrado
-            stats_container = soup
+        if not biolist:
+            app.logger.warning("Could not find <ul id='biolist'>. Data extraction might fail.")
+            return data # Retorna vazio se a lista principal não for encontrada
 
-        # Mapeamento de texto âncora (em negrito) para a chave no nosso objeto data
-        # A ordem pode importar se a estrutura for consistente
+        # Mapeamento do texto da label para a nossa chave de dados interna
         label_map = {
+            "Age:": "age_raw", # Guarda a string completa da idade
             "Born:": "born",
             "Birthplace:": "birthplace",
             "Ethnicity:": "ethnicity",
+            "Sexuality:": "sexuality", # Campo novo
+            "Profession:": "profession", # Campo novo
             "Hair color:": "hair_color",
             "Eye color:": "eye_color",
             "Height:": "height",
             "Weight:": "weight",
             "Body type:": "body_type",
             "Measurements:": "measurements",
+            "Bra/cup size:": "bra_cup_size", # Campo novo
+            "Boobs:": "boobs_type", # Campo novo (Fake/Enhanced)
+            "Pubic hair:": "pubic_hair", # Campo novo
             "Years active:": "years_active",
-            # Adicione outras labels que você quer extrair
+            "Tattoos:": "tattoos", # Campo novo
+            "Piercings:": "piercings", # Campo novo
+            "Instagram follower count:": "instagram_followers" # Campo novo
+            # Adicione outras labels se necessário
         }
 
-        # Encontra todas as tags <strong> (ou a tag que contém a label)
-        # dentro do container (ou da página inteira se container falhou)
-        strong_tags = stats_container.find_all('strong')
-        app.logger.info(f"Found {len(strong_tags)} <strong> tags.")
+        # 2. Itera sobre cada item <li> dentro da lista
+        for li_item in biolist.find_all('li', recursive=False): # recursive=False para pegar só filhos diretos
+            # 3. Encontra o span da label dentro do <li>
+            label_span = li_item.find('span', class_='label')
+            if not label_span:
+                continue # Pula este <li> se não encontrar a label
 
-        for tag in strong_tags:
-            label_text = tag.get_text(strip=True) # Pega o texto da label (ex: "Born:")
+            label_text = label_span.get_text(strip=True) # Ex: "Born:"
+
+            # 4. Verifica se a label é uma das que queremos
             if label_text in label_map:
-                data_key = label_map[label_text] # Mapeia para nossa chave (ex: "born")
-                # Pega o texto que vem *depois* da tag <strong>
-                raw_value = tag.next_sibling
-                if raw_value and isinstance(raw_value, str) and raw_value.strip():
-                    value = raw_value.strip()
-                    app.logger.info(f"Found label '{label_text}' -> Raw value: '{value}'")
+                data_key = label_map[label_text] # Ex: "born"
 
-                    # Aplica formatação/extração específica baseada na chave
+                # 5. Pega o nó irmão *seguinte* à label (deve ser o texto do valor)
+                value_node = label_span.next_sibling
+                raw_value = None
+                if value_node and isinstance(value_node, str):
+                    raw_value = value_node.strip()
+                elif value_node and value_node.name == 'a':
+                     # Caso especial onde o valor é um link (ex: Birthplace, Hair color)
+                     # Pega o texto do link e talvez o texto seguinte se houver (país)
+                     raw_value = value_node.get_text(strip=True)
+                     # Tenta pegar o texto após o link (ex: ", United States")
+                     after_link_node = value_node.next_sibling
+                     if after_link_node and isinstance(after_link_node, str) and after_link_node.strip().startswith(','):
+                         raw_value += after_link_node.strip()
+
+                if raw_value:
+                    app.logger.info(f"Found label '{label_text}' -> Raw value: '{raw_value}'")
+
+                    # 6. Aplica limpeza/formatação específica
                     if data_key == 'born':
-                        data['born'] = format_babepedia_date(value)
+                        # Tenta formatar a data completa que vem após a label
+                        data[data_key] = format_babepedia_date(raw_value)
                     elif data_key == 'birthplace':
-                        data['birthplace'] = extract_country(value)
+                        # A função auxiliar já pega a última parte
+                        data[data_key] = extract_country(raw_value)
                     elif data_key == 'height':
-                        data['height'] = extract_cm(value)
+                        data[data_key] = extract_cm(raw_value)
                     elif data_key == 'weight':
-                        data['weight'] = extract_kg(value)
+                        data[data_key] = extract_kg(raw_value)
                     elif data_key == 'years_active':
-                        data['years_active'] = extract_start_year(value)
+                        data[data_key] = extract_start_year(raw_value)
                     elif data_key == 'measurements':
-                        cleaned_value = value.split('Bra/cup size:')[0].strip() # Remove info extra
-                        data['measurements'] = cleaned_value
-                        # Tenta extrair BWH de 'measurements'
+                        # O valor já vem mais limpo aqui
+                        cleaned_value = raw_value.split('Bra/cup size:')[0].strip()
+                        data[data_key] = cleaned_value
+                        # Tenta extrair BWH das medidas
                         parts = cleaned_value.split('-')
                         if len(parts) == 3:
                             data['Boobs'] = extract_first_number(parts[0])
                             data['Waist'] = extract_first_number(parts[1])
                             data['Ass'] = extract_first_number(parts[2])
+                    elif data_key == 'profession' or data_key == 'tattoos' or data_key == 'piercings':
+                         # Para campos que podem ter múltiplos valores com links ou texto
+                         # Pega todo o texto dentro do <li> após a label
+                         all_texts = [text for text in li_item.stripped_strings if text != label_text]
+                         data[data_key] = " ".join(all_texts).strip()
+                    elif data_key == 'hair_color' or data_key == 'eye_color' or data_key == 'body_type' or data_key == 'boobs_type':
+                         # Pega o texto do primeiro link ou o texto direto
+                         link = li_item.find('a')
+                         if link:
+                             data[data_key] = link.get_text(strip=True)
+                         elif raw_value: # Fallback para texto direto se não houver link
+                              data[data_key] = raw_value
                     else:
-                        # Para outros campos, apenas guarda o valor limpo
-                        data[data_key] = value.strip()
-
+                        # Para outros campos, usa o valor bruto extraído (já stripado)
+                        data[data_key] = raw_value
                 else:
-                    app.logger.warning(f"Found label '{label_text}' but next sibling was not valid text.")
-
-        if not data:
-            app.logger.warning("Parsing finished but no data was extracted via labels. Check selectors/structure.")
+                    app.logger.warning(f"Found label '{label_text}' but could not extract a valid text value after it.")
 
     except Exception as e:
-        app.logger.error(f"Error during HTML parsing: {e}", exc_info=True)
+        app.logger.error(f"Error during HTML parsing within 'biolist': {e}", exc_info=True)
 
-    app.logger.info(f"Finished parsing. Extracted data: {data}")
-    return data
+    # Remove chaves cujo valor final é None ou vazio
+    data_cleaned = {k: v for k, v in data.items() if v is not None and v != ''}
+
+    app.logger.info(f"Finished parsing. Extracted data (cleaned): {data_cleaned}")
+    return data_cleaned
+    
 
 # --- Função Principal de Scraping ---
 def scrape_babepedia_data(babe_name_formatted):
