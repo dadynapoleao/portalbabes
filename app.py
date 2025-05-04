@@ -102,107 +102,112 @@ def parse_html_data(soup):
     app.logger.info("Starting HTML parsing using 'biolist' structure...")
 
     try:
-        # 1. Encontra a lista UL com id 'biolist'
         biolist = soup.find('ul', id='biolist')
-
         if not biolist:
             app.logger.warning("Could not find <ul id='biolist'>. Data extraction might fail.")
-            return data # Retorna vazio se a lista principal não for encontrada
+            return data
 
-        # Mapeamento do texto da label para a nossa chave de dados interna
         label_map = {
-            "Age:": "age_raw", # Guarda a string completa da idade
+            "Age:": "age_raw",
             "Born:": "born",
             "Birthplace:": "birthplace",
             "Ethnicity:": "ethnicity",
-            "Sexuality:": "sexuality", # Campo novo
-            "Profession:": "profession", # Campo novo
+            "Sexuality:": "sexuality",
+            "Profession:": "profession",
             "Hair color:": "hair_color",
             "Eye color:": "eye_color",
             "Height:": "height",
             "Weight:": "weight",
             "Body type:": "body_type",
-            "Measurements:": "measurements",
-            "Bra/cup size:": "bra_cup_size", # Campo novo
-            "Boobs:": "boobs_type", # Campo novo (Fake/Enhanced)
-            "Pubic hair:": "pubic_hair", # Campo novo
+            "Measurements:": "measurements_raw", # Renomeado para guardar valor bruto
+            "Bra/cup size:": "bra_cup_size",
+            "Boobs:": "boobs_type",
+            "Pubic hair:": "pubic_hair",
             "Years active:": "years_active",
-            "Tattoos:": "tattoos", # Campo novo
-            "Piercings:": "piercings", # Campo novo
-            "Instagram follower count:": "instagram_followers" # Campo novo
-            # Adicione outras labels se necessário
+            "Tattoos:": "tattoos",
+            "Piercings:": "piercings",
+            "Instagram follower count:": "instagram_followers"
         }
 
-        # 2. Itera sobre cada item <li> dentro da lista
-        for li_item in biolist.find_all('li', recursive=False): # recursive=False para pegar só filhos diretos
-            # 3. Encontra o span da label dentro do <li>
+        temp_data = {} # Dicionário temporário para guardar valores brutos e processados
+
+        for li_item in biolist.find_all('li', recursive=False):
             label_span = li_item.find('span', class_='label')
-            if not label_span:
-                continue # Pula este <li> se não encontrar a label
+            if not label_span: continue
 
-            label_text = label_span.get_text(strip=True) # Ex: "Born:"
-
-            # 4. Verifica se a label é uma das que queremos
+            label_text = label_span.get_text(strip=True)
             if label_text in label_map:
-                data_key = label_map[label_text] # Ex: "born"
-
-                # 5. Pega o nó irmão *seguinte* à label (deve ser o texto do valor)
+                data_key = label_map[label_text]
                 value_node = label_span.next_sibling
                 raw_value = None
                 if value_node and isinstance(value_node, str):
                     raw_value = value_node.strip()
                 elif value_node and value_node.name == 'a':
-                     # Caso especial onde o valor é um link (ex: Birthplace, Hair color)
-                     # Pega o texto do link e talvez o texto seguinte se houver (país)
                      raw_value = value_node.get_text(strip=True)
-                     # Tenta pegar o texto após o link (ex: ", United States")
                      after_link_node = value_node.next_sibling
                      if after_link_node and isinstance(after_link_node, str) and after_link_node.strip().startswith(','):
                          raw_value += after_link_node.strip()
 
                 if raw_value:
                     app.logger.info(f"Found label '{label_text}' -> Raw value: '{raw_value}'")
+                    temp_data[data_key] = raw_value # Guarda o valor bruto ou semi-processado
 
-                    # 6. Aplica limpeza/formatação específica
-                    if data_key == 'born':
-                        # Tenta formatar a data completa que vem após a label
-                        data[data_key] = format_babepedia_date(raw_value)
-                    elif data_key == 'birthplace':
-                        # A função auxiliar já pega a última parte
-                        data[data_key] = extract_country(raw_value)
-                    elif data_key == 'height':
-                        data[data_key] = extract_cm(raw_value)
-                    elif data_key == 'weight':
-                        data[data_key] = extract_kg(raw_value)
-                    elif data_key == 'years_active':
-                        data[data_key] = extract_start_year(raw_value)
-                    elif data_key == 'measurements':
-                        # O valor já vem mais limpo aqui
-                        cleaned_value = raw_value.split('Bra/cup size:')[0].strip()
-                        data[data_key] = cleaned_value
-                        # Tenta extrair BWH das medidas
-                        parts = cleaned_value.split('-')
-                        if len(parts) == 3:
-                            data['Boobs'] = extract_first_number(parts[0])
-                            data['Waist'] = extract_first_number(parts[1])
-                            data['Ass'] = extract_first_number(parts[2])
-                    elif data_key == 'profession' or data_key == 'tattoos' or data_key == 'piercings':
-                         # Para campos que podem ter múltiplos valores com links ou texto
-                         # Pega todo o texto dentro do <li> após a label
-                         all_texts = [text for text in li_item.stripped_strings if text != label_text]
-                         data[data_key] = " ".join(all_texts).strip()
-                    elif data_key == 'hair_color' or data_key == 'eye_color' or data_key == 'body_type' or data_key == 'boobs_type':
-                         # Pega o texto do primeiro link ou o texto direto
-                         link = li_item.find('a')
-                         if link:
-                             data[data_key] = link.get_text(strip=True)
-                         elif raw_value: # Fallback para texto direto se não houver link
-                              data[data_key] = raw_value
-                    else:
-                        # Para outros campos, usa o valor bruto extraído (já stripado)
-                        data[data_key] = raw_value
+        # Agora processa os valores guardados em temp_data
+        if 'born' in temp_data: data['born'] = format_babepedia_date(temp_data['born'])
+        if 'birthplace' in temp_data: data['birthplace'] = extract_country(temp_data['birthplace'])
+        if 'height' in temp_data: data['height'] = extract_cm(temp_data['height'])
+        if 'weight' in temp_data: data['weight'] = extract_kg(temp_data['weight'])
+        if 'years_active' in temp_data: data['years_active'] = extract_start_year(temp_data['years_active'])
+
+        # Processa Measurements para extrair BWH e criar string limpa
+        if 'measurements_raw' in temp_data:
+            cleaned_value = temp_data['measurements_raw'].split('Bra/cup size:')[0].strip()
+            parts = cleaned_value.split('-')
+            boobs_num, waist_num, ass_num = None, None, None
+            if len(parts) == 3:
+                boobs_num = extract_first_number(parts[0])
+                waist_num = extract_first_number(parts[1])
+                ass_num = extract_first_number(parts[2])
+                if boobs_num: data['Boobs'] = boobs_num
+                if waist_num: data['Waist'] = waist_num
+                if ass_num: data['Ass'] = ass_num
+                # Cria a string limpa SÓ SE conseguiu extrair os 3 números
+                if boobs_num and waist_num and ass_num:
+                    data['measurements'] = f"{boobs_num}-{waist_num}-{ass_num}"
                 else:
-                    app.logger.warning(f"Found label '{label_text}' but could not extract a valid text value after it.")
+                     data['measurements'] = cleaned_value # Fallback para valor semi-limpo se BWH falhou
+            else:
+                 data['measurements'] = cleaned_value # Guarda valor semi-limpo se não tinha formato B-W-H
+
+        # Processa outros campos que podem ter links ou só texto
+        text_fields = ['ethnicity', 'sexuality', 'hair_color', 'eye_color', 'body_type', 'boobs_type', 'pubic_hair', 'bra_cup_size', 'instagram_followers']
+        for key in text_fields:
+            if key in temp_data:
+                # Prioriza texto de link se existir dentro do <li> correspondente
+                li_for_key = soup.find('span', class_='label', string=lambda t: t and t.strip() == next((k for k, v in label_map.items() if v == key), None))
+                if li_for_key:
+                     link = li_for_key.find_next('a')
+                     if link:
+                         data[key] = link.get_text(strip=True)
+                     else:
+                          data[key] = temp_data[key] # Usa o valor bruto se não achou link
+                else:
+                     data[key] = temp_data[key] # Usa valor bruto se não achou label
+
+        # Processa campos com múltiplos valores/texto longo
+        long_text_fields = ['profession', 'tattoos', 'piercings']
+        for key in long_text_fields:
+             if key in temp_data:
+                 li_for_key = soup.find('span', class_='label', string=lambda t: t and t.strip() == next((k for k, v in label_map.items() if v == key), None))
+                 if li_for_key and li_for_key.parent: # Precisa do pai (<li>) para pegar todos os textos
+                    all_texts = [text for text in li_for_key.parent.stripped_strings if text != label_map.get(key)]
+                    data[key] = " ".join(all_texts).strip()
+                 else:
+                     data[key] = temp_data[key] # Fallback
+
+        # Guarda age_raw se encontrado
+        if 'age_raw' in temp_data: data['age_raw'] = temp_data['age_raw']
+
 
     except Exception as e:
         app.logger.error(f"Error during HTML parsing within 'biolist': {e}", exc_info=True)
