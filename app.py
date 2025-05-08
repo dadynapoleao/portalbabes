@@ -1,21 +1,21 @@
 # --- Imports ---
 import os
 from flask import Flask, request, jsonify
-from flask_cors import CORS # Importa o CORS
+from flask_cors import CORS
 import requests
 from bs4 import BeautifulSoup
 import logging
-import re # Importa regex para ajudar na limpeza (exemplo)
+import re
 
 # --- Configuração do Flask App e CORS ---
 app = Flask(__name__)
 CORS(app)
 
 # --- Configuração de Logging ---
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO) # Mudado para INFO para ver os logs de info por padrão
 gunicorn_logger = logging.getLogger('gunicorn.error')
 app.logger.handlers.extend(gunicorn_logger.handlers)
-app.logger.setLevel(logging.INFO)
+app.logger.setLevel(logging.INFO) # Garante que os logs do app também sejam INFO
 
 # --- Funções Auxiliares de Extração/Formatação ---
 
@@ -47,46 +47,72 @@ def extract_kg(weight_text):
 def format_babepedia_date(date_text):
     if not date_text: return None
     month_map = {'january': '01', 'february': '02', 'march': '03', 'april': '04', 'may': '05', 'june': '06', 'july': '07', 'august': '08', 'september': '09', 'october': '10', 'november': '11', 'december': '12'}
-    # Formato: Day (optional suffix) of Month Year (e.g., "20th of December 1985", "1st of January 2000")
     match_detailed = re.search(r'(\d{1,2})(?:st|nd|rd|th)?\s+of\s+([a-zA-Z]+)\s+(\d{4})', date_text, re.IGNORECASE)
     if match_detailed:
-        day = match_detailed.group(1).zfill(2)
-        month_name = match_detailed.group(2).lower()
-        year = match_detailed.group(3)
+        day = match_detailed.group(1).zfill(2); month_name = match_detailed.group(2).lower(); year = match_detailed.group(3)
         month_number = month_map.get(month_name)
         if month_number: return f"{year}/{month_number}/{day}"
-
-    # Formato: Day Month Year (e.g., "23 June 1998", "23rd June 1998") - (from your original source)
     match_day_month_year = re.search(r'(\d{1,2})(?:st|nd|rd|th)?\s+([a-zA-Z]+)\s+(\d{4})', date_text, re.IGNORECASE)
     if match_day_month_year:
-        day = match_day_month_year.group(1).zfill(2)
-        month_name = match_day_month_year.group(2).lower()
-        year = match_day_month_year.group(3)
+        day = match_day_month_year.group(1).zfill(2); month_name = match_day_month_year.group(2).lower(); year = match_day_month_year.group(3)
         month_number = month_map.get(month_name)
         if month_number: return f"{year}/{month_number}/{day}"
-        
-    app.logger.warning(f"Could not parse date format: {date_text}")
+    app.logger.debug(f"Could not parse date format with known patterns: {date_text}") # Mudado para DEBUG
     return date_text
 
 def extract_country(birthplace_text):
-    if not birthplace_text: return None
-    parts = birthplace_text.split(',')
-    return parts[-1].strip() if parts else None
+    if not birthplace_text:
+        app.logger.debug("extract_country: Input is None or empty, returning None")
+        return None
+    
+    app.logger.debug(f"extract_country: Original input: '{birthplace_text}'")
+    
+    # Remove qualquer coisa em parênteses no final da string inteira.
+    # Ex: "California, United States (West Coast)" -> "California, United States"
+    # Ex: "Hungary (Europe)" -> "Hungary"
+    text_cleaned = re.sub(r'\s*\([^)]*\)$', '', birthplace_text).strip()
+    app.logger.debug(f"extract_country: After removing final parentheses: '{text_cleaned}'")
+
+    # Se remover os parênteses resultar em string vazia, usa a original para split.
+    # Isso pode acontecer se o formato for apenas "(Country)" - raro, mas possível.
+    source_for_split = text_cleaned if text_cleaned else birthplace_text
+    parts = source_for_split.split(',')
+    app.logger.debug(f"extract_country: Parts after split from '{source_for_split}': {parts}")
+
+    if not parts:
+        app.logger.warning(f"extract_country: No parts after split for '{source_for_split}'. Returning None.")
+        return None
+
+    country_candidate = parts[-1].strip() # Pega a última parte
+    app.logger.debug(f"extract_country: Candidate (last part stripped): '{country_candidate}'")
+    
+    # Se a última parte for vazia (ex: "USA, ") e houver mais de uma parte, tenta a penúltima.
+    if not country_candidate and len(parts) > 1:
+        app.logger.debug("extract_country: Last part was empty, trying second to last part.")
+        country_candidate = parts[-2].strip()
+        app.logger.debug(f"extract_country: Second to last part candidate: '{country_candidate}'")
+
+    if not country_candidate:
+        app.logger.warning(f"extract_country: Could not determine country from '{birthplace_text}'. Candidate is empty. Returning original cleaned text if available, or original input.")
+        # Fallback para o texto limpo se o candidato final for vazio; senão, o original.
+        return text_cleaned if text_cleaned else birthplace_text 
+    
+    app.logger.info(f"extract_country: Extracted country: '{country_candidate}' from input '{birthplace_text}'")
+    return country_candidate
+
 
 def extract_start_year(active_text):
     if not active_text: return None
     match = re.search(r'^(\d{4})\s*-\s*present', active_text)
     if match: return match.group(1)
-    match_year_only = re.search(r'^(\d{4})', active_text) # Fallback if only year
+    match_year_only = re.search(r'^(\d{4})', active_text)
     if match_year_only: return match_year_only.group(1)
     return None
 
 # --- Função para Parsear o HTML ---
 def parse_html_data(soup):
-    data = {} # Dicionário final para os dados processados
-    temp_data = {} # Dicionário temporário para valores brutos/semi-processados
+    data = {}; temp_data = {}
     app.logger.info("Starting HTML parsing using 'biolist' structure...")
-
     try:
         biolist = soup.find('ul', id='biolist')
         if not biolist:
@@ -105,31 +131,27 @@ def parse_html_data(soup):
 
         for li_item in biolist.find_all('li', recursive=False):
             label_span = li_item.find('span', class_='label')
-            if not label_span:
-                continue
-
+            if not label_span: continue
             label_text_from_span = label_span.get_text(strip=True)
-
             if label_text_from_span in label_map:
                 data_key = label_map[label_text_from_span]
                 value_parts = []
-                for elem in label_span.next_siblings: # Iterar sobre os irmãos DEPOIS do label span
-                    if elem.name == 'a': # Se for um link
+                for elem in label_span.next_siblings:
+                    if elem.name == 'a':
                         link_text = elem.get_text(strip=True)
                         if link_text: value_parts.append(link_text)
-                    elif isinstance(elem, str): # Se for texto puro
+                    elif isinstance(elem, str):
                         text_content = elem.strip()
                         if text_content and text_content != ',': value_parts.append(text_content)
-                
                 raw_value = " ".join(value_parts).strip()
-                raw_value = re.sub(r'\s*,\s*', ', ', raw_value).strip(' ,') # Limpa vírgulas e espaços
-
+                raw_value = re.sub(r'\s*,\s*', ', ', raw_value).strip(' ,')
                 if raw_value:
-                    app.logger.info(f"Found label '{label_text_from_span}' for key '{data_key}' -> Raw value from <li>: '{raw_value}'")
+                    # LOG IMPORTANTE AQUI: Veja o que está sendo capturado para 'birthplace'
+                    app.logger.info(f"Raw extraction for label '{label_text_from_span}' (key: '{data_key}') -> Value: '{raw_value}'")
                     temp_data[data_key] = raw_value
         
-        # Processa os valores de temp_data para o dicionário final 'data'
         if 'born' in temp_data: data['born'] = format_babepedia_date(temp_data['born'])
+        # Chamada da função extract_country com o raw_value de birthplace
         if 'birthplace' in temp_data: data['birthplace'] = extract_country(temp_data['birthplace'])
         if 'height' in temp_data: data['height'] = extract_cm(temp_data['height'])
         if 'weight' in temp_data: data['weight'] = extract_kg(temp_data['weight'])
@@ -137,35 +159,29 @@ def parse_html_data(soup):
 
         if 'measurements_raw' in temp_data:
             cleaned_value = temp_data['measurements_raw'].split('Bra/cup size:')[0].strip()
-            parts = cleaned_value.split('-')
-            boobs_num, waist_num, ass_num = None, None, None
+            parts = cleaned_value.split('-'); boobs_num, waist_num, ass_num = None, None, None
             if len(parts) == 3:
-                boobs_num = extract_first_number(parts[0])
-                waist_num = extract_first_number(parts[1])
-                ass_num = extract_first_number(parts[2])
+                boobs_num = extract_first_number(parts[0]); waist_num = extract_first_number(parts[1]); ass_num = extract_first_number(parts[2])
                 if boobs_num: data['Boobs'] = boobs_num
                 if waist_num: data['Waist'] = waist_num
                 if ass_num: data['Ass'] = ass_num
-                if boobs_num and waist_num and ass_num:
-                    data['measurements'] = f"{boobs_num}-{waist_num}-{ass_num}"
+                if boobs_num and waist_num and ass_num: data['measurements'] = f"{boobs_num}-{waist_num}-{ass_num}"
                 else: data['measurements'] = cleaned_value 
             else: data['measurements'] = cleaned_value
 
-        # Atribui diretamente outros campos que já foram processados pelo loop principal
         direct_assignment_keys = [
             'age_raw', 'ethnicity', 'sexuality', 'profession', 'hair_color', 'eye_color', 
             'body_type', 'bra_cup_size', 'boobs_type', 'pubic_hair', 
             'tattoos', 'piercings', 'instagram_followers'
         ]
         for key in direct_assignment_keys:
-            if key in temp_data:
-                data[key] = temp_data[key]
+            if key in temp_data: data[key] = temp_data[key]
 
     except Exception as e:
-        app.logger.error(f"Error during HTML parsing within 'biolist': {e}", exc_info=True)
+        app.logger.error(f"Error during HTML parsing: {e}", exc_info=True)
 
     data_cleaned = {k: v for k, v in data.items() if v is not None and str(v).strip() != ''}
-    app.logger.info(f"Finished parsing. Extracted data (cleaned): {data_cleaned}")
+    app.logger.info(f"Finished parsing. Final data to be returned (cleaned): {data_cleaned}")
     return data_cleaned
     
 # --- Função Principal de Scraping ---
@@ -175,7 +191,7 @@ def scrape_babepedia_data(babe_name_formatted):
     scraped_info = {}
     try:
         app.logger.info(f"Requesting URL: {url}")
-        response = requests.get(url, headers=headers, timeout=15) # Aumentado timeout
+        response = requests.get(url, headers=headers, timeout=15)
         response.raise_for_status()
         app.logger.info(f"Request successful (Status: {response.status_code}). Parsing content...")
         soup = BeautifulSoup(response.content, 'html.parser')
@@ -183,14 +199,10 @@ def scrape_babepedia_data(babe_name_formatted):
         scraped_info['searched_name'] = babe_name_formatted
         scraped_info['source_url'] = url
         useful_keys = [k for k in scraped_info if k not in ['searched_name', 'source_url']]
-        if not useful_keys and "error" not in scraped_info : # Verifica se não há erro já definido
+        if not useful_keys and "error" not in scraped_info :
              app.logger.warning(f"Scraping for {babe_name_formatted} completed, but no specific data fields were extracted.")
-             # Não definir como erro aqui, deixar o frontend decidir se "sem dados" é um erro
-             # scraped_info["status_message"] = "Dados não encontrados ou não extraídos da página."
-
     except requests.exceptions.HTTPError as e:
-        status_code = e.response.status_code
-        app.logger.error(f"HTTP Error {status_code} for {url}: {e}")
+        status_code = e.response.status_code; app.logger.error(f"HTTP Error {status_code} for {url}: {e}")
         scraped_info = {"error": f"Atriz não encontrada ou erro na página (Status: {status_code})", "status_code": status_code}
     except requests.exceptions.Timeout:
         app.logger.error(f"Request timed out for {url}")
@@ -211,15 +223,13 @@ def scrape_babe_api():
     if not babe_name:
         app.logger.warning("API Request received without 'name' parameter.")
         return jsonify({"error": "Parâmetro 'name' é obrigatório"}), 400
-    
     scraped_data = scrape_babepedia_data(babe_name)
-    
     if "error" in scraped_data:
         status = scraped_data.get("status_code", 500)
         app.logger.info(f"API Returning error for {babe_name}: Status {status}, Message: {scraped_data['error']}")
         return jsonify(scraped_data), status
     else:
-        app.logger.info(f"API Successfully scraped data for {babe_name}. Returning JSON.")
+        app.logger.info(f"API Successfully scraped data for {babe_name}. Returning JSON: {scraped_data}")
         return jsonify(scraped_data)
 
 # --- Para rodar localmente ---
