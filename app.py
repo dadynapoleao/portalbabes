@@ -12,7 +12,8 @@ app = Flask(__name__)
 CORS(app)
 
 # --- Configuração de Logging ---
-logging.basicConfig(level=logging.INFO) # Mudado para INFO para ver os logs de info por padrão
+# Mude para logging.DEBUG se precisar de logs ainda mais detalhados
+logging.basicConfig(level=logging.INFO) 
 gunicorn_logger = logging.getLogger('gunicorn.error')
 app.logger.handlers.extend(gunicorn_logger.handlers)
 app.logger.setLevel(logging.INFO) # Garante que os logs do app também sejam INFO
@@ -57,7 +58,7 @@ def format_babepedia_date(date_text):
         day = match_day_month_year.group(1).zfill(2); month_name = match_day_month_year.group(2).lower(); year = match_day_month_year.group(3)
         month_number = month_map.get(month_name)
         if month_number: return f"{year}/{month_number}/{day}"
-    app.logger.debug(f"Could not parse date format with known patterns: {date_text}") # Mudado para DEBUG
+    app.logger.debug(f"Could not parse date format with known patterns: {date_text}")
     return date_text
 
 def extract_country(birthplace_text):
@@ -66,15 +67,8 @@ def extract_country(birthplace_text):
         return None
     
     app.logger.debug(f"extract_country: Original input: '{birthplace_text}'")
-    
-    # Remove qualquer coisa em parênteses no final da string inteira.
-    # Ex: "California, United States (West Coast)" -> "California, United States"
-    # Ex: "Hungary (Europe)" -> "Hungary"
     text_cleaned = re.sub(r'\s*\([^)]*\)$', '', birthplace_text).strip()
     app.logger.debug(f"extract_country: After removing final parentheses: '{text_cleaned}'")
-
-    # Se remover os parênteses resultar em string vazia, usa a original para split.
-    # Isso pode acontecer se o formato for apenas "(Country)" - raro, mas possível.
     source_for_split = text_cleaned if text_cleaned else birthplace_text
     parts = source_for_split.split(',')
     app.logger.debug(f"extract_country: Parts after split from '{source_for_split}': {parts}")
@@ -83,10 +77,9 @@ def extract_country(birthplace_text):
         app.logger.warning(f"extract_country: No parts after split for '{source_for_split}'. Returning None.")
         return None
 
-    country_candidate = parts[-1].strip() # Pega a última parte
+    country_candidate = parts[-1].strip()
     app.logger.debug(f"extract_country: Candidate (last part stripped): '{country_candidate}'")
     
-    # Se a última parte for vazia (ex: "USA, ") e houver mais de uma parte, tenta a penúltima.
     if not country_candidate and len(parts) > 1:
         app.logger.debug("extract_country: Last part was empty, trying second to last part.")
         country_candidate = parts[-2].strip()
@@ -94,12 +87,10 @@ def extract_country(birthplace_text):
 
     if not country_candidate:
         app.logger.warning(f"extract_country: Could not determine country from '{birthplace_text}'. Candidate is empty. Returning original cleaned text if available, or original input.")
-        # Fallback para o texto limpo se o candidato final for vazio; senão, o original.
         return text_cleaned if text_cleaned else birthplace_text 
     
     app.logger.info(f"extract_country: Extracted country: '{country_candidate}' from input '{birthplace_text}'")
     return country_candidate
-
 
 def extract_start_year(active_text):
     if not active_text: return None
@@ -131,8 +122,12 @@ def parse_html_data(soup):
 
         for li_item in biolist.find_all('li', recursive=False):
             label_span = li_item.find('span', class_='label')
-            if not label_span: continue
+            if not label_span:
+                app.logger.debug(f"Skipping li_item without label_span: {str(li_item)[:100]}...") # Log opcional
+                continue
+            
             label_text_from_span = label_span.get_text(strip=True)
+
             if label_text_from_span in label_map:
                 data_key = label_map[label_text_from_span]
                 value_parts = []
@@ -143,15 +138,20 @@ def parse_html_data(soup):
                     elif isinstance(elem, str):
                         text_content = elem.strip()
                         if text_content and text_content != ',': value_parts.append(text_content)
+                
                 raw_value = " ".join(value_parts).strip()
                 raw_value = re.sub(r'\s*,\s*', ', ', raw_value).strip(' ,')
-                if raw_value:
-                    # LOG IMPORTANTE AQUI: Veja o que está sendo capturado para 'birthplace'
-                    app.logger.info(f"Raw extraction for label '{label_text_from_span}' (key: '{data_key}') -> Value: '{raw_value}'")
+
+                # LOG MAIS DETALHADO INSERIDO AQUI:
+                app.logger.info(f"Attempting extraction for label '{label_text_from_span}' (key: '{data_key}'). Value Parts: {value_parts}. Resulting Raw Value: '{raw_value}'")
+
+                if raw_value: # Só guarda se o raw_value não for vazio
                     temp_data[data_key] = raw_value
+            else: # Log opcional para labels não mapeados
+                app.logger.debug(f"Label '{label_text_from_span}' found in HTML but not in label_map.")
         
+        # Processa os valores de temp_data para o dicionário final 'data'
         if 'born' in temp_data: data['born'] = format_babepedia_date(temp_data['born'])
-        # Chamada da função extract_country com o raw_value de birthplace
         if 'birthplace' in temp_data: data['birthplace'] = extract_country(temp_data['birthplace'])
         if 'height' in temp_data: data['height'] = extract_cm(temp_data['height'])
         if 'weight' in temp_data: data['weight'] = extract_kg(temp_data['weight'])
@@ -234,4 +234,6 @@ def scrape_babe_api():
 
 # --- Para rodar localmente ---
 # if __name__ == '__main__':
+#     # Para ver logs de DEBUG localmente, descomente a linha abaixo e a configuração de logging.basicConfig
+#     # logging.basicConfig(level=logging.DEBUG) 
 #     app.run(debug=True, port=os.environ.get("PORT", 5001))
