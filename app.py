@@ -17,8 +17,7 @@ gunicorn_logger = logging.getLogger('gunicorn.error')
 app.logger.handlers.extend(gunicorn_logger.handlers)
 app.logger.setLevel(logging.INFO)
 
-# --- Funções Auxiliares de Extração/Formatação ---
-
+# --- Funções Auxiliares de Extração/Formatação (sem alterações aqui) ---
 def extract_first_number(text):
     if not text: return None
     match = re.search(r'\d+', str(text))
@@ -111,51 +110,43 @@ def parse_html_data(soup):
             "Bra/cup size:": "bra_cup_size", "Boobs:": "boobs_type", "Pubic hair:": "pubic_hair",
             "Years active:": "years_active", "Tattoos:": "tattoos", "Piercings:": "piercings",
             "Instagram follower count:": "instagram_followers"
-            # Adicione outros labels aqui se necessário, ex: "Country:": "birthplace",
         }
+        
+        # Para normalizar a comparação de chaves do label_map
+        normalized_label_map = {re.sub(r'\s+', ' ', k.lower()): v for k, v in label_map.items()}
 
         for li_item in biolist.find_all('li', recursive=False):
+            app.logger.debug(f"Processing li_item: {str(li_item)[:200]}") # Log do LI completo
+
             label_span = li_item.find('span', class_='label')
-            label_text_from_span = ""
-            raw_value = "" # Inicializa raw_value
+            label_text_from_html = "" # Texto do label como encontrado no HTML
+            processed_label_for_map = "" # Label normalizado para checar no map
+            raw_value = ""
 
             if label_span:
-                label_text_from_span = label_span.get_text(strip=True)
-            else:
-                # Se não encontrar <span class="label">, tenta uma abordagem mais genérica
-                # Pega o primeiro texto forte ou bold dentro do <li> como possível label
+                label_text_from_html = label_span.get_text() # Pega com espaços
+                # Remove múltiplos espaços e normaliza para minúsculas para checar no map
+                processed_label_for_map = re.sub(r'\s+', ' ', label_text_from_html.lower()).strip()
+                app.logger.info(f"LABEL_SPAN_FOUND: Raw text='{label_text_from_html}', Processed for map check='{processed_label_for_map}'")
+            else: # Fallback para strong/b
                 strong_tag = li_item.find(['strong', 'b'])
                 if strong_tag:
-                    possible_label_text = strong_tag.get_text(strip=True)
-                    # Verifica se esse possível label termina com ':' e está no map
-                    if possible_label_text.endswith(':') and possible_label_text in label_map:
-                        label_text_from_span = possible_label_text
-                        app.logger.info(f"Found label '{label_text_from_span}' using strong/b tag fallback.")
-                        # Tenta pegar o valor após o strong/b tag
-                        value_parts_fallback = []
-                        for elem in strong_tag.next_siblings:
-                            if elem.name == 'a':
-                                link_text = elem.get_text(strip=True)
-                                if link_text: value_parts_fallback.append(link_text)
-                            elif isinstance(elem, str):
-                                text_content = elem.strip()
-                                if text_content and text_content != ',': value_parts_fallback.append(text_content)
-                        raw_value = " ".join(value_parts_fallback).strip()
-                        raw_value = re.sub(r'\s*,\s*', ', ', raw_value).strip(' ,')
-                    else:
-                        app.logger.debug(f"Skipping li_item, strong/b tag content '{possible_label_text}' not a mapped label: {str(li_item)[:150]}...")
-                        continue # Pula para o próximo li_item
+                    label_text_from_html = strong_tag.get_text()
+                    processed_label_for_map = re.sub(r'\s+', ' ', label_text_from_html.lower()).strip()
+                    app.logger.info(f"STRONG_B_FALLBACK: Raw text='{label_text_from_html}', Processed for map check='{processed_label_for_map}'")
+                    # Se usou fallback, o elemento de referência para next_siblings é o strong_tag
+                    label_span = strong_tag # Para a lógica de next_siblings funcionar
                 else:
-                    app.logger.warning(f"MISSING_LABEL_SPAN_AND_FALLBACK: Could not find label in li_item: {str(li_item)[:150]}")
-                    continue # Pula para o próximo li_item
+                    app.logger.warning(f"NO_LABEL_ELEMENT_FOUND in li_item: {str(li_item)[:150]}")
+                    continue
 
-            # Se o label foi encontrado (seja por span.label ou pelo fallback)
-            if label_text_from_span and label_text_from_span in label_map:
-                data_key = label_map[label_text_from_span]
+            # Verifica se o label processado existe no normalized_label_map
+            if processed_label_for_map in normalized_label_map:
+                data_key = normalized_label_map[processed_label_for_map]
                 
-                # Se o raw_value não foi preenchido pelo fallback, usa a lógica original
-                if not raw_value and label_span: # label_span deve existir para esta lógica
-                    value_parts = []
+                # Extração do valor usando next_siblings do elemento label encontrado (label_span ou strong_tag)
+                value_parts = []
+                if label_span: # label_span agora pode ser o span.label original ou o strong_tag
                     for elem in label_span.next_siblings:
                         if elem.name == 'a':
                             link_text = elem.get_text(strip=True)
@@ -163,19 +154,21 @@ def parse_html_data(soup):
                         elif isinstance(elem, str):
                             text_content = elem.strip()
                             if text_content and text_content != ',': value_parts.append(text_content)
-                    raw_value = " ".join(value_parts).strip()
-                    raw_value = re.sub(r'\s*,\s*', ', ', raw_value).strip(' ,')
+                
+                raw_value = " ".join(value_parts).strip()
+                raw_value = re.sub(r'\s*,\s*', ', ', raw_value).strip(' ,')
 
-                app.logger.info(f"Extraction for label '{label_text_from_span}' (key: '{data_key}'). Resulting Raw Value: '{raw_value}'")
+                app.logger.info(f"Extraction for MAPPED_LABEL '{label_text_from_html.strip()}' (key: '{data_key}'). Value Parts: {value_parts}. Resulting Raw Value: '{raw_value}'")
 
                 if raw_value:
                     temp_data[data_key] = raw_value
-            elif label_text_from_span: # Label foi encontrado mas não está no map
-                app.logger.debug(f"Label '{label_text_from_span}' found in HTML but not in label_map.")
+            elif label_text_from_html.strip(): # Se algum texto de label foi encontrado mas não mapeado
+                app.logger.debug(f"Label text '{label_text_from_html.strip()}' found in HTML but not recognized or mapped.")
         
-        # Processa os valores de temp_data para o dicionário final 'data'
+        # Processa os valores de temp_data
         if 'born' in temp_data: data['born'] = format_babepedia_date(temp_data['born'])
         if 'birthplace' in temp_data: data['birthplace'] = extract_country(temp_data['birthplace'])
+        # ... (resto do processamento dos campos como antes) ...
         if 'height' in temp_data: data['height'] = extract_cm(temp_data['height'])
         if 'weight' in temp_data: data['weight'] = extract_kg(temp_data['weight'])
         if 'years_active' in temp_data: data['years_active'] = extract_start_year(temp_data['years_active'])
