@@ -12,11 +12,10 @@ app = Flask(__name__)
 CORS(app)
 
 # --- Configuração de Logging ---
-# Mude para logging.DEBUG se precisar de logs ainda mais detalhados
 logging.basicConfig(level=logging.INFO) 
 gunicorn_logger = logging.getLogger('gunicorn.error')
 app.logger.handlers.extend(gunicorn_logger.handlers)
-app.logger.setLevel(logging.INFO) # Garante que os logs do app também sejam INFO
+app.logger.setLevel(logging.INFO)
 
 # --- Funções Auxiliares de Extração/Formatação ---
 
@@ -65,30 +64,24 @@ def extract_country(birthplace_text):
     if not birthplace_text:
         app.logger.debug("extract_country: Input is None or empty, returning None")
         return None
-    
     app.logger.debug(f"extract_country: Original input: '{birthplace_text}'")
     text_cleaned = re.sub(r'\s*\([^)]*\)$', '', birthplace_text).strip()
     app.logger.debug(f"extract_country: After removing final parentheses: '{text_cleaned}'")
     source_for_split = text_cleaned if text_cleaned else birthplace_text
     parts = source_for_split.split(',')
     app.logger.debug(f"extract_country: Parts after split from '{source_for_split}': {parts}")
-
     if not parts:
         app.logger.warning(f"extract_country: No parts after split for '{source_for_split}'. Returning None.")
         return None
-
     country_candidate = parts[-1].strip()
     app.logger.debug(f"extract_country: Candidate (last part stripped): '{country_candidate}'")
-    
     if not country_candidate and len(parts) > 1:
         app.logger.debug("extract_country: Last part was empty, trying second to last part.")
         country_candidate = parts[-2].strip()
         app.logger.debug(f"extract_country: Second to last part candidate: '{country_candidate}'")
-
     if not country_candidate:
         app.logger.warning(f"extract_country: Could not determine country from '{birthplace_text}'. Candidate is empty. Returning original cleaned text if available, or original input.")
         return text_cleaned if text_cleaned else birthplace_text 
-    
     app.logger.info(f"extract_country: Extracted country: '{country_candidate}' from input '{birthplace_text}'")
     return country_candidate
 
@@ -118,36 +111,66 @@ def parse_html_data(soup):
             "Bra/cup size:": "bra_cup_size", "Boobs:": "boobs_type", "Pubic hair:": "pubic_hair",
             "Years active:": "years_active", "Tattoos:": "tattoos", "Piercings:": "piercings",
             "Instagram follower count:": "instagram_followers"
+            # Adicione outros labels aqui se necessário, ex: "Country:": "birthplace",
         }
 
         for li_item in biolist.find_all('li', recursive=False):
             label_span = li_item.find('span', class_='label')
-            if not label_span:
-                app.logger.debug(f"Skipping li_item without label_span: {str(li_item)[:100]}...") # Log opcional
-                continue
-            
-            label_text_from_span = label_span.get_text(strip=True)
+            label_text_from_span = ""
+            raw_value = "" # Inicializa raw_value
 
-            if label_text_from_span in label_map:
+            if label_span:
+                label_text_from_span = label_span.get_text(strip=True)
+            else:
+                # Se não encontrar <span class="label">, tenta uma abordagem mais genérica
+                # Pega o primeiro texto forte ou bold dentro do <li> como possível label
+                strong_tag = li_item.find(['strong', 'b'])
+                if strong_tag:
+                    possible_label_text = strong_tag.get_text(strip=True)
+                    # Verifica se esse possível label termina com ':' e está no map
+                    if possible_label_text.endswith(':') and possible_label_text in label_map:
+                        label_text_from_span = possible_label_text
+                        app.logger.info(f"Found label '{label_text_from_span}' using strong/b tag fallback.")
+                        # Tenta pegar o valor após o strong/b tag
+                        value_parts_fallback = []
+                        for elem in strong_tag.next_siblings:
+                            if elem.name == 'a':
+                                link_text = elem.get_text(strip=True)
+                                if link_text: value_parts_fallback.append(link_text)
+                            elif isinstance(elem, str):
+                                text_content = elem.strip()
+                                if text_content and text_content != ',': value_parts_fallback.append(text_content)
+                        raw_value = " ".join(value_parts_fallback).strip()
+                        raw_value = re.sub(r'\s*,\s*', ', ', raw_value).strip(' ,')
+                    else:
+                        app.logger.debug(f"Skipping li_item, strong/b tag content '{possible_label_text}' not a mapped label: {str(li_item)[:150]}...")
+                        continue # Pula para o próximo li_item
+                else:
+                    app.logger.warning(f"MISSING_LABEL_SPAN_AND_FALLBACK: Could not find label in li_item: {str(li_item)[:150]}")
+                    continue # Pula para o próximo li_item
+
+            # Se o label foi encontrado (seja por span.label ou pelo fallback)
+            if label_text_from_span and label_text_from_span in label_map:
                 data_key = label_map[label_text_from_span]
-                value_parts = []
-                for elem in label_span.next_siblings:
-                    if elem.name == 'a':
-                        link_text = elem.get_text(strip=True)
-                        if link_text: value_parts.append(link_text)
-                    elif isinstance(elem, str):
-                        text_content = elem.strip()
-                        if text_content and text_content != ',': value_parts.append(text_content)
                 
-                raw_value = " ".join(value_parts).strip()
-                raw_value = re.sub(r'\s*,\s*', ', ', raw_value).strip(' ,')
+                # Se o raw_value não foi preenchido pelo fallback, usa a lógica original
+                if not raw_value and label_span: # label_span deve existir para esta lógica
+                    value_parts = []
+                    for elem in label_span.next_siblings:
+                        if elem.name == 'a':
+                            link_text = elem.get_text(strip=True)
+                            if link_text: value_parts.append(link_text)
+                        elif isinstance(elem, str):
+                            text_content = elem.strip()
+                            if text_content and text_content != ',': value_parts.append(text_content)
+                    raw_value = " ".join(value_parts).strip()
+                    raw_value = re.sub(r'\s*,\s*', ', ', raw_value).strip(' ,')
 
-                # LOG MAIS DETALHADO INSERIDO AQUI:
-                app.logger.info(f"Attempting extraction for label '{label_text_from_span}' (key: '{data_key}'). Value Parts: {value_parts}. Resulting Raw Value: '{raw_value}'")
+                app.logger.info(f"Extraction for label '{label_text_from_span}' (key: '{data_key}'). Resulting Raw Value: '{raw_value}'")
 
-                if raw_value: # Só guarda se o raw_value não for vazio
+                if raw_value:
                     temp_data[data_key] = raw_value
-            else: # Log opcional para labels não mapeados
+            elif label_text_from_span: # Label foi encontrado mas não está no map
                 app.logger.debug(f"Label '{label_text_from_span}' found in HTML but not in label_map.")
         
         # Processa os valores de temp_data para o dicionário final 'data'
