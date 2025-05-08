@@ -103,7 +103,7 @@ def parse_html_data(soup):
             return data
 
         label_map = {
-            "Age:": "age_raw", "Born:": "born", "Birthplace:": "birthplace",
+            "Age:": "age_raw", "Born:": "born", "Birthplace": "birthplace_no_colon",
             "Ethnicity:": "ethnicity", "Sexuality:": "sexuality", "Profession:": "profession",
             "Hair color:": "hair_color", "Eye color:": "eye_color", "Height:": "height",
             "Weight:": "weight", "Body type:": "body_type", "Measurements:": "measurements_raw",
