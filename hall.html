@@ -1023,6 +1023,7 @@
                 <div id="actress-list-quick-links">
                     <span class="quick-link-btn" id="quick-link-vids" title="Multimídia Recente">- Vids</span>
                     <span class="quick-link-btn" id="quick-link-new" title="Atrizes Novas">- New</span>
+                    <span class="quick-link-btn" id="quick-link-site" title="page.html">- site</span>
                 </div>
             </div>
             <ul id="actress-list">
@@ -1434,8 +1435,8 @@
     <!-- Firebase SDK -->
 
      <script type="module">
-        // --- Imports ---
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+      // --- Imports ---
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import {
     getFirestore, collection, getDocs, doc, getDoc, addDoc, documentId,
     query, where, limit, serverTimestamp, updateDoc, arrayUnion, orderBy
@@ -1696,6 +1697,22 @@ function safeParseFloat(value) {
     const parsed = parseFloat(String(value).replace(',', '.')); return isNaN(parsed) ? null : parsed;
 }
 function safeStringCompare(strA, strB) { const sA = String(strA || '').trim().toLowerCase(); const sB = String(strB || '').trim().toLowerCase(); return sA === sB; }
+
+function isVideoUrl(url) {
+    if (!url || typeof url !== 'string') return false;
+    try {
+        const parsedUrl = new URL(url);
+        const pathname = parsedUrl.pathname.toLowerCase();
+        // Adicione mais extensões se necessário
+        return pathname.endsWith('.mp4') ||
+               pathname.endsWith('.webm') ||
+               pathname.endsWith('.ogg') ||
+               pathname.endsWith('.m3u8'); // HLS streams
+    } catch (e) {
+        // URL inválida
+        return false;
+    }
+}
 
 // --- Create Actress Specific Helper Functions ---
 async function fetchActressDataFromAPI() {
@@ -2041,21 +2058,136 @@ window.closeRankingDetailModal = function() { if (rankingDetailModal) rankingDet
 
 // --- Content Detail Modal Functions ---
 async function showContentDetails(type, id) {
-     if (!contentModal || !contentModalBody || !contentModalTitle) { console.error("Content modal elements not found!"); return; } contentModalBody.innerHTML = '<div class="loading">Carregando detalhes...</div>'; contentModalTitle.textContent = 'Detalhes'; modalLinkContainer.innerHTML = ''; contentModal.style.display = 'flex';
-     try {
-         let docRef; let collectionName = ''; let data = null; switch (type) { case 'video': collectionName = 'videos'; break; case 'film': collectionName = 'filmes'; break; case 'scene': collectionName = 'cenas'; break; default: throw new Error('Tipo de conteúdo desconhecido: ' + type); }
-         docRef = doc(db, collectionName, id); const docSnap = await getDoc(docRef);
-         if (docSnap.exists()) {
-             data = docSnap.data(); contentModalTitle.textContent = data.nome || ('Detalhes ' + capitalizeFirstLetter(type)); contentModalBody.innerHTML = ''; let imageUrl = data.imagem || 'placeholder.png'; if (typeof imageUrl === 'object' && imageUrl !== null && imageUrl.width) { const urlKey = Object.keys(imageUrl).find(k=>typeof imageUrl[k]==='string'&&imageUrl[k].startsWith('http')); imageUrl = urlKey ? imageUrl[urlKey] : 'placeholder.png'; } else if (typeof imageUrl !== 'string' || !imageUrl) { imageUrl = 'placeholder.png'; }
-             const img = document.createElement('img'); img.src = escapeHtml(imageUrl); img.alt = escapeHtml(data.nome || type); img.classList.add('modal-detail-image'); if (type === 'film') img.classList.add('movie-image'); img.onerror = () => { img.style.display = 'none'; }; contentModalBody.appendChild(img);
-             const addDetail = (label, value) => { if (value != null && String(value).trim() !== '') { const div = document.createElement('div'); div.innerHTML = '<strong>' + escapeHtml(label) + ':</strong> ' + escapeHtml(value); contentModalBody.appendChild(div); } };
-             if (type === 'film' && data.ano) { contentModalBody.innerHTML += '<div class="modal-year">(' + escapeHtml(data.ano) + ')</div>'; } if (type === 'scene' && data.data) { addDetail('Data', data.data); } if (type === 'video' && data.data) { addDetail('Data', data.data); } if (type === 'scene' && data.numero != null) { addDetail('Número', data.numero); } if ((type === 'film' || type === 'video') && data.estudio) { addDetail('Estúdio', data.estudio); } if (type === 'film' && data.duracao) { addDetail('Duração', data.duracao); }
-             if (data.pagina) { const linkButton = document.createElement('button'); linkButton.textContent = 'Abrir Página ' + capitalizeFirstLetter(type); linkButton.onclick = () => window.open(data.pagina, '_blank'); modalLinkContainer.appendChild(linkButton); }
-             if (data.atores && data.atores.length > 0) { const actressContainer = document.createElement('div'); actressContainer.classList.add('modal-actress-list-container'); actressContainer.innerHTML = '<h4>Atrizes</h4><ul class="modal-actress-list"><div class="loading">Carregando...</div></ul>'; contentModalBody.appendChild(actressContainer); await loadActressesForModal(data.atores, actressContainer.querySelector('.modal-actress-list')); }
-             if (type === 'film' && data.cenas && data.cenas.length > 0) { const scenesContainer = document.createElement('div'); scenesContainer.classList.add('modal-scenes-container'); scenesContainer.innerHTML = '<h4>Cenas (' + data.cenas.length + ')</h4><div class="modal-scene-cards"><div class="loading">Carregando...</div></div>'; contentModalBody.appendChild(scenesContainer); await loadScenesForModal(data.cenas, scenesContainer.querySelector('.modal-scene-cards')); }
-         } else { contentModalBody.innerHTML = '<div class="error">' + capitalizeFirstLetter(type) + ' não encontrado.</div>'; }
-     } catch (error) { console.error('Erro ao carregar detalhes de ' + type + ' ' + id + ':', error); contentModalBody.innerHTML = '<div class="error">Erro ao carregar detalhes.</div>'; }
+    if (!contentModal || !contentModalBody || !contentModalTitle || !modalLinkContainer) {
+        console.error("Content modal elements not found!");
+        return;
+    }
+    contentModalBody.innerHTML = '<div class="loading">Carregando detalhes...</div>';
+    contentModalTitle.textContent = 'Detalhes';
+    modalLinkContainer.innerHTML = ''; // Limpa o container de links/botões
+    contentModal.style.display = 'flex';
+
+    try {
+        let docRef;
+        let collectionName = '';
+        let data = null;
+
+        switch (type) {
+            case 'video': collectionName = 'videos'; break;
+            case 'film': collectionName = 'filmes'; break;
+            case 'scene': collectionName = 'cenas'; break;
+            default: throw new Error('Tipo de conteúdo desconhecido: ' + type);
+        }
+
+        docRef = doc(db, collectionName, id);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            data = docSnap.data();
+            contentModalTitle.textContent = data.nome || ('Detalhes ' + capitalizeFirstLetter(type));
+            contentModalBody.innerHTML = ''; // Limpa a mensagem de "Carregando"
+
+            // Lógica para exibir vídeo, link ou imagem de fallback
+            let visualContentRendered = false;
+            if (data.pagina) {
+                if (isVideoUrl(data.pagina)) {
+                    const videoElement = document.createElement('video');
+                    videoElement.src = escapeHtml(data.pagina);
+                    videoElement.classList.add('fp-engine'); // Sua classe personalizada
+                    videoElement.setAttribute('preload', 'metadata');
+                    videoElement.setAttribute('x-webkit-airplay', 'allow');
+                    videoElement.setAttribute('webkit-playsinline', 'true');
+                    videoElement.setAttribute('playsinline', 'true');
+                    videoElement.controls = true; // Adicionar controles padrão
+                    videoElement.style.width = '100%';
+                    videoElement.style.maxHeight = '450px'; // Ajuste conforme necessário
+                    videoElement.style.backgroundColor = '#000'; // Fundo escuro para o player
+                    videoElement.style.marginBottom = '15px';
+                    contentModalBody.appendChild(videoElement);
+                    visualContentRendered = true;
+
+                    const directLinkButton = document.createElement('button');
+                    directLinkButton.textContent = 'Abrir URL do Vídeo';
+                    directLinkButton.onclick = () => window.open(data.pagina, '_blank');
+                    modalLinkContainer.appendChild(directLinkButton);
+
+                } else {
+                    // É uma URL de página, não um vídeo direto
+                    const linkButton = document.createElement('button');
+                    linkButton.textContent = 'Visitar Página Externa';
+                    linkButton.onclick = () => window.open(data.pagina, '_blank');
+                    modalLinkContainer.appendChild(linkButton);
+                    visualContentRendered = true;
+                }
+            }
+
+            if (!visualContentRendered && data.imagem) {
+                let imageUrl = data.imagem;
+                if (typeof imageUrl === 'object' && imageUrl !== null && imageUrl.width) {
+                    const urlKey = Object.keys(imageUrl).find(k => typeof imageUrl[k] === 'string' && imageUrl[k].startsWith('http'));
+                    imageUrl = urlKey ? imageUrl[urlKey] : 'placeholder.png';
+                } else if (typeof imageUrl !== 'string' || !imageUrl) {
+                    imageUrl = 'placeholder.png';
+                }
+                const img = document.createElement('img');
+                img.src = escapeHtml(imageUrl);
+                img.alt = escapeHtml(data.nome || type);
+                img.classList.add('modal-detail-image');
+                if (type === 'film') img.classList.add('movie-image');
+                img.onerror = () => { img.style.display = 'none'; };
+                img.style.marginBottom = '15px';
+                contentModalBody.insertBefore(img, contentModalBody.firstChild);
+            }
+
+            const addDetail = (label, value) => {
+                if (value != null && String(value).trim() !== '') {
+                    const div = document.createElement('div');
+                    div.innerHTML = '<strong>' + escapeHtml(label) + ':</strong> ' + escapeHtml(String(value));
+                    contentModalBody.appendChild(div);
+                }
+            };
+
+            if (type === 'film' && data.ano) {
+                const yearDiv = document.createElement('div');
+                yearDiv.classList.add('modal-year');
+                yearDiv.textContent = '(' + escapeHtml(data.ano) + ')';
+                if (contentModalBody.firstChild && (contentModalBody.firstChild.tagName === 'VIDEO' || contentModalBody.firstChild.tagName === 'IMG')) {
+                    contentModalBody.insertBefore(yearDiv, contentModalBody.firstChild.nextSibling);
+                } else {
+                    contentModalBody.insertBefore(yearDiv, contentModalBody.firstChild);
+                }
+            }
+            if (type === 'scene' && data.data) { addDetail('Data', data.data); }
+            if (type === 'video' && data.data) { addDetail('Data', data.data); }
+            if (type === 'scene' && data.numero != null) { addDetail('Número', data.numero); }
+            if ((type === 'film' || type === 'video') && data.estudio) { addDetail('Estúdio', data.estudio); }
+            if (type === 'film' && data.duracao) { addDetail('Duração', data.duracao); }
+
+            if (data.atores && data.atores.length > 0) {
+                const actressContainer = document.createElement('div');
+                actressContainer.classList.add('modal-actress-list-container');
+                actressContainer.innerHTML = '<h4>Atrizes</h4><ul class="modal-actress-list"><div class="loading">Carregando...</div></ul>';
+                contentModalBody.appendChild(actressContainer);
+                await loadActressesForModal(data.atores, actressContainer.querySelector('.modal-actress-list'));
+            }
+
+            if (type === 'film' && data.cenas && data.cenas.length > 0) {
+                const scenesContainer = document.createElement('div');
+                scenesContainer.classList.add('modal-scenes-container');
+                scenesContainer.innerHTML = '<h4>Cenas (' + data.cenas.length + ')</h4><div class="modal-scene-cards"><div class="loading">Carregando...</div></div>';
+                contentModalBody.appendChild(scenesContainer);
+                await loadScenesForModal(data.cenas, scenesContainer.querySelector('.modal-scene-cards'));
+            }
+
+        } else {
+            contentModalBody.innerHTML = '<div class="error">' + capitalizeFirstLetter(type) + ' não encontrado.</div>';
+        }
+    } catch (error) {
+        console.error('Erro ao carregar detalhes de ' + type + ' ' + id + ':', error);
+        contentModalBody.innerHTML = '<div class="error">Erro ao carregar detalhes.</div>';
+    }
 }
+
 async function loadActressesForModal(actressIds, containerElement, contextActressIds = []) {
     if (!containerElement || !actressIds || actressIds.length === 0) { if(containerElement) containerElement.innerHTML = ''; return; } containerElement.innerHTML = '';
     try {
@@ -2549,6 +2681,7 @@ async function analyzePastedText() {
     } else { errorMessage = 'Erro ao extrair dados de ' + entityType.toLowerCase() + '.'; pasteAnalysisResult.textContent = errorMessage; pasteAnalysisResult.className = 'error'; }
     if (pasteTextModal && pasteTextModal.style.display === 'flex') { analyzePasteButton.disabled = false; analyzePasteButton.textContent = 'Analisar e Criar'; }
 }
+
 function extractSceneDataFromText(text) {
     const data = { nome: null, dataRaw: null, movieName: null, potentialActorNames: [] }; const lines = text.split('\n');
     let actorsLineFound = false; let readingPornstars = false;
@@ -2556,10 +2689,21 @@ function extractSceneDataFromText(text) {
         const trimmedLine = line.trim();
         const isNewMainSectionTag = ['Scene:', 'Date:', 'Movie:', 'Studio:', 'Network:', 'Release date:', 'Line:', 'Categories:'].some(tag => trimmedLine.startsWith(tag));
         const isDescriptionTag = trimmedLine.toLowerCase().startsWith('description -') || trimmedLine.startsWith('* ');
+
         if (readingPornstars) {
-            if (trimmedLine === '' || isNewMainSectionTag || isDescriptionTag) { readingPornstars = false; }
-            else if (!trimmedLine.toLowerCase().includes("this scene is performed by") && !trimmedLine.toLowerCase().startsWith("all scenes") && !trimmedLine.toLowerCase().startsWith("all movies") && !trimmedLine.toLowerCase().startsWith("w/") && !trimmedLine.includes("-------") && trimmedLine.length > 1) { data.potentialActorNames.push(trimmedLine); }
+            if (isNewMainSectionTag || isDescriptionTag) {
+                readingPornstars = false;
+            }
+            else if (!trimmedLine.toLowerCase().includes("this scene is performed by") &&
+                     !trimmedLine.toLowerCase().startsWith("all scenes") &&
+                     !trimmedLine.toLowerCase().startsWith("all movies") &&
+                     !trimmedLine.toLowerCase().startsWith("w/") &&
+                     !trimmedLine.includes("-------") &&
+                     trimmedLine.length > 1) {
+                data.potentialActorNames.push(trimmedLine);
+            }
         }
+
         if (trimmedLine.startsWith('Scene:')) { data.nome = trimmedLine.substring(6).trim(); readingPornstars = false; }
         else if (trimmedLine.startsWith('Date:')) { data.dataRaw = trimmedLine.substring(5).trim(); readingPornstars = false; }
         else if (trimmedLine.startsWith('Release date:')) { let releaseDateStr = trimmedLine.substring(13).trim(); const moreUpdatesIndex = releaseDateStr.indexOf(', more updates...'); if (moreUpdatesIndex !== -1) { releaseDateStr = releaseDateStr.substring(0, moreUpdatesIndex).trim(); } data.dataRaw = releaseDateStr; readingPornstars = false; }
@@ -2576,6 +2720,7 @@ function extractSceneDataFromText(text) {
         else if (data.nome && !actorsLineFound && !readingPornstars && !data.dataRaw && !data.movieName && /^[a-zA-Z\s,-]+$/.test(trimmedLine) && trimmedLine.includes(',')) { data.potentialActorNames = trimmedLine.split(',').map(name => name.trim()).filter(name => name); }
     }); return data;
 }
+
 function extractMovieDataFromText(text) {
     const data = { nome: null, ano: null, estudio: null, duracao: null, potentialActorNames: [] };
     const lines = text.split('\n'); let actorsLineFound = false; let readingPornstars = false;
@@ -2583,7 +2728,21 @@ function extractMovieDataFromText(text) {
         const trimmedLine = line.trim();
         const isNewMainSectionTag = ['Movie:', 'Year:', 'Prod. Year:', 'Studio:', 'Network:', 'Line:', 'Categories:'].some(tag => trimmedLine.startsWith(tag));
         const isDescriptionTag = trimmedLine.toLowerCase().startsWith('description -') || trimmedLine.startsWith('* ');
-        if (readingPornstars) { if (trimmedLine === '' || isNewMainSectionTag || isDescriptionTag) { readingPornstars = false; } else if (!trimmedLine.toLowerCase().includes("cast of") && !trimmedLine.toLowerCase().startsWith("all movies") && !trimmedLine.toLowerCase().startsWith("all scenes") && !trimmedLine.toLowerCase().startsWith("w/") && !trimmedLine.includes("-------") && trimmedLine.length > 1) { data.potentialActorNames.push(trimmedLine); } }
+
+        if (readingPornstars) {
+            if (isNewMainSectionTag || isDescriptionTag) {
+                readingPornstars = false;
+            }
+            else if (!trimmedLine.toLowerCase().includes("cast of") &&
+                     !trimmedLine.toLowerCase().startsWith("all movies") &&
+                     !trimmedLine.toLowerCase().startsWith("all scenes") &&
+                     !trimmedLine.toLowerCase().startsWith("w/") &&
+                     !trimmedLine.includes("-------") &&
+                     trimmedLine.length > 1) {
+                data.potentialActorNames.push(trimmedLine);
+            }
+        }
+
         if (trimmedLine.startsWith('Movie:')) { data.nome = trimmedLine.substring(6).trim(); readingPornstars = false; }
         else if (trimmedLine.startsWith('Prod. Year:')) { let yearStr = trimmedLine.substring(11).trim(); const yearMatch = yearStr.match(/^\d{4}/); if (yearMatch) { data.ano = yearMatch[0]; } readingPornstars = false; }
         else if (trimmedLine.startsWith('Year:')) { data.ano = trimmedLine.substring(5).trim(); readingPornstars = false; }
@@ -2603,6 +2762,7 @@ function extractMovieDataFromText(text) {
         else if (isNewMainSectionTag || isDescriptionTag) { readingPornstars = false; }
     }); return data;
 }
+
 function extractVideoDataFromText(text) {
     const data = { nome: null, dataRaw: null, estudio: null, potentialActorNames: [] }; const lines = text.split('\n');
     let actorsLineFound = false; let readingPornstars = false;
@@ -2610,7 +2770,21 @@ function extractVideoDataFromText(text) {
         const trimmedLine = line.trim();
         const isNewMainSectionTag = ['Scene:', 'Video:', 'Date:', 'Studio:', 'Network:', 'Release date:', 'Line:', 'Categories:'].some(tag => trimmedLine.startsWith(tag));
         const isDescriptionTag = trimmedLine.toLowerCase().startsWith('description -') || trimmedLine.startsWith('* ');
-        if (readingPornstars) { if (trimmedLine === '' || isNewMainSectionTag || isDescriptionTag) { readingPornstars = false; } else if (!trimmedLine.toLowerCase().includes("this scene is performed by") && !trimmedLine.toLowerCase().startsWith("all scenes") && !trimmedLine.toLowerCase().startsWith("all movies") && !trimmedLine.toLowerCase().startsWith("w/") && !trimmedLine.includes("-------") && trimmedLine.length > 1) { data.potentialActorNames.push(trimmedLine); } }
+
+        if (readingPornstars) {
+            if (isNewMainSectionTag || isDescriptionTag) {
+                readingPornstars = false;
+            }
+            else if (!trimmedLine.toLowerCase().includes("this scene is performed by") &&
+                     !trimmedLine.toLowerCase().startsWith("all scenes") &&
+                     !trimmedLine.toLowerCase().startsWith("all movies") &&
+                     !trimmedLine.toLowerCase().startsWith("w/") &&
+                     !trimmedLine.includes("-------") &&
+                     trimmedLine.length > 1) {
+                data.potentialActorNames.push(trimmedLine);
+            }
+        }
+
         if (trimmedLine.startsWith('Scene:') || trimmedLine.startsWith('Video:')) { data.nome = trimmedLine.substring(trimmedLine.indexOf(':') + 1).trim(); readingPornstars = false; }
         else if (trimmedLine.startsWith('Date:')) { data.dataRaw = trimmedLine.substring(5).trim(); readingPornstars = false; }
         else if (trimmedLine.startsWith('Release date:')) { let releaseDateStr = trimmedLine.substring(13).trim(); const moreUpdatesIndex = releaseDateStr.indexOf(', more updates...'); if (moreUpdatesIndex !== -1) { releaseDateStr = releaseDateStr.substring(0, moreUpdatesIndex).trim(); } data.dataRaw = releaseDateStr; readingPornstars = false; }
@@ -2622,6 +2796,7 @@ function extractVideoDataFromText(text) {
         else if (data.nome && !actorsLineFound && !readingPornstars && !data.dataRaw && !data.estudio && /^[a-zA-Z\s,-]+$/.test(trimmedLine) && trimmedLine.includes(',')) { data.potentialActorNames = trimmedLine.split(',').map(name => name.trim()).filter(name => name); }
     }); return data;
 }
+
 function generateMovieNameVariations(name) {
     if (!name) return []; const variations = new Set(); const trimmedName = name.trim(); variations.add(trimmedName); variations.add(trimmedName.toLowerCase()); variations.add(trimmedName.toUpperCase());
     const noPunctuation = trimmedName.replace(/[.,!?;:'"-]/g, '').replace(/\s+/g, ' ').trim(); if (noPunctuation !== trimmedName) { variations.add(noPunctuation); variations.add(noPunctuation.toLowerCase()); variations.add(noPunctuation.toUpperCase());}
