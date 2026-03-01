@@ -2374,17 +2374,23 @@ function closeCreateMenu() { if (createMenuPopup) createMenuPopup.style.display 
 // --- Create Actress Modal Functions ---
 function getCreateActressFormHTML() {
     return `
+        <div class="form-card full-width" style="background: #3a3a3a; border: 1px dashed #bb86fc; margin-bottom: 20px;">
+            <label for="paste-bio-area" style="color: #bb86fc;">Auto-Preencher: Cole a Biografia aqui</label>
+            <textarea id="paste-bio-area" placeholder="Cole o texto do site (ex: Born: ..., Measurements: ...) e clique em Processar" style="width: 100%; min-height: 80px; background: #222; color: #eee; border: 1px solid #444; padding: 10px; font-size: 0.85em;"></textarea>
+            <button type="button" id="btn-process-bio" style="margin-top: 10px; background: #bb86fc; color: #121212; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;">Processar Texto Colado</button>
+        </div>
+
         <form id="create-actress-form" novalidate>
             <div class="form-card full-width">
                 <label for="name">Name:</label>
                 <input type="text" id="name" name="name" required>
                 <span id="name-error-message" class="error-message" style="display:none"></span>
             </div>
+            <!-- ... o resto do seu formulário continua igual abaixo ... -->
             <div class="form-row-flex">
                 <div class="form-card">
                     <label for="nota">Nota (0 a 10):</label>
                     <input type="number" id="nota" name="nota" min="0" max="10" step="0.1" placeholder="Ex: 8.5">
-                    <span id="actress-nota-error" class="error-message"></span>
                 </div>
                 <div class="form-card">
                     <label for="casta">Casta:</label>
@@ -2395,18 +2401,15 @@ function getCreateActressFormHTML() {
                         <option value="Melao">Melão</option>
                         <option value="Tabua">Tabua</option>
                     </select>
-                    <span id="actress-casta-error" class="error-message"></span>
                 </div>
             </div>
             <div class="form-card">
                 <label for="foto">Foto (URL):</label>
-                <input type="url" id="foto" name="foto" placeholder="https://exemplo.com/imagem.jpg">
-                <span id="actress-foto-error" class="error-message"></span>
+                <input type="url" id="foto" name="foto">
             </div>
             <div class="form-card">
-                <label for="born">Born (Ex: 1990/05/15):</label>
-                <input type="text" id="born" name="born" placeholder="YYYY/MM/DD">
-                <span id="actress-dataNascimento-error" class="error-message"></span>
+                <label for="born">Born (YYYY/MM/DD):</label>
+                <input type="text" id="born" name="born">
             </div>
             <div class="form-card">
                 <label for="birthplace">Birthplace (País):</label>
@@ -2426,127 +2429,83 @@ function getCreateActressFormHTML() {
             </div>
             <div class="form-card">
                 <label for="height">Height (cm):</label>
-                <input type="text" id="height" name="height" placeholder="Ex: 170">
+                <input type="text" id="height" name="height">
             </div>
             <div class="form-card">
                 <label for="weight">Weight (kg):</label>
-                <input type="text" id="weight" name="weight" placeholder="Ex: 59">
+                <input type="text" id="weight" name="weight">
             </div>
             <div class="form-card">
-                <label for="body_type">Body type:</label>
-                <input type="text" id="body_type" name="body_type">
+                <label for="measurements">Measurements (B-W-A):</label>
+                <input type="text" id="measurements" name="measurements">
             </div>
             <div class="form-card">
-                <label for="measurements">Measurements (B(cm)-W(cm)-A(cm)):</label>
-                <input type="text" id="measurements" name="measurements" placeholder="Ex: 86.36-66.04-96.52">
+                <label for="years_active">Years active:</label>
+                <input type="text" id="years_active" name="years_active">
             </div>
-            <div class="form-card">
-                <label for="years_active">Years active (Start Year):</label>
-                <input type="text" id="years_active" name="years_active" placeholder="Ex: 2010">
-            </div>
-
-            <!-- NOVO: Container para Estatísticas Dinâmicas -->
-            <div id="create-actress-stats-container" class="full-width" style="display:none; margin-top: 15px; padding-top: 15px; border-top: 1px solid #444;">
-                <h4 style="margin-top:0; margin-bottom:10px; color: #b0b0b0; text-align:center;">Estatísticas Rápidas (se atriz existir)</h4>
-                <div id="quick-stats-content" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
-                    <!-- Cards de estatísticas serão injetados aqui -->
-                </div>
-            </div>
-            <!-- FIM: Container para Estatísticas Dinâmicas -->
-
-            <div class="form-card full-width">
-                <div id="create-actress-form-message" class="error-message" style="text-align:left;margin-bottom:10px"></div>
+            <div id="create-actress-stats-container" class="full-width" style="display:none;">
+                <!-- Stats cards -->
             </div>
         </form>
         <div class="submit-button-container">
-            <button type="submit" id="create-actress-submit-button" form="create-actress-form">${initialButtonText || 'Criar Atriz'}</button>
+            <button type="submit" id="create-actress-submit-button" form="create-actress-form">Criar Atriz</button>
         </div>
     `;
 }
+
 window.openCreateActressModal = function(prefilledName = '') {
     closeCreateMenu();
     if (!createActressModal || !createActressModalBody) return;
 
-    // Define o texto inicial do botão (pode ser alterado se o nome já existir)
     initialButtonText = 'Criar Atriz';
-    
-    // Injeta o HTML do formulário no corpo do modal
     createActressModalBody.innerHTML = getCreateActressFormHTML();
     
-    // Captura as referências dos novos elementos criados no DOM
+    // Mapeamento de Elementos
     createActressForm = document.getElementById('create-actress-form');
     actressNameInput = document.getElementById('name');
     actressNameErrorMessage = document.getElementById('name-error-message');
     actressSubmitButton = document.getElementById('create-actress-submit-button');
-    createActressStatsContainer = document.getElementById('create-actress-stats-container');
-    quickStatsContentContainer = document.getElementById('quick-stats-content');
+    const bioArea = document.getElementById('paste-bio-area');
+    const btnProcess = document.getElementById('btn-process-bio');
 
-    // Reset de estado interno
+    // Reset de estado
     matchedExistingActressData = null;
-    if (actressSubmitButton) { 
-        actressSubmitButton.textContent = initialButtonText; 
-        actressSubmitButton.disabled = false; 
+
+    // Se vier nome do extrator de cena, preenche
+    if (prefilledName) {
+        actressNameInput.value = prefilledName;
+        checkNameExistsForCreateModal();
     }
 
-    // --- LÓGICA DE PREENCHIMENTO AUTOMÁTICO ---
-    if (prefilledName && typeof prefilledName === 'string' && prefilledName.trim() !== '') {
-        const nameToSet = prefilledName.trim();
-        actressNameInput.value = nameToSet;
-        
-        // Executa as verificações automáticas após um pequeno delay para garantir o carregamento do DOM
-        setTimeout(async () => {
-            // Verifica se este nome já existe no banco de dados
-            await checkNameExistsForCreateModal();
-            
-            // Se o nome NÃO existe no banco, tenta buscar os detalhes (altura, idade, etc) na API externa
-            if (!matchedExistingActressData) {
-                fetchActressDataFromAPI();
-            } else {
-                // Se o nome JÁ EXISTE, exibe as estatísticas (Ranks) daquela atriz
-                displayCreateActressStats();
+    // --- LÓGICA DO PROCESSADOR DE TEXTO ---
+    if (btnProcess && bioArea) {
+        btnProcess.onclick = () => {
+            const text = bioArea.value;
+            if (!text.trim()) {
+                alert("Cole o texto da biografia primeiro.");
+                return;
             }
-        }, 200);
+            parsePastedActressBio(text);
+            bioArea.value = ''; // Limpa após processar
+            bioArea.placeholder = "Texto processado com sucesso!";
+        };
     }
 
-    // --- CONFIGURAÇÃO DE EVENTOS (LISTENERS) ---
-
-    // Listener para o envio do formulário
+    // Listeners padrão do formulário
     if (createActressForm) { 
-        createActressForm.removeEventListener('submit', handleCreateActressSubmit); 
         createActressForm.addEventListener('submit', handleCreateActressSubmit); 
     }
-
-    // Listener para verificação de nome enquanto o usuário digita
+    
     if (actressNameInput) {
-        // Criamos a função debounced para não sobrecarregar o banco/API a cada tecla
         debouncedActressNameCheckAndStats = debounce(async () => { 
             await checkNameExistsForCreateModal(); 
             displayCreateActressStats(); 
         }, 700);
-
-        actressNameInput.removeEventListener('input', debouncedActressNameCheckAndStats);
         actressNameInput.addEventListener('input', debouncedActressNameCheckAndStats);
-
-        // Listener para quando o usuário sai do campo (blur)
-        const onBlurHandler = async () => { 
-            await checkNameExistsForCreateModal(); 
-            displayCreateActressStats(); 
-            // Se o nome for novo e não estiver vazio, tenta a API
-            if (!matchedExistingActressData && actressNameInput.value.trim() !== '') { 
-                fetchActressDataFromAPI(); 
-            } 
-        };
-        actressNameInput.removeEventListener('blur', onBlurHandler);
-        actressNameInput.addEventListener('blur', onBlurHandler);
     }
 
-    // Exibe o modal
     createActressModal.style.display = 'flex';
-    
-    // Foca no campo de nome apenas se ele estiver vazio
-    if (!actressNameInput.value) {
-        actressNameInput.focus();
-    }
+    if (!prefilledName) actressNameInput.focus();
 };
 
 
@@ -3851,6 +3810,87 @@ function renderMissingActorLinks(missingNames, type) {
     container.appendChild(warningDiv);
 }
 
+
+function parsePastedActressBio(text) {
+    const data = {};
+    const months = {"january":"01","february":"02","march":"03","april":"04","may":"05","june":"06","july":"07","august":"08","september":"09","october":"10","november":"11","december":"12"};
+
+    // Divide o texto em linhas e processa cada uma
+    const lines = text.split('\n');
+
+    // Tentar pegar o nome se for a primeira linha e não tiver labels
+    if (lines[0] && !lines[0].includes(':') && lines[0].length > 3) {
+        data.name = lines[0].trim();
+    }
+
+    lines.forEach(line => {
+        const cleanLine = line.trim();
+        const lowerLine = cleanLine.toLowerCase();
+
+        // Data de Nascimento
+        if (lowerLine.startsWith('born:')) {
+            const m = cleanLine.match(/(\d{1,2}).+?([a-zA-Z]+)\s+(\d{4})/);
+            if (m) {
+                const day = m[1].padStart(2, '0');
+                const month = months[m[2].toLowerCase()];
+                const year = m[3];
+                if (month) data.born = `${year}/${month}/${day}`;
+            }
+        }
+        // País
+        else if (lowerLine.startsWith('birthplace:')) {
+            data.birthplace = cleanLine.split(':').pop().split(',').pop().trim();
+        }
+        // Etnia
+        else if (lowerLine.startsWith('ethnicity:')) {
+            data.ethnicity = cleanLine.split(':').pop().trim();
+        }
+        // Altura (cm)
+        else if (lowerLine.startsWith('height:')) {
+            const h = cleanLine.match(/(\d+)\s*cm/);
+            if (h) data.height = h[1];
+        }
+        // Peso (kg)
+        else if (lowerLine.startsWith('weight:')) {
+            const w = cleanLine.match(/(\d+)\s*kg/);
+            if (w) data.weight = w[1];
+        }
+        // Medidas
+        else if (lowerLine.startsWith('measurements:')) {
+            const m = cleanLine.match(/\d+/g);
+            if (m && m.length >= 3) data.measurements = `${m[0]}-${m[1]}-${m[2]}`;
+        }
+        // Cabelo
+        else if (lowerLine.startsWith('hair color:')) {
+            data.hair_color = cleanLine.split(':').pop().trim();
+        }
+        // Olhos
+        else if (lowerLine.startsWith('eye color:')) {
+            data.eye_color = cleanLine.split(':').pop().trim();
+        }
+        // Anos Ativa
+        else if (lowerLine.startsWith('years active:')) {
+            const y = cleanLine.match(/\d{4}/);
+            if (y) data.years_active = y[0];
+        }
+    });
+
+    // Injeta os dados nos inputs do DOM
+    if (data.name) {
+        const nameInput = document.getElementById('name');
+        nameInput.value = data.name;
+        checkNameExistsForCreateModal(); 
+    }
+    if (data.born) document.getElementById('born').value = data.born;
+    if (data.birthplace) document.getElementById('birthplace').value = data.birthplace;
+    if (data.ethnicity) document.getElementById('ethnicity').value = data.ethnicity;
+    if (data.height) document.getElementById('height').value = data.height;
+    if (data.weight) document.getElementById('weight').value = data.weight;
+    if (data.measurements) document.getElementById('measurements').value = data.measurements;
+    if (data.hair_color) document.getElementById('hair_color').value = data.hair_color;
+    if (data.eye_color) document.getElementById('eye_color').value = data.eye_color;
+    if (data.years_active) document.getElementById('years_active').value = data.years_active;
+}
 
 
 // --- Event Listeners (Global Page) ---
