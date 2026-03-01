@@ -2586,34 +2586,119 @@ function displayCreateActressStats() {
     quickStatsContentContainer.innerHTML += createStatCardHTML('Rank Mundial (Waist)', waistRankData, safeParseFloat(actress.Waist), ' cm', true, waistAvg, 'Waist', 'asc');
 }
 async function handleCreateActressSubmit(event) {
-    event.preventDefault(); if (!createActressForm || !actressSubmitButton || !actressNameInput) return;
+    event.preventDefault(); 
+    if (!createActressForm || !actressSubmitButton || !actressNameInput) return;
+    
     const formMessage = document.getElementById('create-actress-form-message');
     if (formMessage) formMessage.textContent = '';
-    if (actressNameErrorMessage && !actressNameErrorMessage.classList.contains('api-feedback')) { actressNameErrorMessage.style.display = 'none'; }
-    if (actressSubmitButton.disabled && matchedExistingActressData) { alert('Este nome de atriz já existe.'); return; }
-    if (actressSubmitButton.disabled) { alert('Aguarde a verificação.'); return; }
-    actressSubmitButton.disabled = true; actressSubmitButton.textContent = 'Verificando...';
-    const formData = new FormData(createActressForm); const enteredName = formData.get('name')?.trim();
-    if (!enteredName) { alert('O campo "Name" é obrigatório.'); if (actressNameErrorMessage) { actressNameErrorMessage.textContent = 'Obrigatório.'; actressNameErrorMessage.className = 'error-message error'; actressNameErrorMessage.style.display = 'block'; } actressSubmitButton.disabled = false; actressSubmitButton.textContent = initialButtonText; return; }
+    
+    if (actressNameErrorMessage && !actressNameErrorMessage.classList.contains('api-feedback')) { 
+        actressNameErrorMessage.style.display = 'none'; 
+    }
+
+    // Bloqueia se o nome já existe (verificado pelo debounce anteriormente)
+    if (actressSubmitButton.disabled && matchedExistingActressData) { 
+        alert('Este nome de atriz já existe.'); 
+        return; 
+    }
+    
+    if (actressSubmitButton.disabled) { 
+        alert('Aguarde a verificação do nome.'); 
+        return; 
+    }
+
+    actressSubmitButton.disabled = true; 
+    actressSubmitButton.textContent = 'Verificando...';
+
+    const formData = new FormData(createActressForm); 
+    const enteredName = formData.get('name')?.trim();
+
+    if (!enteredName) { 
+        alert('O campo "Name" é obrigatório.'); 
+        actressSubmitButton.disabled = false; 
+        actressSubmitButton.textContent = initialButtonText; 
+        return; 
+    }
+
     try {
+        // Verificação final de segurança no Banco de Dados
         const finalCheckQuery = query(collection(db, "atores"), where("nome", "==", enteredName), limit(1));
         const finalSnapshot = await getDocs(finalCheckQuery);
+        
         if (!finalSnapshot.empty) {
-            if (actressNameErrorMessage) { actressNameErrorMessage.textContent = 'O nome "' + escapeHtml(enteredName) + '" já existe.'; actressNameErrorMessage.className = 'error-message error'; actressNameErrorMessage.style.display = 'block'; }
-            alert('Já existe uma atriz com o nome "' + escapeHtml(enteredName) + '".'); actressSubmitButton.disabled = true; actressSubmitButton.textContent = "Nome Já Existe"; return;
+            alert('Já existe uma atriz com o nome "' + enteredName + '".');
+            actressSubmitButton.disabled = true;
+            actressSubmitButton.textContent = "Nome Já Existe";
+            return;
         }
+
         actressSubmitButton.textContent = 'Salvando...';
+
+        // Converte FormData para Objeto do Firestore
         const firestoreData = formDataToObject(formData);
-        firestoreData.nome = firestoreData.nome || 'Nome Indisponível';
-        firestoreData.createdAt = serverTimestamp(); firestoreData.timestamp = serverTimestamp();
+        firestoreData.nome = enteredName; // Garante o nome preenchido
+        firestoreData.createdAt = serverTimestamp(); 
+        firestoreData.timestamp = serverTimestamp();
+
+        // Salva no Firebase
         const docRef = await addDoc(collection(db, "atores"), firestoreData);
-        const newActressForCache = { ...firestoreData, id: docRef.id, createdAt: new Date(), timestamp: new Date() };
-        if (newActressForCache.nota !== undefined && typeof newActressForCache.nota !== 'number') { newActressForCache.nota = parseFloat(newActressForCache.nota); if(isNaN(newActressForCache.nota)) delete newActressForCache.nota; }
-        if (newActressForCache.overall !== undefined && typeof newActressForCache.overall !== 'number') { newActressForCache.overall = parseFloat(newActressForCache.overall); if(isNaN(newActressForCache.overall)) newActressForCache.overall = 0; }
-        allActressesData.push(newActressForCache); allActressesData.sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
-        filterAndRenderActressList(); alert('Atriz criada com sucesso!'); closeCreateActressModal();
-    } catch (error) { console.error("Erro ao salvar atriz: ", error); if (formMessage) { formMessage.textContent = 'Erro: ' + error.message; } alert('Erro: ' + error.message); if (actressSubmitButton) { actressSubmitButton.disabled = false; actressSubmitButton.textContent = initialButtonText; } }
+
+        // Cria objeto para atualização local imediata
+        const newActressForCache = { 
+            ...firestoreData, 
+            id: docRef.id, 
+            createdAt: new Date(), 
+            timestamp: new Date() 
+        };
+
+        // Garante tipos numéricos para o cache
+        if (newActressForCache.nota !== undefined) newActressForCache.nota = parseFloat(newActressForCache.nota) || 0;
+        if (newActressForCache.overall !== undefined) newActressForCache.overall = parseFloat(newActressForCache.overall) || 0;
+
+        // Atualiza Lista Global
+        allActressesData.push(newActressForCache); 
+        allActressesData.sort((a, b) => (a.nome || '').localeCompare(b.nome || ''));
+        
+        // Atualiza a barra lateral esquerda
+        filterAndRenderActressList();
+
+        // --- LOGICA DE VINCULO LIVE ---
+        const isSceneOpen = createSceneModal && createSceneModal.style.display === 'flex';
+        const isVideoOpen = createVideoModal && createVideoModal.style.display === 'flex';
+
+        if (isSceneOpen) {
+            // Se o modal de cena está aberto atrás, adiciona a atriz na lista de selecionados da cena
+            if (!selectedSceneActors.some(a => a.id === newActressForCache.id)) {
+                selectedSceneActors.push(newActressForCache);
+                renderSceneActorPills();
+                // Remove o botão amarelado de "Criar Atriz" referente a este nome
+                updateMissingActorLinks(newActressForCache.nome, 'scene');
+            }
+        } else if (isVideoOpen) {
+            // Se o modal de vídeo está aberto atrás
+            if (!selectedVideoActors.some(a => a.id === newActressForCache.id)) {
+                selectedVideoActors.push(newActressForCache);
+                renderVideoActorPills();
+                // Remove o botão amarelado de "Criar Atriz" referente a este nome
+                updateMissingActorLinks(newActressForCache.nome, 'video');
+            }
+        }
+
+        alert('Atriz criada e vinculada com sucesso!');
+        closeCreateActressModal();
+
+    } catch (error) {
+        console.error("Erro ao salvar atriz: ", error);
+        if (formMessage) { formMessage.textContent = 'Erro: ' + error.message; }
+        alert('Erro ao salvar: ' + error.message);
+        if (actressSubmitButton) {
+            actressSubmitButton.disabled = false;
+            actressSubmitButton.textContent = initialButtonText;
+        }
+    }
 }
+
+
 window.closeCreateActressModal = function() { if (createActressModal) createActressModal.style.display = 'none'; createActressForm = null; actressNameInput = null; actressNameErrorMessage = null; actressSubmitButton = null; debouncedActressNameCheckAndStats = null; matchedExistingActressData = null; createActressStatsContainer = null; quickStatsContentContainer = null; initialButtonText = 'Criar Atriz'; };
 
 // --- Edit Actress Modal Functions ---
@@ -3783,10 +3868,13 @@ function populateRecentItemsList(items, type) {
 
 
 function renderMissingActorLinks(missingNames, type) {
-    // Tenta encontrar o container de atores do modal aberto
     const containerId = type === 'scene' ? 'scene-actors-selector' : 'video-actors-selector';
     const container = document.getElementById(containerId);
     if (!container) return;
+
+    // Remove aviso anterior se existir para não duplicar
+    const oldWarning = container.querySelector('.missing-actors-warning');
+    if (oldWarning) oldWarning.remove();
 
     if (missingNames.length === 0) return;
 
@@ -3803,7 +3891,6 @@ function renderMissingActorLinks(missingNames, type) {
         btn.style.cssText = 'background: #fff; border: 1px solid #856404; color: #856404; padding: 3px 8px; border-radius: 3px; cursor: pointer; margin-right: 5px; margin-bottom: 5px; font-size: 0.9em;';
         
         btn.onclick = () => window.openCreateActressModal(name);
-        
         warningDiv.appendChild(btn);
     });
 
@@ -3891,6 +3978,29 @@ function parsePastedActressBio(text) {
     if (data.eye_color) document.getElementById('eye_color').value = data.eye_color;
     if (data.years_active) document.getElementById('years_active').value = data.years_active;
 }
+
+function updateMissingActorLinks(nameCreated, type) {
+    const containerId = type === 'scene' ? 'scene-actors-selector' : 'video-actors-selector';
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const warningDiv = container.querySelector('.missing-actors-warning');
+    if (!warningDiv) return;
+
+    const buttons = warningDiv.querySelectorAll('button');
+    buttons.forEach(btn => {
+        // Verifica se o texto do botão contém o nome criado
+        if (btn.textContent.includes(nameCreated)) {
+            btn.remove();
+        }
+    });
+
+    // Se não houver mais botões (todas as atrizes da lista foram criadas), remove o quadro amarelo
+    if (warningDiv.querySelectorAll('button').length === 0) {
+        warningDiv.remove();
+    }
+}
+
 
 
 // --- Event Listeners (Global Page) ---
