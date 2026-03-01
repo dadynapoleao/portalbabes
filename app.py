@@ -2,7 +2,6 @@ import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import cloudscraper
-from bs4 import BeautifulSoup
 import re
 
 app = Flask(__name__)
@@ -12,66 +11,57 @@ scraper = cloudscraper.create_scraper(
     browser={'browser': 'chrome', 'platform': 'windows', 'desktop': True}
 )
 
-def extract_val(pattern, text):
-    match = re.search(pattern, text, re.IGNORECASE | re.DOTALL)
-    return match.group(1).strip() if match else None
-
 @app.route('/scrape_babe')
 def scrape_babe():
     name = request.args.get('name')
-    if not name: return jsonify({"error": "Nome obrigatorio"}), 400
+    if not name: return jsonify({"error": "Falta nome"}), 400
     
     url = f'https://www.babepedia.com/babe/{name.replace(" ", "_")}'
     
     try:
         response = scraper.get(url, timeout=15)
-        # Transforma o HTML em texto puro e limpo
-        soup = BeautifulSoup(response.content, 'html.parser')
+        text = response.text
         
-        # Remove scripts e estilos antes de pegar o texto
-        for script in soup(["script", "style"]):
-            script.extract()
-            
-        page_text = soup.get_text(separator=" ")
-        # Remove espaços duplos e quebras de linha excessivas
-        page_text = " ".join(page_text.split())
-        
+        # Limpa o HTML para facilitar a busca no texto puro
+        clean_text = re.sub(r'<[^>]+>', ' ', text)
+        clean_text = " ".join(clean_text.split())
+
         data = {}
         
-        # --- BUSCA NO TEXTO PURO ---
-        
-        # 1. Born (Pega o texto entre 'Born:' e 'Years active' ou 'Birthplace')
-        born_raw = extract_val(r'Born:\s*(.*?)(?=\s+Years active|\s+Birthplace|\s+Nationality|\s+Ethnicity)', page_text)
-        if born_raw:
+        # 1. Born
+        born_match = re.search(r'Born:\s*([a-zA-Z]+\s+\d{1,2}(?:st|nd|rd|th)?,\s+\d{4}|[a-zA-Z]+\s+\d{1,2}\s+\d{4}|\d{1,2}\s+of\s+[a-zA-Z]+\s+\d{4})', clean_text, re.I)
+        if born_match:
+            raw_date = born_match.group(1)
             months = {"january":"01","february":"02","march":"03","april":"04","may":"05","june":"06","july":"07","august":"08","september":"09","october":"10","november":"11","december":"12"}
-            m = re.search(r'(\d{1,2}).+?([a-zA-Z]+)\s+(\d{4})', born_raw)
+            m = re.search(r'(\d{1,2}).+?([a-zA-Z]+)\s+(\d{4})|([a-zA-Z]+)\s+(\d{1,2}).+?(\d{4})', raw_date)
             if m:
-                data['born'] = f"{m.group(3)}/{months.get(m.group(2).lower(), '01')}/{m.group(1).zfill(2)}"
+                if m.group(1): # Formato: 24 of February 1994
+                    data['born'] = f"{m.group(3)}/{months.get(m.group(2).lower(), '01')}/{m.group(1).zfill(2)}"
+                else: # Formato: February 24, 1994
+                    data['born'] = f"{m.group(6)}/{months.get(m.group(4).lower(), '01')}/{m.group(5).zfill(2)}"
 
         # 2. Measurements
-        meas_raw = extract_val(r'Measurements:\s*([\d\w]+-[\d\w]+-[\d\w]+)', page_text)
-        if meas_raw:
-            nums = re.findall(r'\d+', meas_raw)
+        m_match = re.search(r'Measurements:\s*(\d+[a-zA-Z]?-\d+-\d+)', clean_text, re.I)
+        if m_match:
+            nums = re.findall(r'\d+', m_match.group(1))
             if len(nums) >= 3: data['measurements'] = f"{nums[0]}-{nums[1]}-{nums[2]}"
 
-        # 3. Altura e Peso
-        h = re.search(r'\(or\s+(\d+)\s*cm\)', page_text)
-        if h: data['height'] = h.group(1)
+        # 3. Altura (cm) e Peso (kg)
+        h_match = re.search(r'(\d+)\s*cm', clean_text)
+        if h_match: data['height'] = h_match.group(1)
         
-        w = re.search(r'\(or\s+(\d+)\s*kg\)', page_text)
-        if w: data['weight'] = w.group(1)
+        w_match = re.search(r'(\d+)\s*kg', clean_text)
+        if w_match: data['weight'] = w_match.group(1)
 
-        # 4. Outros campos
-        data['ethnicity'] = extract_val(r'Ethnicity:\s*(.*?)(?=\s+Profession|\s+Sexuality|\s+Body)', page_text)
-        data['birthplace'] = extract_val(r'Birthplace:\s*(.*?)(?=\s+Nationality|\s+Ethnicity|\s+Born)', page_text)
-        if data['birthplace']: data['birthplace'] = data['birthplace'].split(',')[-1].strip()
-        
-        data['hair_color'] = extract_val(r'Hair color:\s*(.*?)(?=\s+Eye color)', page_text)
-        data['eye_color'] = extract_val(r'Eye color:\s*(.*?)(?=\s+Height)', page_text)
-        data['years_active'] = extract_val(r'Years active:\s*(\d{4})', page_text)
+        # 4. Outros
+        data['ethnicity'] = (re.search(r'Ethnicity:\s*([a-zA-Z\s]+)', clean_text, re.I) or [None, None])[1]
+        data['hair_color'] = (re.search(r'Hair color:\s*([a-zA-Z\s]+)', clean_text, re.I) or [None, None])[1]
+        data['eye_color'] = (re.search(r'Eye color:\s*([a-zA-Z\s]+)', clean_text, re.I) or [None, None])[1]
+        data['years_active'] = (re.search(r'Years active:\s*(\d{4})', clean_text, re.I) or [None, None])[1]
 
         data['source_url'] = url
-        return jsonify(data)
+        return jsonify({k: v.strip() if isinstance(v, str) else v for k, v in data.items()})
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
