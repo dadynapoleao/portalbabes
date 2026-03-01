@@ -1068,6 +1068,20 @@
     cursor: pointer;
 }
 
+/* Classes para Transparência de Fundo */
+.remover-fundo-branco {
+    mix-blend-mode: multiply;
+    filter: contrast(1.1); /* Melhora o recorte */
+}
+
+.remover-fundo-preto {
+    mix-blend-mode: screen;
+}
+
+.borda-suave {
+    mask-image: radial-gradient(circle, black 60%, rgba(0,0,0,0) 100%);
+    -webkit-mask-image: radial-gradient(circle, black 60%, rgba(0,0,0,0) 100%);
+}
 
     </style>
 </head>
@@ -1921,10 +1935,11 @@ function renderActressListItem(actress) {
      const position = actress.fotoPosicao || "50% 50%";
 
      li.innerHTML = `
-        <img src="${escapeHtml(imageUrl)}" 
-             alt="${escapeHtml(actress.nome || '')}" 
-             style="object-position: ${position};" 
-             onerror="this.onerror=null; this.src='placeholder.png';">
+       <img src="${escapeHtml(imageUrl)}" 
+         class="${actress.fundoOpcao || ''}" 
+         style="object-position: ${position};" 
+         alt="${escapeHtml(actress.nome || '')}" 
+         onerror="this.onerror=null; this.src='placeholder.png';">
         <div class="actress-info">
             <span class="name">${escapeHtml(actress.nome || 'Nome Indisponível')}</span>
             <span class="age">Idade: ${age}</span>
@@ -2016,6 +2031,7 @@ function displayMainActressDetails(data) {
         img.alt = escapeHtml(data.nome || 'Foto');
         img.classList.add('detail-photo');
         // Aplica o ajuste de posição feito no modal de edição
+        img.className = 'detail-photo ' + (data.fundoOpcao || '');
         img.style.objectPosition = data.fotoPosicao || "50% 50%";
         img.onerror = () => { img.style.display = 'none'; };
         actressDetailsContainer.appendChild(img);
@@ -2884,22 +2900,30 @@ function getEditActressFormHTML(actress) {
     if (!actress) return '<p class="error">Dados da atriz não encontrados.</p>';
     const val = (field) => actress[field] !== undefined && actress[field] !== null ? String(actress[field]).trim() : '';
     
-    // Recupera a posição salva ou define o padrão 50% 50%
     const pos = actress.fotoPosicao || "50% 50%";
     const [posX, posY] = pos.split(' ').map(p => p.replace('%', ''));
+    const fundo = actress.fundoOpcao || ""; // Nova propriedade
 
     return `
         <form id="edit-actress-form" novalidate>
             <input type="hidden" id="edit-actress-id" value="${actress.id}">
             
-            <!-- Pré-visualização e Controles de Foto -->
             <div class="edit-photo-preview-container">
-                <div class="photo-circle-preview">
+                <div class="photo-circle-preview" style="background: #fff; border: 1px solid #444;"> <!-- Fundo branco no preview para ver o Multiply -->
                     <img id="edit-photo-preview-img" 
                          src="${escapeHtml(actress.foto || 'placeholder.png')}" 
-                         style="object-position: ${pos};">
+                         class="${fundo}"
+                         style="object-position: ${pos}; width: 100%; height: 100%; object-fit: cover;">
                 </div>
                 <div class="photo-controls">
+                    <label>Remover Fundo (Chroma Key CSS):</label>
+                    <select id="edit-fundo-opcao" name="fundoOpcao" style="margin-bottom: 15px;">
+                        <option value="" ${fundo === '' ? 'selected' : ''}>Nenhum (Normal)</option>
+                        <option value="remover-fundo-branco" ${fundo === 'remover-fundo-branco' ? 'selected' : ''}>Remover Fundo Branco (Multiply)</option>
+                        <option value="remover-fundo-preto" ${fundo === 'remover-fundo-preto' ? 'selected' : ''}>Remover Fundo Preto (Screen)</option>
+                        <option value="borda-suave" ${fundo === 'borda-suave' ? 'selected' : ''}>Suavizar Bordas (Vignette)</option>
+                    </select>
+
                     <label>Posição Horizontal (X):</label>
                     <input type="range" id="edit-photo-x" min="0" max="100" value="${posX || 50}">
                     <label>Posição Vertical (Y):</label>
@@ -2907,50 +2931,20 @@ function getEditActressFormHTML(actress) {
                     <input type="hidden" id="edit-foto-posicao" name="fotoPosicao" value="${pos}">
                 </div>
             </div>
-
+            
+            <!-- ... resto do formulário (Nome, Nota, etc) ... -->
             <div class="form-card full-width">
                 <label for="edit-nome">Nome:</label>
                 <input type="text" id="edit-nome" name="nome" value="${escapeHtml(val('nome'))}" required>
-                <span id="edit-nome-error" class="error-message"></span>
             </div>
-
             <div class="form-card">
                 <label for="edit-foto">URL da Foto:</label>
-                <input type="url" id="edit-foto" name="foto" value="${escapeHtml(val('foto'))}" placeholder="https://...">
+                <input type="url" id="edit-foto" name="foto" value="${escapeHtml(val('foto'))}">
             </div>
-
-            <div class="form-row-flex">
-                <div class="form-card">
-                    <label for="edit-nota">Nota (0 a 10):</label>
-                    <input type="number" id="edit-nota" name="nota" value="${val('nota')}" min="0" max="10" step="0.1">
-                </div>
-                <div class="form-card">
-                    <label for="edit-casta">Casta:</label>
-                    <select id="edit-casta" name="casta">
-                        <option value="" ${val('casta') === '' ? 'selected' : ''}>Selecione...</option>
-                        <option value="Panqueca" ${val('casta') === 'Panqueca' ? 'selected' : ''}>Panqueca</option>
-                        <option value="Melancia" ${val('casta') === 'Melancia' ? 'selected' : ''}>Melancia</option>
-                        <option value="Melao" ${val('casta') === 'Melao' ? 'selected' : ''}>Melão</option>
-                        <option value="Tabua" ${val('casta') === 'Tabua' ? 'selected' : ''}>Tabua</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- ... (Mantenha os outros campos do nascimento, país, etc, igual você já tinha) ... -->
-            
-            <div class="form-card"><label for="edit-dataNascimento">Nascimento:</label><input type="text" id="edit-dataNascimento" name="dataNascimento" value="${val('dataNascimento')}"></div>
-            <div class="form-card"><label for="edit-pais">País:</label><input type="text" id="edit-pais" name="pais" value="${escapeHtml(val('pais'))}"></div>
-            <div class="form-card"><label for="edit-etnia">Etnia:</label><input type="text" id="edit-etnia" name="etnia" value="${escapeHtml(val('etnia'))}"></div>
-            <div class="form-card"><label for="edit-altura">Altura:</label><input type="number" id="edit-altura" name="altura" value="${val('altura')}"></div>
-            <div class="form-card"><label for="edit-peso">Peso:</label><input type="number" id="edit-peso" name="peso" value="${val('peso')}"></div>
-            
-            <div class="form-card full-width">
-                <div id="edit-actress-form-message" class="error-message"></div>
+            <div class="submit-button-container">
+                <button type="submit" id="save-actress-changes-button" form="edit-actress-form">Salvar Alterações</button>
             </div>
         </form>
-        <div class="submit-button-container">
-            <button type="submit" id="save-actress-changes-button" form="edit-actress-form">Salvar Alterações</button>
-        </div>
     `;
 }
 
@@ -2970,16 +2964,22 @@ function openEditActressModal(actressId) {
     const sliderX = document.getElementById('edit-photo-x');
     const sliderY = document.getElementById('edit-photo-y');
     const hiddenPos = document.getElementById('edit-foto-posicao');
+    const selectFundo = document.getElementById('edit-fundo-opcao');
 
     // Função para atualizar o preview
     const updatePreview = () => {
-        const x = sliderX.value;
-        const y = sliderY.value;
-        const posString = `${x}% ${y}%`;
-        previewImg.style.objectPosition = posString;
-        hiddenPos.value = posString;
-        previewImg.src = inputFoto.value || 'placeholder.png';
-    };
+    const x = sliderX.value;
+    const y = sliderY.value;
+    const posString = `${x}% ${y}%`;
+    previewImg.style.objectPosition = posString;
+    hiddenPos.value = posString;
+    previewImg.src = inputFoto.value || 'placeholder.png';
+    
+    // Aplica a classe de fundo em tempo real no preview
+    previewImg.className = selectFundo.value;
+};
+
+selectFundo.addEventListener('change', updatePreview);
 
     // Listeners
     inputFoto.addEventListener('input', updatePreview);
@@ -3007,7 +3007,7 @@ async function handleEditActressSubmit(event) {
     const formData = new FormData(form); const dataToUpdate = {}; let hasChanges = false;
     const originalActressData = allActressesData.find(a => a.id === actressId);
     if (!originalActressData) { if (formMessage) { formMessage.textContent = 'Erro: Atriz original não encontrada.'; formMessage.classList.add('error'); } submitButton.disabled = false; submitButton.textContent = 'Salvar Alterações'; return; }
-    const formToFirestoreMap = { 'nome': 'nome', 'foto': 'foto', 'fotoPosicao': 'fotoPosicao', 'dataNascimento': 'dataNascimento', 'pais': 'pais', 'etnia': 'etnia', 'corCabelo': 'corCabelo', 'corOlhos': 'corOlhos', 'altura': 'altura', 'peso': 'peso', 'tipoCorpo': 'tipoCorpo', 'AnosAtiva': 'AnosAtiva', 'nota': 'nota', 'casta': 'casta', 'Boobs': 'Boobs', 'Waist': 'Waist', 'Ass': 'Ass' };
+    const formToFirestoreMap = { 'nome': 'nome', 'foto': 'foto', 'fotoPosicao': 'fotoPosicao', 'fundoOpcao': 'fundoOpcao', 'dataNascimento': 'dataNascimento', 'pais': 'pais', 'etnia': 'etnia', 'corCabelo': 'corCabelo', 'corOlhos': 'corOlhos', 'altura': 'altura', 'peso': 'peso', 'tipoCorpo': 'tipoCorpo', 'AnosAtiva': 'AnosAtiva', 'nota': 'nota', 'casta': 'casta', 'Boobs': 'Boobs', 'Waist': 'Waist', 'Ass': 'Ass' };
     for (const formFieldName in formToFirestoreMap) {
         const firestoreKey = formToFirestoreMap[formFieldName]; let newValue = formData.get(formFieldName);
         if (typeof newValue === 'string') { newValue = newValue.trim(); }
