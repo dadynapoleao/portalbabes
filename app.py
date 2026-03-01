@@ -1,15 +1,21 @@
-# --- Imports ---
 import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import cloudscraper  # SUBSTITUÍDO: de requests para cloudscraper
+import cloudscraper
 from bs4 import BeautifulSoup
 import logging
 import re
 
-# ... (Mantenha as funções auxiliares de extração iguais) ...
+# --- Configuração do Flask App ---
+app = Flask(__name__)
+CORS(app)
 
-# Crie o scraper globalmente para maior eficiência
+# --- Configuração de Logging ---
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# --- Inicialização do Scraper ---
+# Criamos o scraper aqui para evitar bloqueios
 scraper = cloudscraper.create_scraper(
     browser={
         'browser': 'chrome',
@@ -18,37 +24,110 @@ scraper = cloudscraper.create_scraper(
     }
 )
 
-# --- Função Principal de Scraping Atualizada ---
-def scrape_babepedia_data(babe_name_formatted):
-    babe_name_for_url = babe_name_formatted
-    url = f'https://www.babepedia.com/babe/{babe_name_for_url}'
-    
-    scraped_info = {}
-    try:
-        app.logger.info(f"Requesting URL via CloudScraper: {url}")
-        
-        # USANDO SCRAPER NO LUGAR DE REQUESTS
-        response = scraper.get(url, timeout=15)
-        
-        # Se ainda der 403, tentamos forçar um novo scraper
-        if response.status_code == 403:
-             app.logger.warning("403 detectado, tentando novo bypass...")
-             temp_scraper = cloudscraper.create_scraper()
-             response = temp_scraper.get(url, timeout=15)
+# --- Funções Auxiliares (Mantidas do seu código original) ---
+def extract_first_number(text):
+    if not text: return None
+    match = re.search(r'\d+', str(text))
+    return match.group(0) if match else None
 
-        response.raise_for_status()
+def extract_cm(height_text):
+    if not height_text: return None
+    match = re.search(r'\((\d+)\s*cm\)', height_text)
+    if match: return match.group(1)
+    match_direct = re.search(r'(\d+)\s*cm', height_text)
+    if match_direct: return match_direct.group(1)
+    return None
+
+def extract_kg(weight_text):
+    if not weight_text: return None
+    match = re.search(r'\((\d+)\s*kg\)', weight_text)
+    if match: return match.group(1)
+    return None
+
+def format_babepedia_date(date_text):
+    if not date_text: return None
+    month_map = {'january': '01', 'february': '02', 'march': '03', 'april': '04', 'may': '05', 'june': '06', 'july': '07', 'august': '08', 'september': '09', 'october': '10', 'november': '11', 'december': '12'}
+    match = re.search(r'(\d{1,2})(?:st|nd|rd|th)?\s+([a-zA-Z]+)\s+(\d{4})', date_text, re.IGNORECASE)
+    if match:
+        day = match.group(1).zfill(2); month = month_map.get(match.group(2).lower()); year = match.group(3)
+        if month: return f"{year}/{month}/{day}"
+    return date_text
+
+def extract_country(birthplace_text):
+    if not birthplace_text: return None
+    parts = [p.strip() for p in birthplace_text.split(',') if p.strip()]
+    return parts[-1] if parts else None
+
+def extract_start_year(active_text):
+    if not active_text: return None
+    match = re.search(r'(\d{4})', active_text)
+    return match.group(1) if match else None
+
+# --- Lógica de Parsing ---
+def parse_html_data(soup):
+    data = {}
+    temp_data = {}
+    try:
+        biolist = soup.find('ul', id='biolist')
+        if not biolist: return data
+
+        label_map = {
+            "Born:": "born_raw", "Birthplace:": "birthplace", "Ethnicity:": "ethnicity",
+            "Hair color:": "hair_color", "Eye color:": "eye_color", "Height:": "height_raw",
+            "Weight:": "weight_raw", "Body type:": "body_type", "Measurements:": "measurements_raw",
+            "Years active:": "years_active_raw"
+        }
+
+        for li in biolist.find_all('li', recursive=False):
+            label_span = li.find('span', class_='label') or li.find(['strong', 'b'])
+            if label_span:
+                lbl = label_span.get_text().strip()
+                if lbl in label_map:
+                    val = li.get_text().replace(lbl, '').strip()
+                    temp_data[label_map[lbl]] = val
+
+        if 'born_raw' in temp_data: data['born'] = format_babepedia_date(temp_data['born_raw'])
+        if 'birthplace' in temp_data: data['birthplace'] = extract_country(temp_data['birthplace'])
+        if 'height_raw' in temp_data: data['height'] = extract_cm(temp_data['height_raw'])
+        if 'weight_raw' in temp_data: data['weight'] = extract_kg(temp_data['weight_raw'])
+        if 'years_active_raw' in temp_data: data['years_active'] = extract_start_year(temp_data['years_active_raw'])
         
-        app.logger.info(f"Request successful (Status: {response.status_code}). Parsing content...")
-        soup = BeautifulSoup(response.content, 'html.parser')
-        scraped_info = parse_html_data(soup)
-        
-        # ... (resto da lógica de sucesso) ...
-        scraped_info['searched_name'] = babe_name_formatted
-        scraped_info['source_url'] = url
+        if 'measurements_raw' in temp_data:
+            m = temp_data['measurements_raw'].split('-')
+            if len(m) == 3:
+                data['Boobs'] = extract_first_number(m[0])
+                data['Waist'] = extract_first_number(m[1])
+                data['Ass'] = extract_first_number(m[2])
+                data['measurements'] = f"{data['Boobs']}-{data['Waist']}-{data['Ass']}"
+
+        for k in ['ethnicity', 'hair_color', 'eye_color', 'body_type']:
+            if k in temp_data: data[k] = temp_data[k]
 
     except Exception as e:
-        status_code = getattr(e.response, 'status_code', 500) if hasattr(e, 'response') else 500
-        app.logger.error(f"Error scraping {url}: {e}")
-        scraped_info = {"error": f"Erro no Scraping: {str(e)}", "status_code": status_code}
+        logger.error(f"Erro no parse: {e}")
+    return data
+
+# --- Endpoints ---
+@app.route('/scrape_babe')
+def scrape_babe():
+    name = request.args.get('name')
+    if not name: return jsonify({"error": "Nome obrigatorio"}), 400
+    
+    url = f'https://www.babepedia.com/babe/{name.replace(" ", "_")}'
+    try:
+        # Usando cloudscraper para evitar erro 403
+        response = scraper.get(url, timeout=15)
+        if response.status_code == 404:
+            return jsonify({"error": "Atriz nao encontrada"}), 404
+            
+        soup = BeautifulSoup(response.content, 'html.parser')
+        result = parse_html_data(soup)
+        result['source_url'] = url
+        return jsonify(result)
         
-    return scraped_info
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 5001))
+    app.run(host='0.0.0.0', port=port)
