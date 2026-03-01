@@ -12,17 +12,28 @@ scraper = cloudscraper.create_scraper(
     browser={'browser': 'chrome', 'platform': 'windows', 'desktop': True}
 )
 
-def format_date(text):
+def format_date_flexible(text):
+    # Converte qualquer formato de data do site para YYYY/MM/DD
     months = {"january":"01","february":"02","march":"03","april":"04","may":"05","june":"06","july":"07","august":"08","september":"09","october":"10","november":"11","december":"12"}
-    # Procura "24th of February 1994" ou "February 24, 1994"
-    match = re.search(r'(\d{1,2})?.+?([a-zA-Z]+)\s+(\d{1,2})?.+?(\d{4})', text)
-    if match:
-        # Tenta identificar qual grupo é o dia e qual é o mês
-        year = match.group(4)
-        month_name = match.group(2).lower()
-        day = (match.group(1) or match.group(3) or "01").zfill(2)
-        return f"{year}/{months.get(month_name, '01')}/{day}"
-    return text
+    text = text.lower()
+    # Busca por um ano de 4 dígitos
+    year_match = re.search(r'\d{4}', text)
+    if not year_match: return text
+    year = year_match.group(0)
+    
+    # Busca o nome do mês
+    month = "01"
+    for m_name, m_num in months.items():
+        if m_name in text:
+            month = m_num
+            break
+            
+    # Busca o dia (número de 1 ou 2 dígitos que não seja o ano)
+    days = re.findall(r'\b\d{1,2}\b', text)
+    day = "01"
+    if days: day = days[0].zfill(2)
+    
+    return f"{year}/{month}/{day}"
 
 @app.route('/scrape_babe')
 def scrape_babe():
@@ -34,44 +45,42 @@ def scrape_babe():
     try:
         response = scraper.get(url, timeout=15)
         soup = BeautifulSoup(response.content, 'html.parser')
-        
-        # Pega todo o texto das listas da página
-        all_li = soup.find_all('li')
         data = {}
         
-        for li in all_li:
+        # Estratégia: Varre todos os itens de lista (li) da página
+        for li in soup.find_all('li'):
             text = li.get_text(separator=" ").strip()
+            text_lower = text.lower()
             
-            if "Born:" in text:
-                data['born'] = format_date(text.replace("Born:", "").strip())
-            elif "Birthplace:" in text:
-                data['birthplace'] = text.replace("Birthplace:", "").strip().split(',')[-1].strip()
-            elif "Height:" in text:
-                h = re.search(r'(\d+)\s*cm', text)
-                if h: data['height'] = h.group(1)
-            elif "Weight:" in text:
-                w = re.search(r'(\d+)\s*kg', text)
-                if w: data['weight'] = w.group(1)
-            elif "Measurements:" in text:
+            # Nascimento
+            if "born:" in text_lower:
+                val = text.split(":", 1)[1].strip()
+                data['born'] = format_date_flexible(val)
+            
+            # Medidas (Busca padrão 00-00-00)
+            elif "measurements:" in text_lower:
                 m = re.findall(r'\d+', text)
                 if len(m) >= 3: data['measurements'] = f"{m[0]}-{m[1]}-{m[2]}"
-            elif "Ethnicity:" in text:
-                data['ethnicity'] = text.replace("Ethnicity:", "").strip()
-            elif "Hair color:" in text:
-                data['hair_color'] = text.replace("Hair color:", "").strip()
-            elif "Eye color:" in text:
-                data['eye_color'] = text.replace("Eye color:", "").strip()
-            elif "Years active:" in text:
-                y = re.search(r'(\d{4})', text)
-                if y: data['years_active'] = y.group(1)
-            elif "Body type:" in text:
-                data['body_type'] = text.replace("Body type:", "").strip()
-
-        # Fallback para país se Birthplace falhar mas tiver Nationality
-        if not data.get('birthplace'):
-            for li in all_li:
-                if "Nationality:" in li.get_text():
-                    data['birthplace'] = li.get_text().replace("Nationality:", "").replace("(","").replace(")","").strip()
+            
+            # Altura (Busca número antes de "cm")
+            elif "height:" in text_lower:
+                h = re.search(r'(\d+)\s*cm', text)
+                if h: data['height'] = h.group(1)
+            
+            # Peso (Busca número antes de "kg")
+            elif "weight:" in text_lower:
+                w = re.search(r'(\d+)\s*kg', text)
+                if w: data['weight'] = w.group(1)
+            
+            # Etnia / País / Cabelo
+            elif "ethnicity:" in text_lower:
+                data['ethnicity'] = text.split(":", 1)[1].strip()
+            elif "birthplace:" in text_lower:
+                data['birthplace'] = text.split(",")[-1].strip()
+            elif "hair color:" in text_lower:
+                data['hair_color'] = text.split(":", 1)[1].strip()
+            elif "eye color:" in text_lower:
+                data['eye_color'] = text.split(":", 1)[1].strip()
 
         data['source_url'] = url
         return jsonify(data)
