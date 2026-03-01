@@ -1523,6 +1523,27 @@ const firebaseConfig = {
     appId: "1:376795361631:web:d662f2b2f2cd23b115c6ea"
 };
 
+const formToFirestoreMap = { 
+    'nome': 'nome', 
+    'foto': 'foto', 
+    'fotoPosicao': 'fotoPosicao',
+    'fundoOpcao': 'fundoOpcao',
+    'dataNascimento': 'dataNascimento',
+    'pais': 'pais',
+    'etnia': 'etnia',
+    'corCabelo': 'corCabelo',
+    'corOlhos': 'corOlhos',
+    'altura': 'altura',
+    'peso': 'peso',
+    'tipoCorpo': 'tipoCorpo',
+    'AnosAtiva': 'AnosAtiva',
+    'nota': 'nota',
+    'casta': 'casta',
+    'Boobs': 'Boobs',
+    'Waist': 'Waist',
+    'Ass': 'Ass'
+};
+
 // --- Initialize Firebase ---
 const app = initializeApp(firebaseConfig);
 console.log("LOG 1: Firebase App initialized:", app ? 'OK' : 'FALHOU');
@@ -2898,53 +2919,140 @@ window.closeCreateActressModal = function() { if (createActressModal) createActr
 // --- Edit Actress Modal Functions ---
 function getEditActressFormHTML(actress) {
     if (!actress) return '<p class="error">Dados da atriz não encontrados.</p>';
+    
+    // Função auxiliar para evitar erros de undefined nos inputs
     const val = (field) => actress[field] !== undefined && actress[field] !== null ? String(actress[field]).trim() : '';
     
+    // Recupera dados da foto e posição
     const pos = actress.fotoPosicao || "50% 50%";
     const [posX, posY] = pos.split(' ').map(p => p.replace('%', ''));
-    const fundo = actress.fundoOpcao || ""; // Nova propriedade
+    const fundo = actress.fundoOpcao || "";
 
     return `
         <form id="edit-actress-form" novalidate>
             <input type="hidden" id="edit-actress-id" value="${actress.id}">
             
-            <div class="edit-photo-preview-container">
-                <div class="photo-circle-preview" style="background: #fff; border: 1px solid #444;"> <!-- Fundo branco no preview para ver o Multiply -->
+            <!-- SEÇÃO DE AJUSTE DE FOTO -->
+            <div class="edit-photo-preview-container" style="background: #1a1a1a; padding: 20px; border-radius: 8px; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center;">
+                <div class="photo-circle-preview" style="width: 120px; height: 120px; border-radius: 50%; border: 3px solid #bb86fc; overflow: hidden; background-color: #fff; margin-bottom: 15px;">
                     <img id="edit-photo-preview-img" 
                          src="${escapeHtml(actress.foto || 'placeholder.png')}" 
                          class="${fundo}"
                          style="object-position: ${pos}; width: 100%; height: 100%; object-fit: cover;">
                 </div>
-                <div class="photo-controls">
-                    <label>Remover Fundo (Chroma Key CSS):</label>
-                    <select id="edit-fundo-opcao" name="fundoOpcao" style="margin-bottom: 15px;">
+                
+                <div class="photo-controls" style="width: 100%; max-width: 400px;">
+                    <label style="color: #aaa; font-size: 0.8em; display:block; margin-bottom:5px;">Remover Fundo (Chroma CSS):</label>
+                    <select id="edit-fundo-opcao" name="fundoOpcao" style="width: 100%; margin-bottom: 10px; background: #333; color: #fff; border: 1px solid #444; padding: 5px;">
                         <option value="" ${fundo === '' ? 'selected' : ''}>Nenhum (Normal)</option>
                         <option value="remover-fundo-branco" ${fundo === 'remover-fundo-branco' ? 'selected' : ''}>Remover Fundo Branco (Multiply)</option>
                         <option value="remover-fundo-preto" ${fundo === 'remover-fundo-preto' ? 'selected' : ''}>Remover Fundo Preto (Screen)</option>
                         <option value="borda-suave" ${fundo === 'borda-suave' ? 'selected' : ''}>Suavizar Bordas (Vignette)</option>
                     </select>
 
-                    <label>Posição Horizontal (X):</label>
-                    <input type="range" id="edit-photo-x" min="0" max="100" value="${posX || 50}">
-                    <label>Posição Vertical (Y):</label>
-                    <input type="range" id="edit-photo-y" min="0" max="100" value="${posY || 50}">
+                    <div style="display: flex; gap: 10px;">
+                        <div style="flex: 1;">
+                            <label style="color: #aaa; font-size: 0.7em;">Eixo X:</label>
+                            <input type="range" id="edit-photo-x" min="0" max="100" value="${posX || 50}" style="width: 100%;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="color: #aaa; font-size: 0.7em;">Eixo Y:</label>
+                            <input type="range" id="edit-photo-y" min="0" max="100" value="${posY || 50}" style="width: 100%;">
+                        </div>
+                    </div>
                     <input type="hidden" id="edit-foto-posicao" name="fotoPosicao" value="${pos}">
                 </div>
             </div>
-            
-            <!-- ... resto do formulário (Nome, Nota, etc) ... -->
+
+            <!-- CAMPOS PRINCIPAIS -->
             <div class="form-card full-width">
-                <label for="edit-nome">Nome:</label>
+                <label for="edit-nome">Nome da Atriz:</label>
                 <input type="text" id="edit-nome" name="nome" value="${escapeHtml(val('nome'))}" required>
+                <span id="edit-nome-error" class="error-message"></span>
             </div>
-            <div class="form-card">
+
+            <div class="form-row-flex">
+                <div class="form-card">
+                    <label for="edit-nota">Nota (0 a 10):</label>
+                    <input type="number" id="edit-nota" name="nota" value="${val('nota')}" min="0" max="10" step="0.1" placeholder="Ex: 8.5">
+                </div>
+                <div class="form-card">
+                    <label for="edit-casta">Casta:</label>
+                    <select id="edit-casta" name="casta">
+                        <option value="" ${val('casta') === '' ? 'selected' : ''}>Selecione...</option>
+                        <option value="Panqueca" ${val('casta') === 'Panqueca' ? 'selected' : ''}>Panqueca</option>
+                        <option value="Melancia" ${val('casta') === 'Melancia' ? 'selected' : ''}>Melancia</option>
+                        <option value="Melao" ${val('casta') === 'Melao' ? 'selected' : ''}>Melão</option>
+                        <option value="Tabua" ${val('casta') === 'Tabua' ? 'selected' : ''}>Tabua</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-card full-width">
                 <label for="edit-foto">URL da Foto:</label>
-                <input type="url" id="edit-foto" name="foto" value="${escapeHtml(val('foto'))}">
+                <input type="url" id="edit-foto" name="foto" value="${escapeHtml(val('foto'))}" placeholder="https://...">
             </div>
-            <div class="submit-button-container">
-                <button type="submit" id="save-actress-changes-button" form="edit-actress-form">Salvar Alterações</button>
+
+            <div class="form-row-flex">
+                <div class="form-card">
+                    <label for="edit-dataNascimento">Data de Nascimento:</label>
+                    <input type="text" id="edit-dataNascimento" name="dataNascimento" value="${val('dataNascimento')}" placeholder="YYYY/MM/DD">
+                </div>
+                <div class="form-card">
+                    <label for="edit-pais">País / Nacionalidade:</label>
+                    <input type="text" id="edit-pais" name="pais" value="${escapeHtml(val('pais'))}">
+                </div>
             </div>
+
+            <div class="form-row-flex">
+                <div class="form-card">
+                    <label for="edit-altura">Altura (cm):</label>
+                    <input type="number" id="edit-altura" name="altura" value="${val('altura')}">
+                </div>
+                <div class="form-card">
+                    <label for="edit-peso">Peso (kg):</label>
+                    <input type="number" id="edit-peso" name="peso" value="${val('peso')}">
+                </div>
+            </div>
+
+            <!-- MEDIDAS INDIVIDUAIS -->
+            <div class="form-row-flex" style="display: flex; gap: 10px;">
+                <div class="form-card" style="flex: 1;">
+                    <label for="edit-Boobs">Boobs:</label>
+                    <input type="text" id="edit-Boobs" name="Boobs" value="${val('Boobs')}">
+                </div>
+                <div class="form-card" style="flex: 1;">
+                    <label for="edit-Waist">Waist:</label>
+                    <input type="text" id="edit-Waist" name="Waist" value="${val('Waist')}">
+                </div>
+                <div class="form-card" style="flex: 1;">
+                    <label for="edit-Ass">Ass:</label>
+                    <input type="text" id="edit-Ass" name="Ass" value="${val('Ass')}">
+                </div>
+            </div>
+
+            <div class="form-row-flex">
+                <div class="form-card">
+                    <label for="edit-corCabelo">Cor do Cabelo:</label>
+                    <input type="text" id="edit-corCabelo" name="corCabelo" value="${escapeHtml(val('corCabelo'))}">
+                </div>
+                <div class="form-card">
+                    <label for="edit-etnia">Etnia:</label>
+                    <input type="text" id="edit-etnia" name="etnia" value="${escapeHtml(val('etnia'))}">
+                </div>
+            </div>
+
+            <div class="form-card full-width">
+                <label for="edit-AnosAtiva">Anos Ativa (Início):</label>
+                <input type="text" id="edit-AnosAtiva" name="AnosAtiva" value="${val('AnosAtiva')}" placeholder="Ex: 2015">
+            </div>
+
+            <div id="edit-actress-form-message" class="error-message"></div>
         </form>
+        
+        <div class="submit-button-container" style="margin-top: 20px;">
+            <button type="submit" id="save-actress-changes-button" form="edit-actress-form">Salvar Alterações</button>
+        </div>
     `;
 }
 
@@ -2958,33 +3066,28 @@ function openEditActressModal(actressId) {
     editActressModalNameTitle.textContent = actressData.nome || 'Atriz';
     editActressModalBody.innerHTML = getEditActressFormHTML(actressData);
 
-    // Seletores dos elementos de foto
+    // Seletores para o preview em tempo real
     const inputFoto = document.getElementById('edit-foto');
     const previewImg = document.getElementById('edit-photo-preview-img');
     const sliderX = document.getElementById('edit-photo-x');
     const sliderY = document.getElementById('edit-photo-y');
-    const hiddenPos = document.getElementById('edit-foto-posicao');
     const selectFundo = document.getElementById('edit-fundo-opcao');
+    const hiddenPos = document.getElementById('edit-foto-posicao');
 
-    // Função para atualizar o preview
     const updatePreview = () => {
-    const x = sliderX.value;
-    const y = sliderY.value;
-    const posString = `${x}% ${y}%`;
-    previewImg.style.objectPosition = posString;
-    hiddenPos.value = posString;
-    previewImg.src = inputFoto.value || 'placeholder.png';
-    
-    // Aplica a classe de fundo em tempo real no preview
-    previewImg.className = selectFundo.value;
-};
+        const x = sliderX.value;
+        const y = sliderY.value;
+        const posString = `${x}% ${y}%`;
+        previewImg.style.objectPosition = posString;
+        hiddenPos.value = posString;
+        previewImg.src = inputFoto.value || 'placeholder.png';
+        previewImg.className = selectFundo.value;
+    };
 
-selectFundo.addEventListener('change', updatePreview);
-
-    // Listeners
     inputFoto.addEventListener('input', updatePreview);
     sliderX.addEventListener('input', updatePreview);
     sliderY.addEventListener('input', updatePreview);
+    selectFundo.addEventListener('change', updatePreview);
 
     const form = document.getElementById('edit-actress-form');
     if (form) {
