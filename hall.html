@@ -1024,6 +1024,51 @@
     background-color: rgba(0, 0, 0, 0.7); 
 }
 
+/* Container de Pré-visualização no Edit Modal */
+.edit-photo-preview-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #1a1a1a;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.photo-circle-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px solid #bb86fc;
+    overflow: hidden;
+    background-color: #333;
+    margin-bottom: 15px;
+}
+
+.photo-circle-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Essencial para o posicionamento funcionar */
+}
+
+.photo-controls {
+    width: 100%;
+    max-width: 300px;
+}
+
+.photo-controls label {
+    font-size: 0.8em;
+    color: #aaa;
+    margin-bottom: 5px;
+}
+
+.photo-controls input[type="range"] {
+    width: 100%;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+
     </style>
 </head>
 <body>
@@ -1861,12 +1906,35 @@ function renderActressList(actressesToRender) {
         }
     }
 }
+
 function renderActressListItem(actress) {
-     if (!actressListUl) return; const li = document.createElement('li'); li.classList.add('actress-item'); li.dataset.id = actress.id;
-     const age = calculateAge(actress.dataNascimento); const imageUrl = actress.foto || 'placeholder.png'; const rating = actress.nota !== undefined && actress.nota !== null ? Number(actress.nota).toFixed(1) : 'N/A';
-     li.innerHTML = '<img src="' + escapeHtml(imageUrl) + '" alt="' + escapeHtml(actress.nome || '') + '" onerror="this.onerror=null; this.src=\'placeholder.png\';"><div class="actress-info"><span class="name">' + escapeHtml(actress.nome || 'Nome Indisponível') + '</span><span class="age">Idade: ' + age + '</span><span class="rating">Nota: ' + rating + '</span></div>';
-     li.addEventListener('click', () => handleMainActressClick(actress.id, li)); actressListUl.appendChild(li);
+     if (!actressListUl) return;
+     const li = document.createElement('li');
+     li.classList.add('actress-item');
+     li.dataset.id = actress.id;
+
+     const age = calculateAge(actress.dataNascimento);
+     const imageUrl = actress.foto || 'placeholder.png';
+     const rating = actress.nota !== undefined && actress.nota !== null ? Number(actress.nota).toFixed(1) : 'N/A';
+     
+     // Recupera a posição salva ou usa o padrão centralizado
+     const position = actress.fotoPosicao || "50% 50%";
+
+     li.innerHTML = `
+        <img src="${escapeHtml(imageUrl)}" 
+             alt="${escapeHtml(actress.nome || '')}" 
+             style="object-position: ${position};" 
+             onerror="this.onerror=null; this.src='placeholder.png';">
+        <div class="actress-info">
+            <span class="name">${escapeHtml(actress.nome || 'Nome Indisponível')}</span>
+            <span class="age">Idade: ${age}</span>
+            <span class="rating">Nota: ${rating}</span>
+        </div>`;
+
+     li.addEventListener('click', () => handleMainActressClick(actress.id, li));
+     actressListUl.appendChild(li);
 }
+
 async function handleMainActressClick(actressId, listItemElement) {
      if (selectedMainActressElement === listItemElement || !mainContainer || !actressDetailsContainer || !contentCardsContainer || !contentMessage) return;
      if (selectedMainActressElement) selectedMainActressElement.classList.remove('selected');
@@ -1887,31 +1955,141 @@ async function handleMainActressClick(actressId, listItemElement) {
          await loadAndDisplayRelatedContent(actressId);
      } catch (error) { console.error('Erro ao carregar dados da atriz ' + actressId + ': ', error); actressDetailsContainer.innerHTML = '<div class="error">Erro ao carregar detalhes.</div>'; displayMessage(contentMessage,'Erro ao carregar conteúdo.', true); }
 }
+
 function displayMainActressDetails(data) {
-    if (!actressDetailsContainer) return; actressDetailsContainer.innerHTML = '';
-    const detailsHeaderContainer = document.createElement('div'); detailsHeaderContainer.style.display = 'flex'; detailsHeaderContainer.style.justifyContent = 'space-between'; detailsHeaderContainer.style.alignItems = 'center'; detailsHeaderContainer.style.marginBottom = '15px';
-    const detailsTitle = document.createElement('h2'); detailsTitle.textContent = data.nome || 'Detalhes'; detailsTitle.style.margin = '0';
-    const compareIconButton = document.createElement('button'); compareIconButton.id = 'details-compare-icon'; compareIconButton.title = 'Comparar esta atriz'; compareIconButton.style.background = 'none'; compareIconButton.style.border = 'none'; compareIconButton.style.fontSize = '1.5em'; compareIconButton.style.cursor = 'pointer'; compareIconButton.style.padding = '0 5px'; compareIconButton.textContent = '⚖️';
-    compareIconButton.addEventListener('click', () => { if (currentMainActressId) { openComparisonModal([currentMainActressId]); } });
-    const editIconButton = document.createElement('button'); editIconButton.id = 'details-edit-icon'; editIconButton.title = 'Editar esta atriz'; editIconButton.innerHTML = '✏️';
-    editIconButton.addEventListener('click', () => { if (currentMainActressId) { openEditActressModal(currentMainActressId); } });
-    const iconGroup = document.createElement('div'); iconGroup.style.display = 'flex'; iconGroup.appendChild(compareIconButton); iconGroup.appendChild(editIconButton);
-    detailsHeaderContainer.appendChild(detailsTitle); detailsHeaderContainer.appendChild(iconGroup); actressDetailsContainer.appendChild(detailsHeaderContainer);
-    if (data.foto) { const img = document.createElement('img'); img.src = escapeHtml(data.foto); img.alt = escapeHtml(data.nome || 'Foto'); img.classList.add('detail-photo'); img.onerror = () => { img.style.display = 'none'; }; actressDetailsContainer.appendChild(img); }
-    const measurementContainer = document.createElement('div'); measurementContainer.classList.add('measurement-cards-container'); let cardsAdded = 0;
-    const createMeasurementCard = (label, value) => { if (value != null && String(value).trim() !== '') { const card = document.createElement('div'); card.classList.add('measurement-card'); card.innerHTML = '<span class="label">' + escapeHtml(label) + '</span><span class="value">' + escapeHtml(value) + '</span>'; measurementContainer.appendChild(card); cardsAdded++; } };
-    createMeasurementCard('Boobs', data.Boobs); createMeasurementCard('Waist', data.Waist); createMeasurementCard('Ass', data.Ass);
-    if (cardsAdded > 0) { actressDetailsContainer.appendChild(measurementContainer); }
-    let detailsAdded = false; const detailFieldsContainer = document.createElement('div');
-    const addDetailRow = (label, value) => { if (value != null && String(value).trim() !== '') { const div = document.createElement('div'); div.innerHTML = '<strong>' + escapeHtml(label) + ':</strong> ' + escapeHtml(value); detailFieldsContainer.appendChild(div); detailsAdded = true; } };
-    addDetailRow('Nascimento', data.dataNascimento); if (data.dataNascimento) { addDetailRow('Idade', calculateAge(data.dataNascimento)); }
-    if (data.altura != null) { addDetailRow('Altura', data.altura + ' cm'); } if (data.peso != null) { addDetailRow('Peso', data.peso + ' kg'); }
-    addDetailRow('Nacionalidade', data.pais); addDetailRow('Etnia', data.etnia); addDetailRow('Cor Cabelo', data.corCabelo); addDetailRow('Cor Olhos', data.corOlhos);
-    addDetailRow('Medidas', data.medidas); addDetailRow('Tipo Corpo', data.tipoCorpo); addDetailRow('Casta', data.casta); addDetailRow('Anos Ativa', data.AnosAtiva);
-    if (data.nota != null) { addDetailRow('Nota', Number(data.nota).toFixed(1)); } if (data.overall != null) { addDetailRow('Overall', Number(data.overall).toFixed(1)); }
-    if(detailsAdded) { actressDetailsContainer.appendChild(detailFieldsContainer); }
-    if (!data.foto && cardsAdded === 0 && !detailsAdded) { const noDetailsDiv = document.createElement('div'); noDetailsDiv.classList.add('error'); noDetailsDiv.style.textAlign = 'center'; noDetailsDiv.style.marginTop = '20px'; noDetailsDiv.textContent = 'Sem detalhes disponíveis para esta atriz.'; actressDetailsContainer.appendChild(noDetailsDiv); }
+    if (!actressDetailsContainer) return;
+    actressDetailsContainer.innerHTML = '';
+
+    // Container do Header (Nome + Ícones)
+    const detailsHeaderContainer = document.createElement('div');
+    detailsHeaderContainer.style.display = 'flex';
+    detailsHeaderContainer.style.justifyContent = 'space-between';
+    detailsHeaderContainer.style.alignItems = 'center';
+    detailsHeaderContainer.style.marginBottom = '15px';
+
+    const detailsTitle = document.createElement('h2');
+    detailsTitle.textContent = data.nome || 'Detalhes';
+    detailsTitle.style.margin = '0';
+
+    // Ícone de Comparação
+    const compareIconButton = document.createElement('button');
+    compareIconButton.id = 'details-compare-icon';
+    compareIconButton.title = 'Comparar esta atriz';
+    compareIconButton.style.background = 'none';
+    compareIconButton.style.border = 'none';
+    compareIconButton.style.fontSize = '1.5em';
+    compareIconButton.style.cursor = 'pointer';
+    compareIconButton.style.padding = '0 5px';
+    compareIconButton.textContent = '⚖️';
+    compareIconButton.addEventListener('click', () => { 
+        if (currentMainActressId) { openComparisonModal([currentMainActressId]); } 
+    });
+
+    // Ícone de Edição
+    const editIconButton = document.createElement('button');
+    editIconButton.id = 'details-edit-icon';
+    editIconButton.title = 'Editar esta atriz';
+    editIconButton.innerHTML = '✏️';
+    editIconButton.style.background = 'none';
+    editIconButton.style.border = 'none';
+    editIconButton.style.fontSize = '1.3em';
+    editIconButton.style.cursor = 'pointer';
+    editIconButton.style.padding = '0 5px';
+    editIconButton.style.color = '#555';
+    editIconButton.addEventListener('click', () => { 
+        if (currentMainActressId) { openEditActressModal(currentMainActressId); } 
+    });
+
+    const iconGroup = document.createElement('div');
+    iconGroup.style.display = 'flex';
+    iconGroup.appendChild(compareIconButton);
+    iconGroup.appendChild(editIconButton);
+
+    detailsHeaderContainer.appendChild(detailsTitle);
+    detailsHeaderContainer.appendChild(iconGroup);
+    actressDetailsContainer.appendChild(detailsHeaderContainer);
+
+    // Foto Detalhada com posicionamento salvo
+    if (data.foto) {
+        const img = document.createElement('img');
+        img.src = escapeHtml(data.foto);
+        img.alt = escapeHtml(data.nome || 'Foto');
+        img.classList.add('detail-photo');
+        // Aplica o ajuste de posição feito no modal de edição
+        img.style.objectPosition = data.fotoPosicao || "50% 50%";
+        img.onerror = () => { img.style.display = 'none'; };
+        actressDetailsContainer.appendChild(img);
+    }
+
+    // Cards de Medidas (Boobs, Waist, Ass)
+    const measurementContainer = document.createElement('div');
+    measurementContainer.classList.add('measurement-cards-container');
+    let cardsAdded = 0;
+
+    const createMeasurementCard = (label, value) => {
+        if (value != null && String(value).trim() !== '') {
+            const card = document.createElement('div');
+            card.classList.add('measurement-card');
+            card.innerHTML = `<span class="label">${escapeHtml(label)}</span><span class="value">${escapeHtml(value)}</span>`;
+            measurementContainer.appendChild(card);
+            cardsAdded++;
+        }
+    };
+
+    createMeasurementCard('Boobs', data.Boobs);
+    createMeasurementCard('Waist', data.Waist);
+    createMeasurementCard('Ass', data.Ass);
+
+    if (cardsAdded > 0) {
+        actressDetailsContainer.appendChild(measurementContainer);
+    }
+
+    // Outros Campos de Detalhes
+    let detailsAdded = false;
+    const detailFieldsContainer = document.createElement('div');
+
+    const addDetailRow = (label, value) => {
+        if (value != null && String(value).trim() !== '') {
+            const div = document.createElement('div');
+            div.innerHTML = `<strong>${escapeHtml(label)}:</strong> ${escapeHtml(value)}`;
+            detailFieldsContainer.appendChild(div);
+            detailsAdded = true;
+        }
+    };
+
+    addDetailRow('Nascimento', data.dataNascimento);
+    if (data.dataNascimento) { 
+        addDetailRow('Idade', calculateAge(data.dataNascimento)); 
+    }
+    if (data.altura != null) { addDetailRow('Altura', data.altura + ' cm'); }
+    if (data.peso != null) { addDetailRow('Peso', data.peso + ' kg'); }
+    addDetailRow('Nacionalidade', data.pais);
+    addDetailRow('Etnia', data.etnia);
+    addDetailRow('Cor Cabelo', data.corCabelo);
+    addDetailRow('Cor Olhos', data.corOlhos);
+    addDetailRow('Medidas', data.medidas);
+    addDetailRow('Tipo Corpo', data.tipoCorpo);
+    addDetailRow('Casta', data.casta);
+    addDetailRow('Anos Ativa', data.AnosAtiva);
+
+    if (data.nota != null) { addDetailRow('Nota', Number(data.nota).toFixed(1)); }
+    if (data.overall != null) { addDetailRow('Overall', Number(data.overall).toFixed(1)); }
+
+    if(detailsAdded) { 
+        actressDetailsContainer.appendChild(detailFieldsContainer); 
+    }
+
+    // Caso não haja dados nenhuns
+    if (!data.foto && cardsAdded === 0 && !detailsAdded) {
+        const noDetailsDiv = document.createElement('div');
+        noDetailsDiv.classList.add('error');
+        noDetailsDiv.style.textAlign = 'center';
+        noDetailsDiv.style.marginTop = '20px';
+        noDetailsDiv.textContent = 'Sem detalhes disponíveis para esta atriz.';
+        actressDetailsContainer.appendChild(noDetailsDiv);
+    }
 }
+
 function filterAndRenderActressList() {
     if (!actressListUl) return; const searchTerm = actressSearchInput?.value.toLowerCase().trim() || ''; let filteredActresses = [...allActressesData];
     if (searchTerm) { filteredActresses = filteredActresses.filter(actress => (actress.nome || '').toLowerCase().includes(searchTerm) ); }
@@ -2703,44 +2881,119 @@ window.closeCreateActressModal = function() { if (createActressModal) createActr
 
 // --- Edit Actress Modal Functions ---
 function getEditActressFormHTML(actress) {
-    if (!actress) return '<p class="error">Dados da atriz não encontrados.</p>'; const val = (field) => actress[field] !== undefined && actress[field] !== null ? String(actress[field]).trim() : '';
-    return `<form id="edit-actress-form" novalidate>
-                <input type="hidden" id="edit-actress-id" value="${actress.id}">
-                <div class="form-card full-width"><label for="edit-nome">Nome:</label><input type="text" id="edit-nome" name="nome" value="${escapeHtml(val('nome'))}" required><span id="edit-nome-error" class="error-message"></span></div>
-                <div class="form-row-flex">
-                    <div class="form-card"><label for="edit-nota">Nota (0 a 10):</label><input type="number" id="edit-nota" name="nota" value="${val('nota')}" min="0" max="10" step="0.1" placeholder="Ex: 8.5"><span id="edit-nota-error" class="error-message"></span></div>
-                    <div class="form-card"><label for="edit-casta">Casta:</label><select id="edit-casta" name="casta">
+    if (!actress) return '<p class="error">Dados da atriz não encontrados.</p>';
+    const val = (field) => actress[field] !== undefined && actress[field] !== null ? String(actress[field]).trim() : '';
+    
+    // Recupera a posição salva ou define o padrão 50% 50%
+    const pos = actress.fotoPosicao || "50% 50%";
+    const [posX, posY] = pos.split(' ').map(p => p.replace('%', ''));
+
+    return `
+        <form id="edit-actress-form" novalidate>
+            <input type="hidden" id="edit-actress-id" value="${actress.id}">
+            
+            <!-- Pré-visualização e Controles de Foto -->
+            <div class="edit-photo-preview-container">
+                <div class="photo-circle-preview">
+                    <img id="edit-photo-preview-img" 
+                         src="${escapeHtml(actress.foto || 'placeholder.png')}" 
+                         style="object-position: ${pos};">
+                </div>
+                <div class="photo-controls">
+                    <label>Posição Horizontal (X):</label>
+                    <input type="range" id="edit-photo-x" min="0" max="100" value="${posX || 50}">
+                    <label>Posição Vertical (Y):</label>
+                    <input type="range" id="edit-photo-y" min="0" max="100" value="${posY || 50}">
+                    <input type="hidden" id="edit-foto-posicao" name="fotoPosicao" value="${pos}">
+                </div>
+            </div>
+
+            <div class="form-card full-width">
+                <label for="edit-nome">Nome:</label>
+                <input type="text" id="edit-nome" name="nome" value="${escapeHtml(val('nome'))}" required>
+                <span id="edit-nome-error" class="error-message"></span>
+            </div>
+
+            <div class="form-card">
+                <label for="edit-foto">URL da Foto:</label>
+                <input type="url" id="edit-foto" name="foto" value="${escapeHtml(val('foto'))}" placeholder="https://...">
+            </div>
+
+            <div class="form-row-flex">
+                <div class="form-card">
+                    <label for="edit-nota">Nota (0 a 10):</label>
+                    <input type="number" id="edit-nota" name="nota" value="${val('nota')}" min="0" max="10" step="0.1">
+                </div>
+                <div class="form-card">
+                    <label for="edit-casta">Casta:</label>
+                    <select id="edit-casta" name="casta">
                         <option value="" ${val('casta') === '' ? 'selected' : ''}>Selecione...</option>
                         <option value="Panqueca" ${val('casta') === 'Panqueca' ? 'selected' : ''}>Panqueca</option>
                         <option value="Melancia" ${val('casta') === 'Melancia' ? 'selected' : ''}>Melancia</option>
                         <option value="Melao" ${val('casta') === 'Melao' ? 'selected' : ''}>Melão</option>
                         <option value="Tabua" ${val('casta') === 'Tabua' ? 'selected' : ''}>Tabua</option>
-                    </select><span id="edit-casta-error" class="error-message"></span></div>
+                    </select>
                 </div>
-                <div class="form-card"><label for="edit-foto">Foto (URL):</label><input type="url" id="edit-foto" name="foto" value="${escapeHtml(val('foto'))}" placeholder="https://exemplo.com/imagem.jpg"><span id="edit-foto-error" class="error-message"></span></div>
-                <div class="form-card"><label for="edit-dataNascimento">Nascimento (Ex: 1990/05/15):</label><input type="text" id="edit-dataNascimento" name="dataNascimento" value="${val('dataNascimento')}" placeholder="YYYY/MM/DD"><span id="edit-dataNascimento-error" class="error-message"></span></div>
-                <div class="form-card"><label for="edit-pais">País:</label><input type="text" id="edit-pais" name="pais" value="${escapeHtml(val('pais'))}"></div>
-                <div class="form-card"><label for="edit-etnia">Etnia:</label><input type="text" id="edit-etnia" name="etnia" value="${escapeHtml(val('etnia'))}"></div>
-                <div class="form-card"><label for="edit-corCabelo">Cor do Cabelo:</label><input type="text" id="edit-corCabelo" name="corCabelo" value="${escapeHtml(val('corCabelo'))}"></div>
-                <div class="form-card"><label for="edit-corOlhos">Cor dos Olhos:</label><input type="text" id="edit-corOlhos" name="corOlhos" value="${escapeHtml(val('corOlhos'))}"></div>
-                <div class="form-card"><label for="edit-altura">Altura (cm):</label><input type="number" id="edit-altura" name="altura" value="${val('altura')}" placeholder="Ex: 170"><span id="edit-altura-error" class="error-message"></span></div>
-                <div class="form-card"><label for="edit-peso">Peso (kg):</label><input type="number" id="edit-peso" name="peso" value="${val('peso')}" placeholder="Ex: 59"><span id="edit-peso-error" class="error-message"></span></div>
-                <div class="form-card"><label for="edit-Boobs">Boobs (cm):</label><input type="text" id="edit-Boobs" name="Boobs" value="${val('Boobs')}" placeholder="Ex: 86.36"><span id="edit-Boobs-error" class="error-message"></span></div>
-                <div class="form-card"><label for="edit-Waist">Waist (cm):</label><input type="text" id="edit-Waist" name="Waist" value="${val('Waist')}" placeholder="Ex: 63.50"><span id="edit-Waist-error" class="error-message"></span></div>
-                <div class="form-card"><label for="edit-Ass">Ass (cm):</label><input type="text" id="edit-Ass" name="Ass" value="${val('Ass')}" placeholder="Ex: 83.82"><span id="edit-Ass-error" class="error-message"></span></div>
-                <div class="form-card"><label for="edit-tipoCorpo">Tipo de Corpo:</label><input type="text" id="edit-tipoCorpo" name="tipoCorpo" value="${escapeHtml(val('tipoCorpo'))}"></div>
-                <div class="form-card"><label for="edit-AnosAtiva">Anos Ativa (Início YYYY):</label><input type="text" id="edit-AnosAtiva" name="AnosAtiva" value="${val('AnosAtiva')}" placeholder="Ex: 2010"></div>
-                <div class="form-card full-width"><div id="edit-actress-form-message" class="error-message" style="text-align:left;margin-bottom:10px"></div></div>
-            </form>
-            <div class="submit-button-container"><button type="submit" id="save-actress-changes-button" form="edit-actress-form">Salvar Alterações</button></div>`;
+            </div>
+
+            <!-- ... (Mantenha os outros campos do nascimento, país, etc, igual você já tinha) ... -->
+            
+            <div class="form-card"><label for="edit-dataNascimento">Nascimento:</label><input type="text" id="edit-dataNascimento" name="dataNascimento" value="${val('dataNascimento')}"></div>
+            <div class="form-card"><label for="edit-pais">País:</label><input type="text" id="edit-pais" name="pais" value="${escapeHtml(val('pais'))}"></div>
+            <div class="form-card"><label for="edit-etnia">Etnia:</label><input type="text" id="edit-etnia" name="etnia" value="${escapeHtml(val('etnia'))}"></div>
+            <div class="form-card"><label for="edit-altura">Altura:</label><input type="number" id="edit-altura" name="altura" value="${val('altura')}"></div>
+            <div class="form-card"><label for="edit-peso">Peso:</label><input type="number" id="edit-peso" name="peso" value="${val('peso')}"></div>
+            
+            <div class="form-card full-width">
+                <div id="edit-actress-form-message" class="error-message"></div>
+            </div>
+        </form>
+        <div class="submit-button-container">
+            <button type="submit" id="save-actress-changes-button" form="edit-actress-form">Salvar Alterações</button>
+        </div>
+    `;
 }
+
 window.closeEditActressModal = function() { if (editActressModal) editActressModal.style.display = 'none'; }
+
 function openEditActressModal(actressId) {
-    if (!editActressModal || !editActressModalBody || !editActressModalNameTitle) return; const actressData = allActressesData.find(a => a.id === actressId); if (!actressData) { alert('Atriz não encontrada.'); return; }
-    editActressModalNameTitle.textContent = actressData.nome || 'Atriz sem nome'; editActressModalBody.innerHTML = getEditActressFormHTML(actressData);
-    const form = document.getElementById('edit-actress-form'); if (form) { form.removeEventListener('submit', handleEditActressSubmit); form.addEventListener('submit', handleEditActressSubmit); }
-    editActressModal.style.display = 'flex'; const nameInput = document.getElementById('edit-nome'); if (nameInput) nameInput.focus();
+    if (!editActressModal || !editActressModalBody || !editActressModalNameTitle) return;
+    const actressData = allActressesData.find(a => a.id === actressId);
+    if (!actressData) { alert('Atriz não encontrada.'); return; }
+
+    editActressModalNameTitle.textContent = actressData.nome || 'Atriz';
+    editActressModalBody.innerHTML = getEditActressFormHTML(actressData);
+
+    // Seletores dos elementos de foto
+    const inputFoto = document.getElementById('edit-foto');
+    const previewImg = document.getElementById('edit-photo-preview-img');
+    const sliderX = document.getElementById('edit-photo-x');
+    const sliderY = document.getElementById('edit-photo-y');
+    const hiddenPos = document.getElementById('edit-foto-posicao');
+
+    // Função para atualizar o preview
+    const updatePreview = () => {
+        const x = sliderX.value;
+        const y = sliderY.value;
+        const posString = `${x}% ${y}%`;
+        previewImg.style.objectPosition = posString;
+        hiddenPos.value = posString;
+        previewImg.src = inputFoto.value || 'placeholder.png';
+    };
+
+    // Listeners
+    inputFoto.addEventListener('input', updatePreview);
+    sliderX.addEventListener('input', updatePreview);
+    sliderY.addEventListener('input', updatePreview);
+
+    const form = document.getElementById('edit-actress-form');
+    if (form) {
+        form.removeEventListener('submit', handleEditActressSubmit);
+        form.addEventListener('submit', handleEditActressSubmit);
+    }
+    editActressModal.style.display = 'flex';
 }
+
 async function handleEditActressSubmit(event) {
     event.preventDefault();
     const form = event.target;
@@ -2754,7 +3007,7 @@ async function handleEditActressSubmit(event) {
     const formData = new FormData(form); const dataToUpdate = {}; let hasChanges = false;
     const originalActressData = allActressesData.find(a => a.id === actressId);
     if (!originalActressData) { if (formMessage) { formMessage.textContent = 'Erro: Atriz original não encontrada.'; formMessage.classList.add('error'); } submitButton.disabled = false; submitButton.textContent = 'Salvar Alterações'; return; }
-    const formToFirestoreMap = { 'nome': 'nome', 'foto': 'foto', 'dataNascimento': 'dataNascimento', 'pais': 'pais', 'etnia': 'etnia', 'corCabelo': 'corCabelo', 'corOlhos': 'corOlhos', 'altura': 'altura', 'peso': 'peso', 'tipoCorpo': 'tipoCorpo', 'AnosAtiva': 'AnosAtiva', 'nota': 'nota', 'casta': 'casta', 'Boobs': 'Boobs', 'Waist': 'Waist', 'Ass': 'Ass' };
+    const formToFirestoreMap = { 'nome': 'nome', 'foto': 'foto', 'fotoPosicao': 'fotoPosicao', 'dataNascimento': 'dataNascimento', 'pais': 'pais', 'etnia': 'etnia', 'corCabelo': 'corCabelo', 'corOlhos': 'corOlhos', 'altura': 'altura', 'peso': 'peso', 'tipoCorpo': 'tipoCorpo', 'AnosAtiva': 'AnosAtiva', 'nota': 'nota', 'casta': 'casta', 'Boobs': 'Boobs', 'Waist': 'Waist', 'Ass': 'Ass' };
     for (const formFieldName in formToFirestoreMap) {
         const firestoreKey = formToFirestoreMap[formFieldName]; let newValue = formData.get(formFieldName);
         if (typeof newValue === 'string') { newValue = newValue.trim(); }
