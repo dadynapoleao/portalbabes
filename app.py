@@ -2,6 +2,7 @@ import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import cloudscraper
+from bs4 import BeautifulSoup
 import re
 
 app = Flask(__name__)
@@ -11,67 +12,63 @@ scraper = cloudscraper.create_scraper(
     browser={'browser': 'chrome', 'platform': 'windows', 'desktop': True}
 )
 
-def extract_with_regex(pattern, text, group=1):
+def extract_val(pattern, text):
     match = re.search(pattern, text, re.IGNORECASE | re.DOTALL)
-    return match.group(group).strip() if match else None
+    return match.group(1).strip() if match else None
 
 @app.route('/scrape_babe')
 def scrape_babe():
     name = request.args.get('name')
-    if not name: return jsonify({"error": "Falta nome"}), 400
+    if not name: return jsonify({"error": "Nome obrigatorio"}), 400
     
-    # Formata nome para URL (Lilith Grace -> Lilith_Grace)
-    name_url = name.replace(" ", "_")
-    url = f'https://www.babepedia.com/babe/{name_url}'
+    url = f'https://www.babepedia.com/babe/{name.replace(" ", "_")}'
     
     try:
         response = scraper.get(url, timeout=15)
-        # Pegamos o texto bruto da página, ignorando tags HTML
-        html_text = response.text
+        # Transforma o HTML em texto puro e limpo
+        soup = BeautifulSoup(response.content, 'html.parser')
+        
+        # Remove scripts e estilos antes de pegar o texto
+        for script in soup(["script", "style"]):
+            script.extract()
+            
+        page_text = soup.get_text(separator=" ")
+        # Remove espaços duplos e quebras de linha excessivas
+        page_text = " ".join(page_text.split())
         
         data = {}
         
-        # 1. Extração de Data de Nascimento (Busca: Born: [texto] Years active)
-        born_raw = extract_with_regex(r'Born:</span>(.*?)(?:Years active|Birthplace)', html_text)
-        if not born_raw: # Tenta sem a tag span
-             born_raw = extract_with_regex(r'Born:(.*?)(?:Years active|Birthplace)', html_text)
+        # --- BUSCA NO TEXTO PURO ---
         
+        # 1. Born (Pega o texto entre 'Born:' e 'Years active' ou 'Birthplace')
+        born_raw = extract_val(r'Born:\s*(.*?)(?=\s+Years active|\s+Birthplace|\s+Nationality|\s+Ethnicity)', page_text)
         if born_raw:
-            # Limpa HTML do valor
-            born_raw = re.sub('<[^<]+?>', '', born_raw).strip()
-            # Converte data para 1994/02/24
             months = {"january":"01","february":"02","march":"03","april":"04","may":"05","june":"06","july":"07","august":"08","september":"09","october":"10","november":"11","december":"12"}
             m = re.search(r'(\d{1,2}).+?([a-zA-Z]+)\s+(\d{4})', born_raw)
             if m:
                 data['born'] = f"{m.group(3)}/{months.get(m.group(2).lower(), '01')}/{m.group(1).zfill(2)}"
 
-        # 2. Extração de Medidas (Busca: Measurements: [texto] Bra)
-        meas_raw = extract_with_regex(r'Measurements:</span>(.*?)(?:Bra|Boobs|Body)', html_text)
+        # 2. Measurements
+        meas_raw = extract_val(r'Measurements:\s*([\d\w]+-[\d\w]+-[\d\w]+)', page_text)
         if meas_raw:
-            meas_raw = re.sub('<[^<]+?>', '', meas_raw)
             nums = re.findall(r'\d+', meas_raw)
-            if len(nums) >= 3:
-                data['measurements'] = f"{nums[0]}-{nums[1]}-{nums[2]}"
+            if len(nums) >= 3: data['measurements'] = f"{nums[0]}-{nums[1]}-{nums[2]}"
 
-        # 3. Altura (Busca número antes de cm)
-        height_match = re.search(r'\(or\s+(\d+)\s*cm\)', html_text)
-        if height_match:
-            data['height'] = height_match.group(1)
+        # 3. Altura e Peso
+        h = re.search(r'\(or\s+(\d+)\s*cm\)', page_text)
+        if h: data['height'] = h.group(1)
+        
+        w = re.search(r'\(or\s+(\d+)\s*kg\)', page_text)
+        if w: data['weight'] = w.group(1)
 
-        # 4. Peso (Busca número antes de kg)
-        weight_match = re.search(r'\(or\s+(\d+)\s*kg\)', html_text)
-        if weight_match:
-            data['weight'] = weight_match.group(1)
-
-        # 5. Etnia e País
-        data['ethnicity'] = extract_with_regex(r'Ethnicity:</span>\s*<a[^>]*>(.*?)</a>', html_text)
-        data['birthplace'] = extract_with_regex(r'Birthplace:</span>\s*(.*?)(?:Nationality|<)', html_text)
-        if data['birthplace']:
-            data['birthplace'] = re.sub('<[^<]+?>', '', data['birthplace']).split(',')[-1].strip()
-
-        # 6. Cabelo e Olhos
-        data['hair_color'] = extract_with_regex(r'Hair color:</span>\s*(.*?)(?:<)', html_text)
-        data['eye_color'] = extract_with_regex(r'Eye color:</span>\s*(.*?)(?:<)', html_text)
+        # 4. Outros campos
+        data['ethnicity'] = extract_val(r'Ethnicity:\s*(.*?)(?=\s+Profession|\s+Sexuality|\s+Body)', page_text)
+        data['birthplace'] = extract_val(r'Birthplace:\s*(.*?)(?=\s+Nationality|\s+Ethnicity|\s+Born)', page_text)
+        if data['birthplace']: data['birthplace'] = data['birthplace'].split(',')[-1].strip()
+        
+        data['hair_color'] = extract_val(r'Hair color:\s*(.*?)(?=\s+Eye color)', page_text)
+        data['eye_color'] = extract_val(r'Eye color:\s*(.*?)(?=\s+Height)', page_text)
+        data['years_active'] = extract_val(r'Years active:\s*(\d{4})', page_text)
 
         data['source_url'] = url
         return jsonify(data)
