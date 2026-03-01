@@ -1012,6 +1012,18 @@
         /* General Loading/Error Styles */
         .loading { padding: 10px; text-align: center; color: #555; font-style: italic; }
         .error { padding: 10px; text-align: center; color: #a00; font-weight: bold; }
+        /* Modais de Atriz (Criar e Editar) e Ranking devem ficar na frente de tudo */
+#create-actress-modal, 
+#edit-actress-modal, 
+#ranking-detail-modal {
+    z-index: 2000 !important; /* Valor maior que os outros modais (que usam 1000) */
+}
+
+/* Garante que o fundo escuro do segundo modal cubra o primeiro */
+.modal-overlay {
+    background-color: rgba(0, 0, 0, 0.7); 
+}
+
     </style>
 </head>
 <body>
@@ -2425,12 +2437,17 @@ function getCreateActressFormHTML() {
         </div>
     `;
 }
-function openCreateActressModal() {
+window.openCreateActressModal = function(prefilledName = '') {
     closeCreateMenu();
     if (!createActressModal || !createActressModalBody) return;
 
+    // Define o texto inicial do botão (pode ser alterado se o nome já existir)
     initialButtonText = 'Criar Atriz';
+    
+    // Injeta o HTML do formulário no corpo do modal
     createActressModalBody.innerHTML = getCreateActressFormHTML();
+    
+    // Captura as referências dos novos elementos criados no DOM
     createActressForm = document.getElementById('create-actress-form');
     actressNameInput = document.getElementById('name');
     actressNameErrorMessage = document.getElementById('name-error-message');
@@ -2438,25 +2455,75 @@ function openCreateActressModal() {
     createActressStatsContainer = document.getElementById('create-actress-stats-container');
     quickStatsContentContainer = document.getElementById('quick-stats-content');
 
-    if (actressSubmitButton) { actressSubmitButton.textContent = initialButtonText; actressSubmitButton.disabled = false; }
-    const formMessage = document.getElementById('create-actress-form-message');
-    if (formMessage) formMessage.textContent = '';
-    if (actressNameErrorMessage) { actressNameErrorMessage.textContent = ''; actressNameErrorMessage.style.display = 'none'; actressNameErrorMessage.className = 'error-message'; }
+    // Reset de estado interno
     matchedExistingActressData = null;
-    if(createActressStatsContainer) createActressStatsContainer.style.display = 'none';
+    if (actressSubmitButton) { 
+        actressSubmitButton.textContent = initialButtonText; 
+        actressSubmitButton.disabled = false; 
+    }
 
-    if (createActressForm) { createActressForm.removeEventListener('submit', handleCreateActressSubmit); createActressForm.addEventListener('submit', handleCreateActressSubmit); }
+    // --- LÓGICA DE PREENCHIMENTO AUTOMÁTICO ---
+    if (prefilledName && typeof prefilledName === 'string' && prefilledName.trim() !== '') {
+        const nameToSet = prefilledName.trim();
+        actressNameInput.value = nameToSet;
+        
+        // Executa as verificações automáticas após um pequeno delay para garantir o carregamento do DOM
+        setTimeout(async () => {
+            // Verifica se este nome já existe no banco de dados
+            await checkNameExistsForCreateModal();
+            
+            // Se o nome NÃO existe no banco, tenta buscar os detalhes (altura, idade, etc) na API externa
+            if (!matchedExistingActressData) {
+                fetchActressDataFromAPI();
+            } else {
+                // Se o nome JÁ EXISTE, exibe as estatísticas (Ranks) daquela atriz
+                displayCreateActressStats();
+            }
+        }, 200);
+    }
+
+    // --- CONFIGURAÇÃO DE EVENTOS (LISTENERS) ---
+
+    // Listener para o envio do formulário
+    if (createActressForm) { 
+        createActressForm.removeEventListener('submit', handleCreateActressSubmit); 
+        createActressForm.addEventListener('submit', handleCreateActressSubmit); 
+    }
+
+    // Listener para verificação de nome enquanto o usuário digita
     if (actressNameInput) {
-        debouncedActressNameCheckAndStats = debounce(async () => { await checkNameExistsForCreateModal(); displayCreateActressStats(); }, 700);
+        // Criamos a função debounced para não sobrecarregar o banco/API a cada tecla
+        debouncedActressNameCheckAndStats = debounce(async () => { 
+            await checkNameExistsForCreateModal(); 
+            displayCreateActressStats(); 
+        }, 700);
+
         actressNameInput.removeEventListener('input', debouncedActressNameCheckAndStats);
         actressNameInput.addEventListener('input', debouncedActressNameCheckAndStats);
-        const onBlurHandler = async () => { await checkNameExistsForCreateModal(); displayCreateActressStats(); if (!matchedExistingActressData && actressNameInput.value.trim() !== '') { fetchActressDataFromAPI(); } };
+
+        // Listener para quando o usuário sai do campo (blur)
+        const onBlurHandler = async () => { 
+            await checkNameExistsForCreateModal(); 
+            displayCreateActressStats(); 
+            // Se o nome for novo e não estiver vazio, tenta a API
+            if (!matchedExistingActressData && actressNameInput.value.trim() !== '') { 
+                fetchActressDataFromAPI(); 
+            } 
+        };
         actressNameInput.removeEventListener('blur', onBlurHandler);
         actressNameInput.addEventListener('blur', onBlurHandler);
     }
+
+    // Exibe o modal
     createActressModal.style.display = 'flex';
-    actressNameInput?.focus();
-}
+    
+    // Foca no campo de nome apenas se ele estiver vazio
+    if (!actressNameInput.value) {
+        actressNameInput.focus();
+    }
+};
+
+
 async function checkNameExistsForCreateModal() {
     if (!actressNameInput || !actressNameErrorMessage || !db) { matchedExistingActressData = null; return; }
     const enteredName = actressNameInput.value.trim(); let shouldBeDisabled = false;
@@ -2683,84 +2750,208 @@ async function analyzePastedText() {
 }
 
 function extractSceneDataFromText(text) {
-    const data = { nome: null, dataRaw: null, movieName: null, potentialActorNames: [] }; const lines = text.split('\n');
-    let actorsLineFound = false; let readingPornstars = false;
+    const data = { nome: null, dataRaw: null, movieName: null, numero: null, potentialActorNames: [] }; 
+    const lines = text.split('\n');
+    let readingPornstars = false;
+
     lines.forEach(line => {
         const trimmedLine = line.trim();
-        const isNewMainSectionTag = ['Scene:', 'Date:', 'Movie:', 'Studio:', 'Network:', 'Release date:', 'Line:', 'Categories:'].some(tag => trimmedLine.startsWith(tag));
-        const isDescriptionTag = trimmedLine.toLowerCase().startsWith('description -') || trimmedLine.startsWith('* ');
 
+        // 1. Captura Número da Cena (ex: Scene #4)
+        const sceneNumberMatch = trimmedLine.match(/Scene #(\d+)/i);
+        if (sceneNumberMatch) data.numero = sceneNumberMatch[1];
+
+        // 2. Captura Nome da Cena
+        if (trimmedLine.startsWith('Scene:')) { 
+            data.nome = trimmedLine.substring(6).trim(); 
+        }
+        
+        // 3. Identifica início da seção de atrizes
+        if (trimmedLine.toLowerCase().startsWith('pornstars / cast')) {
+            readingPornstars = true;
+            return; 
+        }
+
+        // 4. Critérios para PARAR de ler atrizes (Tags de novas seções)
         if (readingPornstars) {
-            if (isNewMainSectionTag || isDescriptionTag) {
+            const stopTags = ['Movie:', 'Release date:', 'Categories:', 'Studio:', 'Network:', 'Duration:'];
+            if (stopTags.some(tag => trimmedLine.startsWith(tag))) {
                 readingPornstars = false;
             }
-            else if (!trimmedLine.toLowerCase().includes("this scene is performed by") &&
-                     !trimmedLine.toLowerCase().startsWith("all scenes") &&
-                     !trimmedLine.toLowerCase().startsWith("all movies") &&
-                     !trimmedLine.toLowerCase().startsWith("w/") &&
-                     !trimmedLine.includes("-------") &&
-                     trimmedLine.length > 1) {
-                data.potentialActorNames.push(trimmedLine);
+        }
+
+        // 5. Lógica de captura de nomes enquanto a seção estiver ativa
+        if (readingPornstars) {
+            // Filtros de "Lixo" (ignora linhas de navegação, traços e avisos)
+            const isNoise = 
+                trimmedLine.length < 3 || 
+                trimmedLine.toLowerCase().includes("this scene is performed") ||
+                trimmedLine.toLowerCase().startsWith("all scenes") ||
+                trimmedLine.toLowerCase().includes("[nav]") ||
+                trimmedLine.toLowerCase().includes("-------") || // Agora ele ignora os traços mas NÃO para de ler
+                trimmedLine.includes("/") ||
+                trimmedLine.toLowerCase().startsWith("w/");
+
+            if (!isNoise) {
+                // Adiciona o nome apenas se não for duplicado
+                if (!data.potentialActorNames.includes(trimmedLine)) {
+                    data.potentialActorNames.push(trimmedLine);
+                }
             }
         }
 
-        if (trimmedLine.startsWith('Scene:')) { data.nome = trimmedLine.substring(6).trim(); readingPornstars = false; }
-        else if (trimmedLine.startsWith('Date:')) { data.dataRaw = trimmedLine.substring(5).trim(); readingPornstars = false; }
-        else if (trimmedLine.startsWith('Release date:')) { let releaseDateStr = trimmedLine.substring(13).trim(); const moreUpdatesIndex = releaseDateStr.indexOf(', more updates...'); if (moreUpdatesIndex !== -1) { releaseDateStr = releaseDateStr.substring(0, moreUpdatesIndex).trim(); } data.dataRaw = releaseDateStr; readingPornstars = false; }
-        else if (trimmedLine.startsWith('Movie:')) {
-            let movieNameStr = trimmedLine.substring(6).trim();
-            const scenesSuffixMatch = movieNameStr.match(/^(.*?)\s*-\s*\d+\s*Scene(s)?(?:.*)?$/i);
-            if (scenesSuffixMatch && scenesSuffixMatch[1]) { movieNameStr = scenesSuffixMatch[1].trim(); }
-            else { const pipeIndex = movieNameStr.indexOf(' | '); if (pipeIndex !== -1) { movieNameStr = movieNameStr.substring(0, pipeIndex).trim(); } }
-            data.movieName = movieNameStr; readingPornstars = false;
+        // 6. Captura data e filme
+        if (trimmedLine.startsWith('Release date:')) {
+            data.dataRaw = trimmedLine.substring(13).split(', more')[0].trim();
         }
-        else if (trimmedLine.toLowerCase().startsWith('pornstars / cast')) { actorsLineFound = true; readingPornstars = true; }
-        else if (trimmedLine.startsWith('Actors:') || trimmedLine.startsWith('Actor:')) { const actorsString = trimmedLine.substring(trimmedLine.indexOf(':') + 1).trim(); data.potentialActorNames = actorsString.split(',').map(name => name.trim()).filter(name => name); actorsLineFound = true; readingPornstars = false; }
-        else if (isNewMainSectionTag || isDescriptionTag) { readingPornstars = false; }
-        else if (data.nome && !actorsLineFound && !readingPornstars && !data.dataRaw && !data.movieName && /^[a-zA-Z\s,-]+$/.test(trimmedLine) && trimmedLine.includes(',')) { data.potentialActorNames = trimmedLine.split(',').map(name => name.trim()).filter(name => name); }
-    }); return data;
+        if (trimmedLine.startsWith('Movie:')) {
+            // Limpa o nome do filme tirando o que vem depois de " - " ou " | "
+            let movieName = trimmedLine.substring(6).split(' - ')[0].split(' | ')[0].trim();
+            data.movieName = movieName;
+        }
+    }); 
+    return data;
 }
 
 function extractMovieDataFromText(text) {
-    const data = { nome: null, ano: null, estudio: null, duracao: null, potentialActorNames: [] };
-    const lines = text.split('\n'); let actorsLineFound = false; let readingPornstars = false;
+    const data = { 
+        nome: null, 
+        ano: null, 
+        estudio: null, 
+        duracao: null, 
+        potentialActorNames: [] 
+    };
+    
+    const lines = text.split('\n');
+    let actorsLineFound = false;
+    let readingPornstars = false;
+
     lines.forEach(line => {
         const trimmedLine = line.trim();
-        const isNewMainSectionTag = ['Movie:', 'Year:', 'Prod. Year:', 'Studio:', 'Network:', 'Line:', 'Categories:'].some(tag => trimmedLine.startsWith(tag));
+        
+        // Tags que indicam o fim da leitura de atrizes ou início de outra seção importante
+        const isNewMainSectionTag = [
+            'Movie:', 'Year:', 'Prod. Year:', 'Studio:', 'Network:', 
+            'Release date:', 'Line:', 'Categories:', 'Duration:', 'Length:'
+        ].some(tag => trimmedLine.startsWith(tag));
+        
         const isDescriptionTag = trimmedLine.toLowerCase().startsWith('description -') || trimmedLine.startsWith('* ');
 
+        // --- LÓGICA DE CAPTURA DE ATRIZES ---
         if (readingPornstars) {
+            // Se encontrarmos uma nova tag principal ou descrição, paramos de ler atrizes
             if (isNewMainSectionTag || isDescriptionTag) {
                 readingPornstars = false;
             }
+            // Filtros para evitar lixo (créditos, botões de navegação, etc)
             else if (!trimmedLine.toLowerCase().includes("cast of") &&
                      !trimmedLine.toLowerCase().startsWith("all movies") &&
                      !trimmedLine.toLowerCase().startsWith("all scenes") &&
                      !trimmedLine.toLowerCase().startsWith("w/") &&
                      !trimmedLine.includes("-------") &&
                      trimmedLine.length > 1) {
-                data.potentialActorNames.push(trimmedLine);
+                
+                // Adiciona apenas se não for duplicado (o texto costuma repetir o nome)
+                if (!data.potentialActorNames.includes(trimmedLine)) {
+                    data.potentialActorNames.push(trimmedLine);
+                }
             }
         }
 
-        if (trimmedLine.startsWith('Movie:')) { data.nome = trimmedLine.substring(6).trim(); readingPornstars = false; }
-        else if (trimmedLine.startsWith('Prod. Year:')) { let yearStr = trimmedLine.substring(11).trim(); const yearMatch = yearStr.match(/^\d{4}/); if (yearMatch) { data.ano = yearMatch[0]; } readingPornstars = false; }
-        else if (trimmedLine.startsWith('Year:')) { data.ano = trimmedLine.substring(5).trim(); readingPornstars = false; }
-        else if (trimmedLine.startsWith('Studio:')) { let studioName = trimmedLine.substring(7).trim(); const separatorIndex = studioName.indexOf(' - '); if (separatorIndex !== -1) { studioName = studioName.substring(0, separatorIndex).trim(); } data.estudio = studioName; readingPornstars = false; }
-        else if (trimmedLine.startsWith('Network:')) { let networkName = trimmedLine.substring(8).trim(); const separatorIndex = networkName.indexOf(' - '); if (separatorIndex !== -1) { networkName = networkName.substring(0, separatorIndex).trim(); } data.estudio = networkName; readingPornstars = false; }
-        else if (trimmedLine.toLowerCase().includes('length:') || trimmedLine.toLowerCase().startsWith('duration:')) {
-            let durationStringContent = ""; if (trimmedLine.toLowerCase().startsWith('duration:')) { durationStringContent = trimmedLine.substring(9).trim(); } else { durationStringContent = trimmedLine.substring(trimmedLine.toLowerCase().indexOf('length:') + 7).trim(); }
-            const hhmmssPattern = /(\d{1,2}:\d{2}:\d{2})/; const hMinPattern = /(\d+h\s*\d+m(?:in)?)/i; const minPattern = /(\d+)\s*min(?:utes)?\.?/i; let extractedDuration = null;
-            const hhmmssMatch = durationStringContent.match(hhmmssPattern); if (hhmmssMatch && hhmmssMatch[1]) { extractedDuration = hhmmssMatch[1]; }
-            if (!extractedDuration) { const hMinMatch = durationStringContent.match(hMinPattern); if (hMinMatch && hMinMatch[1]) { extractedDuration = hMinMatch[1]; } }
-            if (!extractedDuration) { const minMatch = durationStringContent.match(minPattern); if (minMatch && minMatch[1]) { extractedDuration = minMatch[1] + " min"; } }
-            if (extractedDuration) { data.duracao = extractedDuration; } else { let fallbackDuration = durationStringContent; fallbackDuration = fallbackDuration.replace(/^[a-zA-Z\s]+:\s*/, ''); if (fallbackDuration.match(/^\d+$/)) { fallbackDuration = fallbackDuration + " min"; } data.duracao = fallbackDuration.split('[')[0].trim(); }
+        // --- EXTRAÇÃO DOS CAMPOS DO FILME ---
+
+        // 1. Nome do Filme
+        if (trimmedLine.startsWith('Movie:')) {
+            let movieNameStr = trimmedLine.substring(6).trim();
+            // Limpa sufixos comuns como " - 4 Scenes" ou informações após o pipe |
+            const pipeIndex = movieNameStr.indexOf(' | ');
+            if (pipeIndex !== -1) {
+                movieNameStr = movieNameStr.substring(0, pipeIndex).trim();
+            }
+            const scenesSuffixMatch = movieNameStr.match(/^(.*?)\s*-\s*\d+\s*Scene(s)?/i);
+            if (scenesSuffixMatch && scenesSuffixMatch[1]) {
+                movieNameStr = scenesSuffixMatch[1].trim();
+            }
+            data.nome = movieNameStr;
             readingPornstars = false;
         }
-        else if (trimmedLine.toLowerCase().startsWith('pornstars / cast')) { actorsLineFound = true; readingPornstars = true; }
-        else if (trimmedLine.startsWith('Actors:') || trimmedLine.startsWith('Actor:')) { const actorsString = trimmedLine.substring(trimmedLine.indexOf(':') + 1).trim(); data.potentialActorNames = actorsString.split(',').map(name => name.trim()).filter(name => name); actorsLineFound = true; readingPornstars = false; }
-        else if (isNewMainSectionTag || isDescriptionTag) { readingPornstars = false; }
-    }); return data;
+
+        // 2. Ano (Prioridade para tags específicas de ano)
+        else if (trimmedLine.startsWith('Prod. Year:') || trimmedLine.startsWith('Year:')) {
+            const yearMatch = trimmedLine.match(/\d{4}/);
+            if (yearMatch) {
+                data.ano = yearMatch[0];
+            }
+            readingPornstars = false;
+        }
+
+        // 3. Ano via Release Date (Fallback caso não tenha a tag Year)
+        else if (trimmedLine.startsWith('Release date:')) {
+            const yearMatch = trimmedLine.match(/\d{4}/);
+            if (yearMatch && !data.ano) {
+                data.ano = yearMatch[0];
+            }
+            readingPornstars = false;
+        }
+
+        // 4. Estúdio / Network
+        else if (trimmedLine.startsWith('Studio:') || trimmedLine.startsWith('Network:')) {
+            let studioName = trimmedLine.substring(trimmedLine.indexOf(':') + 1).trim();
+            // Remove sufixos como " - 4,034 Scenes"
+            const separatorIndex = studioName.indexOf(' - ');
+            if (separatorIndex !== -1) {
+                studioName = studioName.substring(0, separatorIndex).trim();
+            }
+            data.estudio = studioName;
+            readingPornstars = false;
+        }
+
+        // 5. Duração
+        else if (trimmedLine.toLowerCase().includes('length:') || trimmedLine.toLowerCase().startsWith('duration:')) {
+            let durationStringContent = "";
+            if (trimmedLine.toLowerCase().startsWith('duration:')) {
+                durationStringContent = trimmedLine.substring(9).trim();
+            } else {
+                durationStringContent = trimmedLine.substring(trimmedLine.toLowerCase().indexOf('length:') + 7).trim();
+            }
+
+            // Tenta padrões: HH:MM:SS, Xh Ym, ou apenas X min
+            const hhmmssPattern = /(\d{1,2}:\d{2}:\d{2})/;
+            const hMinPattern = /(\d+h\s*\d+m(?:in)?)/i;
+            const minPattern = /(\d+)\s*min(?:utes)?\.?/i;
+
+            let extractedDuration = null;
+            const hhmmssMatch = durationStringContent.match(hhmmssPattern);
+            if (hhmmssMatch) extractedDuration = hhmmssMatch[1];
+
+            if (!extractedDuration) {
+                const hMinMatch = durationStringContent.match(hMinPattern);
+                if (hMinMatch) extractedDuration = hMinMatch[1];
+            }
+
+            if (!extractedDuration) {
+                const minMatch = durationStringContent.match(minPattern);
+                if (minMatch) extractedDuration = minMatch[1] + " min";
+            }
+
+            data.duracao = extractedDuration || durationStringContent.split('[')[0].trim();
+            readingPornstars = false;
+        }
+
+        // 6. Início da seção de Atores
+        else if (trimmedLine.toLowerCase().startsWith('pornstars / cast')) {
+            actorsLineFound = true;
+            readingPornstars = true;
+        }
+        else if (trimmedLine.startsWith('Actors:') || trimmedLine.startsWith('Actor:')) {
+            const actorsString = trimmedLine.substring(trimmedLine.indexOf(':') + 1).trim();
+            data.potentialActorNames = actorsString.split(',').map(name => name.trim()).filter(name => name);
+            actorsLineFound = true;
+            readingPornstars = false;
+        }
+    });
+
+    return data;
 }
 
 function extractVideoDataFromText(text) {
@@ -2830,21 +3021,47 @@ async function findActorByName(actorName) {
 
 // --- Create Scene Modal ---
 window.closeCreateSceneModal = function() { if(createSceneModal) createSceneModal.style.display = 'none'; }
+
+
 async function openCreateSceneModal(sceneData = {}) {
-    closeCreateMenu(); if (!createSceneModal || !createSceneForm) return; createSceneForm.reset(); selectedSceneActors = []; renderSceneActorPills();
-    clearFormMessages([ createSceneFormMessage, createSceneForm.querySelector('#scene-nome-error'), createSceneForm.querySelector('#scene-data-error'), createSceneForm.querySelector('#scene-filme-error'), createSceneForm.querySelector('#scene-imagem-error'), createSceneForm.querySelector('#scene-pagina-error'), createSceneForm.querySelector('#scene-atores-error') ]);
-    if(createSceneSubmitButton) createSceneSubmitButton.disabled = false;
+    closeCreateMenu(); 
+    if (!createSceneModal || !createSceneForm) return; 
+    createSceneForm.reset(); 
+    selectedSceneActors = []; 
+    
+    // Limpa seletores e avisos antigos
+    const oldWarning = document.querySelector('.missing-actors-warning');
+    if (oldWarning) oldWarning.remove();
+
     if (sceneData.nome && sceneNomeInput) sceneNomeInput.value = sceneData.nome;
-    if (sceneData.dataRaw && sceneDataInput) { sceneDataInput.value = formatDateString(sceneData.dataRaw) || sceneData.dataRaw; }
-    if (sceneMovieDisplay) sceneMovieDisplay.textContent = 'Procurando filme...'; if (sceneMovieDisplay) sceneMovieDisplay.className = 'info-display loading'; if (sceneFilmeIdInput) sceneFilmeIdInput.value = '';
-    if (sceneData.movieName) {
-        const movieResult = await findMovieIdByName(sceneData.movieName);
-        if (movieResult) { if (sceneMovieDisplay) { sceneMovieDisplay.textContent = 'Filme: ' + escapeHtml(movieResult.nome); sceneMovieDisplay.className = 'info-display found';} if (sceneFilmeIdInput) sceneFilmeIdInput.value = movieResult.id; }
-        else { if (sceneMovieDisplay) { sceneMovieDisplay.textContent = 'Filme "' + escapeHtml(sceneData.movieName) + '" não encontrado.'; sceneMovieDisplay.className = 'info-display not-found'; } }
-    } else { if (sceneMovieDisplay) { sceneMovieDisplay.textContent = 'Nenhum filme associado.'; sceneMovieDisplay.className = 'info-display'; } }
-    if (sceneData.potentialActorNames && sceneData.potentialActorNames.length > 0) { for (const name of sceneData.potentialActorNames) { const actor = await findActorByName(name); if (actor && !selectedSceneActors.some(a => a.id === actor.id)) { selectedSceneActors.push(actor); } } renderSceneActorPills(); }
-    createSceneModal.style.display = 'flex'; sceneNomeInput?.focus();
+    if (sceneData.numero && sceneNumeroInput) sceneNumeroInput.value = sceneData.numero;
+    if (sceneData.dataRaw && sceneDataInput) {
+        sceneDataInput.value = formatDateString(sceneData.dataRaw) || sceneData.dataRaw;
+    }
+
+    // Processa atrizes
+    if (sceneData.potentialActorNames && sceneData.potentialActorNames.length > 0) {
+        let missingNames = [];
+        for (const name of sceneData.potentialActorNames) {
+            const actor = await findActorByName(name);
+            if (actor) {
+                if (!selectedSceneActors.some(a => a.id === actor.id)) {
+                    selectedSceneActors.push(actor);
+                }
+            } else {
+                missingNames.push(name); // Nome não encontrado no Firebase
+            }
+        }
+        renderSceneActorPills();
+        // CHAMA A CRIAÇÃO DOS BOTÕES PARA OS NOMES VAZIOS
+        renderMissingActorLinks(missingNames, 'scene');
+    }
+
+    // Busca o filme... (resto da sua lógica de busca de filme)
+    createSceneModal.style.display = 'flex';
 }
+
+
 async function handleCreateSceneSubmit(event) {
     event.preventDefault(); if (!createSceneForm || !createSceneSubmitButton) return; createSceneSubmitButton.disabled = true; createSceneSubmitButton.textContent = 'Salvando...'; if(createSceneFormMessage) createSceneFormMessage.textContent = '';
     const formData = new FormData(createSceneForm); const sceneName = formData.get('scene-nome')?.trim(); const sceneDate = formData.get('scene-data')?.trim(); const sceneNumber = formData.get('scene-numero')?.trim(); const sceneImage = formData.get('scene-imagem')?.trim(); const scenePage = formData.get('scene-pagina')?.trim(); let sceneMovieId = formData.get('scene-filme-id')?.trim(); const sceneActors = selectedSceneActors.map(a => a.id);
@@ -3579,6 +3796,37 @@ function populateRecentItemsList(items, type) {
     });
 }
 
+
+function renderMissingActorLinks(missingNames, type) {
+    // Tenta encontrar o container de atores do modal aberto
+    const containerId = type === 'scene' ? 'scene-actors-selector' : 'video-actors-selector';
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (missingNames.length === 0) return;
+
+    const warningDiv = document.createElement('div');
+    warningDiv.classList.add('missing-actors-warning');
+    warningDiv.style.cssText = 'background: #fff3cd; padding: 10px; border-radius: 4px; margin-top: 10px; border: 1px solid #ffeeba;';
+    
+    warningDiv.innerHTML = `<span style="color: #856404; font-weight: bold; display: block; margin-bottom: 5px;">Atrizes não encontradas:</span>`;
+
+    missingNames.forEach(name => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.innerHTML = `<b>+</b> Criar <b>${name}</b>`;
+        btn.style.cssText = 'background: #fff; border: 1px solid #856404; color: #856404; padding: 3px 8px; border-radius: 3px; cursor: pointer; margin-right: 5px; margin-bottom: 5px; font-size: 0.9em;';
+        
+        btn.onclick = () => window.openCreateActressModal(name);
+        
+        warningDiv.appendChild(btn);
+    });
+
+    container.appendChild(warningDiv);
+}
+
+
+
 // --- Event Listeners (Global Page) ---
 document.addEventListener('DOMContentLoaded', () => {
     loadInitialData();
@@ -3671,6 +3919,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (videoActorsSuggestionsList && videoActorsSuggestionsList.style.display !== 'none' && !videoActorsSelector?.contains(event.target) && !videoActorsSuggestionsList?.contains(event.target)) { videoActorsSuggestionsList.style.display = 'none'; }
     });
 });
+
+
+
+
+
+
 </script>
 
 
